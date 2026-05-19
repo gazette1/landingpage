@@ -326,19 +326,85 @@
   gap: var(--space-9);
 }
 
-@media (max-width: 900px) {
-  /* Nav: smaller, tighter, fits on mobile */
-  .site-nav {
-    gap: var(--space-3);
-  }
-  .site-nav a {
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    padding: 4px 6px;
-  }
+/* Mobile menu toggle button. Hidden on desktop, shown on mobile. */
+.menu-toggle {
+  display: none;
+  position: fixed;
+  top: var(--page-margin);
+  right: var(--page-margin);
+  z-index: 80;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--paper);
+  cursor: pointer;
+  mix-blend-mode: difference;
+  transition: background var(--dur-quick) var(--ease-precision),
+              color var(--dur-quick) var(--ease-precision);
+}
+
+.menu-toggle:hover,
+.menu-toggle:focus-visible {
+  background: var(--paper);
+  color: var(--void);
+  mix-blend-mode: normal;
+  outline: none;
 }
 
 @media (max-width: 768px) {
+  /* Hide horizontal nav, show menu toggle */
+  .site-nav { display: none; }
+  .menu-toggle { display: inline-block; }
+
+  /* When menu is open, render the nav as a full-screen overlay */
+  body.menu-open {
+    overflow: hidden;
+  }
+
+  body.menu-open .site-nav {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 75;
+    background: var(--void);
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: var(--space-9) var(--page-margin);
+    gap: var(--space-5);
+    mix-blend-mode: normal;
+  }
+
+  body.menu-open .site-nav a {
+    font-family: var(--font-display);
+    font-weight: var(--weight-thin);
+    font-size: clamp(40px, 9vw, 64px);
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    text-transform: lowercase;
+    color: var(--paper);
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  body.menu-open .site-nav a:hover,
+  body.menu-open .site-nav a[aria-current="page"] {
+    color: var(--paper);
+    background: transparent;
+  }
+
+  /* Smaller wordmark on mobile, drops to clear menu toggle */
+  .wordmark.site-wordmark {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+  }
+
+  /* Footer stacks to single column */
   .site-footer { grid-template-columns: 1fr; }
 
   /* Project rows: stack to single column, meta always visible (no hover on mobile) */
@@ -355,7 +421,6 @@
     font-size: clamp(48px, 12vw, 96px);
     line-height: 0.95;
     margin-bottom: var(--space-3);
-    /* Always show outline on mobile since hover does not exist */
     color: var(--paper);
   }
   .project-row .meta {
@@ -371,35 +436,10 @@
     display: none;
   }
 
-  /* Header nav even tighter on small screens */
-  .site-nav {
-    gap: var(--space-2);
-  }
-  .site-nav a {
-    font-size: 9px;
-    padding: 4px 5px;
-    letter-spacing: 0.06em;
-  }
-
-  /* Smaller wordmark on mobile */
-  .wordmark.site-wordmark {
-    font-size: 11px;
-    letter-spacing: 0.12em;
-  }
-
   /* Section opener tighter on mobile */
   .section-opener {
     padding-top: var(--space-9);
     padding-bottom: var(--space-7);
-  }
-}
-
-@media (max-width: 480px) {
-  /* On very narrow viewports, nav drops below wordmark */
-  .site-nav {
-    top: calc(var(--page-margin) + 28px);
-    right: var(--page-margin);
-    gap: var(--space-3);
   }
 }
 
