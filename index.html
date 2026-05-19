@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>russh.work / Forward Deployed AI Architect</title>
+  <meta name="description" content="Work. Receipts. The portfolio and writing of Russ. Six systems shipped end to end, each with measured economics, documented decisions, and a calibration story." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="styles/tokens.css" />
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+  <link rel="stylesheet" href="styles/post.css" />
+</head>
+<body>
+
+  <a class="wordmark site-wordmark" href="/">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="#work" aria-current="page">Work</a>
+    <a href="#writing">Writing</a>
+    <a href="blog/#field-notes">Field Notes</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <main>
+
+    <!-- §6.1 Hero poster: single-word lockup -->
+    <section class="hero" id="top" aria-label="Hero">
+      <div class="hero-poster">
+        <span class="line-1">work.</span>
+      </div>
+    </section>
+
+    <!-- §6.2 Terminal block, bottom-left (counter-position to RECEIPTS) -->
+    <aside class="terminal" aria-hidden="true">
+      <div class="line"><span class="prompt">&gt;</span> <span class="k">CURRENTLY:</span> trialedge v1.6 / ship notes pending</div>
+      <div class="line"><span class="prompt">&gt;</span> <span class="k">STACK:</span> cloudflare / supabase / openrouter / gemma 3 27b</div>
+      <div class="line"><span class="prompt">&gt;</span> <span class="k">BUILD:</span> 2026.05.19 <span class="cursor"></span></div>
+    </aside>
+
+    <!-- §6.3 WORK as broadside -->
+    <section class="section" id="work">
+      <header class="section-opener">
+        <span class="label">§ 01 / Work / Six systems</span>
+        <h2 class="h1">Production AI, underwritten.</h2>
+      </header>
+
+      <ol class="broadside" aria-label="Project index">
+
+        <li class="project-row" data-href="blog/inside-atlas.html">
+          <span class="num">01</span>
+          <span class="title">ATLAS</span>
+          <div class="meta">
+            <span class="row strong">v2.3 / 2026</span>
+            <span class="row">OFF-MARKET RE PLATFORM</span>
+            <span class="row">VERCEL / GEMMA 3 27B</span>
+            <span class="row">NC WHOLESALE OPERATOR</span>
+            <span class="row">$0.005 PER LETTER, GEN</span>
+            <span class="row">$1.205 PER LETTER, ALL-IN</span>
+            <span class="row">ORIGIN: GAZETTE PROBATE SCAN</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code>def validate_voice(letter: str) -> str:
+    if re.search(r"[—–]", letter):
+        raise VoiceViolation("em-dash")
+    if "!" in letter:
+        raise VoiceViolation("exclamation")
+    if BANNED.search(letter.lower()):
+        raise VoiceViolation("banned-phrase")
+    return letter
+
+letter = gemma.generate(prompt, max_tokens=512)
+validate_voice(letter)  # regenerate on violation
+</code></pre>
+        </li>
+
+        <li class="project-row" data-href="blog/inside-marketing-bot.html">
+          <span class="num">02</span>
+          <span class="title">ODI&nbsp;BOT</span>
+          <div class="meta">
+            <span class="row strong">v1.7.0 / 2026</span>
+            <span class="row">19-PASS ORCHESTRATION</span>
+            <span class="row">CLAUDE SONNET 4 + 5 PROVIDERS</span>
+            <span class="row">18 / 21 SECTIONS SHIPPED</span>
+            <span class="row">REAL BRAND ENGAGEMENTS</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code>const PASS_03 = {
+  id: "positioning",
+  inputs:  ["brief.summary", "audience.icp"],
+  outputs: ["positioning.draft"],
+  model:   "claude-sonnet-4",
+  tools:   ["web_search"],
+  validate: (out) =>
+    out.citations.length &gt;= 3 &amp;&amp;
+    out.stop_reason !== "max_tokens",
+};
+const out = await runPass(PASS_03, ctx);
+</code></pre>
+        </li>
+
+        <li class="project-row" data-href="blog/inside-trialedge.html">
+          <span class="num">03</span>
+          <span class="title">TRIALEDGE</span>
+          <div class="meta">
+            <span class="row strong">v1.6 / 2026</span>
+            <span class="row">LIGHTGBM + CALIBRATED DEBATE</span>
+            <span class="row">CLOUDFLARE / SUPABASE</span>
+            <span class="row">0.686 AUC, HELD-OUT</span>
+            <span class="row">4,032 ENTITIES / 208 LABELS</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code>class CalibratedDebateScorer:
+    def score(self, features):
+        bull = self.iso.predict(
+            self.lgbm.predict_proba(self.bull_view(features))
+        )
+        bear = self.iso.predict(
+            self.lgbm.predict_proba(self.bear_view(features))
+        )
+        delta = abs(bull - bear)
+        return bull * (1 - self.penalty * delta)
+</code></pre>
+        </li>
+
+        <li class="project-row" data-href="blog/inside-mes-open.html">
+          <span class="num">04</span>
+          <span class="title">MES&nbsp;OPEN</span>
+          <div class="meta">
+            <span class="row strong">PHASE 3 / 2026</span>
+            <span class="row">MICRO E-MINI S&amp;P 500</span>
+            <span class="row">NY OPEN 9:30-12:30 ET</span>
+            <span class="row">24 MODULES / 251+ TESTS</span>
+            <span class="row">PF 1.49 / SHARPE 2.35 / 2YR</span>
+            <span class="row">REGIME FILTER + 3 ENTRY MODELS</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code>def classify_regime(close, high, low):
+    """ATR Phase Classifier. Short EMA / long EMA ratio."""
+    atr_short = wilder_atr(high, low, close, period=5)
+    atr_long  = wilder_atr(high, low, close, period=20)
+    ratio = atr_short / atr_long
+    if ratio &lt; 0.8:
+        return Regime.CONSOLIDATION   # 36.4% of bars
+    if ratio &gt; 1.2:
+        return Regime.EXPANSION       # 25.3% of bars
+    if direction_change_rate() &gt; thr:
+        return Regime.REVERSAL        # 38.3%, do not trade
+    return Regime.NEUTRAL
+</code></pre>
+        </li>
+
+        <li class="project-row" data-href="blog/inside-cre-feasibility.html">
+          <span class="num">05</span>
+          <span class="title">CRE&nbsp;FEASIBILITY</span>
+          <div class="meta">
+            <span class="row strong">CLAUDE PROMPT SUITE / 2026</span>
+            <span class="row">MOSAIC CAPITAL WORKFLOW</span>
+            <span class="row">DUAL-SCENARIO NOI</span>
+            <span class="row">FOUR CREATIVE STRUCTURES</span>
+            <span class="row">LENDER PROBABILITY MATCHING</span>
+            <span class="row">UNDERWRITING SCHEMA V2.0</span>
+            <span class="row">ROADMAP: DEPLOYABLE Q3</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code>SYSTEM: You are Mosaic's underwriter.
+        Apply Standard Underwriting Schema v2.0.
+
+DEAL: {address}, {asset_class}, {sqft}, {price}
+ECON: {rent_roll}, {opex}, {capex}
+
+OUTPUT (JSON, strict):
+  noi_base, noi_stress (-15% rev, +8% opex),
+  dscr_at_offer, dscr_at_walk,
+  structures: [seller_note, earnout, jv_lp, master_lease],
+  lender_probability: {bank, credit_union, debt_fund}
+</code></pre>
+        </li>
+
+        <li class="project-row" data-href="blog/inside-decktrainer.html">
+          <span class="num">06</span>
+          <span class="title">DECKTRAINER</span>
+          <div class="meta">
+            <span class="row strong">PHASE 1 / 2026</span>
+            <span class="row">LEARN-TO-DJ TRAINER</span>
+            <span class="row">HERCULES DJCONTROL MIX</span>
+            <span class="row">PYTHON 3.11 / RTMIDI / SOUNDDEVICE</span>
+            <span class="row">DRILL-BASED SCORING</span>
+            <span class="row">6 PHASES, MIDI THROUGH GUI</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code>@drill(id="hard_cut_01", target_bpm=128)
+def hard_cut(deck_a, deck_b, ctrl):
+    """Cue deck B on the 1, hard cut on the next downbeat."""
+    cue = ctrl.wait_for(BUTTON.CUE_B,      on=BEAT_01)
+    cut = ctrl.wait_for(BUTTON.XFADE_END,  on=BEAT_02)
+    return score(
+        cue_offset_ms=cue.offset,
+        cut_offset_ms=cut.offset,
+        recovery_db=monitor.peak_drop_db(),
+    )
+</code></pre>
+        </li>
+
+      </ol>
+    </section>
+
+    <section class="section" id="writing">
+      <header class="section-opener right">
+        <span class="label">§ 02 / Writing / Three archetypes</span>
+        <h2 class="h1">Thesis. Ship notes. Field notes.</h2>
+      </header>
+
+      <div class="writing-placeholder" data-latest-posts>
+        <p class="note">
+          Blog index renders from <strong>content/blog/published/</strong>. The first post lands when the <code>/thesis</code>, <code>/ship-log</code>, or <code>/field-note</code> command produces a draft and you run <code>/publish</code>. Thesis posts target the depth of the TrialEdge architecture write-up. Ship notes are dated and versioned. Field notes cover CRE financial models through an AI architect lens.
+        </p>
+        <p class="note" style="margin-top: var(--space-4);">
+          <a class="see-all-writing" href="blog/">See the writing index &rarr;</a>
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <header class="section-opener">
+        <span class="label">§ 03 / About</span>
+        <h2 class="h1">Receipts, not promises.</h2>
+      </header>
+
+      <div class="about-grid">
+        <div class="about-photo-wrap">
+          <img src="assets/russ.jpg" alt="Russell Harris portrait" class="about-photo" />
+          <div class="about-photo-caption">
+            <span class="k">RUSSELL HARRIS</span>
+            <span class="v">Washington, DC</span>
+            <span class="v">FINRA Series 3</span>
+          </div>
+        </div>
+
+        <div class="about-content">
+          <p><strong>Russell Harris.</strong> Forward Deployed AI Architect candidate. CRE credit analyst at PBS in Washington DC. Founder of Mosaic Capital Solutions.</p>
+
+          <p>The career arc traces the intersection of tech and finance. University of Delaware, B.S. Economics with a Business Analytics concentration. Venture analyst at Latimer Ventures, co-leading a $3M inaugural fund backing Black-founded startups and sourcing a portfolio company that exited at $15M plus. Business intelligence at StepStone Group, rebuilding the SQL architecture supporting LP reporting across 70 plus private-markets fund-of-funds. Investment associate at Techstars, sourcing 60 percent of the accelerator portfolio, co-leading an AI HealthTech program with Johns Hopkins, evaluating 2,000 plus startup applications, and authoring 30 plus funded investment memos. Now on the credit side at PBS, evaluating live CRE transactions on a national lending desk.</p>
+
+          <p>The pivot to AI architecture started at Techstars in 2023, building GPT-automated diligence briefs that cut founder screening time by 35 percent. The framework that worked there carried into the Mosaic feasibility prompt suite, Atlas, TrialEdge, and the four other production systems documented in the writing above.</p>
+
+          <p>Named DMV Venture Capital Rising Star (2024). Spoke before the Maryland State Senate on AI and capital formation policy. $250M plus underwritten in CRE acquisitions across multifamily, life sciences, student housing, industrial, hospitality, and land through Mosaic and prior work.</p>
+
+          <p>Currently evaluating Forward Deployed AI Architect roles. Open to NYC relocation, available remote, available for 50 percent travel. Nerds out across the intersection of any two domains that do not usually talk to each other: football analytics to corn futures, credit underwriting to ML calibration, multi-provider orchestration to LIHTC scoring. <a href="#contact">Reach out at the contact block below</a>.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer" id="contact">
+    <div class="col">
+      <h4>Index</h4>
+      <ul>
+        <li><a href="#work">Work</a></li>
+        <li><a href="#writing">Writing</a></li>
+        <li><a href="blog/#field-notes">Field Notes</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </div>
+
+    <div class="col">
+      <h4>Contact</h4>
+      <div class="contact-block">
+        <p class="contact-name">Russ H</p>
+        <p class="contact-email"><a href="mailto:russellharrisrei@gmail.com">russellharrisrei@gmail.com</a></p>
+        <p class="contact-cta">Let's connect.</p>
+      </div>
+    </div>
+
+    <div class="colophon">
+      <span class="left">RUSSH WORK / FORWARD DEPLOYED AI ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="scripts/motion.js"></script>
+  <script src="scripts/blog.js"></script>
+</body>
+</html>

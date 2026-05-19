@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Writing / russh.work</title>
+  <meta name="description" content="Thesis posts, ship notes, and field notes by Russ. {{POST_COUNT}} posts published. Latest {{LATEST_DATE}}." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body>
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <main>
+
+    <section class="blog-hero">
+      <div class="blog-hero-grid">
+        <span class="label">§ 02 / Writing</span>
+        <h1 class="blog-hero-title">writing</h1>
+        <div class="blog-hero-meta">
+          <span><span class="k">Posts:</span> {{POST_COUNT}}</span>
+          <span><span class="k">Latest:</span> {{LATEST_DATE}}</span>
+          <span><span class="k">Archetypes:</span> THESIS / SHIP / FIELD</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="blog-list-wrap">
+      <ol class="blog-list">
+        {{POSTS_HTML}}
+      </ol>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="col">
+      <h4>Index</h4>
+      <ul>
+        <li><a href="../#work">Work</a></li>
+        <li><a href="./">Writing</a></li>
+        <li><a href="./#field-notes">Field Notes</a></li>
+        <li><a href="../#about">About</a></li>
+        <li><a href="../feed.xml">RSS</a></li>
+      </ul>
+    </div>
+
+    <div class="col">
+      <h4>Telemetry</h4>
+      <div class="telemetry">
+        <div class="row"><span class="k">Posts published</span><span class="v">{{POST_COUNT}}</span></div>
+        <div class="row"><span class="k">Last post</span><span class="v">{{LATEST_DATE}}</span></div>
+      </div>
+    </div>
+
+    <div class="colophon">
+      <span class="left">RUSSH WORK / FORWARD DEPLOYED AI ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/motion.js"></script>
+</body>
+</html>

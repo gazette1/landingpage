@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{TITLE}} / russh.work</title>
+  <meta name="description" content="{{SUMMARY}}" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">{{ARCHETYPE}}</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">{{PROJECT}} {{VERSION}}</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">{{DATE}}</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">{{READ_TIME}} MIN / {{WORD_COUNT}} WORDS</span>
+      </div>
+
+      <h1 class="post-title">{{TITLE}}</h1>
+
+      <p class="post-summary">{{SUMMARY}}</p>
+
+      <div class="post-tags">{{TAGS}}</div>
+    </header>
+
+    <div class="post-body">
+      {{BODY_HTML}}
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="{{PREV_POST_URL}}">
+          <span class="k">PREVIOUS</span>
+          <span class="v">{{PREV_POST_TITLE}}</span>
+        </a>
+        <a class="next" href="{{NEXT_POST_URL}}">
+          <span class="k">NEXT</span>
+          <span class="v">{{NEXT_POST_TITLE}}</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / FORWARD DEPLOYED AI ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+</body>
+</html>

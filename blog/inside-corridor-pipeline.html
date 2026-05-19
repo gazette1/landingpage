@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inside the corridor pipeline: Python automation for LIHTC research / russh.work</title>
+  <meta name="description" content="A 15-script Python pipeline that fuses Census ACS, HUD QCT, IRS OZ, USDA Food Atlas, state DDD, and land bank inventory data on a parcel key, scores against the state QAP, and produces an LP-memo-ready output." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">THESIS</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">MOSAIC / CORRIDOR PIPELINE v1</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.05.19</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">12 MIN / 2,500 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Inside the corridor pipeline: Python automation for LIHTC research</h1>
+
+      <p class="post-summary">A 15-script Python pipeline that turns a corridor opportunity into a defensible LIHTC scoring estimate plus a structured proforma. The system fuses Census ACS, HUD QCT, IRS OZ, USDA Food Atlas, state DDD, and land bank inventory data on a parcel key, scores each parcel against the relevant QAP, and produces an LP-memo-ready output. This post walks the architectural decisions that made the pipeline tractable as solo work.</p>
+
+      <div class="post-tags">PYTHON / LIHTC / CORRIDOR-ANALYSIS / PUBLIC-DATA / AUTOMATION / MOSAIC / FDAA / COST-ECONOMICS</div>
+    </header>
+
+    <div class="post-body">
+
+<p class="body">By Russ. Solo build, 2026. Production tooling for Mosaic Capital Solutions corridor evaluation.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What this post is</h2>
+
+<p class="body">This is a Python pipeline I wrote to automate the corridor-evaluation work behind LIHTC applications. Fifteen scripts, a handful of structured-data manifests, and a small collection of analysis markdown files that get regenerated nightly. The system takes a corridor (a contiguous set of parcels in a target market), fuses six public-records layers against a land-bank inventory, scores every parcel against the relevant state Qualified Allocation Plan, and produces an LP-memo-ready output that a senior underwriter reviews and ships.</p>
+
+<p class="body">The pipeline is the engineering backbone of the LIHTC field-note workflow described in <a href="field-lihtc-triple-stack.html">stacking R/ECAP, QCT, OZ, and DDD</a>. That post explained the analytical pattern. This post is the engineering. The pipeline took several weeks to build, runs in production now, and compresses the per-corridor research timeline from roughly three weeks of senior-analyst work to under a day of operator review on auto-generated output.</p>
+
+<p class="body">This post is for engineers and architects evaluating whether a similar fuse-and-score shape applies to their domain. The architectural decisions and the cost economics are what transfer. The LIHTC framing is the vehicle.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The decision frame</h2>
+
+<p class="body">A corridor-evaluation pipeline operates inside three conditions that shape every architectural choice:</p>
+
+<ol>
+<li><strong>Public-data freshness is non-negotiable.</strong> Every designation the pipeline relies on (QCT, OZ, DDD, food desert, R/ECAP, ACS demographics) refreshes on a different cadence and changes the deal economics when it moves. A pipeline that runs on stale data produces wrong scoring estimates that the senior underwriter then has to debug at the worst possible moment, right before an application deadline.</li>
+<li><strong>The output has to be defensible to a credit committee.</strong> Every numeric claim in the output needs a traceable source, every QAP score needs a citation to the QAP section that awards it, and every comp needs a public record the underwriter can pull. Hand-waved outputs fail at the credit-committee stage, and a system that produces hand-waved outputs is worse than no system.</li>
+<li><strong>Solo build means dependency discipline.</strong> Each new library, each new external API, each new data source is a maintenance commitment. The pipeline runs on a small set of well-chosen dependencies, with a clear separation between code that ingests data, code that scores parcels, and code that renders human-readable output.</li>
+</ol>
+
+<p class="body">Those three conditions are the lens for every decision below.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 1: structured data layer before any scoring logic</h2>
+
+<p class="body">The first decision was the order of operations. The candidates:</p>
+
+<ul>
+<li>Build a scoring rubric first, hand-load the data, iterate on the rubric.</li>
+<li>Build the structured data layer first, validate against known parcels, then layer scoring on top.</li>
+</ul>
+
+<p class="body">The naive approach is the first one. The decisive approach was the second.</p>
+
+<p class="body">Scoring rules are useless if the underlying data is unreliable. A QAP scoring rule that awards points for QCT status is a SQL query on the QCT layer; the rule is trivial, the data ingestion is the work. The pipeline puts the data ingestion first as a fully-tested layer with explicit citations to each source, then adds scoring as a layer on top that reads from the validated data.</p>
+
+<p class="body">The architectural commitment underneath this is that every data point in the pipeline carries a citation pointer back to the source API call, the date it was fetched, and the version of the source data. A score that depends on a designation is a score that can be defended by walking the citation chain from the output back to the source. <mark class="callout">The pipeline is auditable from output to source, and that auditability is the discipline that makes the output credit-committee-ready.</mark></p>
+
+<p class="body">The transferable lesson: in any analysis pipeline that fuses multiple data sources, build the data layer as the contract first. Scoring rules and rendering layers come second.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 2: separate the parcel-scoring engine from the corridor-rollup engine</h2>
+
+<p class="body">The pipeline operates at two granularities: per-parcel and per-corridor. Each parcel gets scored independently against the QAP scoring rules. Corridors are then computed as the aggregation of their member parcels, with additional corridor-level signals (median demographic profile, neighbor designation overlap, transit access patterns) that only make sense at the corridor scale.</p>
+
+<p class="body">The decision was whether to fuse these into a single scoring pass or to separate them.</p>
+
+<p class="body">I separated them. The reasoning: per-parcel scoring is a stateless, parallelizable operation (each parcel scores against the same rule set, no inter-parcel state). Corridor-rollup is stateful (membership matters, ordering matters, neighbor counts matter). Mixing the two into a single pass would have required passing corridor state into the per-parcel scoring function, which would have broken parallelism and made debugging harder.</p>
+
+<p class="body">The architectural pattern: <code>score_parcels.py</code> takes a list of parcels and returns a list of scored parcels. A separate corridor-rollup module takes a set of scored parcels and a corridor definition, and returns a corridor-level summary. The two modules can be developed, tested, and run independently.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: when an analysis pipeline operates at two granularities, separate the granularities into distinct passes. The smaller granularity should be stateless. The larger granularity reads from the smaller one's output and adds the aggregation logic.</mark></p>
+
+<p class="body">This is the same pattern as Marketing Bot v2's pass contracts and the same pattern that makes the Atlas signal pipeline composable.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 3: gap-fill documents as a first-class artifact</h2>
+
+<p class="body">The pipeline produces structured data outputs (CSV, Excel, JSON) for the underwriter. It also produces a set of markdown documents called gap-fill files, each scoped to a specific knowledge gap that the structured data cannot resolve: payment standards that are not publicly posted, brownfield grant eligibility that requires a phone call to clarify, CDBG application windows that are administratively closed.</p>
+
+<p class="body">Each gap-fill file is a structured markdown document with: the gap (what is unknown), the best-available information, the source that needs to be contacted to resolve the gap, and the placeholder value used in the model until the gap is filled.</p>
+
+<p class="body">The decision was whether to bury the gaps in the analyst's head or to surface them as artifacts.</p>
+
+<p class="body">Surfacing them as artifacts is the discipline. Every gap-fill file is a TODO for the underwriter. The application deadline is a function of how many gap-fill items remain open, not a function of when the underwriter remembered to make the next call. <mark class="callout">Gap-fill files are the difference between a pipeline that pretends to be complete and a pipeline that is honest about what it does not know.</mark></p>
+
+<p class="body">The transferable lesson: in any analysis system that depends on non-public data sources, the unknowns are first-class artifacts. List them, source them, and track them to closure. Hidden gaps are how applications miss deadlines.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 4: render the LP memo, do not let the LLM compose it</h2>
+
+<p class="body">The pipeline ends with a structured payload that contains everything a Limited Partner memo needs: deal summary, designation stack, QAP scoring estimate, funding stack, pro forma assumptions, key risks, source citations. The question was whether to feed that payload to an LLM and let the model write the memo, or to render the memo deterministically from the payload.</p>
+
+<p class="body">I render it deterministically. The reasoning matches the architectural pattern from Marketing Bot v2: the LLM produces structured outputs at each pass, but the final composition into a branded document is a deterministic renderer reading from the structured payload. Re-rendering the memo with different branding, different ordering, or different section emphasis is a renderer change, not an LLM call.</p>
+
+<p class="body">The cost of this discipline is real. The renderer is more work to maintain than a "send the payload to the LLM and let it write" approach. The benefit is that the memo is exactly what the underwriter expects every time, the numeric claims map to the structured payload exactly, and the memo can be regenerated for free when the underlying data changes.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: structured data is the source of truth. The rendered output is a deterministic view of that data. Mixing the two destroys auditability and re-renderability.</mark></p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 5: nightly refresh with explicit drift detection</h2>
+
+<p class="body">The pipeline runs on a nightly cron against the source APIs. Each refresh writes its outputs alongside the prior night's outputs and produces a drift report: which parcels gained or lost designation status, which census tracts shifted demographic bands, which DDD boundaries changed, which corridor scores moved by more than a configurable threshold.</p>
+
+<p class="body">The decision was whether to overwrite the prior outputs (simpler) or to maintain the historical trail (more work, more disk).</p>
+
+<p class="body">I maintain the trail. The reasoning is operational: an application that cited a designation on the date of submission needs to be defensible against the source data on that exact date, even if the designation has since changed. The historical trail makes that defense possible. The drift report also surfaces the cases where overnight refresh changed something that the underwriter needs to know about before they ship the next deliverable.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: in any pipeline whose outputs get cited in time-bound deliverables (applications, filings, reports), preserve the historical state. The application is dated. The data has to be dated to match.</mark></p>
+
+<hr class="rule">
+
+<h2 class="h2">Cost economics</h2>
+
+<p class="body">The pipeline runs on a small dedicated environment. Compute is rounding error. The data sources (Census ACS, HUD QCT, IRS OZ, USDA Food Atlas, state DDD, the regional land bank's published inventory) are all free public sources accessed via APIs or via cached PDF downloads where APIs are unavailable.</p>
+
+<p class="body">Per-corridor cost at current operating scale:</p>
+
+<ul>
+<li><strong>Compute and storage</strong>: a few dollars a month for the whole pipeline. No LLM costs in the data ingestion path; the LLM is only used in the optional narrative-generation step downstream.</li>
+<li><strong>Engineering maintenance</strong>: a few hours per quarter to handle source-API changes (HUD QCT format shifts annually, USDA Food Atlas refreshes on its own cadence).</li>
+<li><strong>Per-corridor LLM cost</strong> (for the narrative pass at the end): a few dollars per corridor, total.</li>
+</ul>
+
+<p class="body">The labor cost is what the pipeline displaces. The conventional research workflow on a corridor opportunity is two to three weeks of senior-analyst time. The pipeline compresses that to under a day, including the manual review pass that catches anything the model misread. At Mosaic's engagement economics, that compression is the difference between evaluating a handful of corridors per year and evaluating one or two per week.</p>
+
+<p class="body"><mark class="callout">The headline number: the pipeline pays back its engineering cost on the first corridor it surfaces that the conventional research would have missed. The freshness alone justifies the build.</mark></p>
+
+<hr class="rule">
+
+<h2 class="h2">What I would change starting over</h2>
+
+<p class="body">Three things.</p>
+
+<ol>
+<li><strong>Express the QAP scoring rules as a versioned manifest, not as Python functions.</strong> The current scoring rules are encoded in Python. Each state QAP has its own scoring rule set, and the rules change year over year. A YAML or JSON manifest that the scoring engine loads at runtime would let me ship new state QAPs without touching the engine code, and would let me version-control the rule set independently of the engine.</li>
+<li><strong>Move the source-API ingestion to a job queue.</strong> The current ingestion runs as a single nightly script. As I added more sources, the script grew. A proper job queue (each source as its own job, with explicit retry and dead-letter behavior) would let me handle source-API failures gracefully without re-running the whole nightly pass.</li>
+<li><strong>Build the LP memo renderer as a templated system, not as procedural code.</strong> The current renderer is procedural Python that writes out HTML and Excel. A templating system (Jinja2 with explicit section partials) would let me ship new memo formats without rewriting the renderer.</li>
+</ol>
+
+<p class="body">None of these are critical at current scale. All three become important as soon as the pipeline serves a second corridor at a different state's QAP, or as soon as a second underwriter wants a different memo format.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Closing</h2>
+
+<p class="body">The corridor pipeline is the project in my portfolio that most directly demonstrates how I architect data-fusion-plus-scoring systems for high-stakes low-volume domains. Public-data-first, deterministic rendering, explicit gap tracking, audit trail by default, scoring engine separated from data layer separated from renderer.</p>
+
+<p class="body">If you are hiring a Forward Deployed AI Architect to build something similar in a different domain (any analysis pipeline where you fuse multiple public data sources, score against a domain-specific rubric, and produce a deliverable that has to survive credit-committee or regulatory review), the questions worth asking are: how do you separate the data layer from the scoring layer so each can be tested independently; how do you handle the gaps that public data cannot fill without burying them in analyst heads; how do you preserve the historical state so time-bound deliverables stay defensible; and how do you render the final output deterministically so re-rendering is free.</p>
+
+<p class="body">Those are the questions this post is meant to answer.</p>
+
+<p class="body">For the customer-facing data-fusion counterpart that runs on a different domain, see <a href="inside-atlas.html">Inside Atlas</a>. For the production-ML calibration discipline that shaped the score-review workflow, see <a href="inside-trialedge.html">Inside TrialEdge</a>. For the LIHTC field-note that explains the analytical pattern this pipeline implements, see <a href="field-lihtc-triple-stack.html">stacking R/ECAP, QCT, OZ, and DDD</a>.</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="inside-decktrainer.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Inside DeckTrainer</span>
+        </a>
+        <a class="next" href="field-lihtc-triple-stack.html">
+          <span class="k">NEXT</span>
+          <span class="v">Field Note: stacking R/ECAP, QCT, OZ, DDD</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to writing index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / FORWARD DEPLOYED AI ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+</body>
+</html>

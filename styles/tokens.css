@@ -1,0 +1,55 @@
+/* tokens.css — CSS variables mirrored from design.md §11 Changelog entry 2026-05-19b. */
+
+:root {
+  /* §2 Typography */
+  --font-display: 'Inter Tight', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+
+  --weight-thin: 200;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 800;
+
+  /* §3 Color */
+  --void: #0A0A0A;
+  --paper: #F4F4F4;
+  --mid: #8A8A8A;
+  --dim: #404040;
+  --hairline: rgba(244, 244, 244, 0.12);
+  --rule: rgba(244, 244, 244, 0.32);
+
+  /* §4 Spacing */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+  --space-11: 192px;
+  --space-12: 256px;
+
+  --page-margin: 24px;
+
+  /* §5 Motion */
+  --ease-precision: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-decel: cubic-bezier(0, 0, 0.2, 1);
+  --ease-accel: cubic-bezier(0.4, 0, 1, 1);
+  --ease-power: cubic-bezier(0.83, 0, 0.17, 1);
+
+  --dur-quick: 100ms;
+  --dur-base: 240ms;
+  --dur-deliberate: 480ms;
+  --dur-slow: 960ms;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --page-margin: 16px;
+  }
+}

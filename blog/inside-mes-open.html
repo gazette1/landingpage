@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inside MES Open: five architectural decisions in an algorithmic trading system / russh.work</title>
+  <meta name="description" content="MES Open is an algorithmic trading system targeting the New York open window on Micro E-mini S&P 500 futures. This post walks five architectural decisions, the alternatives rejected, and what each teaches about FDAA judgment." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">THESIS</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">MES PHASE 3</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.05.19</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">12 MIN / 2,700 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Inside MES Open: five architectural decisions in an algorithmic trading system</h1>
+
+      <p class="post-summary">MES Open is an algorithmic trading system targeting the New York open window on Micro E-mini S&amp;P 500 futures. The system has shipped through three development phases and a multi-year backtest with positive expected value. This post is not a tutorial on the system. It is a walk through five architectural decisions I made while building it, the alternatives I rejected, and what each decision teaches about Forward Deployed AI Architect judgment in a high-noise low-sample domain. The implementation is mine. The reasoning is portable.</p>
+
+      <div class="post-tags">ALGORITHMIC-TRADING / DECISION-ANALYSIS / REGIME-DETECTION / ANTI-LOOKAHEAD / FDAA / JUDGMENT</div>
+    </header>
+
+    <div class="post-body">
+
+<p class="body">By Russ. Phase 3 of an active build, 2026.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What this post is</h2>
+
+<p class="body">MES Open is an algorithmic trading system I built to target the New York open window on Micro E-mini S&amp;P 500 futures. The system runs as a backtest framework, has shipped through three development phases, and produces positive expected value at meaningful Profit Factor and Sharpe across multi-year out-of-sample tests.</p>
+
+<p class="body">This post is not a tutorial. The trading edge in this kind of system is small, contested, and degraded by being documented. I am not going to walk through every module, name every parameter, or hand a competitor the configuration that produces the backtest result. The system is mine.</p>
+
+<p class="body">What is portable, and what this post is actually about, is the <strong>architectural judgment</strong> I applied while building it. Five decisions, each with alternatives I considered and rejected, each with a transferable lesson about Forward Deployed AI Architect work in a high-noise low-sample domain. If you are reading this as a hiring manager or a peer evaluating how I think, the decisions are the artifact. If you are reading this hoping for a working bot, you are in the wrong post.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The decision frame</h2>
+
+<p class="body">A trading system targeting the open of a major equity-index future operates inside three conditions that shape every other choice:</p>
+
+<ol>
+<li><strong>Signal-to-noise is brutal.</strong> Most bars are noise. The architecture that wins is the one that filters aggressively, not the one with the cleverest entry rule.</li>
+<li><strong>The human discretionary baseline is informative, not embarrassing.</strong> A skilled trader applying the same setup rules outperforms the bot by a wide margin. That gap is not a failure of the system; it is a measurement of what cannot be captured in OHLC bar data. Treating the gap honestly is the discipline that prevents over-tuning the model to false signals that look like the missing alpha.</li>
+<li><strong>Asymmetric payoff means calibration matters more than discrimination.</strong> At the reward-to-risk ratio this strategy targets, a small move in win rate flips the system between profitable and unprofitable. The architecture cannot afford to be wrong about regime; one bad regime call cancels several good entries.</li>
+</ol>
+
+<p class="body">Those three conditions are the lens for every decision below.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 1: mathematical primitives over learned representations</h2>
+
+<p class="body">The first decision was the modeling layer's basic shape. The candidates:</p>
+
+<ul>
+<li>A learned representation (deep network on price tensors, transformer on bar sequences, etc.).</li>
+<li>A library of hand-engineered mathematical primitives (consolidation detection, breakout confirmation, market-phase classification) composed deterministically.</li>
+</ul>
+
+<p class="body">The decision criterion was sample size, not sophistication. The labeled data available for this strategy is the set of historical days when the setup conditions fired and a trade occurred. That sample, even across multiple years, is in the low thousands at best. Deep networks on tabular or sequential market data at this sample size produce models that are either underfit (no edge) or overfit (edge that disappears out of sample). I have seen both failure modes in the published trading literature and in side projects.</p>
+
+<p class="body">Hand-engineered primitives, composed deterministically and parameterized minimally, are inspectable, testable, and survive walk-forward analysis cleanly. They are also, importantly, <strong>debuggable by a domain expert</strong> without a GPU. When a trade does not execute on a day the system should have traded, I can trace why through deterministic code; I cannot trace why through learned weights.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: at small sample size, inspectability beats expressiveness. Pick the architecture whose failure mode you can diagnose.</mark></p>
+
+<p class="body">This is the same call I made on TrialEdge (LightGBM over neural net at 208 labeled outcomes) and the same call I would make for any production system where the labeled set is in the hundreds or low thousands and the operator needs to defend the system's outputs to a non-technical stakeholder.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 2: regime detection by operational informativeness, not theoretical elegance</h2>
+
+<p class="body">The single most consequential architectural decision in the system was the regime filter: a pre-flight check that classifies the current market state and decides whether the entry models even run.</p>
+
+<p class="body">I tested three approaches against each other. Two were more theoretically sophisticated than the one I chose:</p>
+
+<ul>
+<li>A hidden-state clustering approach over a feature vector of returns, volatility, and volume signals.</li>
+<li>A GARCH-family volatility-regime classifier with percentile-based state assignment.</li>
+<li>A simpler approach based on the ratio between a short-window and a long-window volatility measure.</li>
+</ul>
+
+<p class="body">The first approach produced a state distribution that collapsed to one dominant state across more than 90 percent of observations. Mathematically defensible, operationally useless: a filter that says "yes" 90 percent of the time is not a filter.</p>
+
+<p class="body">The second produced an even three-way distribution but with no directional context. It could distinguish a calm market from a violent one but could not distinguish a calm market that was about to break from a calm market that was about to reverse.</p>
+
+<p class="body">The third approach produced a state distribution that <strong>mapped to the entry models' failure modes</strong>. The state it flagged as "do not trade" was the state where the system's trend-following entries had historically lost money. The mapping between regime state and entry-model edge was the only criterion that mattered.</p>
+
+<p class="body">I picked the third. Removing the filter entirely turns the system from a positive-expected-value strategy into a meaningful loss generator over the same test period. The filter alone is the difference between the system being shippable and being a research toy.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: when you are evaluating two approaches and one is more theoretically motivated than the other, pick the one whose output is most informative for the downstream task. Theoretical elegance is not a metric.</mark></p>
+
+<p class="body">This is, in my experience, the single most common architectural failure I see in junior ML work: picking the model whose math is most defensible rather than the model whose output is most useful. The defensible answer is correct in academia and wrong in production.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 3: multi-model architecture with honest selectivity</h2>
+
+<p class="body">The system was designed with three entry models, each rooted in a different trading philosophy: a momentum model, an institutional-order-flow model, and a mean-reversion model. The intent was that the three models would fire on different market conditions and collectively cover more of the year than any one model alone.</p>
+
+<p class="body">In practice, the momentum model produces almost all the executable trades and almost all the edge. The other two generate signals but rarely survive the regime filter, the session filter, and the timing-window constraints downstream. They have not yet produced enough trades to evaluate their per-model edge meaningfully.</p>
+
+<p class="body">The architectural decision queued for the next phase is the one I find most interesting: <strong>what do you do with a model that is theoretically sound but practically silent?</strong></p>
+
+<p class="body">The temptations are:</p>
+
+<ul>
+<li><strong>Relax the model's thresholds</strong> so it fires more often. This is the most common path and usually the wrong one; the strictness is what made the model defensible in the first place.</li>
+<li><strong>Remove the model from the production pipeline.</strong> This is honest but loses the optionality that the model is genuinely valuable on rare regimes the momentum model misses.</li>
+<li><strong>Isolate the model in a research pipeline with relaxed thresholds while keeping the production pipeline strict.</strong> This preserves the optionality without polluting the production system.</li>
+</ul>
+
+<p class="body">I am leaning toward the third option. The reasoning generalizes: any production system that includes a research-grade component should run that component in a parallel research path, not in the production pipeline, until the research path produces enough signal to justify production inclusion.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: a production system and a research system are different systems with different test bars. Mixing them is what corrupts both.</mark></p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 4: anti-lookahead as a system commitment, not a feature</h2>
+
+<p class="body">The anti-lookahead architecture (preventing future information from contaminating past-bar signals) is enforced at the data pipeline boundary, not inside individual signal modules. Every bar-by-bar simulation passes through a single function that maps each execution-timeframe bar to only the most recently <em>completed</em> higher-timeframe bar.</p>
+
+<p class="body">The mechanical reason is correctness: most public algorithmic-trading code lookaheads on this exact boundary, accidentally allowing future information into the signal-generation step, and the resulting backtests look profitable until they touch live data.</p>
+
+<p class="body">The architectural reason is more important: by enforcing the discipline at the boundary, no downstream signal module can violate it accidentally. A new contributor (or future me) writing a new entry model cannot break anti-lookahead unless they bypass the data pipeline entirely, which would be obvious in code review.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: invariants enforced at architectural boundaries beat invariants relied on at the call site. The boundary is the contract; the call site is the failure mode.</mark></p>
+
+<p class="body">This is the same discipline as parse-time voice validation on a generated letter (caught by Atlas and Marketing Bot v2), as point-in-time integrity gates on a labeled training set (caught by TrialEdge-ML), and as deterministic validation of LLM-produced numeric outputs against a separate calculator (caught by the Mosaic CRE feasibility workflow). Different domains, same architectural pattern: the contract sits at the boundary.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 5: how to bound the win-rate gap honestly</h2>
+
+<p class="body">The hardest decision was not technical. It was about how to frame the gap between the bot and the human discretionary baseline on the same strategy.</p>
+
+<p class="body">The bot closes roughly 40 percent of the per-trade edge that a skilled discretionary trader achieves applying the same setup rules. The gap is large and reproducible. Three responses were available:</p>
+
+<ul>
+<li><strong>Pretend the gap does not exist.</strong> Report only the bot's profitable backtests and the human's existence as a sanity check. This is the path of least resistance and the path of dishonest reporting; I will not take it.</li>
+<li><strong>Treat the gap as a failure of the system.</strong> Endlessly tune the bot to close the gap. This is the over-fitting path; every tuning iteration runs the risk of fitting to the noise the bot would not have caught on a fresh sample.</li>
+<li><strong>Treat the gap as a measurement of what cannot be captured in OHLC bar data, and design accordingly.</strong></li>
+</ul>
+
+<p class="body">I picked the third. The gap is informative: it tells me that sub-bar context (tape, order flow, candle nuance, session character) carries roughly 40 percent of the strategy's edge and is invisible to the bot's data. The architectural decision that follows is to either invest in capturing that data (tick-level feeds, order-book modeling) or accept the bot at its current ceiling and ship it as the system that captures 60 percent of the achievable edge.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: when your model underperforms a human baseline, the gap is a measurement of an information asymmetry, not a tuning opportunity. Diagnose the asymmetry before tuning the model.</mark></p>
+
+<p class="body">This is the discipline a Forward Deployed AI Architect brings to a client engagement that is missing its target. Most engagements that "fail" do not fail because the model is wrong; they fail because the input data does not carry the signal the human was using. Diagnosing that distinction is half the job.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What these decisions look like applied elsewhere</h2>
+
+<p class="body">If you are evaluating me as a Forward Deployed AI Architect and you want to know how the MES decisions translate to your domain, the five lessons compress to:</p>
+
+<ol>
+<li><strong>Inspectability over expressiveness at small sample size.</strong> Pick the model whose failure mode you can diagnose.</li>
+<li><strong>Operational informativeness over theoretical elegance for filters and classifiers.</strong> Pick the one whose output maps to your downstream task.</li>
+<li><strong>Separate the production system from the research system.</strong> Mixing them corrupts both.</li>
+<li><strong>Enforce invariants at boundaries, not at call sites.</strong> Boundaries are contracts; call sites are failure modes.</li>
+<li><strong>Treat human-model gaps as information asymmetries, not tuning opportunities.</strong> Diagnose the asymmetry before adjusting the model.</li>
+</ol>
+
+<p class="body">These five are the architectural patterns I would apply to a forecasting system, a fraud-detection system, a recommendation system, a clinical-prediction system, or any other domain where the labeled sample is in the hundreds-to-low-thousands range, the operator needs to defend the output, and a human discretionary baseline exists and meaningfully outperforms the model. They are the closest thing I have to a portable methodology.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What this post does not contain</h2>
+
+<p class="body">For the record, since the framing matters: this post does not contain the specific entry-model parameters, the regime threshold values, the exact backtest configuration, the module-by-module test breakdown, or the dataset specifics that would let someone reconstruct the system. Those are intellectual property I am not handing to a competitor. The decisions and the reasoning are the artifact; the implementation is mine.</p>
+
+<p class="body">If you are a hiring committee and you want a walkthrough of the production code with parameters intact, that is what an on-site technical conversation is for, not what a public blog post is for.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Closing</h2>
+
+<p class="body">MES Open is the project in my portfolio that most directly demonstrates how I make architectural decisions in a high-noise low-sample domain where the inputs are limited, the human baseline outperforms the model, and the cost of being wrong is real.</p>
+
+<p class="body">If you are hiring a Forward Deployed AI Architect to build something similar in a different domain (financial forecasting, anomaly detection, demand modeling, anything where the signal is contested and the discretionary expert beats the algorithm), the questions worth asking are: how do you pick between a learned representation and a hand-engineered model at small sample size; how do you evaluate multiple filter approaches without picking the most mathematically defensible one; how do you handle production-system components that are theoretically sound but practically silent; how do you enforce data-pipeline invariants so no downstream module can violate them; and how do you diagnose the gap between your model and a skilled human baseline without falling into tuning theater.</p>
+
+<p class="body">Those are the questions this post is meant to answer for MES.</p>
+
+<p class="body">For the production-ML calibration discipline that shaped my eval philosophy across projects, see <a href="inside-trialedge.html">Inside TrialEdge</a>. For the customer-facing signal-composition counterpart, see <a href="inside-atlas.html">Inside Atlas</a>.</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="inside-marketing-bot.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Inside Marketing Bot v2</span>
+        </a>
+        <a class="next" href="inside-trialedge.html">
+          <span class="k">NEXT</span>
+          <span class="v">Inside TrialEdge</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to writing index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / FORWARD DEPLOYED AI ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+</body>
+</html>

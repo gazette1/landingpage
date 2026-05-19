@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inside Marketing Bot v2: five architectural decisions in a multi-pass orchestration system / russh.work</title>
+  <meta name="description" content="Marketing Bot v2 is a multi-pass orchestration system that produces senior-strategist-tier marketing deliverables at software-tier cost. This post walks five architectural decisions, the alternatives rejected, and what each teaches about FDAA judgment." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">THESIS</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">MARKETING BOT v2.0</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.05.19</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">11 MIN / 2,400 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Inside Marketing Bot v2: five architectural decisions in a multi-pass orchestration system</h1>
+
+      <p class="post-summary">Marketing Bot v2 is a multi-pass orchestration system that produces senior-strategist-tier marketing deliverables in minutes at software-tier per-deliverable cost. This post is not a walkthrough of the modules or a copy of the pass graph. It is a walk through five architectural decisions I made while building it, the alternatives I rejected, and what each decision teaches about Forward Deployed AI Architect judgment in a high-quality-bar long-context generation domain. The implementation is mine. The reasoning is portable.</p>
+
+      <div class="post-tags">MULTI-PROVIDER / ORCHESTRATION / DECISION-ANALYSIS / CITATION-ENFORCEMENT / FDAA / JUDGMENT</div>
+    </header>
+
+    <div class="post-body">
+
+<p class="body">By Russ. Production version v2.0, 2026. Originated as a 19-pass orchestration in 2024-2025 under the working name Alchemical Growth Engine.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What this post is</h2>
+
+<p class="body">Marketing Bot v2 is a multi-pass orchestration system I built to turn a sector and an audience description into a senior-strategist-tier marketing deliverable in minutes, at a per-deliverable token cost that is a small fraction of what a human strategist charges. The system runs across multiple model providers (Anthropic Claude with web search, OpenAI image generation, plus structured-data services for search-volume validation and reference scraping). It ships a flagship long-form deliverable plus several module-scoped outputs that can be used standalone.</p>
+
+<p class="body">This post is <strong>not</strong> a walkthrough of the modules. It is not the pass graph, it is not the prompt library, and it is not the schema for the structured outputs the orchestrator hands between passes. Those are the intellectual property that produces the per-deliverable cost-quality ratio the system achieves, and I am not handing them to a competitor.</p>
+
+<p class="body">What is portable, and what this post is actually about, is the <strong>architectural judgment</strong> I applied while building it. Five decisions, each with alternatives I considered and rejected, each with a transferable lesson about Forward Deployed AI Architect work in a high-quality-bar long-context generation domain. If you are reading this as a hiring manager or a peer evaluating how I think, the decisions are the artifact. If you are reading this hoping to reconstruct the system, you are in the wrong post.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The decision frame</h2>
+
+<p class="body">A system that produces strategist-tier deliverables at software-tier cost operates inside three conditions that shape every other choice:</p>
+
+<ol>
+<li><strong>Synthesis is the hard part, generation is cheap.</strong> Modern frontier models are excellent at fluent writing on a constrained brief. What they are bad at, in a single call, is multi-step research, cross-source integration, and disciplined application of an explicit framework. A deliverable produced in one prompt collapses to surface-level output even with a long-context model. Quality emerges from the orchestration, not from the model.</li>
+<li><strong>Citations are the difference between strategy and assertion.</strong> A deliverable that asserts a recommendation without sourceable evidence is an essay. The same deliverable with traceable citations on every claim is a defensible recommendation. The architecture has to force evidence at the claim level, not at the document level. Most deliverables that look impressive at first read fall apart when a senior reviewer asks "how do you know that?" The system has to survive that question on every claim.</li>
+<li><strong>Cost-per-deliverable determines what tier of business the system serves.</strong> At a low per-deliverable token cost, the deliverable is a high-margin product at consumer pricing tiers. At a higher cost, the same deliverable is still profitable but the customer-acquisition math changes. The architecture decisions that compress token cost without sacrificing quality are the choices that determine which markets the system can serve. This is FDAA-relevant in a specific way: clients ask about unit economics in the first conversation, and the answer they get determines whether the engagement is worth their budget.</li>
+</ol>
+
+<p class="body">Those three conditions are the lens for every decision below.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 1: pass granularity, one long prompt versus many bounded passes</h2>
+
+<p class="body">The first decision was the orchestration's basic shape. The candidates:</p>
+
+<ul>
+<li>A single long prompt to a frontier model with the full context of the deliverable, asking for the complete output in one call.</li>
+<li>A graph of bounded passes, each with a defined scope, structured inputs, structured outputs, and an explicit handoff to the next pass.</li>
+</ul>
+
+<p class="body">Single-prompt was the default option, especially as model context windows expanded into the hundreds of thousands of tokens. The argument for it is operational simplicity: one call, one model, one billing line.</p>
+
+<p class="body">The argument against it, which I judged decisive, is <strong>quality stability across the deliverable</strong>. Single-prompt output on a long, multi-section deliverable degrades meaningfully past the first few sections. The model produces strong opening sections, weaker middle sections, and surface-level closing sections. This is not a hypothesis; it is a reproducible failure mode that I observed across multiple model families before committing to the multi-pass architecture.</p>
+
+<p class="body">A graph of bounded passes solves this by ensuring every section gets the model's full attention on a tight scope, with the prior section's structured output as part of its input. Cost is roughly comparable in tokens; quality on the back half of the deliverable is meaningfully higher.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: when a single-prompt call produces quality that degrades across the output, the architecture wants to be a graph of smaller passes, not a longer single prompt. Context-window length is a red herring; attention-allocation across a long generation is the real constraint.</mark></p>
+
+<p class="body">The same lesson applies anywhere a long-form deliverable has section-by-section quality requirements: due-diligence reports, audit findings, technical-design documents, legal briefs.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 2: structured I/O contracts with explicit failure handling</h2>
+
+<p class="body">Each pass in the orchestration has a defined contract: structured inputs the previous pass produced, structured outputs the next pass will consume, an explicit validation rule that runs on the output before the pass is considered complete.</p>
+
+<p class="body">The decision was not whether to use structured I/O. It was how to handle the failure modes that structured I/O introduces in long-context generation.</p>
+
+<p class="body">Two failure modes dominate, and the architecture has to handle both explicitly:</p>
+
+<p class="body"><strong>Schema-violation failure.</strong> The model produces output that does not parse against the expected schema. The naive response is to retry the pass. The better response is to first attempt a fallback parser that extracts the structured payload from a markdown-wrapped block, a partial response with truncation markers, or a re-prompt with a tightened schema. Only after the fallback fails does the system retry.</p>
+
+<p class="body"><strong>Truncation failure.</strong> The model produces output that ends with the model's "out of tokens" signal. A pass that hits truncation has, by definition, produced incomplete output. The naive response is to use what the model produced and move on. The honest response is to detect the truncation explicitly, drop the partial output, and re-run the pass with tightened input scope so the output fits.</p>
+
+<p class="body">The architectural commitment underneath both failure modes is: <strong>production orchestration cannot fail open</strong>. A pass that returns malformed output must either succeed via fallback or surface as a failure for review. It cannot silently degrade to "best effort" and pass partial output downstream, because downstream passes will then operate on poisoned input.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: silent failure is the most common production-LLM failure mode and the hardest to debug. Every pass needs an explicit failure handler with explicit retry and surface-for-review behavior. "Try, fall back, retry, surface" is the four-stage discipline.</mark></p>
+
+<p class="body">This is the same architectural pattern as voice validation in Atlas (parse-time gate, retry, surface for manual review) and the same pattern I would apply to any LLM-in-the-loop system where downstream consumers depend on the previous step's output being well-formed.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 3: citation enforcement at the claim level</h2>
+
+<p class="body">Every claim in the deliverable has to be supported by a source the orchestrator can trace. The decision was where in the architecture to enforce this.</p>
+
+<p class="body">The candidates:</p>
+
+<ul>
+<li><strong>At the document level.</strong> Require N citations across the document. Easiest to enforce; allows the model to put all the citations in one section and leave others unsupported.</li>
+<li><strong>At the section level.</strong> Require N citations per section. Better; still allows the model to cluster citations on easy claims and skip hard ones.</li>
+<li><strong>At the claim level.</strong> Every assertion the model produces is tagged with a source and a confidence score. Claims without sources are either demoted to soft framing or rejected by the pass validator.</li>
+</ul>
+
+<p class="body">Claim-level enforcement is the only one that produces a defensible deliverable. The other two produce deliverables that pass surface review and fail under questioning.</p>
+
+<p class="body">The implementation overhead is real: every pass that produces a claim has to attach a source pointer, every claim has to be checkable against the cited source, and the orchestrator has to enforce the gate before the claim ships downstream. The overhead is paid in token cost (more structured output per call) and in engineering cost (the citation infrastructure is non-trivial).</p>
+
+<p class="body">It is worth it. The deliverable that survives a senior reviewer's "how do you know that?" on every claim is the deliverable a client actually pays for.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: in any LLM-in-the-loop system that produces claims-as-output, enforce citations at the claim level, not at the document level. Document-level enforcement looks like it works and quietly fails the production bar.</mark></p>
+
+<p class="body">This is the same discipline a credit-rating agency or a regulated underwriter applies to its work product. The trick is to encode it in the architecture so the model cannot quietly skip it.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 4: cost-architecture by deliverable tier, not by capability</h2>
+
+<p class="body">A multi-provider orchestration touches multiple models and multiple paid services. The decision was how to route calls across model sizes and providers.</p>
+
+<p class="body">The naive approach is to use the strongest available model for every pass on the theory that quality matters most. The decisive approach is to <strong>size the model to the pass</strong>.</p>
+
+<p class="body">Some passes are tight: strict schema, well-defined transformation, low ambiguity. A smaller model handles these passes equivalently to a larger model at a fraction of the cost. Some passes are loose: open-ended synthesis, research-driven framing, cross-source integration. A larger model with web-search tooling produces meaningfully better output and is worth the cost.</p>
+
+<p class="body">The architecture supports per-pass model overrides as a first-class feature, not an afterthought. The per-pass model selection is part of the pass contract, not buried in the prompt.</p>
+
+<p class="body">The cost outcome at the flagship deliverable tier is a token cost that is a small fraction of what the same deliverable would cost if every pass ran on the largest model. The quality outcome is indistinguishable in side-by-side reviews. The two together are the cost-architecture that makes the system economically viable at the price points it targets.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: in any multi-provider orchestration, the cost-per-deliverable economics are determined by per-pass model selection, not by global model selection. The architecture has to support per-pass overrides as a first-class concept.</mark></p>
+
+<p class="body">The same lesson generalizes to any agentic system, any RAG pipeline, any multi-step tool-use chain. The naive approach picks one model and uses it for everything; the disciplined approach picks the smallest model that produces equivalent quality on each step.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 5: separate the composer from the orchestration</h2>
+
+<p class="body">The orchestration produces a structured payload. The composer turns that payload into the final rendered deliverable (a branded long-form document, in this case). The decision was whether to fuse the composition into the orchestration or to separate them.</p>
+
+<p class="body">Fused architecture treats the model's output as the final document and renders it directly. Separated architecture treats the model's output as a structured intermediate representation and runs a deterministic composer to produce the final document.</p>
+
+<p class="body">Separated wins on three criteria:</p>
+
+<p class="body"><strong>Re-rendering is free.</strong> Once the structured payload exists, producing the same deliverable with different branding, different layout, or different language is a composer-only operation. No model calls, no token cost. For a productized service that ships under multiple brands, this is a material economic advantage.</p>
+
+<p class="body"><strong>The composer is testable.</strong> A deterministic composer with a known schema is testable in isolation, against fixtures, without model calls. The orchestration is harder to test because LLM outputs are non-deterministic. Separating the composer means most of the test surface is deterministic.</p>
+
+<p class="body"><strong>The composer is portable across deliverable types.</strong> A separated composer can render the same payload into different formats (PDF, slide deck, email sequence, dashboard) without re-running the orchestration. The orchestration's IP stays in the orchestration; the composer is a render layer.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: in any system where the LLM produces structured output that gets rendered, separate the rendering from the generation. The rendering is deterministic, testable, and free to re-run. Fusing them costs you those three properties.</mark></p>
+
+<p class="body">The same lesson applies to any document-generation pipeline, any report-builder, any structured-output-to-presentation flow.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What these decisions look like applied elsewhere</h2>
+
+<p class="body">If you are evaluating me as a Forward Deployed AI Architect and you want to know how the Marketing Bot decisions translate to your domain, the five lessons compress to:</p>
+
+<ol>
+<li><strong>Multi-pass orchestration beats single-prompt generation on quality-stable long deliverables.</strong> Attention allocation, not context-window length, is the real constraint.</li>
+<li><strong>Production LLM orchestration must handle structured-output failure modes explicitly.</strong> Try, fall back, retry, surface. Silent failure is the default and the most dangerous.</li>
+<li><strong>Citation enforcement belongs at the claim level, not the document level.</strong> Document-level enforcement fails the production bar.</li>
+<li><strong>Cost-per-deliverable economics depend on per-pass model selection.</strong> The architecture has to support per-pass overrides as a first-class concept.</li>
+<li><strong>Separate the composer from the orchestration.</strong> Re-rendering becomes free, testing becomes possible, and the deliverable becomes portable across formats.</li>
+</ol>
+
+<p class="body">These five are the architectural patterns I would apply to any document-generation system, any agentic research pipeline, any RAG-driven report builder, any multi-step LLM-in-the-loop workflow that has to produce defensible, production-quality output at a competitive per-deliverable cost. They are the closest thing I have to a portable methodology for this class of system.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What this post does not contain</h2>
+
+<p class="body">For the record: this post does not contain the pass graph, the prompt library, the structured-output schemas, the per-pass model assignments, the citation-score computation, or the composer's renderer library. Those are the IP that produces the system's cost-quality ratio. The decisions and the reasoning are the artifact; the implementation is mine.</p>
+
+<p class="body">If you are a hiring committee and you want a walkthrough of the orchestration with the prompts and schemas intact, that is what an on-site technical conversation is for, not what a public blog post is for.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Closing</h2>
+
+<p class="body">Marketing Bot v2 is the project in my portfolio that most directly demonstrates how I make architectural decisions in a high-quality-bar long-context generation domain where the deliverable has to survive senior review and the per-deliverable economics determine which markets the system can serve.</p>
+
+<p class="body">If you are hiring a Forward Deployed AI Architect to build something similar in a different domain (regulated white-paper generation, financial research synthesis, due-diligence reports, audit findings, technical-design documents at scale), the questions worth asking are: how do you pick between single-prompt and multi-pass generation for a long deliverable; how do you handle structured-output failure modes without falling open; how do you enforce citations at the claim level without burying the model in instructions; how do you route calls across model sizes to compress per-deliverable cost; and how do you separate the rendering layer from the orchestration so the deliverable is portable across formats.</p>
+
+<p class="body">Those are the questions this post is meant to answer for Marketing Bot v2.</p>
+
+<p class="body">For the production-ML calibration discipline that shaped my eval philosophy across projects, see <a href="inside-trialedge.html">Inside TrialEdge</a>. For the customer-facing signal-composition counterpart, see <a href="inside-atlas.html">Inside Atlas</a>. For the algorithmic-trading decision-analysis counterpart, see <a href="inside-mes-open.html">Inside MES Open</a>.</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="inside-atlas.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Inside Atlas</span>
+        </a>
+        <a class="next" href="inside-mes-open.html">
+          <span class="k">NEXT</span>
+          <span class="v">Inside MES Open</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to writing index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / FORWARD DEPLOYED AI ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+</body>
+</html>

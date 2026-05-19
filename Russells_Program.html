@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Russell's Program</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0D0D0D;
+    --surface: #161616;
+    --card: #1C1C1C;
+    --border: #2A2A2A;
+    --text: #E8E8E8;
+    --text-dim: #888;
+    --text-muted: #555;
+    --accent: #FF3B30;
+    --accent-glow: rgba(255, 59, 48, 0.15);
+    --green: #30D158;
+    --green-dim: rgba(48, 209, 88, 0.12);
+    --yellow: #FFD60A;
+    --yellow-dim: rgba(255, 214, 10, 0.1);
+    --blue: #0A84FF;
+    --blue-dim: rgba(10, 132, 255, 0.1);
+    --yt: #FF0000;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 24px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(165deg, #1a0a0a 0%, #0D0D0D 40%, #0a1a0d 100%);
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255,59,48,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover-tag {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .cover h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: clamp(48px, 12vw, 80px);
+    line-height: 0.95;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .cover h1 span { color: var(--accent); }
+  .cover-sub {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid var(--border);
+    max-width: 400px;
+  }
+  .cover-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 24px;
+  }
+  .cover-pill {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-dim);
+  }
+  .cover-meta {
+    margin-top: 48px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .cover-meta strong { color: var(--text-dim); font-weight: 600; }
+
+  /* ── NAV ── */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,13,13,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-inner {
+    display: flex;
+    gap: 0;
+    min-width: max-content;
+    padding: 0 16px;
+  }
+  .nav-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 14px 16px;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    min-height: 44px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-btn:hover, .nav-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* ── SECTIONS ── */
+  .section { display: none; padding: 0 16px 60px; }
+  .section.active { display: block; }
+
+  /* ── DAY HEADER ── */
+  .day-header {
+    padding: 32px 0 24px;
+    border-bottom: 2px solid var(--accent);
+    margin-bottom: 24px;
+  }
+  .day-num {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .day-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    text-transform: uppercase;
+    color: #fff;
+    margin-top: 4px;
+    line-height: 1.1;
+  }
+  .day-focus {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  /* ── WARMUP ── */
+  .warmup-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+  .warmup-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .warmup-label::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .warmup-list {
+    list-style: none;
+    display: grid;
+    gap: 6px;
+  }
+  .warmup-list li {
+    font-size: 13px;
+    color: var(--text-dim);
+    padding-left: 16px;
+    position: relative;
+  }
+  .warmup-list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--text-muted);
+  }
+
+  /* ── EXERCISE CARD ── */
+  .exercise {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .exercise:hover { border-color: #3a3a3a; }
+  .exercise-top {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px;
+    gap: 14px;
+  }
+  .ex-num {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    color: var(--accent);
+    line-height: 1;
+    min-width: 32px;
+  }
+  .ex-info { flex: 1; }
+  .ex-name {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    text-transform: uppercase;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .ex-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--border);
+  }
+  .ex-stat {
+    padding: 12px 16px;
+    text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .ex-stat:last-child { border-right: none; }
+  .ex-stat-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .ex-stat-val {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    color: #fff;
+  }
+
+  /* ── YOUTUBE LINK ── */
+  .ex-yt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: rgba(255,0,0,0.08);
+    border-top: 1px solid rgba(255,0,0,0.15);
+    text-decoration: none;
+    transition: background 0.2s;
+    min-height: 48px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ex-yt:hover { background: rgba(255,0,0,0.15); }
+  .ex-yt svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  .ex-yt span {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #FF4444;
+  }
+  .ex-yt .arrow {
+    margin-left: auto;
+    color: #FF4444;
+    font-size: 16px;
+  }
+
+  /* ── FINISHER ── */
+  .finisher-block {
+    background: var(--accent-glow);
+    border: 1px solid rgba(255,59,48,0.25);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 24px;
+    margin-bottom: 16px;
+  }
+  .finisher-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .finisher-list {
+    list-style: none;
+    display: grid;
+    gap: 6px;
+  }
+  .finisher-list li {
+    font-size: 14px;
+    color: var(--text);
+    padding-left: 16px;
+    position: relative;
+  }
+  .finisher-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* ── INFO ── */
+  .info-sub {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    text-transform: uppercase;
+    color: var(--text);
+    margin: 24px 0 12px;
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+  .data-table thead th {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 10px 12px;
+    background: var(--accent);
+    color: #fff;
+    white-space: nowrap;
+  }
+  .data-table thead th:first-child { border-radius: 6px 0 0 0; }
+  .data-table thead th:last-child { border-radius: 0 6px 0 0; }
+  .data-table tbody td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .data-table tbody tr:nth-child(odd) td { background: var(--surface); }
+  .data-table tbody tr:nth-child(even) td { background: var(--card); }
+  .data-table tbody tr:last-child td:first-child { border-radius: 0 0 0 6px; }
+  .data-table tbody tr:last-child td:last-child { border-radius: 0 0 6px 0; }
+  .data-table .label-cell { font-weight: 700; color: #fff; white-space: nowrap; }
+
+  .callout {
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .callout-green { background: var(--green-dim); border: 1px solid rgba(48,209,88,0.2); }
+  .callout-yellow { background: var(--yellow-dim); border: 1px solid rgba(255,214,10,0.2); }
+  .callout-blue { background: var(--blue-dim); border: 1px solid rgba(10,132,255,0.2); }
+  .callout-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .callout-green .callout-label { color: var(--green); }
+  .callout-yellow .callout-label { color: var(--yellow); }
+  .callout-blue .callout-label { color: var(--blue); }
+  .callout ul { list-style: none; display: grid; gap: 6px; }
+  .callout li { font-size: 14px; color: var(--text); padding-left: 16px; position: relative; }
+  .callout-green li::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+  .callout-yellow li::before { content: '!'; position: absolute; left: 1px; color: var(--yellow); font-weight: 700; }
+  .callout-blue li::before { content: '→'; position: absolute; left: 0; color: var(--blue); font-weight: 700; }
+  .text-block { font-size: 14px; color: var(--text-dim); margin-bottom: 16px; line-height: 1.6; }
+
+  .mobility-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .mobility-item:last-child { border-bottom: none; }
+  .mobility-name { color: var(--text); }
+  .mobility-rx {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    padding-left: 16px;
+  }
+
+  /* ── MOBILE FIRST (≤480px) ── */
+  @media (max-width: 480px) {
+    body { font-size: 16px; -webkit-text-size-adjust: 100%; }
+    .cover { padding: 32px 20px; min-height: 100svh; }
+    .cover h1 { font-size: 52px; }
+    .cover-pills { gap: 6px; }
+    .cover-pill { font-size: 10px; padding: 5px 10px; }
+
+    .nav-btn { padding: 16px 14px; font-size: 14px; min-height: 48px; }
+
+    .section { padding: 0 12px 60px; }
+
+    .day-header { padding: 24px 0 20px; }
+    .day-title { font-size: 24px; }
+
+    .warmup-block { padding: 14px; }
+    .warmup-list li { font-size: 14px; padding-left: 18px; line-height: 1.6; }
+
+    .exercise { border-radius: 12px; margin-bottom: 14px; }
+    .exercise-top { padding: 14px; gap: 12px; }
+    .ex-num { font-size: 32px; min-width: 36px; }
+    .ex-name { font-size: 17px; }
+
+    .ex-stats { grid-template-columns: repeat(3, 1fr); }
+    .ex-stat { padding: 14px 8px; }
+    .ex-stat-label { font-size: 9px; letter-spacing: 1.5px; }
+    .ex-stat-val { font-size: 24px; }
+
+    .ex-yt {
+      padding: 14px 16px;
+      min-height: 48px;
+    }
+    .ex-yt svg { width: 22px; height: 22px; }
+    .ex-yt span { font-size: 14px; }
+
+    .finisher-block { padding: 14px; }
+    .finisher-list li { font-size: 15px; line-height: 1.6; padding-left: 18px; }
+
+    .data-table { font-size: 14px; }
+    .data-table thead th { padding: 10px 10px; font-size: 10px; }
+    .data-table tbody td { padding: 12px 10px; }
+
+    .callout { padding: 14px; }
+    .callout li { font-size: 15px; line-height: 1.6; }
+
+    .mobility-item { padding: 14px 0; font-size: 15px; }
+    .mobility-rx { font-size: 14px; }
+
+    .info-sub { font-size: 17px; margin: 20px 0 10px; }
+  }
+
+  /* ── SMALL PHONES (≤360px) ── */
+  @media (max-width: 360px) {
+    .cover h1 { font-size: 44px; }
+    .cover-sub { font-size: 14px; }
+    .nav-btn { padding: 14px 10px; font-size: 12px; }
+    .ex-num { font-size: 28px; }
+    .ex-name { font-size: 15px; }
+    .ex-stat-val { font-size: 22px; }
+    .section { padding: 0 10px 48px; }
+  }
+
+  /* ── TABLET+ (≥600px) ── */
+  @media (min-width: 600px) {
+    .section, .cover { max-width: 640px; margin-left: auto; margin-right: auto; }
+    .nav-inner { justify-content: center; }
+    .ex-stat-val { font-size: 22px; }
+    .exercise-top { padding: 18px 20px; }
+    .ex-stats .ex-stat { padding: 14px 20px; }
+    .ex-yt { padding: 12px 20px; }
+  }
+
+  /* ── SAFE AREA (notch phones) ── */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    .nav { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+    .section { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+    .cover { padding-left: calc(20px + env(safe-area-inset-left)); padding-right: calc(20px + env(safe-area-inset-right)); }
+  }
+
+  /* ── TOUCH HELPERS ── */
+  @media (hover: none) and (pointer: coarse) {
+    .exercise:hover { border-color: var(--border); }
+    .ex-yt:hover { background: rgba(255,0,0,0.08); }
+    .ex-yt:active { background: rgba(255,0,0,0.2); }
+    .nav-btn:active { color: var(--accent); border-bottom-color: var(--accent); }
+  }
+
+  @media print {
+    .nav { display: none; }
+    .section { display: block !important; page-break-before: always; }
+    .cover { min-height: auto; page-break-after: always; }
+    body { background: #fff; color: #000; }
+    .exercise { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="cover-tag">Training Program</div>
+  <h1>Russell's<br><span>Program</span></h1>
+  <div class="cover-sub">4-Day Golf Performance Split</div>
+  <div class="cover-pills">
+    <div class="cover-pill">Rotational Power</div>
+    <div class="cover-pill">Core Stability</div>
+    <div class="cover-pill">No Spinal Loading</div>
+    <div class="cover-pill">Pit Shark + KBs</div>
+  </div>
+  <div class="cover-meta">
+    <strong>Tue · Thu · Fri · Sat</strong><br>
+    March 2026 · DMV Iron Gym
+  </div>
+</div>
+
+<div class="nav">
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="show(this,'day1')">Tue</button>
+    <button class="nav-btn" onclick="show(this,'day2')">Thu</button>
+    <button class="nav-btn" onclick="show(this,'day3')">Fri</button>
+    <button class="nav-btn" onclick="show(this,'day4')">Sat</button>
+    <button class="nav-btn" onclick="show(this,'extras')">Extras</button>
+    <button class="nav-btn" onclick="show(this,'schedule')">Schedule</button>
+  </div>
+</div>
+
+<!-- ════════ TUESDAY ════════ -->
+<div class="section active" id="day1">
+  <div class="day-header">
+    <div class="day-num">Tuesday</div>
+    <div class="day-title">Lower Body Power + Core</div>
+    <div class="day-focus">Explosive leg strength & rotational core power for swing mechanics</div>
+  </div>
+  <div class="warmup-block">
+    <div class="warmup-label">Dynamic Warm-Up · 8-10 min</div>
+    <ul class="warmup-list">
+      <li>Hip circles (10 each direction)</li>
+      <li>Walking leg swings (10 fwd/back, 10 side-to-side each leg)</li>
+      <li>Bodyweight squats (15 reps)</li>
+      <li>Thoracic rotation stretch (10 each side)</li>
+      <li>Hip flexor stretch (30 sec each side)</li>
+    </ul>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Pit Shark Belt Squat</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">4</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">8-10</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">90s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=pit+shark+belt+squat+form+demo+short" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Kettlebell Goblet Squat</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">12-15</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">60s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=kettlebell+goblet+squat+form+demo+short" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Single-Leg KB Romanian Deadlift</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3/leg</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">10-12</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">45s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=single+leg+kettlebell+rdl+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">4</div><div class="ex-info"><div class="ex-name">Kettlebell Swing</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">4</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">15-20</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">60s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=kettlebell+swing+proper+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">5</div><div class="ex-info"><div class="ex-name">Cable Wood Chops (High to Low)</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3/side</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">12-15</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">45s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=cable+wood+chop+high+to+low+form" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">6</div><div class="ex-info"><div class="ex-name">Cable Reverse Wood Chops (Low to High)</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3/side</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">12-15</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">45s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=cable+wood+chop+low+to+high+form" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="finisher-block">
+    <div class="finisher-label">Core Finisher · 10 min · 3 Rounds</div>
+    <ul class="finisher-list">
+      <li>Plank: 45-60 seconds</li>
+      <li>Russian twists w/ KB: 20 total reps</li>
+      <li>Dead bug: 10 reps per side</li>
+      <li>Bicycle crunches: 20 total reps</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════ THURSDAY ════════ -->
+<div class="section" id="day2">
+  <div class="day-header">
+    <div class="day-num">Thursday</div>
+    <div class="day-title">Upper Body Push + Rotational Power</div>
+    <div class="day-focus">Pushing strength for club control and rotational work</div>
+  </div>
+  <div class="warmup-block">
+    <div class="warmup-label">Dynamic Warm-Up · 8-10 min</div>
+    <ul class="warmup-list">
+      <li>Arm circles (10 forward, 10 backward)</li>
+      <li>Band pull-aparts (15 reps)</li>
+      <li>Scapular push-ups (10 reps)</li>
+      <li>Thoracic extension over foam roller (10 reps)</li>
+      <li>Band rotations (10 each side)</li>
+    </ul>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Incline Chest Press</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">4</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">8-10</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">90s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=incline+chest+press+dumbbell+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Seated Shoulder Press</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">10-12</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">75s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=seated+shoulder+press+machine+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Cable Fly (Chest Level)</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">12-15</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">60s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=cable+fly+chest+level+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">4</div><div class="ex-info"><div class="ex-name">Lateral Raise Machine</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">12-15</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">45s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=lateral+raise+machine+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">5</div><div class="ex-info"><div class="ex-name">Tricep Pushdown (Cable)</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">12-15</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">45s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=tricep+pushdown+cable+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">6</div><div class="ex-info"><div class="ex-name">Cable Pallof Press</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3/side</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">10-12</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">45s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=cable+pallof+press+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">7</div><div class="ex-info"><div class="ex-name">Med Ball Rotational Throws</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3/side</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">8-10</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">60s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=medicine+ball+rotational+throw+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+</div>
+
+<!-- ════════ FRIDAY ════════ -->
+<div class="section" id="day3">
+  <div class="day-header">
+    <div class="day-num">Friday</div>
+    <div class="day-title">Upper Body Pull + Core Stability</div>
+    <div class="day-focus">Back strength for posture, backswing, and core control</div>
+  </div>
+  <div class="warmup-block">
+    <div class="warmup-label">Dynamic Warm-Up · 8-10 min</div>
+    <ul class="warmup-list">
+      <li>Band pull-aparts (15 reps)</li>
+      <li>Scapular wall slides (10 reps)</li>
+      <li>Cat-cow stretch (10 reps)</li>
+      <li>Thread the needle (8 per side)</li>
+      <li>Band face pulls (15 reps)</li>
+    </ul>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Lat Pulldown (Wide Grip)</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">4</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">8-10</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">90s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=wide+grip+lat+pulldown+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">Seated Cable Row</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">4</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">10-12</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">75s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=seated+cable+row+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Single-Arm Dumbbell Row</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3/arm</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">10-12</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">45s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=single+arm+dumbbell+row+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">4</div><div class="ex-info"><div class="ex-name">Face Pulls (Cable)</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">15-20</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">45s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=cable+face+pull+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">5</div><div class="ex-info"><div class="ex-name">Cable Straight-Arm Pulldown</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">12-15</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">45s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=cable+straight+arm+pulldown+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">6</div><div class="ex-info"><div class="ex-name">Hammer Curl</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">12-15</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">45s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=hammer+curl+dumbbell+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="finisher-block">
+    <div class="finisher-label">Core Stability Circuit · 12 min · 3 Rounds (45s on / 15s off)</div>
+    <ul class="finisher-list">
+      <li>Plank w/ alternating shoulder taps</li>
+      <li>Side plank (right)</li>
+      <li>Bird dog (alternating)</li>
+      <li>Side plank (left)</li>
+      <li>Hollow body hold</li>
+      <li>Mountain climbers</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════ SATURDAY ════════ -->
+<div class="section" id="day4">
+  <div class="day-header">
+    <div class="day-num">Saturday</div>
+    <div class="day-title">Full Body Power + Golf Conditioning</div>
+    <div class="day-focus">Integrating all movement patterns with explosive power</div>
+  </div>
+  <div class="warmup-block">
+    <div class="warmup-label">Dynamic Warm-Up · 10 min</div>
+    <ul class="warmup-list">
+      <li>Light cardio (3 min)</li>
+      <li>Hip mobility flow (3 min)</li>
+      <li>Thoracic rotation w/ club or band (2 min)</li>
+      <li>Shoulder mobility circles (2 min)</li>
+    </ul>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">1</div><div class="ex-info"><div class="ex-name">Pit Shark Belt Squat (Explosive)</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">4</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">6-8</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">2 min</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=explosive+belt+squat+power+form" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">2</div><div class="ex-info"><div class="ex-name">KB Clean and Press</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3/arm</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">6-8</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">90s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=kettlebell+clean+and+press+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">3</div><div class="ex-info"><div class="ex-name">Cable Rotational Row</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3/side</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">10-12</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">60s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=cable+rotational+row+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">4</div><div class="ex-info"><div class="ex-name">KB Single-Leg Deadlift to Row</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3/leg</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">8-10</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">60s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=single+leg+deadlift+to+row+kettlebell+form" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">5</div><div class="ex-info"><div class="ex-name">Cable Rotations (Speed Focus)</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">4/side</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">10-12</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">45s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=cable+rotation+exercise+golf+speed+form" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-top"><div class="ex-num">6</div><div class="ex-info"><div class="ex-name">Landmine Rotational Press</div></div></div>
+    <div class="ex-stats">
+      <div class="ex-stat"><div class="ex-stat-label">Sets</div><div class="ex-stat-val">3/side</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Reps</div><div class="ex-stat-val">8-10</div></div>
+      <div class="ex-stat"><div class="ex-stat-label">Rest</div><div class="ex-stat-val">60s</div></div>
+    </div>
+    <a class="ex-yt" href="https://www.youtube.com/results?search_query=landmine+rotational+press+form+demo" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="#FF0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.9 31.9 0 0 0 0 12a31.9 31.9 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.9 31.9 0 0 0 24 12a31.9 31.9 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span>Watch Demo</span><span class="arrow">›</span></a>
+  </div>
+
+  <div class="finisher-block">
+    <div class="finisher-label">Golf Power Finisher · 10 min · 3 Rounds</div>
+    <ul class="finisher-list">
+      <li>KB swings: 15 reps (explosive)</li>
+      <li>Med ball slam: 10 reps</li>
+      <li>Jump squats (BW): 8 reps</li>
+      <li>Rest: 90 sec between rounds</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════ EXTRAS ════════ -->
+<div class="section" id="extras">
+  <div class="day-header">
+    <div class="day-num">Reference</div>
+    <div class="day-title">Extras & Programming</div>
+  </div>
+
+  <div class="info-sub">Core-Specific Session (2x/week)</div>
+  <p class="text-block">Perform on off days (Mon, Wed, Sun). Circuit format, 3-4 rounds.</p>
+  <div class="callout callout-green">
+    <div class="callout-label">Circuit (60-90s rest between rounds)</div>
+    <ul>
+      <li>Plank: 60 seconds</li>
+      <li>Side plank: 45 sec each side</li>
+      <li>Russian twists w/ KB: 20 reps</li>
+      <li>Cable Pallof press: 12 reps each side</li>
+      <li>Dead bug: 12 reps per side</li>
+      <li>Cable wood chops: 15 reps each side</li>
+      <li>Bicycle crunches: 20 reps</li>
+    </ul>
+  </div>
+
+  <div class="info-sub">Cardio Sessions (2x/week)</div>
+  <p class="text-block">Perform on off days or after training sessions.</p>
+  <div class="callout callout-blue">
+    <div class="callout-label">Choose one per session</div>
+    <ul>
+      <li><strong>Steady-State:</strong> 25-30 min, 6-7/10 effort</li>
+      <li><strong>HIIT:</strong> 30s hard / 90s recovery × 8-10 rounds</li>
+      <li><strong>Incline Walk:</strong> 8-12% incline, 3.0-3.5 mph, 25-30 min</li>
+    </ul>
+  </div>
+
+  <div class="info-sub">Progressive Overload</div>
+  <table class="data-table">
+    <thead><tr><th>Week</th><th>Protocol</th></tr></thead>
+    <tbody>
+      <tr><td class="label-cell">1-2</td><td>Learn movements, moderate weight, form focus</td></tr>
+      <tr><td class="label-cell">3-4</td><td>Add 5-10 lbs to main lifts, maintain reps</td></tr>
+      <tr><td class="label-cell">5-6</td><td>Add 1-2 reps per set or reduce rest 15s</td></tr>
+      <tr><td class="label-cell">7-8</td><td>Increase weight again or add 1 set to mains</td></tr>
+      <tr><td class="label-cell">9</td><td>DELOAD: reduce weight 30%, maintain volume</td></tr>
+      <tr><td class="label-cell">10+</td><td>Restart cycle with higher baseline</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-sub">Intensity Guide</div>
+  <div class="callout callout-yellow">
+    <div class="callout-label">RPE Targets</div>
+    <ul>
+      <li><strong>Main lifts (6-10 reps):</strong> Leave 1-2 reps in reserve</li>
+      <li><strong>Accessory (12-15 reps):</strong> Can approach near failure</li>
+      <li><strong>Power movements:</strong> Speed and quality over weight</li>
+      <li><strong>Rotational:</strong> Control and speed equally important</li>
+    </ul>
+  </div>
+
+  <div class="info-sub">Golf-Specific Mobility (Daily, 10-15 min)</div>
+  <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 4px 16px;">
+    <div class="mobility-item"><span class="mobility-name">Hip 90/90 Stretch</span><span class="mobility-rx">60s each side</span></div>
+    <div class="mobility-item"><span class="mobility-name">Thoracic Rotation (half-kneeling)</span><span class="mobility-rx">10 reps/side</span></div>
+    <div class="mobility-item"><span class="mobility-name">World's Greatest Stretch</span><span class="mobility-rx">5 reps/side</span></div>
+    <div class="mobility-item"><span class="mobility-name">Shoulder Dislocations w/ Band</span><span class="mobility-rx">15 reps</span></div>
+    <div class="mobility-item"><span class="mobility-name">Cat-Cow</span><span class="mobility-rx">10 reps</span></div>
+    <div class="mobility-item"><span class="mobility-name">Deep Squat Hold</span><span class="mobility-rx">60-90s</span></div>
+    <div class="mobility-item"><span class="mobility-name">Thread the Needle</span><span class="mobility-rx">8 reps/side</span></div>
+    <div class="mobility-item"><span class="mobility-name">Hip Flexor Stretch (half-kneeling)</span><span class="mobility-rx">60s each side</span></div>
+  </div>
+
+  <div class="info-sub">Performance Benchmarks (Test Every 4 Weeks)</div>
+  <table class="data-table">
+    <thead><tr><th>Metric</th><th>Target</th></tr></thead>
+    <tbody>
+      <tr><td class="label-cell">Driver Distance</td><td>+10-20 yards in 8-12 weeks</td></tr>
+      <tr><td class="label-cell">Swing Speed</td><td>+3-5 mph in 8-12 weeks</td></tr>
+      <tr><td class="label-cell">Core Rotation</td><td>Track wood chop weight progression</td></tr>
+      <tr><td class="label-cell">Balance</td><td>Single-leg deadlift weight progression</td></tr>
+      <tr><td class="label-cell">Endurance</td><td>Maintain power through back 9</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-sub">Injury Prevention</div>
+  <div class="callout callout-yellow">
+    <div class="callout-label">Non-Negotiables</div>
+    <ul>
+      <li>Never skip warm-ups</li>
+      <li>Progress weight gradually (5-10 lbs/week max)</li>
+      <li>Pain ≠ fatigue. If it hurts, stop.</li>
+      <li>Pit Shark + KBs only for legs. No spinal loading.</li>
+      <li>Belt low across hips on Pit Shark</li>
+    </ul>
+  </div>
+
+  <div class="info-sub">Recovery & Nutrition</div>
+  <div class="callout callout-green">
+    <div class="callout-label">Recovery</div>
+    <ul>
+      <li>Sleep: 7-9 hours nightly</li>
+      <li>Active recovery: light walking or swimming on off days</li>
+      <li>Foam rolling: 10 min pre and post workout</li>
+      <li>Stretching: 10-15 min daily (hips + thoracic spine)</li>
+    </ul>
+  </div>
+  <div class="callout callout-blue">
+    <div class="callout-label">Nutrition</div>
+    <ul>
+      <li>Protein: 0.8-1.0g per lb bodyweight daily</li>
+      <li>Carbs: pre-workout meal 1-2 hours before</li>
+      <li>Water: 64-80+ oz daily, more on training days</li>
+      <li>Post-workout: protein shake or meal within 60 min</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════ SCHEDULE ════════ -->
+<div class="section" id="schedule">
+  <div class="day-header">
+    <div class="day-num">Weekly Layout</div>
+    <div class="day-title">Your Schedule</div>
+  </div>
+
+  <table class="data-table">
+    <thead><tr><th>Day</th><th>Activity</th></tr></thead>
+    <tbody>
+      <tr><td class="label-cell">MON</td><td>Off — Core Session + Mobility</td></tr>
+      <tr><td class="label-cell">TUE</td><td>Lower Body Power + Core</td></tr>
+      <tr><td class="label-cell">WED</td><td>Off — Cardio (25-30 min) + Mobility</td></tr>
+      <tr><td class="label-cell">THU</td><td>Upper Push + Rotational Power</td></tr>
+      <tr><td class="label-cell">FRI</td><td>Upper Pull + Core Stability</td></tr>
+      <tr><td class="label-cell">SAT</td><td>Full Body Power + Golf Conditioning</td></tr>
+      <tr><td class="label-cell">SUN</td><td>Rest — Mobility Routine Only</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-sub">Gym Tracking</div>
+  <div class="callout callout-green">
+    <div class="callout-label">Log Every 4 Weeks</div>
+    <ul>
+      <li>Record weights, sets, reps for all main lifts</li>
+      <li>Test Pit Shark 8-rep max</li>
+      <li>Test KB swing max weight × 20 reps</li>
+      <li>Measure cable wood chop progression</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function show(btn, id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: document.querySelector('.nav').offsetTop, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
