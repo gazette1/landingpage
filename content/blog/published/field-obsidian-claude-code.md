@@ -22,7 +22,7 @@ Most engineers I have watched manage AI-assisted projects use three or four tool
 
 The cost is real. Switching tools loses context. The roadmap doc in Notion does not know what the AI just wrote in Cursor. The AI doing the writing does not know what the roadmap says is the current sprint goal. The research session does not remember which decision the roadmap was waiting on. Every transition is a chance for the wrong thing to ship.
 
-I run six concurrent AI projects (the six on the homepage) plus a CRE underwriting practice, plus a job search. The conventional multi-tool setup would collapse under the context-switching tax in a week. The personal workflow I run instead is one stack with two surfaces: Obsidian for me, Claude Code for the model, and a shared file system underneath.
+I multi-task a lot: six concurrent AI projects (the six on the homepage) and a CRE underwriting practice. The conventional multi-tool setup would collapse under the context-switching tax in a week. The personal workflow I run instead is one stack with two surfaces: Obsidian for me, Claude Code for the model, and a shared file system underneath.
 
 ## Where it works
 
