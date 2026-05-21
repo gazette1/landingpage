@@ -7,7 +7,7 @@ project: null
 version: null
 status: published
 tags: [obsidian, claude-code, workflow, project-tracking, ai-architecture, fdaa]
-summary: I run six concurrent AI projects with one personal stack: Obsidian as the human-facing planning and roadmap layer, Claude Code as the execution layer that reads the same files. The two share the same disk. This Field Note walks the conventions I use to keep the two in sync, where the workflow breaks, and what an AI architect would change if they were building it for a team.
+summary: I run multiple AI projects with one personal stack: Obsidian as the human-facing planning and roadmap layer, Claude Code as the execution layer that reads the same files. The two share the same disk. This Field Note walks the conventions I use to keep the two in sync, where the workflow breaks, and what an AI architect would change if they were building it for a team.
 ---
 
 # Field Note: the Obsidian-Claude Code loop for project tracking and roadmaps
@@ -22,7 +22,7 @@ Most engineers I have watched manage AI-assisted projects use three or four tool
 
 The cost is real. Switching tools loses context. The roadmap doc in Notion does not know what the AI just wrote in Cursor. The AI doing the writing does not know what the roadmap says is the current sprint goal. The research session does not remember which decision the roadmap was waiting on. Every transition is a chance for the wrong thing to ship.
 
-I multi-task a lot: six concurrent AI projects (the six on the homepage) and a CRE underwriting practice. The conventional multi-tool setup would collapse under the context-switching tax in a week. The personal workflow I run instead is one stack with two surfaces: Obsidian for me, Claude Code for the model, and a shared file system underneath.
+I multi-task a lot across AI projects and a CRE underwriting practice. The conventional multi-tool setup would collapse under the context-switching tax in a week. The personal workflow I run instead is one stack with two surfaces: Obsidian for me, Claude Code for the model, and a shared file system underneath.
 
 ## Where it works
 
@@ -84,7 +84,7 @@ The team version costs an Obsidian Sync subscription per person ($4-8/month each
 
 ## What an AI architect would change
 
-The honest answer is that the solo workflow is already at its rough optimum for one person managing six projects. Where an architecture rebuild would help is at three specific friction points:
+The honest answer is that the solo workflow is already at its rough optimum for one person managing multiple projects. Where an architecture rebuild would help is at three specific friction points:
 
 **Auto-context loading.** Right now I manually `@docs/decision-log.md` and `@docs/roadmap.md` at the start of every Claude Code session. A small hook that reads the CLAUDE.md at session start and pre-loads the named context files would save 30 seconds per session. Over 200 sessions a year, that is real time.
 

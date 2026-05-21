@@ -50,7 +50,7 @@ The architecture is small.
 
 **A shared library** of message formatters (one for ship notes, one for failures, one for daily summary) keeps the format consistent across projects. Adding a new project means adding a new webhook URL and pointing the existing formatters at it.
 
-**A daily-summary cron** runs at 8 AM, walks the previous day's git activity across all six projects, and posts a single message to #daily-summary with what shipped, what failed, what is queued. This is the message I actually read every morning while drinking coffee.
+**A daily-summary cron** runs at 8 AM, walks the previous day's git activity across all my projects, and posts a single message to #daily-summary with what shipped, what failed, what is queued. This is the message I actually read every morning while drinking coffee.
 
 **A failures-only catch-all** sits at #failures. Anything that goes wrong in any project ends up here with the project name in the message. This is the closest thing I have to a pager.
 
@@ -90,7 +90,7 @@ The same principle applies to monitoring pipelines for production AI systems, to
 
 ## Closing
 
-Discord as a second screen is the personal infrastructure that makes running six concurrent AI projects sustainable. Without ambient notification, I forget tasks finished. Without channel-per-project structure, the alerts blur together. Without strict allowlisting, the channels turn into noise. All three disciplines together turn Discord into a real coordination layer for solo AI work.
+Discord as a second screen is the personal infrastructure that makes multi-tasking across AI projects sustainable. Without ambient notification, I forget tasks finished. Without channel-per-project structure, the alerts blur together. Without strict allowlisting, the channels turn into noise. All three disciplines together turn Discord into a real coordination layer for solo AI work.
 
 If you are evaluating how to set up ambient notification for AI-assisted work, or how to scale solo-coordination patterns into team-coordination patterns, the questions worth asking are: which channel does your human already watch (Slack, Discord, SMS, email); what is the strict allowlist for events worth alerting on; how do you format the message so it is readable in one glance; and how do you keep the volume low enough that the channel stays signal.
 
