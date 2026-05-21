@@ -135,7 +135,7 @@ This is the discipline a Forward Deployed AI Architect brings to a client engage
 
 ## What these decisions look like applied elsewhere
 
-If you are evaluating me as a Forward Deployed AI Architect and you want to know how the MES decisions translate to your domain, the five lessons compress to:
+If you are looking at how the MES decisions translate to a different domain, the five lessons compress to:
 
 1. **Inspectability over expressiveness at small sample size.** Pick the model whose failure mode you can diagnose.
 2. **Operational informativeness over theoretical elegance for filters and classifiers.** Pick the one whose output maps to your downstream task.
@@ -159,7 +159,7 @@ If you are a hiring committee and you want a walkthrough of the production code 
 
 MES Open is the project in my portfolio that most directly demonstrates how I make architectural decisions in a high-noise low-sample domain where the inputs are limited, the human baseline outperforms the model, and the cost of being wrong is real.
 
-If you are hiring a Forward Deployed AI Architect to build something similar in a different domain (financial forecasting, anomaly detection, demand modeling, anything where the signal is contested and the discretionary expert beats the algorithm), the questions worth asking are: how do you pick between a learned representation and a hand-engineered model at small sample size; how do you evaluate multiple filter approaches without picking the most mathematically defensible one; how do you handle production-system components that are theoretically sound but practically silent; how do you enforce data-pipeline invariants so no downstream module can violate them; and how do you diagnose the gap between your model and a skilled human baseline without falling into tuning theater.
+If you are building something similar in a different domain (financial forecasting, anomaly detection, demand modeling, anything where the signal is contested and the discretionary expert beats the algorithm), the questions worth asking are: how do you pick between a learned representation and a hand-engineered model at small sample size; how do you evaluate multiple filter approaches without picking the most mathematically defensible one; how do you handle production-system components that are theoretically sound but practically silent; how do you enforce data-pipeline invariants so no downstream module can violate them; and how do you diagnose the gap between your model and a skilled human baseline without falling into tuning theater.
 
 Those are the questions this post is meant to answer for MES.
 

@@ -141,7 +141,7 @@ The same lesson applies to any document-generation pipeline, any report-builder,
 
 ## What these decisions look like applied elsewhere
 
-If you are evaluating me as a Forward Deployed AI Architect and you want to know how the Marketing Bot decisions translate to your domain, the five lessons compress to:
+If you are looking at how the Marketing Bot decisions translate to a different domain, the five lessons compress to:
 
 1. **Multi-pass orchestration beats single-prompt generation on quality-stable long deliverables.** Attention allocation, not context-window length, is the real constraint.
 2. **Production LLM orchestration must handle structured-output failure modes explicitly.** Try, fall back, retry, surface. Silent failure is the default and the most dangerous.
@@ -165,7 +165,7 @@ If you are a hiring committee and you want a walkthrough of the orchestration wi
 
 Marketing Bot v2 is the project in my portfolio that most directly demonstrates how I make architectural decisions in a high-quality-bar long-context generation domain where the deliverable has to survive senior review and the per-deliverable economics determine which markets the system can serve.
 
-If you are hiring a Forward Deployed AI Architect to build something similar in a different domain (regulated white-paper generation, financial research synthesis, due-diligence reports, audit findings, technical-design documents at scale), the questions worth asking are: how do you pick between single-prompt and multi-pass generation for a long deliverable; how do you handle structured-output failure modes without falling open; how do you enforce citations at the claim level without burying the model in instructions; how do you route calls across model sizes to compress per-deliverable cost; and how do you separate the rendering layer from the orchestration so the deliverable is portable across formats.
+If you are building something similar in a different domain (regulated white-paper generation, financial research synthesis, due-diligence reports, audit findings, technical-design documents at scale), the questions worth asking are: how do you pick between single-prompt and multi-pass generation for a long deliverable; how do you handle structured-output failure modes without falling open; how do you enforce citations at the claim level without burying the model in instructions; how do you route calls across model sizes to compress per-deliverable cost; and how do you separate the rendering layer from the orchestration so the deliverable is portable across formats.
 
 Those are the questions this post is meant to answer for Marketing Bot v2.
 

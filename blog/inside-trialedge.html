@@ -59,7 +59,7 @@
 
 <p class="body">This post walks through the architecture decisions that matter, why each one was made, what I would change if I were starting over, and how the system is monitored in production. It is written for engineers and architects who are evaluating whether a similar shape applies to their domain, not for biotech investors looking for catalyst picks.</p>
 
-<p class="body">If you are a Forward Deployed AI Architect, the parts I expect to be most useful are the modeling-and-calibration discussion, the eval rig, the cost economics, and the monitoring section. The biotech domain framing is a vehicle for those architectural points.</p>
+<p class="body">The parts most likely to be useful to a fellow architect are the modeling-and-calibration discussion, the eval rig, the cost economics, and the monitoring section. The biotech domain framing is a vehicle for those architectural points.</p>
 
 <hr class="rule">
 
@@ -169,7 +169,7 @@
 
 <h2 class="h2">Cost economics</h2>
 
-<p class="body">Forward Deployed AI Architects get asked about per-unit economics. I am asked the same question in interviews. Here are the numbers.</p>
+<p class="body">Per-unit economics get asked at every architecture review. Here are the numbers.</p>
 
 <p class="body"><strong>Per-catalyst cost (inference):</strong> approximately $0.02 in OpenRouter calls. The cost is dominated by filing summarization, not by the LightGBM inference itself, which runs in milliseconds on a Cloudflare Worker for free at this volume.</p>
 
@@ -217,7 +217,7 @@
 
 <p class="body">TrialEdge is a small production AI system that solves a narrow problem with disciplined calibration, a cheap stack, and a layered eval rig. The architecture is not novel; the discipline is what makes it work. The small-N domain, the asymmetric payoff, and the noisy-source signal all conspired to force decisions that look conservative from the outside (no neural net, no ensembling, manual retraining) but were the right tradeoffs given the constraints.</p>
 
-<p class="body">If I were hiring a Forward Deployed AI Architect to build something similar in a different domain, the questions I would ask are: how do you decide between deep and shallow architectures at small N, what is your calibration story, how do you catch drift in upstream LLM components, and what does your system cost to run per useful output. Those are the questions this post is meant to answer for TrialEdge.</p>
+<p class="body">If you are building something similar in a different domain, the questions worth asking are: how do you decide between deep and shallow architectures at small N, what is your calibration story, how do you catch drift in upstream LLM components, and what does your system cost to run per useful output. Those are the questions this post is meant to answer for TrialEdge.</p>
 
 <p class="body">For more on the architectural discipline behind this and related systems, see the Atlas case study at <a href="/blog/inside-atlas.html">/blog/inside-atlas.html</a> when it lands, and the upcoming TrialEdge-ML companion post that covers the tabular calibration sibling to this system.</p>
 

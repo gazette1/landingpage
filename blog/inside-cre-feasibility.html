@@ -59,7 +59,7 @@
 
 <p class="body">The output is a feasibility study at the quality bar a regional bank or a deal sponsor expects: dual-scenario NOI analysis, DSCR at offer and at walk, four creative structures (seller note, earnout, JV/LP, master lease), and a ranked list of probable lenders by counterparty type (bank, credit union, debt fund). The work I do for a single feasibility study, before the workflow, was roughly 20 to 40 hours of senior-analyst time. With the workflow, the same study takes 60 to 90 minutes of my time, plus a final hour of validation against the actual deal documents.</p>
 
-<p class="body">I am writing this post for two audiences. The first is Forward Deployed AI Architect hiring committees who want to see that I use AI in my domain expertise, not just that I ship AI products. The second is real estate professionals who want a window into how a careful prompt suite changes the unit economics of underwriting.</p>
+<p class="body">I am writing this post for two audiences. The first is engineers and architects evaluating whether to use AI in their own domain expertise, not just to ship AI products. The second is real estate professionals who want a window into how a careful prompt suite changes the unit economics of underwriting.</p>
 
 <p class="body">The post also exists because the workflow is on a roadmap to become deployed software in Q3 2026. Writing it down now is the first step toward shipping the v1 product.</p>
 
@@ -206,7 +206,7 @@ OUTPUT (JSON, strict):
 
 <p class="body">The Mosaic feasibility workflow is the system in my portfolio that most directly proves the FDAA value proposition: I do my own domain's work with AI, at a quality bar my counterparties accept, at a cost basis that changes the economics of the practice. The workflow is not deployed software, and that honesty is the post's point. <mark class="callout">The discipline of running a careful, schema-loaded LLM pass with deterministic validation, every time, is what makes the workflow work; the discipline is portable to any high-stakes low-volume domain where consistency of framework beats per-case creativity.</mark></p>
 
-<p class="body">If I were hiring a Forward Deployed AI Architect to bring a system like this into a regulated finance practice (LIHTC syndication, lender QA, deal underwriting at a regional bank, family-office acquisition diligence), the questions I would ask are: how do you encode framework discipline into a prompt suite without depending on the model to know your firm's standards; how do you validate numeric outputs deterministically before they leave the system; and what does the path look like from a prompt suite the senior partner runs by hand to a deployed software product the firm sells.</p>
+<p class="body">If you are bringing a system like this into a regulated finance practice (LIHTC syndication, lender QA, deal underwriting at a regional bank, family-office acquisition diligence), the questions worth asking are: how do you encode framework discipline into a prompt suite without depending on the model to know your firm's standards; how do you validate numeric outputs deterministically before they leave the system; and what does the path look like from a prompt suite the senior partner runs by hand to a deployed software product the firm sells.</p>
 
 <p class="body">That is the path Mosaic is on. The Q3 software ship will be the first post in this series that points at a deployed URL.</p>
 
