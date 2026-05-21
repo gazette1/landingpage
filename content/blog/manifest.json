@@ -1,6 +1,6 @@
 {
-  "generated": "2026-05-19T23:00:00Z",
-  "count": 12,
+  "generated": "2026-05-20T20:00:00Z",
+  "count": 15,
   "posts": [
     {
       "title": "Inside Atlas: a 19-signal composition scorer for off-market real estate",
@@ -50,7 +50,7 @@
       "project": "mosaic",
       "version": "v1 / 2026",
       "tags": ["python", "lihtc", "corridor-analysis", "public-data", "automation", "mosaic", "fdaa", "cost-economics"],
-      "summary": "A 15-script Python pipeline that fuses Census ACS, HUD QCT, IRS OZ, USDA Food Atlas, state DDD, and land bank inventory data on a parcel key, scores against the state QAP, and produces an LP-memo-ready output. Five architectural decisions, transferable lessons, free public-data foundation.",
+      "summary": "A 15-script Python pipeline that fuses Census ACS, HUD QCT, IRS OZ, USDA Food Atlas, state DDD, and land bank inventory data on a parcel key, scores against the state QAP, and produces an LP-memo-ready output.",
       "word_count": 2500,
       "read_time_min": 12
     },
@@ -76,7 +76,7 @@
       "project": "cre",
       "version": "Prompt Suite",
       "tags": ["cre", "underwriting", "prompt-engineering", "claude", "mosaic", "eat-your-own-dog-food"],
-      "summary": "The Mosaic feasibility workflow is a Claude prompt suite that produces bank-quality CRE feasibility studies in 90 minutes instead of 30 hours. Standard Underwriting Schema v2.0, dual-scenario NOI, four creative structures, lender probability matching.",
+      "summary": "The Mosaic feasibility workflow is a Claude prompt suite that produces bank-quality CRE feasibility studies in 90 minutes instead of 30 hours.",
       "word_count": 2500,
       "read_time_min": 11
     },
@@ -89,7 +89,7 @@
       "project": "decktrainer",
       "version": "Phase 1 / 2026",
       "tags": ["hardware", "midi", "python", "drill-engine", "coaching-tool", "scope-discipline"],
-      "summary": "DeckTrainer is a learn-to-DJ coaching tool for the Hercules DJControl Starlight and Mix. Scope discipline, hardware-constraint surfacing, phased build plan, and a drill engine designed around deterministic scoring functions.",
+      "summary": "DeckTrainer is a learn-to-DJ coaching tool for the Hercules DJControl Starlight and Mix. Scope discipline, hardware-constraint surfacing, phased build plan.",
       "word_count": 2400,
       "read_time_min": 11
     },
@@ -102,7 +102,7 @@
       "project": null,
       "version": null,
       "tags": ["lihtc", "cre", "affordable-housing", "mosaic", "public-data", "ai-architecture", "fdaa"],
-      "summary": "Five public-records distress designations on a single parcel: QCT, OZ, DDD, R/ECAP, USDA food desert. The Mosaic framework to identify and stack them, and the AI architecture that compresses three weeks of research to three hours.",
+      "summary": "Five public-records distress designations on a single parcel. The Mosaic framework to stack them, and the AI architecture that compresses three weeks of research to three hours.",
       "word_count": 1600,
       "read_time_min": 7
     },
@@ -115,7 +115,7 @@
       "project": null,
       "version": null,
       "tags": ["hospitality", "debt-sizing", "lender-matching", "cre", "constraint-satisfaction", "ai-architecture", "fdaa"],
-      "summary": "Hospitality debt sourcing as constraint satisfaction followed by ranking. The architecture that compresses a week of broker research into thirty minutes of operator review, and what it leaves to the human relationship.",
+      "summary": "Hospitality debt sourcing as constraint satisfaction followed by ranking. The architecture that compresses a week of broker research into thirty minutes.",
       "word_count": 1500,
       "read_time_min": 7
     },
@@ -128,7 +128,7 @@
       "project": null,
       "version": null,
       "tags": ["hospitality", "noi-projection", "appraisal", "sponsor-bias", "underwriting", "ai-architecture", "fdaa"],
-      "summary": "A coastal hospitality asset has an appraisal-stabilized NOI and a sponsor pro forma that differ by 17 percent. Both numbers are produced in good faith. The gap decomposes into four components. This Field Note walks the decomposition.",
+      "summary": "A coastal hospitality asset has an appraisal-stabilized NOI and a sponsor pro forma that differ by 17 percent. The gap decomposes into four components.",
       "word_count": 1500,
       "read_time_min": 7
     },
@@ -141,7 +141,7 @@
       "project": null,
       "version": null,
       "tags": ["brokerage", "cre", "offering-memo", "signal-vs-spin", "ai-underwriting", "fdaa"],
-      "summary": "A brokerage marketing flyer is the highest-volume unstructured document in CRE. Four lines actually matter; the rest is decorative. This Field Note walks the AI-architected workflow that closes the gap between flyer claims and underwritten reality.",
+      "summary": "A brokerage marketing flyer is the highest-volume unstructured document in CRE. Four lines actually matter. The AI-architected workflow that closes the gap.",
       "word_count": 1500,
       "read_time_min": 7
     },
@@ -154,9 +154,48 @@
       "project": null,
       "version": null,
       "tags": ["emerging-sponsor", "capital-stack", "institutional-capital", "cre", "sponsor-narrative", "ai-architecture", "fdaa"],
-      "summary": "An emerging sponsor faces a structural problem in the capital stack: senior debt is reachable, LP equity is the wall. The four packaging patterns institutional LPs evaluate against, and the AI-architected workflow that produces the documentation.",
+      "summary": "An emerging sponsor faces a structural problem in the capital stack: senior debt is reachable, LP equity is the wall. The four packaging patterns institutional LPs evaluate against.",
       "word_count": 1500,
       "read_time_min": 7
+    },
+    {
+      "title": "Field Note: the Obsidian-Claude Code loop for project tracking and roadmaps",
+      "slug": "field-obsidian-claude-code",
+      "url": "blog/field-obsidian-claude-code.html",
+      "archetype": "field-note",
+      "date": "2026-05-20",
+      "project": null,
+      "version": null,
+      "tags": ["obsidian", "claude-code", "workflow", "project-tracking", "ai-architecture", "fdaa"],
+      "summary": "Obsidian as the human-facing planning layer, Claude Code as the execution layer, both reading the same file system. Conventions, failure modes, what changes at team scale.",
+      "word_count": 1700,
+      "read_time_min": 8
+    },
+    {
+      "title": "Field Note: Discord as the second screen for Claude Code activity",
+      "slug": "field-discord-claude-alerts",
+      "url": "blog/field-discord-claude-alerts.html",
+      "archetype": "field-note",
+      "date": "2026-05-20",
+      "project": null,
+      "version": null,
+      "tags": ["discord", "claude-code", "webhooks", "alerts", "ambient-notification", "ai-architecture", "fdaa"],
+      "summary": "Discord webhooks for AI alerts: ship notifications, build failures, long-task completions, daily summaries. Hook architecture and channel layout.",
+      "word_count": 1500,
+      "read_time_min": 7
+    },
+    {
+      "title": "Field Note: Perplexity deep research as the synthesis layer for binary and trinary decision trees",
+      "slug": "field-perplexity-decision-trees",
+      "url": "blog/field-perplexity-decision-trees.html",
+      "archetype": "field-note",
+      "date": "2026-05-20",
+      "project": null,
+      "version": null,
+      "tags": ["perplexity", "deep-research", "decision-trees", "synthesis", "ai-architecture", "fdaa"],
+      "summary": "Map the decision as a tree of binary or trinary branches, write a per-node Perplexity prompt, let the model synthesize, then come back to the node and decide.",
+      "word_count": 1800,
+      "read_time_min": 8
     }
   ]
 }

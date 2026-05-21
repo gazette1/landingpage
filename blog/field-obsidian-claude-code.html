@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Field Note: the Obsidian-Claude Code loop for project tracking / russh.work</title>
+  <meta name="description" content="Obsidian as the human-facing planning layer, Claude Code as the execution layer, both reading the same file system. The conventions, where it breaks, what an AI architect would change for teams." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">FIELD NOTE</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">WORKFLOW / OBSIDIAN + CLAUDE CODE</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.05.20</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">8 MIN / 1,700 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Field Note: the Obsidian-Claude Code loop for project tracking and roadmaps</h1>
+
+      <p class="post-summary">I run six concurrent AI projects with one personal stack: Obsidian as the human-facing planning and roadmap layer, Claude Code as the execution layer that reads the same files. The two share the same disk. This Field Note walks the conventions I use to keep the two in sync, where the workflow breaks, and what an AI architect would change if they were building it for a team.</p>
+
+      <div class="post-tags">OBSIDIAN / CLAUDE-CODE / WORKFLOW / PROJECT-TRACKING / AI-ARCHITECTURE / FDAA</div>
+    </header>
+
+    <div class="post-body">
+
+<p class="body">By Russ. Field Note, 2026.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The existing approach</h2>
+
+<p class="body">Most engineers I have watched manage AI-assisted projects use three or four tools at the same time: Notion or Linear for the roadmap, Cursor or Claude Code for the actual editing, a separate chat (ChatGPT, Claude.ai, or Perplexity) for research, and Slack or email for the human handoff. Each tool has its own context. None of them read each other's state.</p>
+
+<p class="body">The cost is real. Switching tools loses context. The roadmap doc in Notion does not know what the AI just wrote in Cursor. The AI doing the writing does not know what the roadmap says is the current sprint goal. The research session does not remember which decision the roadmap was waiting on. Every transition is a chance for the wrong thing to ship.</p>
+
+<p class="body">I run six concurrent AI projects (the six on the homepage) plus a CRE underwriting practice, plus a job search. The conventional multi-tool setup would collapse under the context-switching tax in a week. The personal workflow I run instead is one stack with two surfaces: Obsidian for me, Claude Code for the model, and a shared file system underneath.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Where it works</h2>
+
+<p class="body">Three properties of my domain make this workflow shape work:</p>
+
+<ol>
+<li><strong>Most of my projects are repository-shaped.</strong> They live in a git repo with a CLAUDE.md at the root, a README, phase docs, source files, and a content folder. Obsidian is happy to treat any folder as a vault. Claude Code is happy to read any path. The two tools point at the same disk locations.</li>
+<li><strong>My planning is markdown-first.</strong> Every project roadmap, every phase plan, every decision log lives as a markdown file in the project's docs folder or in a sibling Obsidian vault. Both tools render markdown natively. There is no Notion-to-markdown export step, no Linear-to-markdown sync, no manual copy-paste.</li>
+<li><strong>Decisions and code change at different cadences.</strong> I plan in Obsidian (slow, deliberate, sometimes weeks of iteration on a roadmap). I execute in Claude Code (fast, granular, daily commits). The two cadences do not need to be synced because they reference the same files. When I update the roadmap in Obsidian, the next Claude Code session reads the update. When Claude Code lands a phase, I open the phase doc in Obsidian to review and edit.</li>
+</ol>
+
+<p class="body">This is the same architectural pattern Atlas uses for source registry: separate the planning (the source-of-truth schema) from the execution (the per-source scrapers). One tool plans, the other executes, both read from the same data layer.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Where it breaks</h2>
+
+<p class="body">Two failure modes show up consistently.</p>
+
+<p class="body"><strong>Mode one: the Obsidian vault drifts from the live repo.</strong> If I edit a roadmap doc in Obsidian on my laptop and the repo is also being modified by Claude Code or by a git pull, the two views can disagree. Obsidian does not refresh automatically when the underlying file changes externally; you have to close and reopen the file or hit the reload command. I have lost a few paragraphs of planning to this. The discipline is: do not edit the same file in Obsidian and Claude Code simultaneously, and always git pull before opening a roadmap doc.</p>
+
+<p class="body"><strong>Mode two: Obsidian's links and tags do not translate to Claude Code's mental model.</strong> Obsidian is great at backlinks (page A links to page B; the graph view shows the relationship). Claude Code reads files in sequence based on what is in context; it does not automatically follow Obsidian's <code>[[backlink]]</code> syntax. Linked planning in Obsidian becomes invisible to Claude Code unless I explicitly tell the model "also read X, which is linked from Y."</p>
+
+<p class="body">Both modes are tractable. Both are why a more rigorous workflow would use a single source of truth with a thin viewing layer per tool, instead of two tools sharing files directly.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What I actually do</h2>
+
+<p class="body">The vault structure mirrors the repo structure, with one extra subfolder:</p>
+
+<pre><code>project-root/
+  CLAUDE.md
+  docs/
+    phase1.md
+    phase2.md
+    decision-log.md
+  obsidian/         &lt;- vault-only files, .gitignored
+    daily/
+      2026-05-20.md
+    inbox/
+      raw-ideas.md
+</code></pre>
+
+<p class="body">The <code>docs/</code> folder is shared with the repo and committed to git. The <code>obsidian/</code> folder is vault-only and gitignored, used for daily notes, raw-idea capture, and freeform thinking that has not yet earned its place in a decision log.</p>
+
+<p class="body">The decision log is the single most important file in any project. Every architectural decision I make on a project gets an ADR-style entry: date, decision, alternatives considered, rejection reasoning. Both Obsidian (for human writing) and Claude Code (for model reading) treat the decision log as the source of truth for "why does this project look the way it does." When I start a new Claude Code session, the first thing I do is <code>@docs/decision-log.md</code> to load the context.</p>
+
+<p class="body">Roadmaps follow the same pattern: roadmap.md in the docs folder, with the current sprint goal in the first paragraph and a phase-by-phase plan below. Claude Code reads the roadmap at session start; I edit it in Obsidian between sessions. Every commit that lands work for a roadmap item updates the roadmap status inline. The roadmap is never stale because both tools touch it.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What it would cost to do this for a team</h2>
+
+<p class="body">The workflow is solo-shaped. Scaling it to a team would require three additions:</p>
+
+<p class="body"><strong>A shared vault.</strong> Obsidian Sync, or putting the vault in a shared dropbox/iCloud folder, lets multiple people view and edit. Conflict resolution is manual; Obsidian does not have real-time collaboration.</p>
+
+<p class="body"><strong>A merge discipline.</strong> When two people edit the same markdown doc, you need git merge or a manual reconciliation. For docs/ files, git handles it. For the obsidian/ vault-only files, you need a separate sync tool.</p>
+
+<p class="body"><strong>A decision-log enforcement step.</strong> Solo, I can rely on personal discipline to write every architectural decision into the log. On a team, the discipline has to be in the workflow: every PR that lands an architectural change requires a decision-log entry, enforced by a pre-merge check. This is the same pattern as voice validation in Atlas: enforce the discipline at the boundary, not at the call site.</p>
+
+<p class="body">The team version costs an Obsidian Sync subscription per person ($4-8/month each), a couple of hours of setup, and a few weeks of teaching the discipline to people who have not done ADR-style decision logs before.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What an AI architect would change</h2>
+
+<p class="body">The honest answer is that the solo workflow is already at its rough optimum for one person managing six projects. Where an architecture rebuild would help is at three specific friction points:</p>
+
+<p class="body"><strong>Auto-context loading.</strong> Right now I manually <code>@docs/decision-log.md</code> and <code>@docs/roadmap.md</code> at the start of every Claude Code session. A small hook that reads the CLAUDE.md at session start and pre-loads the named context files would save 30 seconds per session. Over 200 sessions a year, that is real time.</p>
+
+<p class="body"><strong>Bidirectional sync between the decision log and the commit log.</strong> Every commit that introduces an architectural change should append a stub entry to the decision log. The model can write the rationale before the commit; the commit message references the decision log entry. This makes the decision log self-maintaining as code changes happen.</p>
+
+<p class="body"><strong>A typed schema for roadmap status.</strong> Currently the roadmap is freeform markdown. A YAML frontmatter block on each roadmap file (<code>current_phase: 3</code>, <code>next_milestone: 'TabPFN integration'</code>, <code>blocked_on: 'data ingestion'</code>) would let Claude Code parse the status programmatically and offer status-aware suggestions ("you're on phase 3, this looks like phase 4 work").</p>
+
+<p class="body">None of these are heavy lifts. None are critical at solo scale.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What would not change</h2>
+
+<p class="body">The two-surface, one-disk pattern is the right shape for solo AI-assisted work. I have tried single-tool setups (everything in Claude Code, no Obsidian) and they fail because the model is bad at the long-form reflective writing that the human needs to do to plan well. I have tried single-source planning tools (everything in Notion, sync to repo) and they fail because the sync is always behind the actual repo state.</p>
+
+<p class="body">The model writes code. I write plans. We meet at the markdown.</p>
+
+<p class="body"><mark class="callout">The architectural principle: in any solo-AI workflow, separate the planning layer from the execution layer, but make them share the same file system. The human gets a tool optimized for thinking; the model gets a tool optimized for editing; both read the same docs. The friction at the boundary is the cost of the freedom on each side.</mark></p>
+
+<hr class="rule">
+
+<h2 class="h2">Closing</h2>
+
+<p class="body">The Obsidian-Claude Code loop is the personal infrastructure underneath all six production AI projects on this site. Without it I do not run six in parallel; I drop to two and the rest stale.</p>
+
+<p class="body">If you are evaluating how to set up an AI-assisted personal stack, or how to onboard a junior engineer who needs both a planning surface and an execution surface, or how to scale solo-discipline patterns into team-discipline patterns, the questions worth asking are: how do you keep the planning layer and the execution layer reading from the same data without forcing them to use the same tool; how do you enforce decision-log discipline so the project's "why" survives staffing changes; and what is the smallest set of automation hooks that compress the per-session context-loading tax.</p>
+
+<p class="body">Those are the questions this Field Note is meant to answer.</p>
+
+<p class="body">For the multi-source data-fusion counterpart that runs the same shared-data, separate-tools pattern on parcel data, see <a href="inside-atlas.html">Inside Atlas</a>. For the prompt-suite workflow that produces structured outputs from the same kind of paired-tool discipline, see <a href="inside-cre-feasibility.html">Inside the Mosaic feasibility workflow</a>.</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="field-emerging-sponsor.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Field Note: packaging an emerging sponsor</span>
+        </a>
+        <a class="next" href="field-discord-claude-alerts.html">
+          <span class="k">NEXT</span>
+          <span class="v">Field Note: Discord as second screen for Claude Code</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to writing index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / AI SOLUTIONS ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+  <script src="../scripts/menu.js"></script>
+</body>
+</html>

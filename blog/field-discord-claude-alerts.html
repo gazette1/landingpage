@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Field Note: Discord as the second screen for Claude Code activity / russh.work</title>
+  <meta name="description" content="Discord webhooks routed to a private server for ambient AI alerts: ship notifications, build failures, long-task completions, daily summaries. The hook architecture, the channel layout, what an AI architect would change for teams." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">FIELD NOTE</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">WORKFLOW / DISCORD ALERTS</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.05.20</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">7 MIN / 1,500 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Field Note: Discord as the second screen for Claude Code activity</h1>
+
+      <p class="post-summary">Long-running AI tasks have a coordination problem. You cannot stare at the terminal for fifteen minutes waiting for a build, but you also cannot afford to forget what was running. I route Claude Code activity to a private Discord server via webhooks: ship notifications, build failures, long-task completions, daily summaries. Discord becomes the second screen. This Field Note walks the hook architecture, the channel layout, and what an AI architect would change if they were building a team version.</p>
+
+      <div class="post-tags">DISCORD / CLAUDE-CODE / WEBHOOKS / ALERTS / AMBIENT-NOTIFICATION / AI-ARCHITECTURE / FDAA</div>
+    </header>
+
+    <div class="post-body">
+
+<p class="body">By Russ. Field Note, 2026.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The existing approach</h2>
+
+<p class="body">Most AI-assisted development workflows assume you are watching the terminal. The model emits a status line, you read it, you respond, the model continues. This works for tight, foreground tasks (writing a function, debugging an error). It fails for any task that runs more than a few minutes.</p>
+
+<p class="body">A long-running task in Claude Code (a backtest sweep, a multi-file refactor, a batch publish of blog posts) sits between two bad options. Option one: you watch the terminal for 15 minutes doing nothing, which is wasted attention. Option two: you switch to another task and forget to come back, which is wasted output (the model finished and is waiting for the next instruction; you do not know).</p>
+
+<p class="body">The conventional fix is desktop notifications, which work but are noisy and easily dismissed. The fix I actually use is Discord webhooks routed to a private server.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Where it works</h2>
+
+<p class="body">Discord works as an alert channel for three reasons.</p>
+
+<ol>
+<li><strong>It is already where I spend ambient attention.</strong> I have Discord open on a side monitor for community participation. Routing AI alerts to a dedicated channel on that monitor means the notification lands in a context I already check, not in a new context I have to remember to check.</li>
+<li><strong>Webhooks are free, easy, and fast.</strong> Every Discord channel can have a webhook URL that accepts a POST request and posts the body as a channel message. No bot registration, no OAuth, no rate-limit handling for low-volume use. A bash <code>curl -X POST</code> is the entire integration on the sender side.</li>
+<li><strong>The channel structure becomes the project structure.</strong> I have one channel per project (#atlas, #trialedge, #mes, #marketing-bot, etc.), plus #ship-log for all version bumps across projects, plus #failures for any task that errored, plus #daily-summary for a once-a-day digest. The channel layout becomes the dashboard.</li>
+</ol>
+
+<hr class="rule">
+
+<h2 class="h2">Where it breaks</h2>
+
+<p class="body">Two failure modes show up regularly.</p>
+
+<p class="body"><strong>Mode one: the alert volume drowns the signal.</strong> Early on I sent a webhook on every Claude Code session start, end, and tool call. The channels turned into log dumps that I stopped reading. The fix was a strict allowlist: alerts only fire on (a) a session that completed a meaningful task as judged by a Stop hook, (b) any error or unrecoverable failure, (c) any commit that pushed to a remote, (d) any scheduled task firing or missing its window. Everything else stays in the terminal.</p>
+
+<p class="body"><strong>Mode two: the message format matters more than I thought.</strong> A raw text dump from Claude Code is unreadable in Discord. The format that actually gets read is: one-line summary in bold, three-line context block in monospace, link to the relevant commit or file. Discord's markdown rendering helps; the discipline of one-line-summary-first is what makes the alert actionable in a glance.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What I actually do</h2>
+
+<p class="body">The architecture is small.</p>
+
+<p class="body"><strong>Claude Code hooks</strong> trigger on Stop, on tool failures, on certain script completions. The hook is a tiny bash script that constructs a JSON payload and POSTs to a per-project webhook URL stored in an environment variable.</p>
+
+<p class="body"><strong>A shared library</strong> of message formatters (one for ship notes, one for failures, one for daily summary) keeps the format consistent across projects. Adding a new project means adding a new webhook URL and pointing the existing formatters at it.</p>
+
+<p class="body"><strong>A daily-summary cron</strong> runs at 8 AM, walks the previous day's git activity across all six projects, and posts a single message to #daily-summary with what shipped, what failed, what is queued. This is the message I actually read every morning while drinking coffee.</p>
+
+<p class="body"><strong>A failures-only catch-all</strong> sits at #failures. Anything that goes wrong in any project ends up here with the project name in the message. This is the closest thing I have to a pager.</p>
+
+<p class="body">The channels and the hooks together replace what would otherwise be a custom dashboard. I do not need a status page or a Grafana board; I have Discord.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What it costs</h2>
+
+<p class="body">The cost stack is rounding error.</p>
+
+<p class="body"><strong>Discord:</strong> free for personal use. The server I run for AI alerts has one user (me) and zero paid features. No bots, no Nitro, no premium tier.</p>
+
+<p class="body"><strong>Hooks:</strong> the bash scripts that POST to the webhooks are 20 to 50 lines each. They run as Claude Code Stop hooks (free), as cron jobs (free), or inline in build scripts (free).</p>
+
+<p class="body"><strong>Time:</strong> an hour to set up the webhooks per project, another hour to write the message formatters, ongoing maintenance is essentially zero.</p>
+
+<p class="body">The value is the recovered attention. Before this setup, I lost 10 to 20 minutes per day to checking terminals for completed tasks, or worse, forgetting tasks finished and discovering them stale the next morning. Now the completions surface in Discord and I respond at my own pace.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What an AI architect would change</h2>
+
+<p class="body">If I were building the team version, three changes.</p>
+
+<p class="body"><strong>A shared schema for alert messages.</strong> Right now each formatter is hand-written. A typed message schema (severity, project, summary, context, action_url) would let the formatters be auto-generated from the schema and let downstream tooling (filters, threading, escalation) work consistently.</p>
+
+<p class="body"><strong>Threading by task.</strong> Discord supports threads. A long-running task that emits multiple status updates should land them in a single thread, not as separate messages. This needs the hooks to maintain a task-id state, which is harder than it sounds because tasks span sessions.</p>
+
+<p class="body"><strong>An "ack" loop.</strong> Currently the alerts are one-way. For team use, you want to acknowledge an alert (so others know it has been seen) and convert it to a follow-up task. A Discord bot that accepts emoji reactions as ack and writes them back to a tracking system would close that loop. I have not built this because solo use does not need it.</p>
+
+<p class="body">None of these are critical. The current setup works at solo scale.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What would not change</h2>
+
+<p class="body">The pattern is right. Long-running tasks need ambient notification, not active monitoring. Channel-per-project is the right organizing principle because it matches how the work is already organized. The discipline of "only fire on meaningful events" is what keeps the channels readable.</p>
+
+<p class="body"><mark class="callout">The architectural principle: in any system where humans coordinate with long-running AI tasks, the alerts should land in a channel the human already watches, in a format the human can read in one glance, with a strict allowlist for what fires. Volume is the enemy. Signal is the product.</mark></p>
+
+<p class="body">The same principle applies to monitoring pipelines for production AI systems, to ops alerts on infrastructure, to credit-committee escalation paths, to incident-response triage. Discord is the surface I happen to use. The pattern is portable.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Closing</h2>
+
+<p class="body">Discord as a second screen is the personal infrastructure that makes running six concurrent AI projects sustainable. Without ambient notification, I forget tasks finished. Without channel-per-project structure, the alerts blur together. Without strict allowlisting, the channels turn into noise. All three disciplines together turn Discord into a real coordination layer for solo AI work.</p>
+
+<p class="body">If you are evaluating how to set up ambient notification for AI-assisted work, or how to scale solo-coordination patterns into team-coordination patterns, the questions worth asking are: which channel does your human already watch (Slack, Discord, SMS, email); what is the strict allowlist for events worth alerting on; how do you format the message so it is readable in one glance; and how do you keep the volume low enough that the channel stays signal.</p>
+
+<p class="body">Those are the questions this Field Note is meant to answer.</p>
+
+<p class="body">For the project-tracking counterpart that pairs Obsidian and Claude Code into a planning-and-execution loop, see <a href="field-obsidian-claude-code.html">the Obsidian-Claude Code loop for project tracking</a>. For the orchestration discipline behind structured outputs at scale, see <a href="inside-marketing-bot.html">Inside Marketing Bot v2</a>.</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="field-obsidian-claude-code.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Field Note: the Obsidian-Claude Code loop</span>
+        </a>
+        <a class="next" href="field-perplexity-decision-trees.html">
+          <span class="k">NEXT</span>
+          <span class="v">Field Note: Perplexity for decision trees</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to writing index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / AI SOLUTIONS ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+  <script src="../scripts/menu.js"></script>
+</body>
+</html>
