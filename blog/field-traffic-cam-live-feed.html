@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Field Note: turning NYC's public traffic cameras into a live feed / russh.work</title>
+  <meta name="description" content="New York DOT puts roughly 957 traffic cameras online as still images with no key and no login. Refresh one on a timer and a still becomes a feed. How I found the right cameras, faked live without the page jumping, and handled cameras that die." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">FIELD NOTE</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">GARDENCAM / TRAFFIC-CAM</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.06.08</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">6 MIN / 1,180 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Field Note: turning NYC's public traffic cameras into a live feed</h1>
+
+      <p class="post-summary">New York DOT puts roughly 957 traffic cameras online as still images with no key and no login. Refresh one on a timer and a still becomes a feed. This is how I found the right cameras for each location, faked "live" without the page jumping, and handled the cameras that quietly die.</p>
+
+      <div class="post-tags">TRAFFIC-CAMERAS / NYC-DOT / PUBLIC-DATA / HAVERSINE / CORS / JAVASCRIPT / STATIC-SITE</div>
+    </header>
+
+    <div class="post-body">
+
+<p class="body">By Russ. Field Note, 2026.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The whole idea in one line</h2>
+
+<p class="body">New York DOT runs a public traffic-camera site. Every camera has a still image at a stable URL. Refresh that image on a timer and a still becomes a feed. That is the entire trick. Everything below is just the detail that makes it hold up.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The image URL</h2>
+
+<p class="body">Each camera's picture lives at a predictable address:</p>
+
+<pre><code>https://webcams.nyctmc.org/api/cameras/{id}/image</code></pre>
+
+<p class="body">It returns a JPEG. No key, no login, nothing to sign up for. The only real snag is caching: browsers hold onto an image URL, so a plain reload shows you the same frame over and over. The fix is a throwaway query string that changes every time:</p>
+
+<pre><code>https://webcams.nyctmc.org/api/cameras/{id}/image?cacheAvoidance=1717800000000</code></pre>
+
+<p class="body">Stick the current timestamp on the end and every request is a new URL, so the browser actually goes and fetches a fresh frame. Reload every two seconds and it reads as live. I picked two seconds on purpose: the cameras themselves only refresh about once a second, so there is no point hammering faster, and two seconds stays honest about what the source actually is instead of pretending to be full-motion video.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Finding the right cameras</h2>
+
+<p class="body">The site also exposes a list of every camera:</p>
+
+<pre><code>https://webcams.nyctmc.org/api/cameras</code></pre>
+
+<p class="body">That comes back as an array of roughly 957 entries, each with an id, a human name like "6 Ave @ 42 St", a latitude and longitude, and an online flag. I did not want to hand-pick cameras for every location, so I let geography do it. For each venue I have a coordinate, and I run a haversine distance against every online camera, sort by distance, and keep the nearest handful.</p>
+
+<pre><code>function haversine(lat1, lng1, lat2, lng2) {
+  const R = 6371; // km
+  const toRad = (d) =&gt; (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}</code></pre>
+
+<p class="body">The nice side effect is that the whole thing is re-targetable. Change a venue's latitude and longitude and the camera set follows it. Move the watch party from Bryant Park to Brooklyn Bowl and the app just points at the cameras near the new spot.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Faking "live" without the page jumping</h2>
+
+<p class="body">Each camera is its own image element sitting in a fixed aspect-ratio box with object-fit cover. That part matters more than it sounds: because the box never changes size, a new frame swapping in causes zero layout shift. The page sits perfectly still while the pictures underneath it update.</p>
+
+<p class="body">One shared timer ticks every two seconds, walks every tile, and swaps each image source to a fresh cache-busted URL. The loads happen independently, so a slow camera or a dead one only affects its own tile. Nothing waits on anything else.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The CORS wall, and why I ship a hardcoded list</h2>
+
+<p class="body">Here is the one place the browser fights you. The image URL works cross-origin from an image tag with no trouble at all. The list URL does not send the headers a browser needs to read a cross-origin fetch, so calling the list from client-side JavaScript gets blocked.</p>
+
+<p class="body">There are two honest ways around that. Stand up a small proxy, or ship a hardcoded list of camera IDs with the app. For something I want to be a single static page that runs by opening a file, I went with the hardcoded list. The app tries the live list first, and when the fetch is blocked it quietly falls back to a vetted list of camera IDs per location. In practice the browser uses the fallback every time, and the live list is a bonus for environments that allow it.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Cameras die, so plan for it</h2>
+
+<p class="body">Camera IDs go stale. A retired camera answers its image URL with a 404, and an image element pointed at a 404 just fires an error event. So every tile listens for that error, swaps itself to a RECONNECTING state, and tries again on the next tick. One dead camera should never freeze the rest of the wall.</p>
+
+<p class="body">Two small things bit me here:</p>
+
+<ol>
+<li>Several IDs from an older public list had already been retired, so I re-pulled the full list and kept only the ones whose image actually came back as a real JPEG.</li>
+<li>The online flag in the list is the string "true" or "false", not a real boolean. A plain truthy check treats the string "false" as true, which silently keeps offline cameras in the mix.</li>
+</ol>
+
+<hr class="rule">
+
+<h2 class="h2">The bug that actually cost me time</h2>
+
+<p class="body">The one worth writing down: the RECONNECTING overlay was a div with display:flex in the stylesheet, and I was toggling the hidden attribute on it from JavaScript. The problem is that display:flex wins over the hidden attribute, so the overlay sat on top of every tile permanently, covering feeds that were loading perfectly well underneath.</p>
+
+<p class="body"><mark class="callout">For a while the data was completely live and the screen looked dead. The JavaScript was telling the truth and the CSS was lying.</mark></p>
+
+<p class="body">The fix was one line that lets the attribute win:</p>
+
+<pre><code>.overlay[hidden] { display: none; }</code></pre>
+
+<p class="body">The lesson I am keeping: when a piece of state lives in both an HTML attribute and a stylesheet, make sure the stylesheet actually respects the attribute, or you will spend an hour debugging a network layer that was fine the whole time.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Closing</h2>
+
+<p class="body">None of this is hard. A still image, a timer, a distance calc, and some care around the cameras that drop out. The interesting part is not the code, it is that the raw material was sitting in public the entire time. For the short version, and the reason I built it on a Finals night, see <a href="ship-gardencam.html">the ship note</a>.</p>
+
+<hr class="rule">
+
+<p class="body">Russ</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="field-perplexity-decision-trees.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Field Note: Perplexity deep research for decision trees</span>
+        </a>
+        <a class="next" href="ship-gardencam.html">
+          <span class="k">NEXT</span>
+          <span class="v">Ship Note: I built a way to watch the watch party</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / AI SOLUTIONS ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+  <script src="../scripts/menu.js"></script>
+</body>
+</html>

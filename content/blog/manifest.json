@@ -1,7 +1,33 @@
 {
-  "generated": "2026-05-20T20:00:00Z",
-  "count": 15,
+  "generated": "2026-06-08T20:00:00Z",
+  "count": 17,
   "posts": [
+    {
+      "title": "Ship Note: I built a way to watch the watch party",
+      "slug": "ship-gardencam",
+      "url": "blog/ship-gardencam.html",
+      "archetype": "ship-note",
+      "date": "2026-06-08",
+      "project": "gardencam",
+      "version": "v1 / 2026",
+      "tags": ["vibe-coding", "public-data", "traffic-cameras", "nyc-dot", "knicks", "build-in-public", "static-site", "civic-tech"],
+      "summary": "The Knicks are up 2-0 in the Finals and the Game 3 watch party got scattered across three parks. So in one evening I built a way to watch the watch party, using New York's public traffic cameras as a stand-in live feed.",
+      "word_count": 430,
+      "read_time_min": 3
+    },
+    {
+      "title": "Field Note: turning NYC's public traffic cameras into a live feed",
+      "slug": "field-traffic-cam-live-feed",
+      "url": "blog/field-traffic-cam-live-feed.html",
+      "archetype": "field-note",
+      "date": "2026-06-08",
+      "project": null,
+      "version": null,
+      "tags": ["traffic-cameras", "nyc-dot", "public-data", "haversine", "cors", "javascript", "static-site", "civic-tech"],
+      "summary": "New York DOT puts roughly 957 traffic cameras online as still images with no key and no login. Refresh one on a timer and a still becomes a feed. How I found the right cameras for each location, faked live without the page jumping, and handled the cameras that quietly die.",
+      "word_count": 1180,
+      "read_time_min": 6
+    },
     {
       "title": "Inside Atlas: a 19-signal composition scorer for off-market real estate",
       "slug": "inside-atlas",

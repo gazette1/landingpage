@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ship Note: I built a way to watch the watch party / russh.work</title>
+  <meta name="description" content="The Knicks are up 2-0 in the Finals and the Game 3 watch party got scattered across three parks. So in one evening I built a way to watch the watch party, using New York's public traffic cameras as a stand-in live feed." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">SHIP NOTE</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">GARDENCAM V1</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.06.08</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">3 MIN / 430 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Ship Note: I built a way to watch the watch party</h1>
+
+      <p class="post-summary">The Knicks are up 2-0 in the Finals and the Game 3 watch party got scattered across three parks. So in one evening I built a way to watch the watch party, using New York's public traffic cameras as a stand-in live feed.</p>
+
+      <div class="post-tags">VIBE-CODING / PUBLIC-DATA / TRAFFIC-CAMERAS / NYC-DOT / KNICKS / BUILD-IN-PUBLIC / STATIC-SITE</div>
+    </header>
+
+    <div class="post-body">
+
+<p class="body">By Russ. Ship Note, 2026.</p>
+
+<hr class="rule">
+
+<p class="body">Last night I built something kind of dumb and kind of delightful.</p>
+
+<p class="body">The Knicks are up 2-0 in the Finals. Game 3 is at the Garden tonight, but with the President in the building, the city moved the outdoor watch party out of MSG and spread it across Bryant Park, Wollman Rink, and Brooklyn Bowl. So I built a way to watch the watch party.</p>
+
+<p class="body">Here is the trick. New York DOT publishes around 957 traffic cameras to the public. No API key, no login, just a still image at a URL that refreshes about once a second. Loop that image every two seconds and you have a passable live feed of any street corner in the city.</p>
+
+<p class="body">Credit where it is due: I saw wttdotm's GardenCam pull this off for MSG and wanted my own. Then I pushed it one step further. Instead of hardcoding a handful of cameras, I pulled the full list, ran a quick distance calculation against each watch-party venue, and let the app find the nearest cameras to wherever the crowd actually is. Bryant Park. Brooklyn Bowl. Wherever the party moves next.</p>
+
+<p class="body">Total build time was one evening.</p>
+
+<p class="body">I keep coming back to this. The gap between "I have an idea" and "it is live" has basically collapsed. Public data, an AI coding tool, and one quiet evening is the whole stack now.</p>
+
+<p class="body"><mark class="callout">You do not need permission or a budget to build something people enjoy. You just need to be curious enough to lop the /image off a URL and see what is underneath.</mark></p>
+
+<p class="body">Let's go Knicks.</p>
+
+<hr class="rule">
+
+<p class="body">If you want the version with the wiring exposed (how the app finds the right cameras, why a two-second reload reads as live, and the things that broke along the way), I wrote it up in <a href="field-traffic-cam-live-feed.html">the companion field note</a>.</p>
+
+<hr class="rule">
+
+<p class="body">Russ</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="field-traffic-cam-live-feed.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Field Note: turning NYC's public traffic cameras into a live feed</span>
+        </a>
+        <a class="next" href="" style="visibility:hidden;">
+          <span class="k">NEXT</span>
+          <span class="v"></span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / AI SOLUTIONS ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+  <script src="../scripts/menu.js"></script>
+</body>
+</html>
