@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inside StrikeOut Bot: quantile regression for MLB strikeout prediction / russh.work</title>
+  <meta name="description" content="StrikeOut Bot predicts a starting pitcher's next-start strikeouts. Three LightGBM quantile regressors produce a median and a 90 percent interval, a Ridge stacker blends them against a dumb baseline, and a stratified blind test is the only gate that lets a model ship." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">THESIS</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">STRIKEOUT BOT v1</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.06.24</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">13 MIN / 2,600 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Inside StrikeOut Bot: quantile regression and beat-the-baseline discipline for MLB strikeout prediction</h1>
+
+      <p class="post-summary">StrikeOut Bot predicts how many batters a starting pitcher will strike out in his next start. Three LightGBM quantile regressors produce a median and a 90 percent interval, a Ridge meta-learner stacks them against a dumb baseline, and a blind test on unseen post-All-Star-Break data is the only gate that lets a model ship. This post walks the 40-feature pipeline, why quantile regression beats point prediction here, the baseline discipline that keeps the project honest, and the leakage prevention that makes the backtest trustworthy.</p>
+
+      <div class="post-tags">LIGHTGBM / QUANTILE-REGRESSION / STACKING / CALIBRATION / WALK-FORWARD-CV / BASEBALL / STATCAST / EVAL</div>
+    </header>
+
+    <div class="post-body">
+
+<p class="body">By Russ. Built 2026.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What this post is</h2>
+
+<p class="body">StrikeOut Bot predicts how many batters a starting pitcher will strike out in his next start. The output is not a single number. It is a median prediction plus a 90 percent confidence interval, produced per pitcher per game, from a 40-feature matrix built out of Statcast pitch data, opponent profiles, ballpark factors, and battery effects.</p>
+
+<p class="body">The system is three LightGBM quantile regression models wrapped in a Ridge meta-learner, validated with walk-forward cross-validation, and gated by a blind test on data the model never touched during training. It is a personal project, so unlike some of the other systems on this site there is no competitive edge to protect. Everything here is exactly how it is built.</p>
+
+<p class="body">This post is for engineers and architects evaluating whether a similar shape applies to a different small-signal prediction problem. The quantile-interval design, the beat-the-dumb-baseline discipline, the walk-forward validation, and the leakage prevention are the parts most likely to transfer. Baseball is the vehicle.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The problem</h2>
+
+<p class="body">A strikeout prediction sounds like a regression problem and mostly is. A starter faces a lineup, throws his repertoire, and records somewhere between zero and roughly fifteen strikeouts. The naive approach is to predict the mean and move on.</p>
+
+<p class="body">Three properties of this domain make the naive approach wrong.</p>
+
+<ol>
+<li><strong>The useful output is an interval, not a point.</strong> A prediction of "7 strikeouts" is far less useful than "median 7, with a 90 percent interval of 4 to 10." The interval is what tells you whether a game is a coin flip or a strong lean. A point estimate throws away the single most decision-relevant piece of information: how confident the model actually is on this specific pitcher against this specific lineup. <mark class="callout">Calibration of the interval is the product. The point estimate is the qualifier.</mark></li>
+<li><strong>A dumb baseline is already good.</strong> Strikeouts per nine innings times innings per start gets you most of the way there. Any model that does not clearly beat that baseline is not worth the maintenance cost. This is the central honesty constraint: every gain has to be measured against the dumbest reasonable predictor, not against zero.</li>
+<li><strong>Leakage is trivially easy and fatally common.</strong> Baseball data is a time series. Season-to-date stats, rolling averages, and opponent profiles all update after every game. It is extremely easy to accidentally build a feature that includes information from the game you are trying to predict, which produces a backtest that looks brilliant and a live model that is worthless. The architecture has to make leakage structurally hard, not rely on remembering to avoid it.</li>
+</ol>
+
+<p class="body">StrikeOut Bot is shaped by these three constraints in order.</p>
+
+<hr class="rule">
+
+<h2 class="h2">System overview</h2>
+
+<p class="body">The stack is deliberately boring.</p>
+
+<ul>
+<li><strong>Python</strong> with <strong>LightGBM</strong> for the models, <strong>Ridge</strong> (scikit-learn) for the stacker, <strong>Optuna</strong> for hyperparameter tuning, <strong>SHAP</strong> for feature attribution.</li>
+<li><strong>Parquet</strong> feature matrices and staging tables on disk. No cloud database; the whole thing runs locally and on a daily cron.</li>
+<li><strong>Statcast and FanGraphs</strong> as the upstream data sources, pulled into staging tables plus lineup, weather, umpire, and schedule data.</li>
+<li>A <strong>daily pipeline</strong> that resolves probable starters, builds the feature matrix, runs inference, and logs predictions for later scoring against actual outcomes.</li>
+</ul>
+
+<p class="body">LightGBM was the obvious modeling choice: it handles missing values natively (baseball data has plenty), trains fast enough to retune whenever features change, and produces inspectable trees. The interesting decisions are all in the wrapper around it.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The feature pipeline</h2>
+
+<p class="body">The feature layer turns staging tables into a fixed 40-column matrix, one row per probable starter. Features are organized into five groups, each in its own module, orchestrated by a single feature pipeline.</p>
+
+<table>
+<thead>
+<tr><th>Group</th><th>Features</th><th>What it captures</th></tr>
+</thead>
+<tbody>
+<tr><td>Pitcher Ability</td><td>1 to 14</td><td>Swinging-strike rate, called+swinging strike rate, whiff rates, vertical approach angle, induced vertical and horizontal break, spin, tunneling, putaway rate</td></tr>
+<tr><td>Recent Form</td><td>15 to 18</td><td>Recency-weighted rolling performance, exponentially weighted means</td></tr>
+<tr><td>Opponent Profile</td><td>19 to 31</td><td>Lineup chase rate, in-zone contact rate, strikeout tendency, chase-versus-velocity-band behavior</td></tr>
+<tr><td>Contextual</td><td>32 to 36</td><td>Ballpark strikeout factor, umpire tendencies, weather, schedule, days rest</td></tr>
+<tr><td>Battery Effects</td><td>37 to 40</td><td>Catcher framing and the specific pitcher-catcher pairing</td></tr>
+</tbody>
+</table>
+
+<p class="body">Two things about this layer matter architecturally.</p>
+
+<p class="body"><strong>Ordering is a dependency, not a convenience.</strong> Pitcher Ability runs first, because it extracts the pitcher's primary velocity, which then feeds an Opponent Profile feature that measures how the opposing lineup chases against that specific velocity band. The orchestrator enforces the order. A failing feature group is wrapped in try/except and NaN-filled rather than crashing the whole matrix, and the missing values are imputed downstream with league-average fallbacks.</p>
+
+<p class="body"><strong>The metadata and the target are never in the feature slice.</strong> The matrix carries the 40 features plus four metadata columns (pitcher id, game date, game id, opponent) plus, at training time, the target (actual strikeouts). The metadata and the target are structurally excluded from the model inputs, and that exclusion is verified by dedicated leakage-prevention tests. This is the first line of defense against the leakage failure mode.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The modeling layer</h2>
+
+<p class="body">The model is where the interval-first design lives.</p>
+
+<h3 class="h3">Why quantile regression, not point prediction</h3>
+
+<p class="body">Instead of training one model to predict the mean strikeout count, StrikeOut Bot trains three LightGBM models with a quantile objective: one at the 5th percentile, one at the median, one at the 95th percentile. The median is the headline prediction; the 5th and 95th together form a 90 percent confidence interval.</p>
+
+<pre><code>                 40 features
+                     |
+      +--------------+--------------+
+      v              v              v
+ LightGBM q=0.05  q=0.50 (median)  q=0.95
+   (lower)            |            (upper)
+                      v
+        Ridge meta-learner (stacking)
+        inputs: [median_pred, baseline, days_rest]
+                      v
+        predicted_strikeouts (stacked)
+        pred_ci_lower / pred_ci_upper
+</code></pre>
+
+<p class="body">This is the architectural decision that makes the output useful. A point model tells you "7." The quantile stack tells you "median 7, interval 4 to 10," and critically it can tell you "median 7, interval 6 to 8" on a different pitcher where the model is genuinely more confident. The width of the interval is signal. Quantile regression is how you get it directly out of the model rather than bolting on a variance estimate after the fact.</p>
+
+<p class="body">The honesty check on this is interval calibration: across many predictions, roughly 90 percent of actual outcomes should fall inside the 90 percent interval. If only 70 percent do, the intervals are lying and the model is overconfident. Calibration at 90 is a first-class metric in every evaluation report.</p>
+
+<h3 class="h3">The Ridge stacker</h3>
+
+<p class="body">The three quantile models produce a median. That median is not the final prediction. It is one input to a Ridge meta-learner that stacks three signals: the model's median prediction, the dumb baseline (strikeouts per nine times innings per start), and days of rest.</p>
+
+<p class="body">The stacker exists for a specific reason. The LightGBM median is strong but occasionally drifts on edge cases; the baseline is weak but almost never catastrophically wrong; days of rest carries a small real effect the tree model under-weights. A Ridge regression with light regularization blends the three into a prediction that is more robust than any of them alone. The final output is clamped to a sane range and forced to respect its own interval bounds, so the stacked prediction can never fall outside the lower and upper quantiles.</p>
+
+<p class="body"><mark class="callout">The pattern is the same one behind TrialEdge's CalibratedDebateScorer: the base model produces a signal, and a thin, inspectable wrapper turns that signal into something you can actually make a decision on.</mark></p>
+
+<h3 class="h3">Hyperparameters</h3>
+
+<p class="body">Tuned with Optuna's tree-structured Parzen estimator, then frozen: 63 leaves, learning rate 0.05, up to 1000 estimators with early stopping, feature and bagging fractions at 0.8, light L1 and L2 regularization, fixed seed, deterministic mode on. Deterministic training matters more than it sounds. It means a retrain on the same data produces the same model, which means when a metric moves I know it moved because the data changed, not because the RNG did.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Baseline discipline</h2>
+
+<p class="body">Three baselines exist, and every model is scored head-to-head against all three.</p>
+
+<ul>
+<li><strong>B1</strong>: strikeouts per nine divided by nine, times innings per start. The dumbest reasonable predictor, and also the baseline fed into the Ridge stacker.</li>
+<li><strong>B2</strong>: a Vegas proxy that scales B1 by team average innings and the ballpark strikeout factor. This loosely mimics how a sportsbook would set a strikeout line, so beating it is the closest thing to beating the market.</li>
+<li><strong>B3</strong>: the pitcher's last-five-start average.</li>
+</ul>
+
+<p class="body">The rule is simple and non-negotiable. <mark class="callout">A complex model that barely beats strikeouts-per-nine-times-innings is not worth maintaining. Baselines keep the project honest: every point of improvement is measured against the dumbest predictor that works, not against zero.</mark> This is the discipline that most personal ML projects skip, and skipping it is why most personal ML projects quietly do not work.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The eval rig</h2>
+
+<p class="body">Two layers, and a model has to pass both to ship.</p>
+
+<h3 class="h3">Walk-forward cross-validation</h3>
+
+<p class="body">Baseball is a time series, so the validation is a time series. Train on the past, test on the future, roll the window forward. No random shuffling, because a random split would let the model train on August to predict July, which is leakage wearing a lab coat. Walk-forward validation is the only honest way to estimate how the model will do on games that have not happened yet. Within the training pipeline itself, the split is strict: train on everything before the last four weeks, validate on the last four weeks, early-stop on the validation set.</p>
+
+<h3 class="h3">The blind test</h3>
+
+<p class="body">The final gate is a blind test on data the model has never seen in any form: 2024 post-All-Star-Break starts. The test does three things that make it trustworthy.</p>
+
+<ol>
+<li>It filters to a clean temporal hold-out (games after the All-Star Break split point).</li>
+<li>It <strong>stratified-samples 5,000 starts across strikeout tiers</strong> (low, medium, high), so the evaluation is not dominated by average pitchers. The model has to perform on the low-strikeout control artists and the high-strikeout aces, not just the fat middle of the distribution.</li>
+<li>It scores the model head-to-head against all three baselines on the same sample, reporting MAE, RMSE, over-under accuracy at common strikeout lines, and interval calibration.</li>
+</ol>
+
+<p class="body">If the model cannot beat the baselines on truly unseen data with honest intervals, it does not ship. That is the whole rule.</p>
+
+<h3 class="h3">The metrics that matter</h3>
+
+<p class="body">Mean absolute error is the headline: the average strikeout miss. But the report also breaks MAE down by strikeout tier, because a model can have a good overall MAE while failing badly on aces or on low-strikeout arms, and that segmented failure is exactly the kind of thing an aggregate number hides. Over-under accuracy against lines of 5.5, 6.5, 7.5, and 8.5 is the practical, decision-relevant metric. Calibration at 90 is the honesty metric. All four flow into a model-degradation alert that fires when rolling MAE drifts above the baseline in production.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Leakage prevention</h2>
+
+<p class="body">Because leakage is the domain's defining failure mode, it gets its own defense in depth.</p>
+
+<ul>
+<li>The metadata columns and the target are structurally excluded from the feature slice, verified by tests.</li>
+<li>Rolling and season-to-date features are computed as-of the prediction date, never including the game being predicted.</li>
+<li>Validation is strictly temporal, never random.</li>
+<li>The blind test uses a hold-out period that no training run has ever seen.</li>
+</ul>
+
+<p class="body">None of these is clever. All of them are the kind of discipline that separates a backtest you can trust from a backtest that flatters you. The clever part is making them structural, so a future change cannot reintroduce leakage without a test going red.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What I would change starting over</h2>
+
+<ol>
+<li><strong>Model the pitch-level distribution, not just the start-level count.</strong> Predicting total strikeouts is coarse. A richer version would predict the outcome distribution pitch by pitch and aggregate up, which would produce naturally calibrated intervals and let the model reason about pitch counts and times-through-the-order effects explicitly.</li>
+<li><strong>Add an explicit opponent-lineup model.</strong> Opponent profile is currently a set of team-level aggregate features. The real signal is the specific nine hitters likely to be in the lineup and how each matches up against this pitcher's repertoire. That is a bigger data-engineering lift but it is where the remaining accuracy lives.</li>
+<li><strong>Externalize the baseline comparison into continuous production monitoring.</strong> The baseline comparison currently runs in the blind test and in periodic scoring. It should run every single day against the previous day's realized outcomes, so baseline-relative performance is a live dashboard, not a periodic check.</li>
+</ol>
+
+<hr class="rule">
+
+<h2 class="h2">Closing</h2>
+
+<p class="body">StrikeOut Bot is a small, honest ML system that solves a narrow prediction problem with calibrated intervals, a dumb-baseline honesty constraint, and a leakage-resistant eval rig. The architecture is not novel. The discipline is what makes the numbers trustworthy: quantile regression so the interval is real, a stacker so the prediction is robust, walk-forward validation and a stratified blind test so the backtest is not a lie.</p>
+
+<p class="body">The through-line to the rest of my work is the same one that runs through TrialEdge and the MES trading model: at small signal and high noise, calibration beats raw accuracy, and the model that honestly says "I do not know" on the hard cases is worth more than the one that confidently guesses. If you are building something similar in a different small-signal domain, the questions worth asking are: is your useful output a point or an interval; what is the dumbest baseline you have to beat; is your validation actually temporal; and can a future code change reintroduce leakage without a test catching it.</p>
+
+<p class="body">For the production-ML calibration discipline that shaped this project, see <a href="inside-trialedge.html">Inside TrialEdge</a>. For the same anti-lookahead and beat-the-baseline discipline applied to markets, see <a href="inside-mes-open.html">Inside MES Open</a>.</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="inside-study-quest.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Inside Study Quest</span>
+        </a>
+        <a class="next" href="inside-adoption-chain.html">
+          <span class="k">NEXT</span>
+          <span class="v">Inside Adoption Chain</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to writing index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / AI SOLUTIONS ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+  <script src="../scripts/menu.js"></script>
+</body>
+</html>

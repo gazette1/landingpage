@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inside Adoption Chain: an auditable second-order research engine for small-cap equity / russh.work</title>
+  <meta name="description" content="Adoption Chain turns a PM's scenario into a consequence map, finds the under-covered small-cap companies on each consequence, and drafts a one-page thesis per name where every claim links to the exact SEC filing sentence. Leverage underneath judgment, never a recommendation." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">THESIS</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">ADOPTION CHAIN v6</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.07.02</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">12 MIN / 2,300 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Inside Adoption Chain: an auditable second-order research engine for small-cap equity</h1>
+
+      <p class="post-summary">Adoption Chain turns a portfolio manager's scenario into a consequence map, then finds the under-covered small-cap companies sitting on each consequence, then drafts a one-page thesis per name in which every factual claim links to the exact SEC filing sentence behind it. It is leverage underneath judgment, never a recommendation. This post walks the phrase-rule that makes retrieval actually work, the rubric-outside-the-model design that makes it auditable, and the read-once-query-many corpus that runs the whole thing for about twenty-two dollars.</p>
+
+      <div class="post-tags">BUY-SIDE / SEC-EDGAR / RETRIEVAL / AUDITABILITY / DEEPSEEK / PROVIDER-AGNOSTIC / COST-ECONOMICS / RESEARCH-TOOLING</div>
+    </header>
+
+    <div class="post-body">
+
+<p class="body">By Russ. Built 2026.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What this post is</h2>
+
+<p class="body">Adoption Chain is an idea-generation engine for a small-cap growth-equity team. A portfolio manager types a scenario ("humanoid robotics reaches commercial scale," "onshoring accelerates"). The system returns three things: an organized consequence map of first, second, and third-order effects, both good and bad; a ranked list of under-covered small-cap companies sitting on each consequence; and a one-page thesis draft per name in which every factual claim links to the exact sentence in the exact SEC filing it came from.</p>
+
+<p class="body">The design principle is one line: <strong>leverage underneath judgment, never a recommendation.</strong> The system does the search, the reading, and the sourcing that would take an analyst days. It does not tell the PM what to buy. It hands them a defensible starting point where every claim is one click from its primary source.</p>
+
+<p class="body">I built it as the centerpiece of a buy-side Associate Analyst case. It is a personal project on public data, so everything here is exactly how it works. This post is for engineers and architects evaluating retrieval-heavy, auditability-first LLM systems. The financial-research framing is the vehicle.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The problem</h2>
+
+<p class="body">A growth-equity PM has more scenarios than analyst-hours. The valuable ideas are not the obvious first-order beneficiaries everyone already owns; they are the second and third-order names three links down the supply chain that no sell-side analyst covers yet. Finding them means reading a lot of filings.</p>
+
+<p class="body">Three properties of this domain shape the architecture.</p>
+
+<ol>
+<li><strong>The output has to be auditable or it is worthless.</strong> A PM cannot act on "the model says this company benefits." They can act on "this company's own 10-K, this sentence, says it supplies this component to this end market." An LLM assertion is a liability; a linked primary-source citation is an asset. The system is built so every factual claim is traceable to a filing sentence, and claims that cannot be sourced are dropped.</li>
+<li><strong>The retrieval system has its own grammar.</strong> SEC EDGAR full-text search matches exact phrases. It does not understand analyst language. This single fact governs whether the map-to-company step works at all, and it is where the naive version fails.</li>
+<li><strong>The economics have to work at a solo budget.</strong> Reading the full small-cap universe with a frontier model on every query would cost real money per run. The architecture has to make the expensive work happen once and the queries happen for near-free.</li>
+</ol>
+
+<hr class="rule">
+
+<h2 class="h2">System overview</h2>
+
+<p class="body">The stack is deliberately dependency-light.</p>
+
+<ul>
+<li><strong>TypeScript end to end.</strong> A Vite and React front end with essentially no runtime dependencies, and an API server on Node's built-in HTTP module, no web framework.</li>
+<li><strong>A provider-agnostic LLM adapter</strong>: plain fetch, no vendor SDK, selected by an environment variable. It runs against a local fixture set for deterministic testing, a local Ollama model, or any OpenAI-compatible endpoint. In production it targets DeepSeek, a heavy tier for reasoning-dense passes and a light tier for bulk tagging. Swapping providers is a config change, not a code change.</li>
+<li><strong>Free, keyless public data</strong>: SEC EDGAR full-text search, XBRL company facts, and Form 4 insider filings; federal contract data; reverse-citation lookups. A seam exists for paid sell-side coverage data, off by default.</li>
+<li><strong>Persistence</strong> to Supabase in the intended deployment, currently identical JSON shapes on disk, so the storage layer can swap without touching the pipeline.</li>
+</ul>
+
+<p class="body">The interesting decisions are in how these fit together.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The phrase rule</h2>
+
+<p class="body">This is the single most important design decision in the system, and it came from a real failure.</p>
+
+<p class="body">The map-to-company step takes a consequence ("demand for rare-earth permanent magnets rises") and has to find the companies exposed to it. The mechanism is SEC EDGAR full-text search, which matches <strong>exact phrases</strong>. So the LLM's job in this step is not to reason about who benefits. Its job is to generate the search phrases a company would actually write <strong>in its own filings</strong>.</p>
+
+<p class="body">The naive version has the model produce analyst language: "humanoid robotics beneficiaries," "companies exposed to embodied AI." Those phrases return nothing, because no company writes that sentence in its 10-K. The failure was concrete and logged: hyper-specific engineering compounds like "harmonic drive gear" mapped to zero filers, because the phrasing was too precise to appear verbatim. The fix was to rebalance toward the common on-theme terms companies actually use to describe their own business: "rare earth magnets," the names of the components and end markets as they appear in a risk-factors section.</p>
+
+<p class="body"><mark class="callout">The phrase rule: when an LLM drives a retrieval system, the model's output must be shaped to the retrieval system's actual grammar, not to natural language. Ground the generation in how the corpus is written, not in how the question is asked.</mark> This is the difference between a demo that returns plausible nonsense and a system that returns the actual supply chain. It generalizes to any RAG or agentic-search system: the model has to speak the index's language, and getting that alignment right is most of the work.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The rubric lives outside the model</h2>
+
+<p class="body">Once candidates are found, they are scored on a six-dimension rubric: optionality, revenue-relative-to-opportunity, customer validation, catalyst density, insider conviction, and management conviction, each with an explicit weight.</p>
+
+<p class="body">The decision that matters is that <strong>the rubric arithmetic lives outside the model.</strong> The LLM extracts and tags the evidence for each dimension. The weighting and the final ranking are ordinary arithmetic in application code, with the weights stored as editable configuration, not baked into a prompt.</p>
+
+<p class="body">The payoff is an "argue with the weights" panel. A PM who thinks customer validation should matter more than catalyst density slides the weight and the entire ranking re-sorts live, with no model call and no rerun. The scoring is transparent, deterministic, and instantly tunable, because it is arithmetic the PM can see and change, not a black-box judgment buried in a generation.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: keep the judgment the model is good at (reading and tagging evidence) inside the model, and keep the arithmetic the model is bad at (weighted ranking) outside it, where it is auditable and tunable. Do not ask the model to do math you want to be able to argue with.</mark> This is the same principle as the deterministic validation layer in my CRE workflow: the model writes, deterministic code audits and computes.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Read once, query many</h2>
+
+<p class="body">Running the full small-cap universe through the model on every PM query would be slow and expensive. The architecture separates the expensive step from the cheap step through an offline corpus.</p>
+
+<p class="body">A one-time backfill reads the in-band universe once and produces a structured corpus: for each company, its tagged exposures, its catalysts, its addressable-market claims, each linked to its source filing. That corpus is the read-once artifact. Every subsequent PM query runs against the corpus, not against the raw filings, so the per-query cost collapses.</p>
+
+<p class="body">The economics are the headline. Building the corpus across nearly two thousand in-band companies (thousands of tagged exposures, thousands of catalysts, over a thousand market-size claims) cost under seven dollars against a fifty-dollar cap, on the order of a fraction of a cent per company. A full-universe backfill runs about twenty-two dollars one time on the light-tier model, with single-digit dollars a month to keep it current.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: separate the expensive read from the cheap query. Pay once to build a structured corpus, then serve many queries against it for near-free. The cost architecture is what makes a research tool viable at a real budget.</mark></p>
+
+<hr class="rule">
+
+<h2 class="h2">Never a recommendation</h2>
+
+<p class="body">The system is built to say no. The candidate universe is filtered to a defined small-and-mid-cap band, then most candidates are rejected at the customer-validation stage, which checks whether a company's own filings actually substantiate the exposure the theme implies. A dry run on a humanoid-robotics scenario mapped eighty companies, narrowed to thirty-four in the market-cap band, and surfaced three worth a full read. The other thirty-one did not clear the bar, and the system said so.</p>
+
+<p class="body">This is a feature, not a limitation. <mark class="callout">A research tool that mostly returns "no candidate clears the bar" is more trustworthy than one that always returns picks. A system that cannot say no is a system that is telling you what you want to hear.</mark> The output per surviving name is a one-page thesis draft with every claim sourced, explicitly framed as leverage for the analyst's judgment, never as a buy signal. The PM decides. The system defends.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What I would change starting over</h2>
+
+<ol>
+<li><strong>Deploy the persistence and auth layer.</strong> The system currently persists structured JSON to disk with a mock auth token. The intended Supabase deployment, with real accounts and row-level security, is the operational work that turns it from a local tool into a team tool.</li>
+<li><strong>Add explicit recency weighting to catalysts.</strong> Catalyst density currently counts catalysts; it should decay them by age, the same way my other systems weight signals by a half-life, so a catalyst from last quarter outweighs one from three years ago.</li>
+<li><strong>Close the retrospective loop.</strong> The system generates theses; it does not yet track what happened to the names it surfaced. A retrospective layer that scores the pipeline's hit rate over time is the thing that would make it measurably better rather than just faster.</li>
+</ol>
+
+<hr class="rule">
+
+<h2 class="h2">Closing</h2>
+
+<p class="body">Adoption Chain is a retrieval-heavy, auditability-first research engine that turns a PM's scenario into sourced, rank-ordered, argue-with-the-weights leverage, for about the price of lunch per corpus build. The architecture is not exotic. The discipline is: shape the model's output to the retrieval system's grammar, keep the rankable arithmetic outside the model where it is auditable, read once and query many so the economics work, and build the thing to say no.</p>
+
+<p class="body">The through-line to the rest of my work is auditability and cost discipline: every claim traceable to a primary source, every ranking transparent and tunable, every expensive operation paid for once. If you are building a retrieval-heavy LLM system where the users cannot act on an unsourced assertion, the questions worth asking are: does the model speak your index's actual language; is the arithmetic you want to argue with kept outside the model; have you separated the expensive read from the cheap query; and can your system say no.</p>
+
+<p class="body">For the deterministic-validation-around-a-model pattern in a different domain, see <a href="inside-cre-feasibility.html">Inside the Mosaic feasibility workflow</a>. For the multi-pass orchestration discipline behind structured, sourced outputs, see <a href="inside-marketing-bot.html">Inside Marketing Bot v2</a>.</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="inside-strikeout-bot.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Inside StrikeOut Bot</span>
+        </a>
+        <a class="next" href="" style="visibility:hidden;">
+          <span class="k">NEXT</span>
+          <span class="v"></span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to writing index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / AI SOLUTIONS ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+  <script src="../scripts/menu.js"></script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inside Study Quest: five architectural decisions in a mastery-gated learning app / russh.work</title>
+  <meta name="description" content="Study Quest is a gamified, mastery-gated catch-up learning app I built for my son. Five architectural decisions: ship for the platform you can deploy from, pick the model on cost, put the integrity boundary in the database, grade only what the model is good at, make the reward economy a config." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">THESIS</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">STUDY QUEST v1</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.06.21</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">10 MIN / 2,100 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Inside Study Quest: five architectural decisions in a mastery-gated learning app</h1>
+
+      <p class="post-summary">Study Quest is a gamified, mastery-gated catch-up learning app I built for my son to close a grade level over one summer. Five architectural decisions shaped it: ship for the platform you can actually deploy from, pick the model on cost not brand, put the integrity boundary in the database, grade only what the model is reliably good at, and make the reward economy a config not a constant. This post walks each decision, the alternative I rejected, and what it teaches about building AI systems with a real human on the other end.</p>
+
+      <div class="post-tags">PWA / SUPABASE / RLS / DEEPSEEK / PROVIDER-SELECTION / HUMAN-IN-THE-LOOP / INTEGRITY / DECISION-ANALYSIS</div>
+    </header>
+
+    <div class="post-body">
+
+<p class="body">By Russ. Built 2026.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What this post is</h2>
+
+<p class="body">Study Quest is a gamified, mastery-gated catch-up learning app I built for my 9th-grade son to get on pace in Math, English, and Spanish over a single summer. It is a real system with a real user I care about, which is a very different constraint than a portfolio demo. If it does not work, my kid does not catch up.</p>
+
+<p class="body">It is not a tutorial. It is a walk through five architectural decisions, each with the alternative I rejected, and what each teaches about building an AI system where the point is a measurable human outcome, not a model metric. If you are evaluating how a solutions architect makes tradeoffs under real constraints, the decisions are the artifact.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The decision frame</h2>
+
+<p class="body">A learning app for one motivated-but-behind teenager operates inside three conditions that shaped every choice.</p>
+
+<ol>
+<li><strong>The outcome is mastery, not engagement.</strong> Most ed-tech optimizes time-in-app. The goal here is the opposite: get the concept locked, then get out. That inverts the usual incentives and makes gating, not streaks, the core mechanic.</li>
+<li><strong>The learner will try to game it.</strong> Any system a teenager uses for a cash-equivalent reward will be probed for the shortcut. Integrity cannot be a UI nicety; it has to be structural, or the whole thing becomes a Robux dispenser.</li>
+<li><strong>I am building solo, on Windows, on a deadline.</strong> No team, no Mac, no runway to over-engineer. Every decision had to be the one I could actually ship before the school year restarted.</li>
+</ol>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 1: ship for the platform you can actually deploy from</h2>
+
+<p class="body">My son wanted "an iOS app." I am on Windows 11 with no Mac and no Xcode. A native iOS binary was simply not shippable by me, and pretending otherwise would have burned the summer on a toolchain I could not run.</p>
+
+<p class="body">The decision was to build a <strong>PWA</strong>: React, Vite, Tailwind, installable through Safari's Add to Home Screen. It gets an app icon on the phone, runs full-screen, and the camera works through <code>getUserMedia</code> on modern iOS PWAs, which mattered for one feature I will get to. I kept the code Capacitor-ready so a native wrap is possible later, but I refused to design around a native build step I cannot execute.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: ship for the platform you can actually deploy from, not the one the stakeholder named. A working PWA this summer beats a native app that never compiles.</mark> The number of AI projects that die because the architect designed for infrastructure they did not actually control is large. This one shipped because I designed for the machine in front of me.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 2: pick the model on cost, not brand</h2>
+
+<p class="body">I use Anthropic models across most of my other systems. For Study Quest I chose <strong>DeepSeek</strong> instead, specifically for cost.</p>
+
+<p class="body">The reasoning is unit economics. This app runs many small grading and hinting calls per study session, every day, for months. At that call volume the per-token price dominates, and the grading task (evaluate whether a typed explanation demonstrates understanding of a specific step) does not need frontier reasoning. DeepSeek's API is OpenAI-compatible, so the integration cost of switching was near zero, and the key lives in Supabase Edge Function secrets, never in the client.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: model selection is a cost-per-useful-output decision, not a loyalty decision. Match the model to the task and the volume.</mark> The same discipline runs through every system I build: use the smallest model that clears the quality bar for that specific call. A solutions architect who defaults to the most capable model on every call is leaving the client's budget on the table.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 3: put the integrity boundary in the database</h2>
+
+<p class="body">The core mechanic is mastery gating: you cannot advance to the next module until you have proven the current one, and you earn a cash-equivalent reward for each module mastered. That reward is exactly the incentive to cheat.</p>
+
+<p class="body">The naive place to enforce gating is the UI: hide the next button, disable the reward until a flag flips. That is trivially defeated by anyone who opens dev tools. The decision was to enforce the integrity boundary in the <strong>database, via Supabase Row-Level Security</strong>, across two real accounts: the learner and the mentor. The learner's account physically cannot write its own mastery flags or approve its own rewards; those rows are governed by policies the learner's token cannot satisfy. The mentor account settles the ledger with one-tap approval.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: if a boundary matters, it belongs at the layer that cannot be bypassed from the client. The integrity boundary is a database boundary, not a UI state.</mark> This is the same architectural principle as parse-time validation in my other systems and RLS in any multi-tenant app: enforce the invariant where the untrusted party cannot reach it.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 4: grade only what the model is reliably good at</h2>
+
+<p class="body">The strongest anti-cheat design in the app came from an honest assessment of what the model could not do. I wanted a "Prove mode" where the learner does real work on paper and the system verifies it. The obvious version is: photograph the handwritten work, have a vision model grade it.</p>
+
+<p class="body">DeepSeek's vision grading was not reliable enough to trust in mid-2026, and grading a teenager's math homework wrong in either direction is corrosive: a false fail demoralizes, a false pass defeats the purpose. So I did not build vision grading. Instead:</p>
+
+<ul>
+<li>The learner does the work on paper and photographs it. The photo is stored as <strong>mentor-reviewed evidence</strong>, not as an AI-graded artifact.</li>
+<li>The system captures <strong>integrity signals</strong> around it: timestamps, time-on-task.</li>
+<li>The model grades what it is reliably good at: a typed <strong>explain-a-step-back</strong> response, where the learner has to articulate the reasoning behind the step they just did. Understanding the why is hard to fake and is exactly the text-reasoning task the model handles well.</li>
+</ul>
+
+<p class="body"><mark class="callout">The transferable lesson: grade what the model is reliably good at, and design the human into the loop for the rest. Do not ship a feature on a capability the model does not actually have.</mark> Refusing to build the vision-grading feature was the most important decision in the app. The temptation to use the flashy capability is precisely where AI systems earn their users' distrust.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 5: make the reward economy a config, not a constant</h2>
+
+<p class="body">The reward economy is the behavioral engine: a base payout per module mastered, a first-try bonus, a streak bonus for a five-active-day week, a weekly cap. The currency is Robux, because that is what my son actually spends, tracked as a cash-equivalent balance the mentor settles.</p>
+
+<p class="body">Every one of those numbers lives in editable settings, not hardcoded. The reason is that I do not know the right values yet. The correct base payout, the right cap, whether the first-try bonus should be twenty-five percent or forty, are empirical questions I will only answer by watching a real kid respond over weeks. Hardcoding them would mean a code change and redeploy every time I want to adjust the incentive, which at solo speed means I would simply not tune it.</p>
+
+<p class="body"><mark class="callout">The transferable lesson: the parameters you cannot get right on day one belong in editable config, not in the code. The things you will tune are the things you will only tune if tuning is cheap.</mark> The same applies to the pacing engine, which drives off an editable target date, because the real school calendar was not even published when I built it.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What these decisions look like applied elsewhere</h2>
+
+<p class="body">Compressed, the five lessons are:</p>
+
+<ol>
+<li><strong>Ship for the platform you can actually deploy from.</strong> Not the one the stakeholder named.</li>
+<li><strong>Pick the model on cost per useful output.</strong> Not on brand.</li>
+<li><strong>Put integrity boundaries at the layer that cannot be bypassed.</strong> The database, not the UI.</li>
+<li><strong>Grade what the model is reliably good at; design the human in for the rest.</strong> Do not ship on a capability the model lacks.</li>
+<li><strong>Put the parameters you will tune into editable config.</strong> Cheap tuning is the only tuning that happens.</li>
+</ol>
+
+<p class="body">These are the same tradeoffs that show up in any applied-AI build with a real user and a real budget: enterprise workflow tools, internal copilots, anything where the point is a human outcome rather than a benchmark. Build status as of this writing: all phases built locally, the PWA build passes, a full multi-subject curriculum is seeded and validated, and the remaining work is operational deployment.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Closing</h2>
+
+<p class="body">Study Quest is a small system with the highest stakes of anything on this site, because the user is my kid and the outcome is whether he starts the year on pace. The architecture is not fancy. It is a PWA I can actually ship, a cheap model matched to the task, an integrity boundary in the database, a human in the loop exactly where the model is weak, and a reward economy I can tune without a redeploy.</p>
+
+<p class="body">The through-line to the rest of my work is the discipline of building for the real constraint in front of you. If you are building an applied-AI system with a human on the other end, the questions worth asking are: can you actually deploy the platform you chose; is the model matched to the task and the volume; is the boundary that matters enforced where it cannot be bypassed; are you grading only what the model is good at; and are the numbers you will inevitably tune cheap to tune.</p>
+
+<p class="body">For the same cost-and-calibration discipline applied to production ML, see <a href="inside-trialedge.html">Inside TrialEdge</a>. For another deliberately scoped single-user build, see <a href="inside-decktrainer.html">Inside DeckTrainer</a>.</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="ship-gardencam.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Ship Note: I built a way to watch the watch party</span>
+        </a>
+        <a class="next" href="inside-strikeout-bot.html">
+          <span class="k">NEXT</span>
+          <span class="v">Inside StrikeOut Bot</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to writing index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / AI SOLUTIONS ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+  <script src="../scripts/menu.js"></script>
+</body>
+</html>

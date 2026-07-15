@@ -46,7 +46,7 @@
     <!-- §6.3 WORK as broadside -->
     <section class="section" id="work">
       <header class="section-opener">
-        <span class="label">§ 01 / Work / Six systems</span>
+        <span class="label">§ 01 / Work / Systems</span>
         <h2 class="h1">Production AI, underwritten.</h2>
       </header>
 
@@ -198,6 +198,64 @@ def hard_cut(deck_a, deck_b, ctrl):
         cut_offset_ms=cut.offset,
         recovery_db=monitor.peak_drop_db(),
     )
+</code></pre>
+        </li>
+
+        <li class="project-row" data-href="blog/inside-strikeout-bot.html">
+          <span class="num">07</span>
+          <span class="title">STRIKEOUT&nbsp;BOT</span>
+          <div class="meta">
+            <span class="row strong">v1 / 2026</span>
+            <span class="row">MLB STRIKEOUT PREDICTION</span>
+            <span class="row">LIGHTGBM QUANTILE + RIDGE STACK</span>
+            <span class="row">40 FEATURES / 5 GROUPS</span>
+            <span class="row">90% CALIBRATED INTERVALS</span>
+            <span class="row">WALK-FORWARD + BLIND TEST</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code># 3 LightGBM quantile models + Ridge stacker
+lo = q05.predict(X); med = q50.predict(X); hi = q95.predict(X)
+baseline = (k_per_9 / 9) * ip_per_start      # must beat this
+stack = ridge.predict([[med, baseline, days_rest]])
+pred = clamp(stack, lo, hi)                   # respect the interval
+# blind test: 2024 post-ASB, 5,000 starts by K/9 tier
+</code></pre>
+        </li>
+
+        <li class="project-row" data-href="blog/inside-study-quest.html">
+          <span class="num">08</span>
+          <span class="title">STUDY&nbsp;QUEST</span>
+          <div class="meta">
+            <span class="row strong">v1 / 2026</span>
+            <span class="row">MASTERY-GATED LEARNING PWA</span>
+            <span class="row">REACT / VITE / SUPABASE</span>
+            <span class="row">DEEPSEEK (COST-DRIVEN)</span>
+            <span class="row">RLS INTEGRITY BOUNDARY</span>
+            <span class="row">36 MODULES / 3 SUBJECTS</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code>-- integrity boundary lives in the database, not the UI
+create policy mastery_write on modules
+  for update using ( auth.uid() = mentor_id );
+-- the learner token cannot flip its own mastery flag
+-- or approve its own reward; the mentor settles the ledger
+</code></pre>
+        </li>
+
+        <li class="project-row" data-href="blog/inside-adoption-chain.html">
+          <span class="num">09</span>
+          <span class="title">ADOPTION&nbsp;CHAIN</span>
+          <div class="meta">
+            <span class="row strong">v6 / 2026</span>
+            <span class="row">SECOND-ORDER RESEARCH ENGINE</span>
+            <span class="row">SEC EDGAR / XBRL / FORM 4</span>
+            <span class="row">PROVIDER-AGNOSTIC / DEEPSEEK</span>
+            <span class="row">CITATION-TRACEABLE OUTPUT</span>
+            <span class="row">$22 CORPUS / ~$0.004 PER CARD</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code>// EDGAR full-text is exact-phrase: speak the filing's language
+const phrases = ["rare earth magnets", "permanent magnet motors"];
+//   NOT "humanoid robotics beneficiaries" -> returns nothing
+// rubric arithmetic lives OUTSIDE the model, weights editable
+const score = w.optionality*o + w.customerValidation*c + ...;
 </code></pre>
         </li>
 

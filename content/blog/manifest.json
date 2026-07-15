@@ -1,7 +1,46 @@
 {
-  "generated": "2026-06-08T20:00:00Z",
-  "count": 17,
+  "generated": "2026-07-02T20:00:00Z",
+  "count": 20,
   "posts": [
+    {
+      "title": "Inside Adoption Chain: an auditable second-order research engine for small-cap equity",
+      "slug": "inside-adoption-chain",
+      "url": "blog/inside-adoption-chain.html",
+      "archetype": "thesis",
+      "date": "2026-07-02",
+      "project": "adoption-chain",
+      "version": "v6 / 2026",
+      "tags": ["buy-side", "sec-edgar", "retrieval", "auditability", "deepseek", "provider-agnostic", "cost-economics", "research-tooling"],
+      "summary": "Turns a PM's scenario into a consequence map, finds the under-covered small-cap companies on each consequence, and drafts a one-page thesis per name where every claim links to the exact SEC filing sentence. Leverage underneath judgment, never a recommendation.",
+      "word_count": 2300,
+      "read_time_min": 12
+    },
+    {
+      "title": "Inside StrikeOut Bot: quantile regression and beat-the-baseline discipline for MLB strikeout prediction",
+      "slug": "inside-strikeout-bot",
+      "url": "blog/inside-strikeout-bot.html",
+      "archetype": "thesis",
+      "date": "2026-06-24",
+      "project": "strikeout",
+      "version": "v1 / 2026",
+      "tags": ["lightgbm", "quantile-regression", "stacking", "calibration", "walk-forward-cv", "baseball", "statcast", "eval"],
+      "summary": "Three LightGBM quantile regressors produce a median and a 90 percent interval, a Ridge stacker blends them against a dumb baseline, and a stratified blind test on unseen post-All-Star-Break data is the only gate that lets a model ship.",
+      "word_count": 2600,
+      "read_time_min": 13
+    },
+    {
+      "title": "Inside Study Quest: five architectural decisions in a mastery-gated learning app",
+      "slug": "inside-study-quest",
+      "url": "blog/inside-study-quest.html",
+      "archetype": "thesis",
+      "date": "2026-06-21",
+      "project": "study-quest",
+      "version": "v1 / 2026",
+      "tags": ["pwa", "supabase", "rls", "deepseek", "provider-selection", "human-in-the-loop", "integrity", "decision-analysis"],
+      "summary": "A gamified, mastery-gated catch-up learning PWA built for my son. Ship for the platform you can deploy from, pick the model on cost, put the integrity boundary in the database, grade only what the model is good at, and make the reward economy a config.",
+      "word_count": 2100,
+      "read_time_min": 10
+    },
     {
       "title": "Ship Note: I built a way to watch the watch party",
       "slug": "ship-gardencam",
