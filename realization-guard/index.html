@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Realization Guard: Pre-Bill OCG Compliance · Russell Harris</title>
+<style>
+  :root{
+    --paper:#FBFBFA; --card:#FFFFFF; --well:#F2F5F6; --ink:#1C1E21; --ink-2:#4B5258; --ink-3:#8A9199;
+    --line:#E2E4E3; --teal:#00576F; --teal-soft:#E4EEF1; --ice:#C6DFE6;
+    --wine:#872434; --wine-soft:#F6E9EB; --warn:#8A6114; --warn-soft:#F7EFDF; --ok:#2E7D4F; --ok-soft:#E7F1EA;
+    --serif:Charter,'Bitstream Charter','Sitka Text',Cambria,Georgia,serif;
+    --sans:-apple-system,'Segoe UI','Helvetica Neue',sans-serif;
+    --mono:'Cascadia Code',Consolas,'SF Mono',Menlo,monospace;
+    /* stepped type scale, 16px base */
+    --t-0:12px; --t-1:13.5px; --t-2:16px; --t-3:20px; --t-4:28px;
+    /* radius scale */
+    --r-s:3px; --r-m:7px; --r-pill:999px;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --paper:#14181A; --card:#1B2124; --well:#20282C; --ink:#E6E8E7; --ink-2:#AEB6BA; --ink-3:#79838A;
+    --line:#2B3438; --teal:#5FA8BE; --teal-soft:#16303A; --ice:#274753;
+    --wine:#D4808E; --wine-soft:#3A2226; --warn:#D2A04C; --warn-soft:#332A18; --ok:#63B183; --ok-soft:#1D2F24;
+  }}
+  :root[data-theme="dark"]{
+    --paper:#14181A; --card:#1B2124; --well:#20282C; --ink:#E6E8E7; --ink-2:#AEB6BA; --ink-3:#79838A;
+    --line:#2B3438; --teal:#5FA8BE; --teal-soft:#16303A; --ice:#274753;
+    --wine:#D4808E; --wine-soft:#3A2226; --warn:#D2A04C; --warn-soft:#332A18; --ok:#63B183; --ok-soft:#1D2F24;
+  }
+  :root[data-theme="light"]{
+    --paper:#FBFBFA; --card:#FFFFFF; --well:#F2F5F6; --ink:#1C1E21; --ink-2:#4B5258; --ink-3:#8A9199;
+    --line:#E2E4E3; --teal:#00576F; --teal-soft:#E4EEF1; --ice:#C6DFE6;
+    --wine:#872434; --wine-soft:#F6E9EB; --warn:#8A6114; --warn-soft:#F7EFDF; --ok:#2E7D4F; --ok-soft:#E7F1EA;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font:var(--t-2)/1.55 var(--sans)}
+  header.bar{padding:22px 30px 18px;border-bottom:3px solid var(--teal)}
+  .bar .top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .bar h1{font:700 var(--t-4) var(--serif);margin:0;color:var(--teal);letter-spacing:.2px}
+  .bar h1 .g{color:var(--wine)}
+  .bar .sub{font-size:var(--t-2);color:var(--ink-2);margin-top:6px;max-width:72ch}
+  .bar .sub b{color:var(--ink)}
+  .bar .who{margin-left:auto;font-size:var(--t-0);color:var(--ink-3);text-align:right;line-height:1.6}
+  .bar .who b{color:var(--ink-2)}
+  main{max-width:1240px;margin:0 auto;padding:24px 30px 56px}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:0 0 12px}
+  .kpi{border:1px solid var(--line);border-radius:var(--r-m);padding:14px 16px;background:var(--card)}
+  .kpi .n{font:600 var(--t-3) var(--serif);color:var(--teal);font-variant-numeric:tabular-nums}
+  .kpi.risk .n{color:var(--wine)} .kpi.save .n{color:var(--ok)}
+  .kpi .l{font-size:var(--t-0);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-top:3px}
+  .meter{display:flex;align-items:center;gap:12px;margin:0 0 22px;font-size:var(--t-0);color:var(--ink-2)}
+  .meter .track{flex:1;height:8px;border-radius:var(--r-pill);background:var(--wine-soft);overflow:hidden}
+  .meter .fill{height:100%;width:0%;background:var(--ok);border-radius:var(--r-pill);transition:width .45s ease}
+  @media (prefers-reduced-motion:reduce){.meter .fill{transition:none}}
+  .meter .pct{font:600 var(--t-1) var(--mono);color:var(--ok);min-width:118px;text-align:right}
+  .grid{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:1000px){.grid{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:18px 20px;margin-bottom:20px}
+  .card h3{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.07em;color:var(--teal);margin:0 0 12px}
+  select.client{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--paper);color:var(--ink);font:600 var(--t-2) var(--sans)}
+  .rules{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .rule{font:var(--t-0) var(--sans);border:1px solid var(--ice);background:var(--teal-soft);color:var(--teal);border-radius:var(--r-pill);padding:3px 11px}
+  .matter{font-size:var(--t-0);color:var(--ink-3);margin:0 0 10px}
+  .matter b{color:var(--ink-2)}
+  .tblwrap{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:var(--t-1)}
+  th{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  tr.held td{opacity:.45;text-decoration:line-through}
+  .tk{font-weight:600;white-space:nowrap}
+  .role{color:var(--ink-3);font-size:var(--t-0)}
+  td .narr{font:var(--t-0)/1.5 var(--mono);color:var(--ink-2)}
+  td .narr.fixed{color:var(--ok)}
+  .btn{border:1px solid var(--teal);background:var(--teal);color:var(--paper);border-radius:var(--r-s);padding:10px 18px;font:600 var(--t-1) var(--sans);cursor:pointer}
+  .btn.ghost{background:none;color:var(--teal)}
+  .btn:hover{filter:brightness(1.12)}
+  .btn:disabled{opacity:.45;cursor:default;filter:none}
+  .btn:focus-visible,select:focus-visible,.mini:focus-visible{outline:2px solid var(--wine);outline-offset:2px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  .verdicts{display:flex;flex-direction:column;gap:10px}
+  .v{border:1px solid var(--line);border-radius:var(--r-m);background:var(--card);padding:12px 14px}
+  .v.warn{background:var(--warn-soft)} .v.flag{background:var(--wine-soft)} .v.done{background:var(--ok-soft)}
+  .v .head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .sev{font:700 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.06em;border-radius:var(--r-s);padding:2px 9px;color:var(--paper)}
+  .sev.flag{background:var(--wine)} .sev.warn{background:var(--warn)} .sev.ok{background:var(--ok)}
+  .v .who{font:600 var(--t-1) var(--sans)}
+  .v .amt{margin-left:auto;font:600 var(--t-1) var(--mono)}
+  .v .cite{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.05em;margin-top:7px;color:var(--ok)}
+  .v.flag .cite{color:var(--wine)} .v.warn .cite{color:var(--warn)}
+  .v .orig{font:var(--t-0)/1.5 var(--mono);color:var(--ink-3);margin-top:6px;text-decoration:line-through}
+  .v .fix{font:var(--t-0)/1.5 var(--mono);color:var(--ink);margin-top:4px}
+  .v .impact{font-size:var(--t-1);color:var(--ink-2);margin-top:6px}
+  .mini{border:1px solid var(--ok);background:none;color:var(--ok);border-radius:var(--r-s);padding:5px 12px;font:600 var(--t-0) var(--sans);cursor:pointer;margin-top:9px}
+  .mini:hover{background:var(--ok-soft)}
+  pre.memo{white-space:pre-wrap;font:var(--t-0)/1.6 var(--mono);background:var(--well);border:1px solid var(--line);border-radius:var(--r-m);padding:14px;margin:0}
+  .spec{margin:12px 0 0;padding:0;list-style:none}
+  .spec li{display:grid;grid-template-columns:1fr;gap:2px 18px;padding:12px 0;border-bottom:1px solid var(--line);font-size:var(--t-1)}
+  @media(min-width:760px){.spec li{grid-template-columns:250px 1fr}}
+  .spec b{font:600 var(--t-1) var(--serif);color:var(--teal)}
+  .note{font-size:var(--t-1);color:var(--ink-3);max-width:80ch;margin-top:12px}
+  footer{border-top:1px solid var(--line);margin-top:36px;padding-top:18px}
+  footer h2{font:600 var(--t-2) var(--serif);margin:0}
+  a{color:var(--teal)}
+</style>
+</head>
+<body>
+
+
+<header class="bar">
+  <div class="top">
+    <h1>Realization <span class="g">Guard</span></h1>
+    <div class="who">Working prototype · <b>Russell Harris</b> · <a href="https://russh.work">russh.work</a><br>
+    Prepared for WilmerHale · AI Automation Engineer (2229-437) · July 2026</div>
+  </div>
+  <p class="sub"><b>Catch write-downs before the invoice ships.</b> Client guidelines now refuse payment for block billing, vague narratives, and tasks AI should have done. This agent screens every time entry against the client's own OCG while the pre-bill is still editable, then fixes what it finds.</p>
+</header>
+
+<main>
+  <div class="kpis">
+    <div class="kpi"><div class="n" id="k-total">–</div><div class="l">Pre-bill total</div></div>
+    <div class="kpi risk"><div class="n" id="k-risk">–</div><div class="l">Write-down exposure</div></div>
+    <div class="kpi save"><div class="n" id="k-save">–</div><div class="l">Protected by fixes</div></div>
+    <div class="kpi"><div class="n" id="k-count">–</div><div class="l">Open exceptions</div></div>
+  </div>
+  <div class="meter" role="img" aria-label="Share of write-down exposure remediated">
+    <span>Exposure remediated</span>
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <span class="pct" id="pct">0% · $0</span>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h3>Step 1 · Client guideline profile</h3>
+        <select class="client" id="client" aria-label="Select client OCG profile">
+          <option value="fed">Federal Contractor: strict OCG (rate caps · approved timekeepers · 50% travel)</option>
+          <option value="tech">Technology Client: AI-forward OCG (no attorney rates for AI-capable tasks)</option>
+          <option value="std">Standard Commercial: baseline OCG</option>
+        </select>
+        <div class="rules" id="rules"></div>
+        <p class="note">Same pre-bill, different client, different verdicts. The agent is grounded in each client's own guidelines, not a generic rulebook. Switching profiles re-screens from scratch.</p>
+      </div>
+
+      <div class="card">
+        <h3>Step 2 · Draft pre-bill</h3>
+        <p class="matter"><b id="m-client">–</b> · Matter 2026-0847 · Billing period June 2026 · Fixes applied here update the invoice live</p>
+        <div class="tblwrap"><table>
+          <thead><tr><th>Timekeeper</th><th class="num">Rate</th><th class="num">Hrs</th><th class="num">Amount</th><th>Narrative</th></tr></thead>
+          <tbody id="bill"></tbody>
+        </table></div>
+        <div class="row">
+          <button class="btn" id="applyall">Apply all suggested fixes</button>
+          <button class="btn ghost" id="reset">Restore original pre-bill</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h3>Step 3 · Verdicts and one-click remediation</h3>
+        <div class="verdicts" id="out"></div>
+      </div>
+      <div class="card">
+        <h3>Auto-drafted pre-bill review memo</h3>
+        <pre class="memo" id="memo"></pre>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <h2>Production build on the firm's Microsoft tenant</h2>
+    <ul class="spec">
+      <li><b>Copilot Studio agent · Azure AI Foundry</b><span>Grounded per client in the OCG documents themselves (SharePoint), not hand-coded rules; new guidelines take effect the day the client sends them. In-tenant, DLP-compliant.</span></li>
+      <li><b>Power Automate · billing system</b><span>Hooks the existing pre-bill workflow (Elite 3E / Aderant): screens on pre-bill generation, routes exceptions to the billing attorney in Outlook or Teams, writes an audit trail.</span></li>
+      <li><b>Power BI · measured impact</b><span>Realization protected, write-down rate, and appeal rate by client. Metrics are defined before deployment and reviewed after. No metric, no build.</span></li>
+    </ul>
+    <p class="note">This prototype is rule-based and fully client-side; nothing on this page is transmitted anywhere. It demonstrates the agent pattern. The production version reasons over the client's actual OCG text. Built as a single deployable file by Russell Harris · <a href="https://russh.work">russh.work</a> · harris.russell1@gmail.com</p>
+  </footer>
+</main>
+
+<script>
+/* ---------- data ---------- */
+const TK=[
+  {n:"R. Whitfield",role:"Partner",rate:1150},
+  {n:"J. Osei",role:"Senior Associate",rate:745},
+  {n:"M. Calloway",role:"Associate",rate:565},
+  {n:"D. Pruitt",role:"Paralegal",rate:295},
+  {n:"T. Vance",role:"Staff Attorney",rate:410},
+];
+const ENTRIES=[
+  {tk:0,h:1.2,narr:"Strategy conference with client regarding motion to compel; outline argument structure for reply brief."},
+  {tk:1,h:6.5,narr:"Review documents; draft motion; emails with team; prepare for call and attention to discovery matters.",
+   blockFix:"Review custodian production batch 6 (2.1); draft motion to compel re: withheld financials (3.2); correspondence with team re: deposition scheduling (0.6); prepare discovery-conference outline (0.6)."},
+  {tk:2,h:3.0,narr:"Summarize deposition transcript of R. Alvarez and prepare chronology of key events.",
+   aiFix:{h:0.9,narr:"AI-assisted summary of Alvarez transcript via firm workflow; attorney verification of citations and key-event chronology."}},
+  {tk:2,h:0.8,narr:"Work on file.",
+   vagueFix:"Revise exhibit list to reflect amended scheduling order; confirm Bates ranges for Exs. 14-22."},
+  {tk:3,h:4.0,narr:"Cite-check and proofread reply brief; conform exhibits to local rules."},
+  {tk:0,h:5.5,narr:"Travel to Denver for hearing; review hearing outline en route.",
+   travelFix:"Travel to Denver for June 24 hearing (billed at 50% per OCG 5.2); substantive hearing-outline review recorded separately."},
+  {tk:4,h:2.4,narr:"First-pass privilege review of custodian email batch 7; code documents for responsiveness.",
+   aiFix:{h:0.8,narr:"AI-assisted first-pass privilege screen of batch 7; attorney QC of privilege calls and responsiveness coding."}},
+  {tk:1,h:0.4,narr:"Confer with M. Calloway re: exhibit list corrections."},
+];
+const PROFILES={
+  fed:{name:"Federal Contractor OCG",caps:{Partner:995,"Senior Associate":695,Associate:525,Paralegal:295,"Staff Attorney":395},
+    approved:["R. Whitfield","J. Osei","M. Calloway","D. Pruitt"],travel:.5,block:true,vague:true,ai:false,
+    rules:["3.1 Rate caps by role","3.4 Approved timekeeper list","4.2 No block billing","4.5 Narrative specificity","5.2 Travel at 50%"]},
+  tech:{name:"Technology Client OCG",caps:null,approved:null,travel:1,block:true,vague:true,ai:true,
+    rules:["4.2 No block billing","4.5 Narrative specificity","6.1 AI-capable tasks: no attorney rates for summarization, first-pass review, cite-checking, chronologies"]},
+  std:{name:"Standard Commercial OCG",caps:null,approved:null,travel:1,block:true,vague:true,ai:false,
+    rules:["4.2 No block billing","4.5 Narrative specificity"]},
+};
+const AI_PAT=/summariz|chronolog|cite-?check|proofread|first-?pass|privilege review|code documents/i;
+const BLOCK_PAT=/;.*(and|;)/i;
+const VAGUE_PAT=/^(work on|attention to|review file|misc|file review)/i;
+const fmt$=v=>'$'+Math.round(v).toLocaleString();
+
+let applied=ENTRIES.map(()=>false);
+let baseRisk=0;
+
+function evaluate(e,p){
+  const t=TK[e.tk];const amt=t.rate*e.h;
+  const hits=[],remedies=[];let risk=0;
+  if(p.approved&&!p.approved.includes(t.n)){
+    hits.push({s:'flag',cite:'3.4 Unapproved timekeeper',impact:`Entire entry (${fmt$(amt)}) is subject to rejection; this timekeeper is not on the approved list.`});
+    remedies.push({type:'hold',text:'Hold entry this cycle and submit a timekeeper-approval request, so the work bills next month instead of being rejected.'});
+    risk=amt;
+  }
+  if(p.caps&&t.rate>(p.caps[t.role]||1e9)){
+    const cap=p.caps[t.role],over=(t.rate-cap)*e.h;
+    hits.push({s:'flag',cite:'3.1 Rate exceeds cap',impact:`${fmt$(over)} over the ${t.role} cap of $${cap}/hr. Client e-billing auto-adjusts this, then the appeal cycle starts.`});
+    remedies.push({type:'cap',cap,text:`Bill at the capped rate of $${cap}/hr before submission, avoiding the e-billing rejection and appeal cycle.`});
+    risk=Math.max(risk,over);
+  }
+  if(p.block&&e.h>=2&&BLOCK_PAT.test(e.narr)){
+    hits.push({s:'flag',cite:'4.2 Block billing',impact:`Blocked entries average a 20% haircut on appeal, putting ${fmt$(amt*.2)} at risk.`});
+    remedies.push({type:'narr',text:e.blockFix,label:'Split into itemized task entries:'});
+    risk=Math.max(risk,amt*.2);
+  }
+  if(p.vague&&VAGUE_PAT.test(e.narr)){
+    hits.push({s:'flag',cite:'4.5 Vague narrative',impact:`Entries like this are rejected outright, putting ${fmt$(amt)} at risk.`});
+    remedies.push({type:'narr',text:e.vagueFix,label:'Replace with a specific, work-product narrative:'});
+    risk=Math.max(risk,amt);
+  }
+  if(p.ai&&e.aiFix&&AI_PAT.test(e.narr)&&t.role!=="Paralegal"){
+    hits.push({s:'flag',cite:'6.1 AI-capable task at attorney rate',impact:`The client OCG refuses attorney rates here; expected write-down is ${fmt$(amt*.6)}.`});
+    remedies.push({type:'ai',text:e.aiFix.narr,h:e.aiFix.h,label:`Run through the firm AI workflow and bill attorney verification only (${e.aiFix.h} hrs):`});
+    risk=Math.max(risk,amt*.6);
+  }
+  if(p.travel<1&&/travel/i.test(e.narr)){
+    const over=amt*(1-p.travel);
+    hits.push({s:'warn',cite:'5.2 Travel billed at full rate',impact:`The OCG caps travel at ${p.travel*100}%, so ${fmt$(over)} will be cut.`});
+    remedies.push({type:'travel',factor:p.travel,text:e.travelFix,label:`Bill travel at ${p.travel*100}%:`});
+    risk=Math.max(risk,over);
+  }
+  return {t,amt,hits,remedies,risk};
+}
+
+function remediated(e,p){
+  const ev=evaluate(e,p);const t=TK[e.tk];
+  let rate=t.rate,h=e.h,narr=e.narr,factor=1,held=false;
+  ev.remedies.forEach(r=>{
+    if(r.type==='hold')held=true;
+    if(r.type==='cap')rate=r.cap;
+    if(r.type==='travel'){factor=r.factor;if(r.text)narr=r.text;}
+    if(r.type==='narr'&&r.text)narr=r.text;
+    if(r.type==='ai'){h=r.h;narr=r.text;}
+  });
+  return {rate,h,narr,factor,held,amt:held?0:rate*h*factor};
+}
+
+function profileRisk(p){return ENTRIES.reduce((s,e)=>s+evaluate(e,p).risk,0)}
+
+/* ---------- render ---------- */
+const sel=document.getElementById('client');
+function showRules(){document.getElementById('rules').innerHTML=
+  PROFILES[sel.value].rules.map(r=>`<span class="rule">${r}</span>`).join('');
+  document.getElementById('m-client').textContent=PROFILES[sel.value].name;}
+
+function render(){
+  const p=PROFILES[sel.value];
+  let total=0,risk=0,open=0;
+  const rows=[],cards=[];
+  ENTRIES.forEach((e,i)=>{
+    const t=TK[e.tk];
+    if(applied[i]){
+      const r=remediated(e,p);
+      total+=r.amt;
+      rows.push(`<tr class="${r.held?'held':''}"><td class="tk">${t.n}<div class="role">${t.role}</div></td>
+        <td class="num">$${r.rate.toLocaleString()}${r.factor<1?' ×50%':''}</td><td class="num">${r.h.toFixed(1)}</td>
+        <td class="num">${r.held?'held':fmt$(r.amt)}</td><td><span class="narr fixed">${r.narr}</span></td></tr>`);
+      cards.push(`<div class="v done"><div class="head"><span class="sev ok">Remediated</span><span class="who">${t.n} · ${r.held?'held to next cycle':r.h.toFixed(1)+' hrs'}</span><span class="amt">${r.held?'–':fmt$(r.amt)}</span></div>
+        <div class="cite">Conforms to ${p.name}</div>
+        <div class="fix">${r.held?'Timekeeper-approval request drafted; entry moved to the July pre-bill.':r.narr}</div></div>`);
+    }else{
+      const ev=evaluate(e,p);
+      total+=ev.amt;risk+=ev.risk;if(ev.hits.length)open++;
+      rows.push(`<tr><td class="tk">${t.n}<div class="role">${t.role}</div></td>
+        <td class="num">$${t.rate.toLocaleString()}</td><td class="num">${e.h.toFixed(1)}</td>
+        <td class="num">${fmt$(ev.amt)}</td><td><span class="narr">${e.narr}</span></td></tr>`);
+      const worst=ev.hits.some(h=>h.s==='flag')?'flag':ev.hits.length?'warn':'ok';
+      const sev=worst==='flag'?'<span class="sev flag">Violation</span>':worst==='warn'?'<span class="sev warn">Caution</span>':'<span class="sev ok">Conforms</span>';
+      cards.push(`<div class="v ${worst==='ok'?'':worst}"><div class="head">${sev}<span class="who">${t.n} · ${e.h.toFixed(1)} hrs</span><span class="amt">${fmt$(ev.amt)}</span></div>
+        ${ev.hits.length?ev.hits.map(h=>`<div class="cite">${h.cite}</div><div class="impact">${h.impact}</div>`).join(''):`<div class="cite">Conforms to ${p.name}</div>`}
+        ${ev.remedies.length?`<div class="orig">${e.narr}</div>`+ev.remedies.map(r=>`<div class="fix">→ ${r.label?r.label+' ':''}${r.text||''}</div>`).join('')+
+          `<button class="mini" data-fix="${i}">Apply suggested fix, protects ${fmt$(ev.risk)}</button>`:''}
+      </div>`);
+    }
+  });
+  document.getElementById('bill').innerHTML=rows.join('');
+  document.getElementById('out').innerHTML=cards.join('');
+  const prot=Math.max(0,baseRisk-risk);
+  document.getElementById('k-total').textContent=fmt$(total);
+  document.getElementById('k-risk').textContent=fmt$(risk);
+  document.getElementById('k-save').textContent=fmt$(prot);
+  document.getElementById('k-count').textContent=open;
+  const pc=baseRisk?Math.round(prot/baseRisk*100):0;
+  document.getElementById('fill').style.width=pc+'%';
+  document.getElementById('pct').textContent=pc+'% · '+fmt$(prot);
+  document.getElementById('applyall').disabled=open===0;
+  document.getElementById('memo').textContent=
+`PRE-BILL REVIEW MEMO (auto-generated)
+Client profile: ${p.name} · Matter 2026-0847 · June 2026
+Invoice as currently drafted: ${fmt$(total)}
+
+Write-down exposure remaining: ${fmt$(risk)}
+Realization protected by fixes: ${fmt$(prot)} (${pc}% of original exposure)
+Open exceptions for billing-attorney review: ${open}
+
+Production: a Copilot Studio agent grounded in this client's OCG via
+Azure AI Foundry; exceptions routed by Power Automate before the
+invoice leaves the billing system; impact tracked in Power BI.`;
+  document.querySelectorAll('[data-fix]').forEach(b=>b.addEventListener('click',()=>{applied[+b.dataset.fix]=true;render()}));
+}
+
+sel.addEventListener('change',()=>{applied=ENTRIES.map(()=>false);baseRisk=profileRisk(PROFILES[sel.value]);showRules();render()});
+document.getElementById('applyall').addEventListener('click',()=>{
+  const p=PROFILES[sel.value];
+  ENTRIES.forEach((e,i)=>{if(!applied[i]&&evaluate(e,p).remedies.length)applied[i]=true});
+  render()});
+document.getElementById('reset').addEventListener('click',()=>{applied=ENTRIES.map(()=>false);render()});
+
+baseRisk=profileRisk(PROFILES.fed);
+showRules();render();
+</script>
+
+</body>
+</html>
