@@ -6,185 +6,228 @@
 <title>Intake Copilot: Corporate Services Document Intake · Russell Harris</title>
 <style>
   :root{
-    --paper:#FAFAF8; --card:#FFFFFF; --well:#F1F3F6; --ink:#181F38; --ink-2:#4A5468; --ink-3:#8A93A6;
-    --line:#E1E4EA; --navy:#0A364A; --navy-soft:#E7F0F5; --sky:#95DAFF; --sky-soft:#EAF7FF;
-    --plum:#752D4F; --plum-soft:#F5E9EF; --warn:#8A6114; --warn-soft:#F6EEDC; --ok:#2E7D4F; --ok-soft:#E7F1EA;
+    --paper:#F4F5F7; --card:#FFFFFF; --well:#EDEFF2; --rail:#181F38; --rail-ink:#C9CFDE; --rail-dim:#7A83A0;
+    --ink:#181F38; --ink-2:#4A5468; --ink-3:#8A93A6;
+    --line:#DDE1E8; --navy:#0A364A; --navy-soft:#E7F0F5; --sky:#6FB8E8; --sky-soft:#EAF7FF;
+    --plum:#752D4F; --plum-soft:#F3E4EC; --warn:#8A6114; --warn-soft:#F6EEDC; --ok:#2E7D4F; --ok-soft:#E3EFE7;
+    --sel:#E7F0F5;
     --serif:Charter,'Bitstream Charter','Sitka Text',Cambria,Georgia,serif;
     --sans:-apple-system,'Segoe UI','Helvetica Neue',sans-serif;
     --mono:'Cascadia Code',Consolas,'SF Mono',Menlo,monospace;
-    --t-0:12px; --t-1:13.5px; --t-2:16px; --t-3:20px; --t-4:28px;
-    --r-s:3px; --r-m:7px; --r-pill:999px;
+    --t-0:11.5px; --t-1:13px; --t-2:16px; --t-3:19px;
+    --r-s:3px; --r-m:6px; --r-pill:999px;
   }
   @media (prefers-color-scheme:dark){:root{
-    --paper:#12172A; --card:#1A2036; --well:#20273F; --ink:#E7E9EF; --ink-2:#A9B1C4; --ink-3:#727C93;
-    --line:#2B3450; --navy:#7FB6D5; --navy-soft:#16283A; --sky:#3E5E76; --sky-soft:#182C3C;
-    --plum:#D389AB; --plum-soft:#33202B; --warn:#D2A04C; --warn-soft:#332A18; --ok:#63B183; --ok-soft:#1D2F24;
+    --paper:#101528; --card:#181E33; --well:#1F2740; --rail:#0C1122; --rail-ink:#B9C1D6; --rail-dim:#5D6784;
+    --ink:#E7E9EF; --ink-2:#A9B1C4; --ink-3:#727C93;
+    --line:#2A3350; --navy:#7FB6D5; --navy-soft:#16283A; --sky:#4E7EA0; --sky-soft:#16283A;
+    --plum:#D389AB; --plum-soft:#31202A; --warn:#D2A04C; --warn-soft:#322818; --ok:#63B183; --ok-soft:#1C2C22;
+    --sel:#1D2C3E;
   }}
   :root[data-theme="dark"]{
-    --paper:#12172A; --card:#1A2036; --well:#20273F; --ink:#E7E9EF; --ink-2:#A9B1C4; --ink-3:#727C93;
-    --line:#2B3450; --navy:#7FB6D5; --navy-soft:#16283A; --sky:#3E5E76; --sky-soft:#182C3C;
-    --plum:#D389AB; --plum-soft:#33202B; --warn:#D2A04C; --warn-soft:#332A18; --ok:#63B183; --ok-soft:#1D2F24;
+    --paper:#101528; --card:#181E33; --well:#1F2740; --rail:#0C1122; --rail-ink:#B9C1D6; --rail-dim:#5D6784;
+    --ink:#E7E9EF; --ink-2:#A9B1C4; --ink-3:#727C93;
+    --line:#2A3350; --navy:#7FB6D5; --navy-soft:#16283A; --sky:#4E7EA0; --sky-soft:#16283A;
+    --plum:#D389AB; --plum-soft:#31202A; --warn:#D2A04C; --warn-soft:#322818; --ok:#63B183; --ok-soft:#1C2C22;
+    --sel:#1D2C3E;
   }
   :root[data-theme="light"]{
-    --paper:#FAFAF8; --card:#FFFFFF; --well:#F1F3F6; --ink:#181F38; --ink-2:#4A5468; --ink-3:#8A93A6;
-    --line:#E1E4EA; --navy:#0A364A; --navy-soft:#E7F0F5; --sky:#95DAFF; --sky-soft:#EAF7FF;
-    --plum:#752D4F; --plum-soft:#F5E9EF; --warn:#8A6114; --warn-soft:#F6EEDC; --ok:#2E7D4F; --ok-soft:#E7F1EA;
+    --paper:#F4F5F7; --card:#FFFFFF; --well:#EDEFF2; --rail:#181F38; --rail-ink:#C9CFDE; --rail-dim:#7A83A0;
+    --ink:#181F38; --ink-2:#4A5468; --ink-3:#8A93A6;
+    --line:#DDE1E8; --navy:#0A364A; --navy-soft:#E7F0F5; --sky:#6FB8E8; --sky-soft:#EAF7FF;
+    --plum:#752D4F; --plum-soft:#F3E4EC; --warn:#8A6114; --warn-soft:#F6EEDC; --ok:#2E7D4F; --ok-soft:#E3EFE7;
+    --sel:#E7F0F5;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font:var(--t-2)/1.55 var(--sans)}
-  header.bar{padding:22px 30px 18px;border-bottom:3px solid var(--navy)}
-  .bar .top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-  .bar h1{font:700 var(--t-4) var(--serif);margin:0;color:var(--navy);letter-spacing:.2px}
-  .bar h1 .g{color:var(--plum)}
-  .bar .sub{font-size:var(--t-2);color:var(--ink-2);margin-top:6px;max-width:74ch}
-  .bar .sub b{color:var(--ink)}
-  .bar .who{margin-left:auto;font-size:var(--t-0);color:var(--ink-3);text-align:right;line-height:1.6}
-  .bar .who b{color:var(--ink-2)}
-  .bar a{color:var(--navy)}
-  main{max-width:1240px;margin:0 auto;padding:24px 30px 56px}
-  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:0 0 20px}
-  .kpi{border:1px solid var(--line);border-radius:var(--r-m);padding:14px 16px;background:var(--card)}
-  .kpi .n{font:600 var(--t-3) var(--serif);color:var(--navy);font-variant-numeric:tabular-nums}
-  .kpi.risk .n{color:var(--plum)} .kpi.save .n{color:var(--ok)}
-  .kpi .l{font-size:var(--t-0);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-top:3px}
-  .grid{display:grid;grid-template-columns:1fr;gap:20px}
-  @media(min-width:1020px){.grid{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:18px 20px;margin-bottom:20px}
-  .card h3{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.07em;color:var(--navy);margin:0 0 12px}
-  .doc{border:1px solid var(--line);border-radius:var(--r-m);background:var(--card);padding:12px 14px;margin:0 0 10px}
-  .doc.warn{background:var(--warn-soft)} .doc.flag{background:var(--plum-soft)} .doc.done{background:var(--ok-soft)}
-  .doc .head{display:flex;gap:10px;align-items:center;flex-wrap:wrap;cursor:pointer}
-  .sev{font:700 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.06em;border-radius:var(--r-s);padding:2px 9px;color:var(--paper);flex:none}
-  .sev.flag{background:var(--plum)} .sev.warn{background:var(--warn)} .sev.ok{background:var(--ok)} .sev.info{background:var(--navy)}
-  .doc .vendor{font:600 var(--t-1) var(--sans)}
-  .doc .dept{font-size:var(--t-0);color:var(--ink-3)}
-  .doc .amt{margin-left:auto;font:600 var(--t-1) var(--mono)}
-  .doc .body{display:none;border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
-  .doc.open .body{display:block}
-  .fields{display:grid;grid-template-columns:1fr;gap:6px;margin:0 0 10px}
-  @media(min-width:680px){.fields{grid-template-columns:1fr 1fr}}
-  .f{display:flex;gap:8px;align-items:center;font-size:var(--t-1)}
-  .f b{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);width:88px;flex:none}
-  .f .v{font-family:var(--mono);font-size:var(--t-0)}
-  .conf{width:54px;height:6px;border-radius:var(--r-pill);background:var(--well);overflow:hidden;flex:none}
-  .conf i{display:block;height:100%;background:var(--sky)}
-  .conf.low i{background:var(--plum)}
-  .finding{font-size:var(--t-1);color:var(--ink-2);margin:4px 0}
-  .finding b{color:var(--plum);font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.05em}
-  .doc.warn .finding b{color:var(--warn)}
-  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  .btn{border:1px solid var(--navy);background:var(--navy);color:var(--paper);border-radius:var(--r-s);padding:8px 15px;font:600 var(--t-1) var(--sans);cursor:pointer}
+  body{margin:0;background:var(--paper);color:var(--ink);font:var(--t-2)/1.5 var(--sans)}
+  .app{display:grid;grid-template-columns:198px 1fr;min-height:640px}
+  @media(max-width:900px){.app{grid-template-columns:1fr}.rail{display:none}}
+  /* ---------- left rail ---------- */
+  .rail{background:var(--rail);color:var(--rail-ink);padding:14px 0}
+  .rail .brand{font:700 15px var(--serif);padding:4px 16px 14px;letter-spacing:.2px;color:#fff}
+  .rail .brand span{color:var(--sky)}
+  .rail .sect{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.09em;color:var(--rail-dim);padding:12px 16px 5px}
+  .rail .item{display:flex;justify-content:space-between;align-items:center;padding:7px 16px;font:500 var(--t-1) var(--sans);color:var(--rail-dim)}
+  .rail .item.on{color:#fff;background:rgba(255,255,255,.07);box-shadow:inset 3px 0 0 var(--sky)}
+  .rail .item .n{font:600 var(--t-0) var(--mono);background:rgba(255,255,255,.10);border-radius:var(--r-pill);padding:1px 8px}
+  .rail .foot{margin-top:22px;padding:12px 16px;border-top:1px solid rgba(255,255,255,.08);font:var(--t-0)/1.6 var(--sans);color:var(--rail-dim)}
+  .rail .foot a{color:var(--sky);text-decoration:none}
+  /* ---------- main ---------- */
+  .main{display:flex;flex-direction:column;min-width:0}
+  .topbar{display:flex;align-items:center;gap:12px;background:var(--card);border-bottom:1px solid var(--line);padding:9px 18px;flex-wrap:wrap}
+  .crumb{font:var(--t-1) var(--sans);color:var(--ink-3)}
+  .crumb b{color:var(--ink);font-weight:600}
+  .env{font:700 var(--t-0) var(--mono);letter-spacing:.08em;color:var(--warn);border:1px solid var(--warn);border-radius:var(--r-s);padding:1px 7px}
+  .topbar .right{margin-left:auto;display:flex;gap:10px;align-items:center}
+  .user{display:flex;gap:8px;align-items:center;font:600 var(--t-1) var(--sans)}
+  .user .av{width:24px;height:24px;border-radius:var(--r-pill);background:var(--navy);color:var(--paper);font:700 var(--t-0) var(--sans);display:flex;align-items:center;justify-content:center}
+  .statbar{display:flex;gap:22px;align-items:center;background:var(--card);border-bottom:1px solid var(--line);padding:8px 18px;flex-wrap:wrap}
+  .stat{font:var(--t-1) var(--sans);color:var(--ink-3)}
+  .stat b{font:600 var(--t-2) var(--serif);color:var(--navy);font-variant-numeric:tabular-nums;margin-right:4px}
+  .stat.risk b{color:var(--plum)} .stat.save b{color:var(--ok)}
+  .statbar .right{margin-left:auto;display:flex;gap:8px}
+  .btn{border:1px solid var(--navy);background:var(--navy);color:var(--paper);border-radius:var(--r-s);padding:6px 13px;font:600 var(--t-1) var(--sans);cursor:pointer}
   .btn.ghost{background:none;color:var(--navy)}
   .btn.reject{border-color:var(--plum);background:none;color:var(--plum)}
   .btn:hover{filter:brightness(1.12)}
-  .btn:focus-visible,.doc .head:focus-visible{outline:2px solid var(--plum);outline-offset:2px}
-  .topline{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
-  pre.audit{white-space:pre-wrap;font:var(--t-0)/1.7 var(--mono);background:var(--well);border:1px solid var(--line);border-radius:var(--r-m);padding:12px;margin:0;max-height:300px;overflow:auto}
-  .spec{margin:12px 0 0;padding:0;list-style:none}
-  .spec li{display:grid;grid-template-columns:1fr;gap:2px 18px;padding:12px 0;border-bottom:1px solid var(--line);font-size:var(--t-1)}
-  @media(min-width:760px){.spec li{grid-template-columns:250px 1fr}}
+  .btn:disabled{opacity:.4;cursor:default;filter:none}
+  .btn:focus-visible,.row:focus-visible,.tab:focus-visible{outline:2px solid var(--plum);outline-offset:-2px}
+  /* ---------- content: master-detail ---------- */
+  .content{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:0;flex:1;min-height:0}
+  @media(max-width:1020px){.content{grid-template-columns:1fr}}
+  .list{border-right:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+  .tabs{display:flex;gap:2px;padding:10px 14px 0;background:var(--paper)}
+  .tab{border:1px solid var(--line);border-bottom:none;background:var(--well);color:var(--ink-3);font:600 var(--t-1) var(--sans);padding:6px 13px;border-radius:var(--r-s) var(--r-s) 0 0;cursor:pointer}
+  .tab[aria-selected="true"]{background:var(--card);color:var(--ink)}
+  .tab .n{font:600 var(--t-0) var(--mono);margin-left:5px;color:var(--ink-3)}
+  .thead,.row{display:grid;grid-template-columns:96px minmax(0,1fr) 92px 86px;gap:10px;align-items:center;padding:7px 14px}
+  @media(min-width:1240px){.thead,.row{grid-template-columns:96px minmax(0,1fr) 110px 92px 86px}.dept-col{display:block}}
+  .dept-col{display:none}
+  .thead{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);background:var(--card);border-bottom:1px solid var(--line)}
+  .rows{background:var(--card);overflow:auto;flex:1}
+  .row{border-bottom:1px solid var(--line);cursor:pointer;font:var(--t-1) var(--sans)}
+  .row:hover{background:var(--well)}
+  .row.sel{background:var(--sel);box-shadow:inset 3px 0 0 var(--navy)}
+  .row .id{font:var(--t-0) var(--mono);color:var(--ink-3)}
+  .row .vendor{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .vendor small{display:block;font:var(--t-0) var(--sans);color:var(--ink-3);font-weight:400}
+  .row .amt{font:600 var(--t-1) var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+  .chip{font:700 10px var(--sans);text-transform:uppercase;letter-spacing:.05em;border-radius:var(--r-s);padding:2px 7px;color:var(--paper);text-align:center}
+  .chip.flag{background:var(--plum)} .chip.warn{background:var(--warn)} .chip.ok{background:var(--ok)} .chip.hold{background:var(--ink-3)}
+  /* ---------- detail ---------- */
+  .detail{background:var(--paper);padding:14px 18px;overflow:auto;min-width:0}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:14px 16px;margin-bottom:14px}
+  .panel h3{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.07em;color:var(--navy);margin:0 0 10px}
+  .dhead{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:4px}
+  .dhead .v{font:700 var(--t-3) var(--serif)}
+  .dhead .amt{margin-left:auto;font:700 var(--t-3) var(--mono);font-variant-numeric:tabular-nums}
+  .meta{font:var(--t-0) var(--mono);color:var(--ink-3);margin-bottom:10px}
+  .fields{display:grid;grid-template-columns:1fr;gap:5px;margin:0 0 4px}
+  @media(min-width:640px){.fields{grid-template-columns:1fr 1fr}}
+  .f{display:flex;gap:8px;align-items:center;font-size:var(--t-1)}
+  .f b{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);width:92px;flex:none}
+  .conf{width:52px;height:5px;border-radius:var(--r-pill);background:var(--well);overflow:hidden;flex:none}
+  .conf i{display:block;height:100%;background:var(--sky)}
+  .conf.low i{background:var(--plum)}
+  .f .pct{font:var(--t-0) var(--mono);color:var(--ink-3)}
+  .finding{font-size:var(--t-1);color:var(--ink-2);margin:7px 0;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--well)}
+  .finding b{display:block;color:var(--plum);font:700 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+  .finding.warn b{color:var(--warn)} .finding.clean b{color:var(--ok)}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  pre.audit{white-space:pre-wrap;font:var(--t-0)/1.7 var(--mono);background:var(--well);border:1px solid var(--line);border-radius:var(--r-s);padding:10px;margin:0;max-height:210px;overflow:auto}
+  .empty{color:var(--ink-3);font-size:var(--t-1);padding:30px;text-align:center}
+  /* ---------- about strip ---------- */
+  .about{max-width:1240px;margin:0 auto;padding:26px 30px 56px;color:var(--ink-2)}
+  .about h2{font:600 var(--t-2) var(--serif);color:var(--ink);margin:0 0 4px}
+  .spec{margin:10px 0 0;padding:0;list-style:none}
+  .spec li{display:grid;grid-template-columns:1fr;gap:2px 18px;padding:10px 0;border-bottom:1px solid var(--line);font-size:var(--t-1)}
+  @media(min-width:760px){.spec li{grid-template-columns:240px 1fr}}
   .spec b{font:600 var(--t-1) var(--serif);color:var(--navy)}
-  .work{margin:12px 0 0;padding:0;list-style:none}
-  .work li{display:grid;grid-template-columns:1fr;gap:2px 18px;padding:10px 0;border-bottom:1px solid var(--line);font-size:var(--t-1)}
-  @media(min-width:760px){.work li{grid-template-columns:250px 1fr}}
-  .work a{font:600 var(--t-1) var(--serif);color:var(--plum)}
+  .spec a{font:600 var(--t-1) var(--serif);color:var(--plum)}
   .note{font-size:var(--t-1);color:var(--ink-3);max-width:80ch;margin-top:12px}
-  footer{border-top:1px solid var(--line);margin-top:36px;padding-top:18px}
-  footer h2{font:600 var(--t-2) var(--serif);margin:0}
 </style>
 </head>
 <body>
 
 
-<header class="bar">
-  <div class="top">
-    <h1>Intake <span class="g">Copilot</span></h1>
-    <div class="who">Working prototype · <b>Russell Harris</b> · <a href="https://russh.work">russh.work</a><br>
-    Prepared for Carlyle Corporate Services Technology · Engineer, AI &amp; Process Automation · July 2026</div>
-  </div>
-  <p class="sub"><b>Intake to downstream, with humans on the exceptions.</b> High-volume document intake is where Corporate Services loses hours: extraction, policy checks, approvals, and posting. This copilot runs that path end to end. Clean documents post straight through; only exceptions reach a person, with the evidence attached.</p>
-</header>
+<div class="app">
+  <aside class="rail">
+    <div class="brand">Intake <span>Copilot</span></div>
+    <div class="sect">Queues</div>
+    <div class="item on">Vendor invoices <span class="n" id="nav-n">0</span></div>
+    <div class="item">Expense reports</div>
+    <div class="item">Engagement letters</div>
+    <div class="sect">Operations</div>
+    <div class="item">Approvals</div>
+    <div class="item">Vendor master</div>
+    <div class="item">Reports</div>
+    <div class="foot">Prototype by <a href="https://russh.work">Russell Harris</a><br>
+      Prepared for Carlyle Corporate Services Technology<br>
+      More systems: <a href="https://russh.work">russh.work</a></div>
+  </aside>
 
-<main>
-  <div class="kpis">
-    <div class="kpi"><div class="n" id="k-processed">0</div><div class="l">Documents processed</div></div>
-    <div class="kpi save"><div class="n" id="k-st">0%</div><div class="l">Straight-through rate</div></div>
-    <div class="kpi risk"><div class="n" id="k-open">0</div><div class="l">Open exceptions</div></div>
-    <div class="kpi"><div class="n" id="k-touches">0</div><div class="l">Manual touches avoided</div></div>
-  </div>
-
-  <div class="grid">
-    <div>
-      <div class="card">
-        <h3>Intake queue · vendor invoices, June cycle</h3>
-        <div class="topline">
-          <button class="btn ghost" id="batch">Process next batch</button>
-          <button class="btn ghost" id="reset">Reset demo</button>
-          <span class="note" style="margin:0">Click any document to open its extraction and findings.</span>
+  <div class="main">
+    <div class="topbar">
+      <span class="crumb">Corporate Services / Accounts Payable / <b>June cycle</b></span>
+      <span class="env">PROTOTYPE · CLIENT-SIDE ONLY</span>
+      <div class="right">
+        <span class="user"><span class="av">RH</span> R. Harris · Reviewer</span>
+      </div>
+    </div>
+    <div class="statbar">
+      <span class="stat"><b id="k-processed">0</b>processed</span>
+      <span class="stat save"><b id="k-st">0%</b>straight-through</span>
+      <span class="stat risk"><b id="k-open">0</b>open exceptions</span>
+      <span class="stat"><b id="k-touches">0</b>touches avoided</span>
+      <div class="right">
+        <button class="btn ghost" id="batch">Ingest next batch</button>
+        <button class="btn ghost" id="reset">Reset</button>
+      </div>
+    </div>
+    <div class="content">
+      <section class="list">
+        <div class="tabs" id="tabs" role="tablist"></div>
+        <div class="thead"><span>Doc ID</span><span>Vendor</span><span class="dept-col">Department</span><span style="text-align:right">Amount</span><span>Status</span></div>
+        <div class="rows" id="rows"></div>
+      </section>
+      <section class="detail">
+        <div id="dpanel"></div>
+        <div class="panel">
+          <h3>Audit trail</h3>
+          <pre class="audit" id="audit"></pre>
         </div>
-        <div id="queue"></div>
-      </div>
-    </div>
-    <div>
-      <div class="card">
-        <h3>Audit trail · every action, attributable</h3>
-        <pre class="audit" id="audit"></pre>
-      </div>
-      <div class="card">
-        <h3>How the screen works</h3>
-        <p class="note" style="margin-top:0">Fields arrive with extraction confidence (bars). Policy rules run on every document: duplicate detection, PO requirements by amount, vendor-master and W-9 checks, contract-rate comparison, and approval-tier thresholds. Verdicts: <b>auto-post</b> (no touch), <b>verify</b> (confirm one field), <b>exception</b> (approver decision with evidence). This demo is rule-based and fully client-side; the production version is an agentic extraction pipeline with an evaluation harness, model-confidence routing, and posting into the systems of record.</p>
-      </div>
+      </section>
     </div>
   </div>
+</div>
 
-  <footer>
-    <h2>How this hardens for production</h2>
-    <ul class="spec">
-      <li><b>Extraction with evals, not vibes</b><span>LLM extraction scored against a labeled regression set per document type; confidence thresholds tuned to route uncertainty to humans, and every model change re-scored before deploy.</span></li>
-      <li><b>Human-in-the-loop by design</b><span>Approvers see the finding, the evidence, and the suggested action in one place; their decisions feed back into the rule and prompt patterns as reusable building blocks for the next use case.</span></li>
-      <li><b>Enterprise fit</b><span>Deploys inside the firm's environment with observability, access controls, and a full audit trail; posts to the ERP and approval systems of record rather than living beside them.</span></li>
-    </ul>
-
-    <h2 style="margin-top:26px">More working systems by the same builder</h2>
-    <ul class="work">
-      <li><a href="https://russh.work">russh.work</a><span>The full portfolio: six production AI systems, built and operated end to end.</span></li>
-      <li><a href="https://russh.work/realization-guard/">Realization Guard</a><span>Document-compliance agent prototype (pre-bill review against client billing guidelines), scoped and shipped solo in one day with Claude Code.</span></li>
-      <li><a href="https://russh.work">TrialEdge</a><span>Production ML pipeline: LightGBM plus LLM document analysis, ingestion to inference on Cloudflare Workers and Supabase.</span></li>
-      <li><a href="https://russh.work">ODI Bot</a><span>19-pass multi-provider LLM orchestration with per-pass contracts, fallback parsing, and claim-level citation enforcement.</span></li>
-    </ul>
-    <p class="note">Rule-based prototype; nothing on this page is transmitted anywhere. Built as a single deployable file by Russell Harris · <a href="https://russh.work">russh.work</a> · harris.russell1@gmail.com · 302-824-0225</p>
-  </footer>
-</main>
+<div class="about">
+  <h2>About this prototype</h2>
+  <p class="note" style="margin-top:4px">Rule-based and fully client-side; nothing on this page is transmitted anywhere. It demonstrates the intake-to-downstream pattern: extraction with per-field confidence, policy screening, human-in-the-loop exceptions, and an attributable audit trail. The production version is an agentic extraction pipeline with an evaluation harness, model-confidence routing, and posting into the systems of record.</p>
+  <ul class="spec">
+    <li><b>Extraction with evals, not vibes</b><span>LLM extraction scored against a labeled regression set per document type; confidence thresholds tuned to route uncertainty to humans, and every model change re-scored before deploy.</span></li>
+    <li><b>Human-in-the-loop by design</b><span>Approvers see the finding, the evidence, and the suggested action in one place; decisions feed back into reusable rule and prompt patterns.</span></li>
+    <li><b>Enterprise fit</b><span>Deploys inside the firm's environment with observability, access controls, and a full audit trail; posts to the ERP and approval systems of record.</span></li>
+  </ul>
+  <h2 style="margin-top:26px">More working systems by the same builder</h2>
+  <ul class="spec">
+    <li><a href="https://russh.work">russh.work</a><span>The full portfolio: six production AI systems, built and operated end to end.</span></li>
+    <li><a href="https://russh.work/realization-guard/">Realization Guard</a><span>Document-compliance agent prototype, scoped and shipped solo in one day with Claude Code.</span></li>
+    <li><a href="https://russh.work">TrialEdge</a><span>Production ML pipeline: LightGBM plus LLM document analysis, ingestion to inference.</span></li>
+    <li><a href="https://russh.work">ODI Bot</a><span>19-pass multi-provider LLM orchestration with per-pass contracts and citation enforcement.</span></li>
+  </ul>
+  <p class="note">Built as a single deployable file by Russell Harris · <a href="https://russh.work" style="color:var(--navy)">russh.work</a> · harris.russell1@gmail.com · 302-824-0225</p>
+</div>
 
 <script>
 /* ---------------- data ---------------- */
 const BATCH1=[
- {v:"Capitol Office Supply Co.",dept:"Finance · office consumables",amt:1240.18,po:"PO-88412",vendorOk:1,w9:1,dupKey:"cos-1240-0612",
+ {id:"INV-0612-031",v:"Capitol Office Supply Co.",dept:"Finance",amt:1240.18,po:"PO-88412",vendorOk:1,w9:1,dupKey:"cos-1240-0612",recv:"Jun 12",
   f:{Vendor:[0.99],Amount:[0.99],"PO number":[0.98],"Invoice date":[0.97],"GL code":[0.95]}},
- {v:"Summit AV Services",dept:"Marketing & Communications · event support",amt:920.00,po:"PO-88437",vendorOk:1,w9:1,dupKey:"sav-920-0614",
+ {id:"INV-0614-007",v:"Summit AV Services",dept:"Marketing & Comms",amt:920.00,po:"PO-88437",vendorOk:1,w9:1,dupKey:"sav-920-0614",recv:"Jun 14",
   f:{Vendor:[0.98],Amount:[0.99],"PO number":[0.97],"Invoice date":[0.98],"GL code":[0.93]}},
- {v:"Meridian Audit Partners LLP",dept:"Finance · external audit",amt:84500.00,po:"PO-88301",vendorOk:1,w9:1,dupKey:"map-84500-0610",
+ {id:"INV-0610-114",v:"Meridian Audit Partners LLP",dept:"Finance",amt:84500.00,po:"PO-88301",vendorOk:1,w9:1,dupKey:"map-84500-0610",recv:"Jun 10",
   f:{Vendor:[0.99],Amount:[0.98],"PO number":[0.99],"Invoice date":[0.98],"GL code":[0.96]}},
- {v:"Nova Translations Ltd.",dept:"Legal & Compliance · document translation",amt:12400.00,po:null,vendorOk:1,w9:1,dupKey:"ntl-12400-0611",
+ {id:"INV-0611-052",v:"Nova Translations Ltd.",dept:"Legal & Compliance",amt:12400.00,po:null,vendorOk:1,w9:1,dupKey:"ntl-12400-0611",recv:"Jun 11",
   f:{Vendor:[0.97],Amount:[0.98],"PO number":[0.30],"Invoice date":[0.96],"GL code":[0.90]}},
- {v:"Bridgepoint Legal Search",dept:"Human Capital · retained search",amt:28750.00,po:"PO-88355",vendorOk:0,w9:0,dupKey:"bls-28750-0609",
+ {id:"INV-0609-089",v:"Bridgepoint Legal Search",dept:"Human Capital",amt:28750.00,po:"PO-88355",vendorOk:0,w9:0,dupKey:"bls-28750-0609",recv:"Jun 9",
   f:{Vendor:[0.96],Amount:[0.97],"PO number":[0.95],"Tax ID":[0.41],"GL code":[0.88]}},
- {v:"Beltway Catering Group",dept:"Marketing & Communications · client event",amt:3180.00,po:"PO-88420",vendorOk:1,w9:1,dupKey:"bcg-3180-0613",
+ {id:"INV-0613-020",v:"Beltway Catering Group",dept:"Marketing & Comms",amt:3180.00,po:"PO-88420",vendorOk:1,w9:1,dupKey:"bcg-3180-0613",recv:"Jun 13",
   f:{Vendor:[0.98],Amount:[0.99],"PO number":[0.96],"Invoice date":[0.97],"GL code":[0.94]}},
- {v:"Beltway Catering Group",dept:"Marketing & Communications · client event",amt:3180.00,po:"PO-88420",vendorOk:1,w9:1,dupKey:"bcg-3180-0613",
+ {id:"INV-0613-021",v:"Beltway Catering Group",dept:"Marketing & Comms",amt:3180.00,po:"PO-88420",vendorOk:1,w9:1,dupKey:"bcg-3180-0613",recv:"Jun 13",
   f:{Vendor:[0.98],Amount:[0.99],"PO number":[0.96],"Invoice date":[0.97],"GL code":[0.94]}},
 ];
 const BATCH2=[
- {v:"GreenLine Facilities",dept:"Finance · janitorial contract",amt:9840.00,po:"PO-88460",vendorOk:1,w9:1,rate:8200,dupKey:"glf-9840-0618",
+ {id:"INV-0618-006",v:"GreenLine Facilities",dept:"Finance",amt:9840.00,po:"PO-88460",vendorOk:1,w9:1,rate:8200,dupKey:"glf-9840-0618",recv:"Jun 18",
   f:{Vendor:[0.98],Amount:[0.99],"PO number":[0.97],"Contract rate":[0.95],"GL code":[0.92]}},
- {v:"District Print Works",dept:"Marketing & Communications · collateral",amt:640.55,po:"PO-88471",vendorOk:1,w9:1,dupKey:"dpw-640-0619",
+ {id:"INV-0619-042",v:"District Print Works",dept:"Marketing & Comms",amt:640.55,po:"PO-88471",vendorOk:1,w9:1,dupKey:"dpw-640-0619",recv:"Jun 19",
   f:{Vendor:[0.99],Amount:[0.99],"PO number":[0.98],"Invoice date":[0.98],"GL code":[0.96]}},
- {v:"Hawthorne Tax Advisory",dept:"Tax · state filings support",amt:41200.00,po:"PO-88448",vendorOk:1,w9:1,dupKey:"hta-41200-0617",
+ {id:"INV-0617-093",v:"Hawthorne Tax Advisory",dept:"Tax",amt:41200.00,po:"PO-88448",vendorOk:1,w9:1,dupKey:"hta-41200-0617",recv:"Jun 17",
   f:{Vendor:[0.98],Amount:[0.98],"PO number":[0.98],"Invoice date":[0.97],"GL code":[0.95]}},
 ];
 const PO_THRESHOLD=10000, APPROVAL_TIER=25000;
 
-let docs=[], seenKeys=new Set(), audit=[], step=0, batch2Loaded=false;
+let docs=[], seenKeys=new Set(), audit=[], step=0, batch2Loaded=false, sel=null, filter='all';
 const fmt$=v=>'$'+v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 
 function screenDoc(d){
@@ -199,10 +242,8 @@ function screenDoc(d){
   if(d.rate && d.amt>d.rate*1.1)
     findings.push({s:'flag',cite:'Contract rate mismatch',text:'Invoice exceeds contracted monthly rate by more than 10%. Variance evidence attached for the approver.'});
   const lowFields=Object.entries(d.f).filter(([k,v])=>v[0]<0.6).map(([k])=>k);
-  if(lowFields.length && !findings.length)
-    findings.push({s:'warn',cite:'Low extraction confidence',text:'Field needs one human look: '+lowFields.join(', ')+'. Confirm and the document proceeds.'});
-  else if(lowFields.length)
-    findings.push({s:'warn',cite:'Low extraction confidence',text:'Also confirm: '+lowFields.join(', ')+'.'});
+  if(lowFields.length)
+    findings.push({s:'warn',cite:'Low extraction confidence',text:'Confirm before posting: '+lowFields.join(', ')+'.'});
   if(d.amt>=APPROVAL_TIER && !findings.some(f=>f.s==='flag'))
     findings.push({s:'warn',cite:'Approval tier',text:'Above the $25,000 auto-post ceiling. One-click approval requested from the department owner.'});
   d.findings=findings;
@@ -217,66 +258,107 @@ function ingest(batch,label){
   batch.forEach(raw=>{
     const d=screenDoc({...raw});
     docs.push(d);
-    if(d.state==='auto'){d.resolved='posted';log('AUTO-POST  '+d.v+'  '+fmt$(d.amt)+'  posted to ERP, no touch');}
-    else log('QUEUED     '+d.v+'  '+fmt$(d.amt)+'  '+d.findings[0].cite);
+    if(d.state==='auto'){d.resolved='posted';log('AUTO-POST  '+d.id+'  '+d.v+'  '+fmt$(d.amt));}
+    else log('QUEUED     '+d.id+'  '+d.findings[0].cite);
   });
   log('BATCH      '+label+' ingested ('+batch.length+' documents)');
+  if(sel===null){const first=docs.findIndex(d=>!d.resolved&&d.state!=='auto');sel=first>=0?first:0;}
   render();
 }
 
 function act(i,action){
-  const d=docs[i];
-  d.resolved=action;
+  const d=docs[i];d.resolved=action;
   const verb={posted:'APPROVED   ',held:'HELD       ',rejected:'REJECTED   '}[action];
-  log(verb+d.v+'  '+fmt$(d.amt)+'  by reviewer');
+  log(verb+d.id+'  '+d.v+'  by R. Harris');
+  const next=docs.findIndex(x=>!x.resolved&&x.state!=='auto');
+  if(next>=0)sel=next;
   render();
 }
 
+function statusOf(d){
+  if(d.resolved==='rejected')return['flag','Rejected'];
+  if(d.resolved==='held')return['hold','Held'];
+  if(d.state==='auto')return['ok','Auto-posted'];
+  if(d.resolved==='posted')return['ok','Approved'];
+  return d.state==='flag'?['flag','Exception']:['warn','Verify'];
+}
+
+function matches(d){
+  if(filter==='all')return true;
+  if(filter==='open')return !d.resolved&&d.state!=='auto';
+  if(filter==='posted')return d.state==='auto'||d.resolved==='posted';
+  if(filter==='resolved')return d.resolved==='held'||d.resolved==='rejected';
+  return true;
+}
+
 function render(){
-  const q=document.getElementById('queue');
-  q.innerHTML=docs.map((d,i)=>{
-    const cls=d.resolved?'done':d.state==='auto'?'done':d.state;
-    const sev=d.resolved==='rejected'?'<span class="sev flag">Rejected</span>'
-      :d.resolved==='held'?'<span class="sev warn">Held</span>'
-      :d.resolved==='posted'||d.state==='auto'?'<span class="sev ok">'+(d.state==='auto'?'Auto-posted':'Approved')+'</span>'
-      :d.state==='flag'?'<span class="sev flag">Exception</span>':'<span class="sev warn">Verify</span>';
-    const fields=Object.entries(d.f).map(([k,v])=>
-      '<div class="f"><b>'+k+'</b><span class="conf'+(v[0]<0.6?' low':'')+'"><i style="width:'+Math.round(v[0]*100)+'%"></i></span><span class="v">'+Math.round(v[0]*100)+'%</span></div>').join('');
-    const findings=d.findings.length?d.findings.map(f=>
-      '<div class="finding"><b>'+f.cite+'</b> '+f.text+'</div>').join('')
-      :'<div class="finding">Clean: all policy checks passed, extraction confidence high.</div>';
-    const actions=(!d.resolved&&d.state!=='auto')?
-      '<div class="row"><button class="btn" data-a="posted" data-i="'+i+'">Approve and post</button>'+
-      '<button class="btn ghost" data-a="held" data-i="'+i+'">Hold</button>'+
-      '<button class="btn reject" data-a="rejected" data-i="'+i+'">Reject</button></div>':'';
-    return '<div class="doc '+cls+(d.open?' open':'')+'">'+
-      '<div class="head" tabindex="0" role="button" data-t="'+i+'">'+sev+
-      '<span class="vendor">'+d.v+'</span><span class="dept">'+d.dept+'</span><span class="amt">'+fmt$(d.amt)+'</span></div>'+
-      '<div class="body"><div class="fields">'+fields+'</div>'+findings+actions+'</div></div>';
-  }).join('');
-  q.querySelectorAll('[data-t]').forEach(h=>{
-    h.addEventListener('click',()=>{const i=+h.dataset.t;docs[i].open=!docs[i].open;render();});
-    h.addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='Enter'){e.preventDefault();const i=+h.dataset.t;docs[i].open=!docs[i].open;render();}});
+  /* tabs */
+  const openN=docs.filter(d=>!d.resolved&&d.state!=='auto').length;
+  const postedN=docs.filter(d=>d.state==='auto'||d.resolved==='posted').length;
+  const resolvedN=docs.filter(d=>d.resolved==='held'||d.resolved==='rejected').length;
+  const tabs=[['all','All',docs.length],['open','Needs action',openN],['posted','Posted',postedN],['resolved','Held / rejected',resolvedN]];
+  document.getElementById('tabs').innerHTML=tabs.map(([k,l,n])=>
+    '<button class="tab" role="tab" aria-selected="'+(filter===k)+'" data-f="'+k+'">'+l+'<span class="n">'+n+'</span></button>').join('');
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{filter=t.dataset.f;render();}));
+
+  /* rows */
+  const rows=docs.map((d,i)=>({d,i})).filter(x=>matches(x.d));
+  document.getElementById('rows').innerHTML=rows.length?rows.map(({d,i})=>{
+    const [cls,label]=statusOf(d);
+    return '<div class="row'+(sel===i?' sel':'')+'" tabindex="0" data-r="'+i+'">'+
+      '<span class="id">'+d.id+'</span>'+
+      '<span class="vendor">'+d.v+'<small>received '+d.recv+'</small></span>'+
+      '<span class="dept-col" style="font-size:var(--t-0);color:var(--ink-3)">'+d.dept+'</span>'+
+      '<span class="amt">'+fmt$(d.amt)+'</span>'+
+      '<span class="chip '+cls+'">'+label+'</span></div>';
+  }).join(''):'<div class="empty">No documents in this view.</div>';
+  document.querySelectorAll('[data-r]').forEach(r=>{
+    const go=()=>{sel=+r.dataset.r;render();};
+    r.addEventListener('click',go);
+    r.addEventListener('keydown',e=>{if(e.code==='Enter'||e.code==='Space'){e.preventDefault();go();}});
   });
-  q.querySelectorAll('[data-a]').forEach(b=>b.addEventListener('click',e=>{
-    e.stopPropagation();act(+b.dataset.i,b.dataset.a);
-  }));
+
+  /* detail */
+  const dp=document.getElementById('dpanel');
+  if(sel===null||!docs[sel]){dp.innerHTML='<div class="panel"><div class="empty">Select a document.</div></div>';}
+  else{
+    const d=docs[sel];const [cls,label]=statusOf(d);
+    const fields=Object.entries(d.f).map(([k,v])=>
+      '<div class="f"><b>'+k+'</b><span class="conf'+(v[0]<0.6?' low':'')+'"><i style="width:'+Math.round(v[0]*100)+'%"></i></span><span class="pct">'+Math.round(v[0]*100)+'%</span></div>').join('');
+    const findings=d.findings.length?d.findings.map(f=>
+      '<div class="finding'+(f.s==='warn'?' warn':'')+'"><b>'+f.cite+'</b>'+f.text+'</div>').join('')
+      :'<div class="finding clean"><b>Clean</b>All policy checks passed; extraction confidence high. Posted without touch.</div>';
+    const actions=(!d.resolved&&d.state!=='auto')?
+      '<div class="actions"><button class="btn" data-a="posted">Approve and post</button>'+
+      '<button class="btn ghost" data-a="held">Hold</button>'+
+      '<button class="btn reject" data-a="rejected">Reject</button></div>':'';
+    dp.innerHTML='<div class="panel">'+
+      '<div class="dhead"><span class="chip '+cls+'">'+label+'</span><span class="v">'+d.v+'</span><span class="amt">'+fmt$(d.amt)+'</span></div>'+
+      '<div class="meta">'+d.id+' · '+d.dept+' · received '+d.recv+' · '+(d.po||'no PO')+'</div>'+
+      '<h3>Extraction</h3><div class="fields">'+fields+'</div>'+
+      '<h3 style="margin-top:12px">Policy findings</h3>'+findings+actions+'</div>';
+    dp.querySelectorAll('[data-a]').forEach(b=>b.addEventListener('click',()=>act(sel,b.dataset.a)));
+  }
+
+  /* stats */
   const processed=docs.length;
   const auto=docs.filter(d=>d.state==='auto').length;
-  const open=docs.filter(d=>!d.resolved&&d.state!=='auto').length;
-  const touches=auto*3+docs.filter(d=>d.resolved).length*2;
+  const touches=auto*3+docs.filter(d=>d.resolved&&d.state!=='auto').length*2;
   document.getElementById('k-processed').textContent=processed;
   document.getElementById('k-st').textContent=processed?Math.round(auto/processed*100)+'%':'0%';
-  document.getElementById('k-open').textContent=open;
+  document.getElementById('k-open').textContent=openN;
   document.getElementById('k-touches').textContent=touches;
+  document.getElementById('nav-n').textContent=openN;
 }
 
 document.getElementById('batch').addEventListener('click',()=>{
   if(batch2Loaded)return;
   batch2Loaded=true;ingest(BATCH2,'June cycle, week 3');
+  document.getElementById('batch').disabled=true;
 });
 document.getElementById('reset').addEventListener('click',()=>{
-  docs=[];seenKeys=new Set();audit=[];step=0;batch2Loaded=false;
+  docs=[];seenKeys=new Set();audit=[];step=0;batch2Loaded=false;sel=null;filter='all';
+  document.getElementById('batch').disabled=false;
   ingest(BATCH1,'June cycle, week 2');
 });
 ingest(BATCH1,'June cycle, week 2');
