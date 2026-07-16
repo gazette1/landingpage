@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio Sentinel: Property Data Validation · Russell Harris</title>
+<style>
+  :root{
+    --paper:#F5F6F8; --card:#FFFFFF; --well:#EDF0F4; --rail:#0C1D41; --rail-ink:#C7D0E4; --rail-dim:#7583A6;
+    --ink:#102C63; --ink-2:#44527A; --ink-3:#8792AE;
+    --line:#DCE1EA; --blue:#074BE6; --blue-deep:#102C63; --blue-soft:#E8EEFD; --peri:#9EADD3; --peri-soft:#F0F3FA;
+    --flag:#B3392E; --flag-soft:#F8E7E5; --warn:#8A6114; --warn-soft:#F6EEDC; --ok:#2E7D4F; --ok-soft:#E4F0E8;
+    --sel:#E8EEFD;
+    --serif:Charter,'Bitstream Charter','Sitka Text',Cambria,Georgia,serif;
+    --sans:-apple-system,'Segoe UI','Helvetica Neue',sans-serif;
+    --mono:'Cascadia Code',Consolas,'SF Mono',Menlo,monospace;
+    --t-0:11.5px; --t-1:13px; --t-2:16px; --t-3:19px;
+    --r-s:3px; --r-m:6px; --r-pill:999px;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --paper:#0E1526; --card:#161E33; --well:#1D2740; --rail:#0A1226; --rail-ink:#BBC6E0; --rail-dim:#5B688C;
+    --ink:#E6EAF3; --ink-2:#A7B2CC; --ink-3:#6E7B9C;
+    --line:#28324E; --blue:#6E97F5; --blue-deep:#A8BFF0; --blue-soft:#17233F; --peri:#4A5B85; --peri-soft:#161F36;
+    --flag:#D5776C; --flag-soft:#331E1B; --warn:#D2A04C; --warn-soft:#322818; --ok:#63B183; --ok-soft:#1B2C21;
+    --sel:#1B2942;
+  }}
+  :root[data-theme="dark"]{
+    --paper:#0E1526; --card:#161E33; --well:#1D2740; --rail:#0A1226; --rail-ink:#BBC6E0; --rail-dim:#5B688C;
+    --ink:#E6EAF3; --ink-2:#A7B2CC; --ink-3:#6E7B9C;
+    --line:#28324E; --blue:#6E97F5; --blue-deep:#A8BFF0; --blue-soft:#17233F; --peri:#4A5B85; --peri-soft:#161F36;
+    --flag:#D5776C; --flag-soft:#331E1B; --warn:#D2A04C; --warn-soft:#322818; --ok:#63B183; --ok-soft:#1B2C21;
+    --sel:#1B2942;
+  }
+  :root[data-theme="light"]{
+    --paper:#F5F6F8; --card:#FFFFFF; --well:#EDF0F4; --rail:#0C1D41; --rail-ink:#C7D0E4; --rail-dim:#7583A6;
+    --ink:#102C63; --ink-2:#44527A; --ink-3:#8792AE;
+    --line:#DCE1EA; --blue:#074BE6; --blue-deep:#102C63; --blue-soft:#E8EEFD; --peri:#9EADD3; --peri-soft:#F0F3FA;
+    --flag:#B3392E; --flag-soft:#F8E7E5; --warn:#8A6114; --warn-soft:#F6EEDC; --ok:#2E7D4F; --ok-soft:#E4F0E8;
+    --sel:#E8EEFD;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font:var(--t-2)/1.5 var(--sans)}
+  .app{display:grid;grid-template-columns:206px 1fr;min-height:640px}
+  @media(max-width:900px){.app{grid-template-columns:1fr}.rail{display:none}}
+  .rail{background:var(--rail);color:var(--rail-ink);padding:14px 0}
+  .rail .brand{font:700 15px var(--serif);padding:4px 16px 14px;color:#fff}
+  .rail .brand span{color:var(--peri)}
+  .rail .sect{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.09em;color:var(--rail-dim);padding:12px 16px 5px}
+  .rail .item{display:flex;justify-content:space-between;align-items:center;padding:7px 16px;font:500 var(--t-1) var(--sans);color:var(--rail-dim)}
+  .rail .item.on{color:#fff;background:rgba(255,255,255,.07);box-shadow:inset 3px 0 0 var(--peri)}
+  .rail .item .n{font:600 var(--t-0) var(--mono);background:rgba(255,255,255,.10);border-radius:var(--r-pill);padding:1px 8px}
+  .rail .foot{margin-top:22px;padding:12px 16px;border-top:1px solid rgba(255,255,255,.08);font:var(--t-0)/1.6 var(--sans);color:var(--rail-dim)}
+  .rail .foot a{color:var(--peri);text-decoration:none}
+  .main{display:flex;flex-direction:column;min-width:0}
+  .topbar{display:flex;align-items:center;gap:12px;background:var(--card);border-bottom:1px solid var(--line);padding:9px 18px;flex-wrap:wrap}
+  .crumb{font:var(--t-1) var(--sans);color:var(--ink-3)}
+  .crumb b{color:var(--ink);font-weight:600}
+  .env{font:700 var(--t-0) var(--mono);letter-spacing:.08em;color:var(--warn);border:1px solid var(--warn);border-radius:var(--r-s);padding:1px 7px}
+  .topbar .right{margin-left:auto;display:flex;gap:10px;align-items:center}
+  .user{display:flex;gap:8px;align-items:center;font:600 var(--t-1) var(--sans)}
+  .user .av{width:24px;height:24px;border-radius:var(--r-pill);background:var(--blue);color:#fff;font:700 var(--t-0) var(--sans);display:flex;align-items:center;justify-content:center}
+  .statbar{display:flex;gap:22px;align-items:center;background:var(--card);border-bottom:1px solid var(--line);padding:8px 18px;flex-wrap:wrap}
+  .stat{font:var(--t-1) var(--sans);color:var(--ink-3)}
+  .stat b{font:600 var(--t-2) var(--serif);color:var(--blue-deep);font-variant-numeric:tabular-nums;margin-right:4px}
+  .stat.risk b{color:var(--flag)} .stat.save b{color:var(--ok)}
+  .statbar .right{margin-left:auto;display:flex;gap:8px}
+  .btn{border:1px solid var(--blue);background:var(--blue);color:#fff;border-radius:var(--r-s);padding:6px 13px;font:600 var(--t-1) var(--sans);cursor:pointer}
+  .btn.ghost{background:none;color:var(--blue)}
+  .btn.escalate{border-color:var(--warn);background:none;color:var(--warn)}
+  .btn.waive{border-color:var(--ink-3);background:none;color:var(--ink-2)}
+  .btn:hover{filter:brightness(1.1)}
+  .btn:disabled{opacity:.4;cursor:default;filter:none}
+  .btn:focus-visible,.row:focus-visible,.tab:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+  .content{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);flex:1;min-height:0}
+  @media(max-width:1020px){.content{grid-template-columns:1fr}}
+  .list{border-right:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+  .tabs{display:flex;gap:2px;padding:10px 14px 0;background:var(--paper)}
+  .tab{border:1px solid var(--line);border-bottom:none;background:var(--well);color:var(--ink-3);font:600 var(--t-1) var(--sans);padding:6px 13px;border-radius:var(--r-s) var(--r-s) 0 0;cursor:pointer}
+  .tab[aria-selected="true"]{background:var(--card);color:var(--ink)}
+  .tab .n{font:600 var(--t-0) var(--mono);margin-left:5px;color:var(--ink-3)}
+  .thead,.row{display:grid;grid-template-columns:118px minmax(0,1fr) 120px 86px;gap:10px;align-items:center;padding:7px 14px}
+  .thead{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);background:var(--card);border-bottom:1px solid var(--line)}
+  .rows{background:var(--card);overflow:auto;flex:1}
+  .row{border-bottom:1px solid var(--line);cursor:pointer;font:var(--t-1) var(--sans)}
+  .row:hover{background:var(--well)}
+  .row.sel{background:var(--sel);box-shadow:inset 3px 0 0 var(--blue)}
+  .row .id{font:var(--t-0) var(--mono);color:var(--ink-3)}
+  .row .what{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .what small{display:block;font:var(--t-0) var(--sans);color:var(--ink-3);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .prop{font:var(--t-0) var(--sans);color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chip{font:700 10px var(--sans);text-transform:uppercase;letter-spacing:.05em;border-radius:var(--r-s);padding:2px 7px;color:#fff;text-align:center}
+  .chip.flag{background:var(--flag)} .chip.warn{background:var(--warn)} .chip.ok{background:var(--ok)} .chip.hold{background:var(--ink-3)}
+  .detail{background:var(--paper);padding:14px 18px;overflow:auto;min-width:0}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:14px 16px;margin-bottom:14px}
+  .panel h3{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.07em;color:var(--blue-deep);margin:0 0 10px}
+  .dhead{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:4px}
+  .dhead .v{font:700 var(--t-3) var(--serif)}
+  .meta{font:var(--t-0) var(--mono);color:var(--ink-3);margin-bottom:10px}
+  .kv2{display:grid;grid-template-columns:1fr;gap:5px;margin:0 0 4px}
+  @media(min-width:640px){.kv2{grid-template-columns:1fr 1fr}}
+  .f{display:flex;gap:8px;align-items:baseline;font-size:var(--t-1)}
+  .f b{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);width:110px;flex:none}
+  .f .v{font-family:var(--mono);font-size:var(--t-0)}
+  .f .v.bad{color:var(--flag);font-weight:600}
+  .finding{font-size:var(--t-1);color:var(--ink-2);margin:7px 0;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--well)}
+  .finding b{display:block;color:var(--flag);font:700 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+  .finding.warn b{color:var(--warn)}
+  .fix{font-size:var(--t-1);color:var(--ink);margin:7px 0;padding:8px 10px;border:1px solid var(--ok);border-radius:var(--r-s);background:var(--ok-soft)}
+  .fix b{display:block;color:var(--ok);font:700 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  pre.audit{white-space:pre-wrap;font:var(--t-0)/1.7 var(--mono);background:var(--well);border:1px solid var(--line);border-radius:var(--r-s);padding:10px;margin:0;max-height:200px;overflow:auto}
+  .empty{color:var(--ink-3);font-size:var(--t-1);padding:30px;text-align:center}
+  .about{max-width:1240px;margin:0 auto;padding:26px 30px 56px;color:var(--ink-2)}
+  .about h2{font:600 var(--t-2) var(--serif);color:var(--ink);margin:0 0 4px}
+  .spec{margin:10px 0 0;padding:0;list-style:none}
+  .spec li{display:grid;grid-template-columns:1fr;gap:2px 18px;padding:10px 0;border-bottom:1px solid var(--line);font-size:var(--t-1)}
+  @media(min-width:760px){.spec li{grid-template-columns:240px 1fr}}
+  .spec b{font:600 var(--t-1) var(--serif);color:var(--blue-deep)}
+  .spec a{font:600 var(--t-1) var(--serif);color:var(--blue)}
+  .note{font-size:var(--t-1);color:var(--ink-3);max-width:80ch;margin-top:12px}
+</style>
+</head>
+<body>
+
+
+<div class="app">
+  <aside class="rail">
+    <div class="brand">Portfolio <span>Sentinel</span></div>
+    <div class="sect">Validations</div>
+    <div class="item on">Property financials <span class="n" id="nav-n">0</span></div>
+    <div class="item">Rent rolls</div>
+    <div class="item">Hotel operations</div>
+    <div class="sect">Operations</div>
+    <div class="item">Integrations · Yardi, RealPage</div>
+    <div class="item">Reports</div>
+    <div class="item">Governance log</div>
+    <div class="foot">Prototype by <a href="https://russh.work">Russell Harris</a><br>
+      Prepared for MIG Real Estate<br>
+      AI Innovation Analyst application · July 2026</div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="crumb">Asset Management / Data Validation / <b>May close</b></span>
+      <span class="env">PROTOTYPE · CLIENT-SIDE ONLY</span>
+      <div class="right"><span class="user"><span class="av">RH</span> R. Harris · Analyst</span></div>
+    </div>
+    <div class="statbar">
+      <span class="stat"><b id="k-records">0</b>records validated</span>
+      <span class="stat save"><b id="k-pass">0%</b>pass rate</span>
+      <span class="stat risk"><b id="k-open">0</b>open exceptions</span>
+      <span class="stat"><b id="k-cleared">0</b>cleared this run</span>
+      <div class="right">
+        <button class="btn ghost" id="rerun">Run June validation</button>
+        <button class="btn ghost" id="reset">Reset</button>
+      </div>
+    </div>
+    <div class="content">
+      <section class="list">
+        <div class="tabs" id="tabs" role="tablist"></div>
+        <div class="thead"><span>Record</span><span>Check failed</span><span>Property</span><span>Status</span></div>
+        <div class="rows" id="rows"></div>
+      </section>
+      <section class="detail">
+        <div id="dpanel"></div>
+        <div class="panel"><h3>Audit trail</h3><pre class="audit" id="audit"></pre></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="about">
+  <h2>About this prototype</h2>
+  <p class="note" style="margin-top:4px">Rule-based and fully client-side; nothing on this page is transmitted anywhere. It demonstrates the validation-agent pattern on a mixed portfolio (multifamily, hotel, industrial/flex): every record checked, clean data passing silently, and only exceptions reaching a person, with evidence and a suggested correction attached. The 1,284 records and three properties are synthetic.</p>
+  <ul class="spec">
+    <li><b>Where this runs in production</b><span>Reads from Yardi Voyager and RealPage through governed connectors into Microsoft Fabric / OneLake; orchestrated with Power Automate or Logic Apps and MCP tool servers; agents composed in Claude Code and Copilot Studio.</span></li>
+    <li><b>Governed by design</b><span>Every deployed agent documented: purpose, owners, data accessed, prompts, evaluation results, and known limitations, with read/write boundaries enforced at the connector, not the prompt.</span></li>
+    <li><b>Measured, not demo-ready</b><span>Evaluation pipeline scores the checks against labeled cases before deploy; pass rates, exception aging, and hours returned to the accounting team tracked in Power BI.</span></li>
+  </ul>
+  <h2 style="margin-top:26px">More working systems by the same builder</h2>
+  <ul class="spec">
+    <li><a href="https://russh.work">russh.work</a><span>The full portfolio: six production AI systems, built and operated end to end.</span></li>
+    <li><a href="https://russh.work/intake-copilot/">Intake Copilot</a><span>Document-intake agent with policy screening and human-in-the-loop exceptions, built for a private markets firm's corporate services application.</span></li>
+    <li><a href="https://russh.work/realization-guard/">Realization Guard</a><span>Document-compliance agent prototype, scoped and shipped solo in one day with Claude Code.</span></li>
+  </ul>
+  <p class="note">Built as a single deployable file by Russell Harris · <a href="https://russh.work" style="color:var(--blue)">russh.work</a> · harris.russell1@gmail.com · 302-824-0225</p>
+</div>
+
+<script>
+/* ---------------- data ---------------- */
+const RUN1={label:"May close",records:1284,items:[
+ {id:"SF-U214",prop:"Sagebrush Flats · Phoenix, AZ",what:"Occupied unit with $0 scheduled rent",check:"Rent roll integrity",sev:"flag",
+  ev:[["Unit","214, 2BR/2BA"],["Status","Occupied, lease through Mar 2027"],["Scheduled rent","$0.00",1],["Comp band (2BR)","$1,610 to $1,780"]],
+  fix:"Set scheduled rent from the executed lease ($1,675 per the lease abstract); post retroactive charge for May."},
+ {id:"SF-U108",prop:"Sagebrush Flats · Phoenix, AZ",what:"Vacant unit carrying rent charges",check:"Rent roll integrity",sev:"flag",
+  ev:[["Unit","108, 1BR/1BA"],["Status","Vacant since Apr 12"],["May charges","$1,420",1],["Move-out record","Present, deposit refunded"]],
+  fix:"Reverse May charge; confirm unit status with the site team before June billing."},
+ {id:"SF-U317",prop:"Sagebrush Flats · Phoenix, AZ",what:"Lease end date precedes start date",check:"Lease data quality",sev:"flag",
+  ev:[["Unit","317, Studio"],["Lease start","2026-08-01",1],["Lease end","2026-02-01",1],["Term on application","12 months"]],
+  fix:"Correct end date to 2027-08-01 per the signed lease; flag the data-entry pattern to the leasing office."},
+ {id:"SF-U122",prop:"Sagebrush Flats · Phoenix, AZ",what:"Rent 38% above comp band for unit type",check:"Rent reasonableness",sev:"warn",
+  ev:[["Unit","122, 1BR/1BA"],["Scheduled rent","$2,240",1],["Comp band (1BR)","$1,380 to $1,620"],["Notes field","Corporate lease, furnished"]],
+  fix:"Likely legitimate (furnished corporate lease). Confirm and tag the unit so the check whitelists it going forward."},
+ {id:"SF-U241",prop:"Sagebrush Flats · Phoenix, AZ",what:"90+ day delinquency not flagged for collections",check:"Delinquency aging",sev:"warn",
+  ev:[["Unit","241, 2BR/1BA"],["Balance","$4,890",1],["Aging","94 days"],["Collections status","Not referred"]],
+  fix:"Refer to collections per policy at 60 days; confirm no payment plan is on file before referral."},
+ {id:"HP-MAR",prop:"Harbor Point Inn · San Diego, CA",what:"RevPAR does not equal ADR times occupancy",check:"Hotel ops consistency",sev:"flag",
+  ev:[["Month","March"],["ADR (reported)","$187.40"],["Occupancy (reported)","81.2%"],["RevPAR (reported)","$168.10",1],["RevPAR (computed)","$152.17"]],
+  fix:"Recompute from the daily flash. One of the three figures is misstated; computed RevPAR suggests the reported figure carried February's value forward."},
+ {id:"HP-FEB",prop:"Harbor Point Inn · San Diego, CA",what:"Occupancy above 100% of available rooms",check:"Hotel ops consistency",sev:"flag",
+  ev:[["Month","February"],["Rooms available","3,976 (142 keys x 28)"],["Rooms sold (reported)","4,095",1],["Out-of-order rooms","Not recorded"]],
+  fix:"Reconcile rooms-sold against the PMS; verify out-of-order rooms were excluded from the available count."},
+ {id:"MR-T12",prop:"Mesa Ridge Flex Park · Denver, CO",what:"Missing month in trailing-12 utilities",check:"T-12 completeness",sev:"flag",
+  ev:[["Line","Utilities, electric"],["April amount","absent",1],["Mar / May amounts","$18,240 / $19,105"],["GL export row count","11 of 12"]],
+  fix:"Pull April from the GL export re-run; the row count says the export truncated, not that the expense is zero."},
+ {id:"MR-RM",prop:"Mesa Ridge Flex Park · Denver, CO",what:"R&M expense 2.4x the portfolio benchmark",check:"Expense outlier",sev:"warn",
+  ev:[["Line","Repairs and maintenance, May"],["Amount","$61,300",1],["Benchmark (flex, PSF)","$25,400 expected"],["Work orders","Roof section replacement logged"]],
+  fix:"Likely a capital item coded to R&M. Confirm with accounting and reclass to CapEx if the roof work qualifies."},
+]};
+const RUN2={label:"June validation",records:1291,items:[
+ {id:"SF-U330",prop:"Sagebrush Flats · Phoenix, AZ",what:"Duplicate unit rows in rent roll export",check:"Rent roll integrity",sev:"flag",
+  ev:[["Unit","330, 3BR/2BA"],["Rows in export","2",1],["Charges","Identical, $2,140 each"],["Total impact","Overstates GPR by $2,140"]],
+  fix:"De-duplicate the export; add a uniqueness check on unit number to the ingest step."},
+ {id:"HP-JUN",prop:"Harbor Point Inn · San Diego, CA",what:"STR index moved 22 points month over month",check:"STR trend outlier",sev:"warn",
+  ev:[["Metric","RevPAR index vs comp set"],["May / June","96.4 / 118.2",1],["Comp set change","One hotel exited the set"],["STR footnote","Comp set revision noted"]],
+  fix:"Not an error. Annotate the comp-set revision so trend reports explain the jump instead of alarming on it."},
+]};
+
+let items=[], audit=[], step=0, sel=null, filter='all', records=0, cleared=0, run2=false;
+
+function log(line){step+=1;audit.unshift(String(step).padStart(2,'0')+'  '+line);
+  document.getElementById('audit').textContent=audit.join('\n');}
+
+function ingest(run){
+  records+=run.records;
+  run.items.forEach(raw=>{items.push({...raw});log('EXCEPTION  '+raw.id+'  '+raw.check);});
+  log('RUN        '+run.label+': '+run.records+' records validated, '+run.items.length+' exceptions');
+  if(sel===null&&items.length)sel=0;
+  render();
+}
+
+function act(i,action){
+  const d=items[i];d.resolved=action;cleared+=1;
+  const verb={corrected:'CORRECTED  ',escalated:'ESCALATED  ',waived:'WAIVED     '}[action];
+  log(verb+d.id+'  by R. Harris');
+  const next=items.findIndex(x=>!x.resolved);
+  if(next>=0)sel=next;
+  render();
+}
+
+function statusOf(d){
+  if(d.resolved==='corrected')return['ok','Corrected'];
+  if(d.resolved==='escalated')return['warn','Escalated'];
+  if(d.resolved==='waived')return['hold','Waived'];
+  return d.sev==='flag'?['flag','Error']:['warn','Review'];
+}
+function matches(d){
+  if(filter==='all')return true;
+  if(filter==='open')return !d.resolved;
+  if(filter==='errors')return d.sev==='flag'&&!d.resolved;
+  if(filter==='done')return !!d.resolved;
+  return true;
+}
+
+function render(){
+  const openN=items.filter(d=>!d.resolved).length;
+  const errN=items.filter(d=>d.sev==='flag'&&!d.resolved).length;
+  const doneN=items.filter(d=>d.resolved).length;
+  const tabs=[['all','All',items.length],['open','Open',openN],['errors','Errors',errN],['done','Resolved',doneN]];
+  document.getElementById('tabs').innerHTML=tabs.map(([k,l,n])=>
+    '<button class="tab" role="tab" aria-selected="'+(filter===k)+'" data-f="'+k+'">'+l+'<span class="n">'+n+'</span></button>').join('');
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{filter=t.dataset.f;render();}));
+
+  const rows=items.map((d,i)=>({d,i})).filter(x=>matches(x.d));
+  document.getElementById('rows').innerHTML=rows.length?rows.map(({d,i})=>{
+    const [cls,label]=statusOf(d);
+    return '<div class="row'+(sel===i?' sel':'')+'" tabindex="0" data-r="'+i+'">'+
+      '<span class="id">'+d.id+'</span>'+
+      '<span class="what">'+d.what+'<small>'+d.check+'</small></span>'+
+      '<span class="prop">'+d.prop.split(' · ')[0]+'</span>'+
+      '<span class="chip '+cls+'">'+label+'</span></div>';
+  }).join(''):'<div class="empty">No exceptions in this view.</div>';
+  document.querySelectorAll('[data-r]').forEach(r=>{
+    const go=()=>{sel=+r.dataset.r;render();};
+    r.addEventListener('click',go);
+    r.addEventListener('keydown',e=>{if(e.code==='Enter'||e.code==='Space'){e.preventDefault();go();}});
+  });
+
+  const dp=document.getElementById('dpanel');
+  if(sel===null||!items[sel]){dp.innerHTML='<div class="panel"><div class="empty">Select an exception.</div></div>';}
+  else{
+    const d=items[sel];const [cls,label]=statusOf(d);
+    const ev=d.ev.map(([k,v,bad])=>'<div class="f"><b>'+k+'</b><span class="v'+(bad?' bad':'')+'">'+v+'</span></div>').join('');
+    const actions=!d.resolved?
+      '<div class="actions"><button class="btn" data-a="corrected">Apply correction</button>'+
+      '<button class="btn escalate" data-a="escalated">Escalate to accounting</button>'+
+      '<button class="btn waive" data-a="waived">Waive with note</button></div>':'';
+    dp.innerHTML='<div class="panel">'+
+      '<div class="dhead"><span class="chip '+cls+'">'+label+'</span><span class="v">'+d.what+'</span></div>'+
+      '<div class="meta">'+d.id+' · '+d.prop+' · check: '+d.check+'</div>'+
+      '<h3>Evidence</h3><div class="kv2">'+ev+'</div>'+
+      '<div class="finding'+(d.sev==='warn'?' warn':'')+'"><b>'+(d.sev==='flag'?'Why this blocks the close':'Why this needs one look')+'</b>'+
+        (d.sev==='flag'?'Left uncorrected, this error flows into the monthly close and investor reporting.':'Pattern is unusual but may be legitimate; one confirmation prevents both a false alarm and a miss.')+'</div>'+
+      '<div class="fix"><b>Suggested action</b>'+d.fix+'</div>'+actions+'</div>';
+    dp.querySelectorAll('[data-a]').forEach(b=>b.addEventListener('click',()=>act(sel,b.dataset.a)));
+  }
+
+  const passN=records?((records-items.filter(d=>!d.resolved&&d.sev==='flag').length)/records*100):0;
+  document.getElementById('k-records').textContent=records.toLocaleString();
+  document.getElementById('k-pass').textContent=records?passN.toFixed(1)+'%':'0%';
+  document.getElementById('k-open').textContent=openN;
+  document.getElementById('k-cleared').textContent=cleared;
+  document.getElementById('nav-n').textContent=openN;
+}
+
+document.getElementById('rerun').addEventListener('click',()=>{
+  if(run2)return;run2=true;ingest(RUN2);
+  document.getElementById('rerun').disabled=true;
+});
+document.getElementById('reset').addEventListener('click',()=>{
+  items=[];audit=[];step=0;sel=null;filter='all';records=0;cleared=0;run2=false;
+  document.getElementById('rerun').disabled=false;
+  ingest(RUN1);
+});
+ingest(RUN1);
+</script>
+
+</body>
+</html>
