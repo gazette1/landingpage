@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Intake Copilot: Corporate Services Document Intake · Russell Harris</title>
+<style>
+  :root{
+    --paper:#FAFAF8; --card:#FFFFFF; --well:#F1F3F6; --ink:#181F38; --ink-2:#4A5468; --ink-3:#8A93A6;
+    --line:#E1E4EA; --navy:#0A364A; --navy-soft:#E7F0F5; --sky:#95DAFF; --sky-soft:#EAF7FF;
+    --plum:#752D4F; --plum-soft:#F5E9EF; --warn:#8A6114; --warn-soft:#F6EEDC; --ok:#2E7D4F; --ok-soft:#E7F1EA;
+    --serif:Charter,'Bitstream Charter','Sitka Text',Cambria,Georgia,serif;
+    --sans:-apple-system,'Segoe UI','Helvetica Neue',sans-serif;
+    --mono:'Cascadia Code',Consolas,'SF Mono',Menlo,monospace;
+    --t-0:12px; --t-1:13.5px; --t-2:16px; --t-3:20px; --t-4:28px;
+    --r-s:3px; --r-m:7px; --r-pill:999px;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --paper:#12172A; --card:#1A2036; --well:#20273F; --ink:#E7E9EF; --ink-2:#A9B1C4; --ink-3:#727C93;
+    --line:#2B3450; --navy:#7FB6D5; --navy-soft:#16283A; --sky:#3E5E76; --sky-soft:#182C3C;
+    --plum:#D389AB; --plum-soft:#33202B; --warn:#D2A04C; --warn-soft:#332A18; --ok:#63B183; --ok-soft:#1D2F24;
+  }}
+  :root[data-theme="dark"]{
+    --paper:#12172A; --card:#1A2036; --well:#20273F; --ink:#E7E9EF; --ink-2:#A9B1C4; --ink-3:#727C93;
+    --line:#2B3450; --navy:#7FB6D5; --navy-soft:#16283A; --sky:#3E5E76; --sky-soft:#182C3C;
+    --plum:#D389AB; --plum-soft:#33202B; --warn:#D2A04C; --warn-soft:#332A18; --ok:#63B183; --ok-soft:#1D2F24;
+  }
+  :root[data-theme="light"]{
+    --paper:#FAFAF8; --card:#FFFFFF; --well:#F1F3F6; --ink:#181F38; --ink-2:#4A5468; --ink-3:#8A93A6;
+    --line:#E1E4EA; --navy:#0A364A; --navy-soft:#E7F0F5; --sky:#95DAFF; --sky-soft:#EAF7FF;
+    --plum:#752D4F; --plum-soft:#F5E9EF; --warn:#8A6114; --warn-soft:#F6EEDC; --ok:#2E7D4F; --ok-soft:#E7F1EA;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font:var(--t-2)/1.55 var(--sans)}
+  header.bar{padding:22px 30px 18px;border-bottom:3px solid var(--navy)}
+  .bar .top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .bar h1{font:700 var(--t-4) var(--serif);margin:0;color:var(--navy);letter-spacing:.2px}
+  .bar h1 .g{color:var(--plum)}
+  .bar .sub{font-size:var(--t-2);color:var(--ink-2);margin-top:6px;max-width:74ch}
+  .bar .sub b{color:var(--ink)}
+  .bar .who{margin-left:auto;font-size:var(--t-0);color:var(--ink-3);text-align:right;line-height:1.6}
+  .bar .who b{color:var(--ink-2)}
+  .bar a{color:var(--navy)}
+  main{max-width:1240px;margin:0 auto;padding:24px 30px 56px}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:0 0 20px}
+  .kpi{border:1px solid var(--line);border-radius:var(--r-m);padding:14px 16px;background:var(--card)}
+  .kpi .n{font:600 var(--t-3) var(--serif);color:var(--navy);font-variant-numeric:tabular-nums}
+  .kpi.risk .n{color:var(--plum)} .kpi.save .n{color:var(--ok)}
+  .kpi .l{font-size:var(--t-0);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-top:3px}
+  .grid{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:1020px){.grid{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:18px 20px;margin-bottom:20px}
+  .card h3{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.07em;color:var(--navy);margin:0 0 12px}
+  .doc{border:1px solid var(--line);border-radius:var(--r-m);background:var(--card);padding:12px 14px;margin:0 0 10px}
+  .doc.warn{background:var(--warn-soft)} .doc.flag{background:var(--plum-soft)} .doc.done{background:var(--ok-soft)}
+  .doc .head{display:flex;gap:10px;align-items:center;flex-wrap:wrap;cursor:pointer}
+  .sev{font:700 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.06em;border-radius:var(--r-s);padding:2px 9px;color:var(--paper);flex:none}
+  .sev.flag{background:var(--plum)} .sev.warn{background:var(--warn)} .sev.ok{background:var(--ok)} .sev.info{background:var(--navy)}
+  .doc .vendor{font:600 var(--t-1) var(--sans)}
+  .doc .dept{font-size:var(--t-0);color:var(--ink-3)}
+  .doc .amt{margin-left:auto;font:600 var(--t-1) var(--mono)}
+  .doc .body{display:none;border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+  .doc.open .body{display:block}
+  .fields{display:grid;grid-template-columns:1fr;gap:6px;margin:0 0 10px}
+  @media(min-width:680px){.fields{grid-template-columns:1fr 1fr}}
+  .f{display:flex;gap:8px;align-items:center;font-size:var(--t-1)}
+  .f b{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);width:88px;flex:none}
+  .f .v{font-family:var(--mono);font-size:var(--t-0)}
+  .conf{width:54px;height:6px;border-radius:var(--r-pill);background:var(--well);overflow:hidden;flex:none}
+  .conf i{display:block;height:100%;background:var(--sky)}
+  .conf.low i{background:var(--plum)}
+  .finding{font-size:var(--t-1);color:var(--ink-2);margin:4px 0}
+  .finding b{color:var(--plum);font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.05em}
+  .doc.warn .finding b{color:var(--warn)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .btn{border:1px solid var(--navy);background:var(--navy);color:var(--paper);border-radius:var(--r-s);padding:8px 15px;font:600 var(--t-1) var(--sans);cursor:pointer}
+  .btn.ghost{background:none;color:var(--navy)}
+  .btn.reject{border-color:var(--plum);background:none;color:var(--plum)}
+  .btn:hover{filter:brightness(1.12)}
+  .btn:focus-visible,.doc .head:focus-visible{outline:2px solid var(--plum);outline-offset:2px}
+  .topline{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+  pre.audit{white-space:pre-wrap;font:var(--t-0)/1.7 var(--mono);background:var(--well);border:1px solid var(--line);border-radius:var(--r-m);padding:12px;margin:0;max-height:300px;overflow:auto}
+  .spec{margin:12px 0 0;padding:0;list-style:none}
+  .spec li{display:grid;grid-template-columns:1fr;gap:2px 18px;padding:12px 0;border-bottom:1px solid var(--line);font-size:var(--t-1)}
+  @media(min-width:760px){.spec li{grid-template-columns:250px 1fr}}
+  .spec b{font:600 var(--t-1) var(--serif);color:var(--navy)}
+  .work{margin:12px 0 0;padding:0;list-style:none}
+  .work li{display:grid;grid-template-columns:1fr;gap:2px 18px;padding:10px 0;border-bottom:1px solid var(--line);font-size:var(--t-1)}
+  @media(min-width:760px){.work li{grid-template-columns:250px 1fr}}
+  .work a{font:600 var(--t-1) var(--serif);color:var(--plum)}
+  .note{font-size:var(--t-1);color:var(--ink-3);max-width:80ch;margin-top:12px}
+  footer{border-top:1px solid var(--line);margin-top:36px;padding-top:18px}
+  footer h2{font:600 var(--t-2) var(--serif);margin:0}
+</style>
+</head>
+<body>
+
+
+<header class="bar">
+  <div class="top">
+    <h1>Intake <span class="g">Copilot</span></h1>
+    <div class="who">Working prototype · <b>Russell Harris</b> · <a href="https://russh.work">russh.work</a><br>
+    Prepared for Carlyle Corporate Services Technology · Engineer, AI &amp; Process Automation · July 2026</div>
+  </div>
+  <p class="sub"><b>Intake to downstream, with humans on the exceptions.</b> High-volume document intake is where Corporate Services loses hours: extraction, policy checks, approvals, and posting. This copilot runs that path end to end. Clean documents post straight through; only exceptions reach a person, with the evidence attached.</p>
+</header>
+
+<main>
+  <div class="kpis">
+    <div class="kpi"><div class="n" id="k-processed">0</div><div class="l">Documents processed</div></div>
+    <div class="kpi save"><div class="n" id="k-st">0%</div><div class="l">Straight-through rate</div></div>
+    <div class="kpi risk"><div class="n" id="k-open">0</div><div class="l">Open exceptions</div></div>
+    <div class="kpi"><div class="n" id="k-touches">0</div><div class="l">Manual touches avoided</div></div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h3>Intake queue · vendor invoices, June cycle</h3>
+        <div class="topline">
+          <button class="btn ghost" id="batch">Process next batch</button>
+          <button class="btn ghost" id="reset">Reset demo</button>
+          <span class="note" style="margin:0">Click any document to open its extraction and findings.</span>
+        </div>
+        <div id="queue"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h3>Audit trail · every action, attributable</h3>
+        <pre class="audit" id="audit"></pre>
+      </div>
+      <div class="card">
+        <h3>How the screen works</h3>
+        <p class="note" style="margin-top:0">Fields arrive with extraction confidence (bars). Policy rules run on every document: duplicate detection, PO requirements by amount, vendor-master and W-9 checks, contract-rate comparison, and approval-tier thresholds. Verdicts: <b>auto-post</b> (no touch), <b>verify</b> (confirm one field), <b>exception</b> (approver decision with evidence). This demo is rule-based and fully client-side; the production version is an agentic extraction pipeline with an evaluation harness, model-confidence routing, and posting into the systems of record.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <h2>How this hardens for production</h2>
+    <ul class="spec">
+      <li><b>Extraction with evals, not vibes</b><span>LLM extraction scored against a labeled regression set per document type; confidence thresholds tuned to route uncertainty to humans, and every model change re-scored before deploy.</span></li>
+      <li><b>Human-in-the-loop by design</b><span>Approvers see the finding, the evidence, and the suggested action in one place; their decisions feed back into the rule and prompt patterns as reusable building blocks for the next use case.</span></li>
+      <li><b>Enterprise fit</b><span>Deploys inside the firm's environment with observability, access controls, and a full audit trail; posts to the ERP and approval systems of record rather than living beside them.</span></li>
+    </ul>
+
+    <h2 style="margin-top:26px">More working systems by the same builder</h2>
+    <ul class="work">
+      <li><a href="https://russh.work">russh.work</a><span>The full portfolio: six production AI systems, built and operated end to end.</span></li>
+      <li><a href="https://russh.work/realization-guard/">Realization Guard</a><span>Document-compliance agent prototype (pre-bill review against client billing guidelines), scoped and shipped solo in one day with Claude Code.</span></li>
+      <li><a href="https://russh.work">TrialEdge</a><span>Production ML pipeline: LightGBM plus LLM document analysis, ingestion to inference on Cloudflare Workers and Supabase.</span></li>
+      <li><a href="https://russh.work">ODI Bot</a><span>19-pass multi-provider LLM orchestration with per-pass contracts, fallback parsing, and claim-level citation enforcement.</span></li>
+    </ul>
+    <p class="note">Rule-based prototype; nothing on this page is transmitted anywhere. Built as a single deployable file by Russell Harris · <a href="https://russh.work">russh.work</a> · harris.russell1@gmail.com · 302-824-0225</p>
+  </footer>
+</main>
+
+<script>
+/* ---------------- data ---------------- */
+const BATCH1=[
+ {v:"Capitol Office Supply Co.",dept:"Finance · office consumables",amt:1240.18,po:"PO-88412",vendorOk:1,w9:1,dupKey:"cos-1240-0612",
+  f:{Vendor:[0.99],Amount:[0.99],"PO number":[0.98],"Invoice date":[0.97],"GL code":[0.95]}},
+ {v:"Summit AV Services",dept:"Marketing & Communications · event support",amt:920.00,po:"PO-88437",vendorOk:1,w9:1,dupKey:"sav-920-0614",
+  f:{Vendor:[0.98],Amount:[0.99],"PO number":[0.97],"Invoice date":[0.98],"GL code":[0.93]}},
+ {v:"Meridian Audit Partners LLP",dept:"Finance · external audit",amt:84500.00,po:"PO-88301",vendorOk:1,w9:1,dupKey:"map-84500-0610",
+  f:{Vendor:[0.99],Amount:[0.98],"PO number":[0.99],"Invoice date":[0.98],"GL code":[0.96]}},
+ {v:"Nova Translations Ltd.",dept:"Legal & Compliance · document translation",amt:12400.00,po:null,vendorOk:1,w9:1,dupKey:"ntl-12400-0611",
+  f:{Vendor:[0.97],Amount:[0.98],"PO number":[0.30],"Invoice date":[0.96],"GL code":[0.90]}},
+ {v:"Bridgepoint Legal Search",dept:"Human Capital · retained search",amt:28750.00,po:"PO-88355",vendorOk:0,w9:0,dupKey:"bls-28750-0609",
+  f:{Vendor:[0.96],Amount:[0.97],"PO number":[0.95],"Tax ID":[0.41],"GL code":[0.88]}},
+ {v:"Beltway Catering Group",dept:"Marketing & Communications · client event",amt:3180.00,po:"PO-88420",vendorOk:1,w9:1,dupKey:"bcg-3180-0613",
+  f:{Vendor:[0.98],Amount:[0.99],"PO number":[0.96],"Invoice date":[0.97],"GL code":[0.94]}},
+ {v:"Beltway Catering Group",dept:"Marketing & Communications · client event",amt:3180.00,po:"PO-88420",vendorOk:1,w9:1,dupKey:"bcg-3180-0613",
+  f:{Vendor:[0.98],Amount:[0.99],"PO number":[0.96],"Invoice date":[0.97],"GL code":[0.94]}},
+];
+const BATCH2=[
+ {v:"GreenLine Facilities",dept:"Finance · janitorial contract",amt:9840.00,po:"PO-88460",vendorOk:1,w9:1,rate:8200,dupKey:"glf-9840-0618",
+  f:{Vendor:[0.98],Amount:[0.99],"PO number":[0.97],"Contract rate":[0.95],"GL code":[0.92]}},
+ {v:"District Print Works",dept:"Marketing & Communications · collateral",amt:640.55,po:"PO-88471",vendorOk:1,w9:1,dupKey:"dpw-640-0619",
+  f:{Vendor:[0.99],Amount:[0.99],"PO number":[0.98],"Invoice date":[0.98],"GL code":[0.96]}},
+ {v:"Hawthorne Tax Advisory",dept:"Tax · state filings support",amt:41200.00,po:"PO-88448",vendorOk:1,w9:1,dupKey:"hta-41200-0617",
+  f:{Vendor:[0.98],Amount:[0.98],"PO number":[0.98],"Invoice date":[0.97],"GL code":[0.95]}},
+];
+const PO_THRESHOLD=10000, APPROVAL_TIER=25000;
+
+let docs=[], seenKeys=new Set(), audit=[], step=0, batch2Loaded=false;
+const fmt$=v=>'$'+v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+
+function screenDoc(d){
+  const findings=[];
+  if(seenKeys.has(d.dupKey))
+    findings.push({s:'flag',cite:'Duplicate detection',text:'Same vendor, amount, and PO already in this cycle. Held before payment, not clawed back after.'});
+  seenKeys.add(d.dupKey);
+  if(!d.po && d.amt>=PO_THRESHOLD)
+    findings.push({s:'flag',cite:'PO required above $10,000',text:'No purchase order captured. Routed to the requesting department for PO match before posting.'});
+  if(!d.vendorOk||!d.w9)
+    findings.push({s:'flag',cite:'Vendor master / W-9',text:'Vendor not in the master file or W-9 missing. Onboarding packet triggered; payment blocked until complete.'});
+  if(d.rate && d.amt>d.rate*1.1)
+    findings.push({s:'flag',cite:'Contract rate mismatch',text:'Invoice exceeds contracted monthly rate by more than 10%. Variance evidence attached for the approver.'});
+  const lowFields=Object.entries(d.f).filter(([k,v])=>v[0]<0.6).map(([k])=>k);
+  if(lowFields.length && !findings.length)
+    findings.push({s:'warn',cite:'Low extraction confidence',text:'Field needs one human look: '+lowFields.join(', ')+'. Confirm and the document proceeds.'});
+  else if(lowFields.length)
+    findings.push({s:'warn',cite:'Low extraction confidence',text:'Also confirm: '+lowFields.join(', ')+'.'});
+  if(d.amt>=APPROVAL_TIER && !findings.some(f=>f.s==='flag'))
+    findings.push({s:'warn',cite:'Approval tier',text:'Above the $25,000 auto-post ceiling. One-click approval requested from the department owner.'});
+  d.findings=findings;
+  d.state=findings.some(f=>f.s==='flag')?'flag':findings.length?'warn':'auto';
+  return d;
+}
+
+function log(line){step+=1;audit.unshift(String(step).padStart(2,'0')+'  '+line);
+  document.getElementById('audit').textContent=audit.join('\n');}
+
+function ingest(batch,label){
+  batch.forEach(raw=>{
+    const d=screenDoc({...raw});
+    docs.push(d);
+    if(d.state==='auto'){d.resolved='posted';log('AUTO-POST  '+d.v+'  '+fmt$(d.amt)+'  posted to ERP, no touch');}
+    else log('QUEUED     '+d.v+'  '+fmt$(d.amt)+'  '+d.findings[0].cite);
+  });
+  log('BATCH      '+label+' ingested ('+batch.length+' documents)');
+  render();
+}
+
+function act(i,action){
+  const d=docs[i];
+  d.resolved=action;
+  const verb={posted:'APPROVED   ',held:'HELD       ',rejected:'REJECTED   '}[action];
+  log(verb+d.v+'  '+fmt$(d.amt)+'  by reviewer');
+  render();
+}
+
+function render(){
+  const q=document.getElementById('queue');
+  q.innerHTML=docs.map((d,i)=>{
+    const cls=d.resolved?'done':d.state==='auto'?'done':d.state;
+    const sev=d.resolved==='rejected'?'<span class="sev flag">Rejected</span>'
+      :d.resolved==='held'?'<span class="sev warn">Held</span>'
+      :d.resolved==='posted'||d.state==='auto'?'<span class="sev ok">'+(d.state==='auto'?'Auto-posted':'Approved')+'</span>'
+      :d.state==='flag'?'<span class="sev flag">Exception</span>':'<span class="sev warn">Verify</span>';
+    const fields=Object.entries(d.f).map(([k,v])=>
+      '<div class="f"><b>'+k+'</b><span class="conf'+(v[0]<0.6?' low':'')+'"><i style="width:'+Math.round(v[0]*100)+'%"></i></span><span class="v">'+Math.round(v[0]*100)+'%</span></div>').join('');
+    const findings=d.findings.length?d.findings.map(f=>
+      '<div class="finding"><b>'+f.cite+'</b> '+f.text+'</div>').join('')
+      :'<div class="finding">Clean: all policy checks passed, extraction confidence high.</div>';
+    const actions=(!d.resolved&&d.state!=='auto')?
+      '<div class="row"><button class="btn" data-a="posted" data-i="'+i+'">Approve and post</button>'+
+      '<button class="btn ghost" data-a="held" data-i="'+i+'">Hold</button>'+
+      '<button class="btn reject" data-a="rejected" data-i="'+i+'">Reject</button></div>':'';
+    return '<div class="doc '+cls+(d.open?' open':'')+'">'+
+      '<div class="head" tabindex="0" role="button" data-t="'+i+'">'+sev+
+      '<span class="vendor">'+d.v+'</span><span class="dept">'+d.dept+'</span><span class="amt">'+fmt$(d.amt)+'</span></div>'+
+      '<div class="body"><div class="fields">'+fields+'</div>'+findings+actions+'</div></div>';
+  }).join('');
+  q.querySelectorAll('[data-t]').forEach(h=>{
+    h.addEventListener('click',()=>{const i=+h.dataset.t;docs[i].open=!docs[i].open;render();});
+    h.addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='Enter'){e.preventDefault();const i=+h.dataset.t;docs[i].open=!docs[i].open;render();}});
+  });
+  q.querySelectorAll('[data-a]').forEach(b=>b.addEventListener('click',e=>{
+    e.stopPropagation();act(+b.dataset.i,b.dataset.a);
+  }));
+  const processed=docs.length;
+  const auto=docs.filter(d=>d.state==='auto').length;
+  const open=docs.filter(d=>!d.resolved&&d.state!=='auto').length;
+  const touches=auto*3+docs.filter(d=>d.resolved).length*2;
+  document.getElementById('k-processed').textContent=processed;
+  document.getElementById('k-st').textContent=processed?Math.round(auto/processed*100)+'%':'0%';
+  document.getElementById('k-open').textContent=open;
+  document.getElementById('k-touches').textContent=touches;
+}
+
+document.getElementById('batch').addEventListener('click',()=>{
+  if(batch2Loaded)return;
+  batch2Loaded=true;ingest(BATCH2,'June cycle, week 3');
+});
+document.getElementById('reset').addEventListener('click',()=>{
+  docs=[];seenKeys=new Set();audit=[];step=0;batch2Loaded=false;
+  ingest(BATCH1,'June cycle, week 2');
+});
+ingest(BATCH1,'June cycle, week 2');
+</script>
+
+</body>
+</html>
