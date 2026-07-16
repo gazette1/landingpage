@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>First Pass: Rent Roll to Underwriting Read · Russell Harris</title>
+<style>
+  :root{
+    --paper:#F5F6F8; --card:#FFFFFF; --well:#EDF0F4; --ink:#102C63; --ink-2:#44527A; --ink-3:#8792AE;
+    --line:#DCE1EA; --blue:#074BE6; --blue-deep:#102C63; --blue-soft:#E8EEFD; --peri:#9EADD3;
+    --flag:#B3392E; --flag-soft:#F8E7E5; --warn:#8A6114; --warn-soft:#F6EEDC; --ok:#2E7D4F; --ok-soft:#E4F0E8;
+    --serif:Charter,'Bitstream Charter','Sitka Text',Cambria,Georgia,serif;
+    --sans:-apple-system,'Segoe UI','Helvetica Neue',sans-serif;
+    --mono:'Cascadia Code',Consolas,'SF Mono',Menlo,monospace;
+    --t-0:11.5px; --t-1:13px; --t-2:16px; --t-3:19px; --t-4:26px;
+    --r-s:3px; --r-m:6px;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --paper:#0E1526; --card:#161E33; --well:#1D2740; --ink:#E6EAF3; --ink-2:#A7B2CC; --ink-3:#6E7B9C;
+    --line:#28324E; --blue:#6E97F5; --blue-deep:#A8BFF0; --blue-soft:#17233F; --peri:#4A5B85;
+    --flag:#D5776C; --flag-soft:#331E1B; --warn:#D2A04C; --warn-soft:#322818; --ok:#63B183; --ok-soft:#1B2C21;
+  }}
+  :root[data-theme="dark"]{
+    --paper:#0E1526; --card:#161E33; --well:#1D2740; --ink:#E6EAF3; --ink-2:#A7B2CC; --ink-3:#6E7B9C;
+    --line:#28324E; --blue:#6E97F5; --blue-deep:#A8BFF0; --blue-soft:#17233F; --peri:#4A5B85;
+    --flag:#D5776C; --flag-soft:#331E1B; --warn:#D2A04C; --warn-soft:#322818; --ok:#63B183; --ok-soft:#1B2C21;
+  }
+  :root[data-theme="light"]{
+    --paper:#F5F6F8; --card:#FFFFFF; --well:#EDF0F4; --ink:#102C63; --ink-2:#44527A; --ink-3:#8792AE;
+    --line:#DCE1EA; --blue:#074BE6; --blue-deep:#102C63; --blue-soft:#E8EEFD; --peri:#9EADD3;
+    --flag:#B3392E; --flag-soft:#F8E7E5; --warn:#8A6114; --warn-soft:#F6EEDC; --ok:#2E7D4F; --ok-soft:#E4F0E8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font:var(--t-2)/1.5 var(--sans)}
+  header.bar{padding:20px 28px 16px;border-bottom:3px solid var(--blue)}
+  .bar .top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .bar h1{font:700 var(--t-4) var(--serif);margin:0;color:var(--blue-deep)}
+  .bar h1 span{color:var(--blue)}
+  .bar .who{margin-left:auto;font-size:var(--t-0);color:var(--ink-3);text-align:right;line-height:1.6}
+  .bar .who b{color:var(--ink-2)}
+  .bar a{color:var(--blue)}
+  .bar .sub{font-size:var(--t-2);color:var(--ink-2);margin-top:5px;max-width:76ch}
+  .bar .sub b{color:var(--ink)}
+  .privacy{display:inline-block;margin-top:8px;font:600 var(--t-0) var(--mono);letter-spacing:.05em;color:var(--ok);border:1px solid var(--ok);border-radius:var(--r-s);padding:2px 8px}
+  main{max-width:1280px;margin:0 auto;padding:20px 28px 56px}
+  .grid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+  @media(min-width:1040px){.grid{grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr)}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-m);padding:16px 18px;margin-bottom:18px}
+  .card h3{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.07em;color:var(--blue-deep);margin:0 0 10px}
+  textarea{width:100%;min-height:190px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--paper);color:var(--ink);font:var(--t-0)/1.6 var(--mono);padding:10px;resize:vertical}
+  textarea:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+  .hintline{font-size:var(--t-0);color:var(--ink-3);margin-top:6px}
+  .assume{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+  @media(min-width:620px){.assume{grid-template-columns:1fr 1fr 1fr}}
+  .a{display:flex;flex-direction:column;gap:3px}
+  .a label{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3)}
+  .a input{border:1px solid var(--line);border-radius:var(--r-s);background:var(--paper);color:var(--ink);font:var(--t-1) var(--mono);padding:6px 8px;width:100%}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+  .btn{border:1px solid var(--blue);background:var(--blue);color:#fff;border-radius:var(--r-s);padding:9px 18px;font:600 var(--t-1) var(--sans);cursor:pointer}
+  .btn.ghost{background:none;color:var(--blue)}
+  .btn:hover{filter:brightness(1.1)}
+  .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+  .stat{border:1px solid var(--line);border-radius:var(--r-m);padding:10px 12px;background:var(--card)}
+  .stat .n{font:600 var(--t-3) var(--serif);color:var(--blue-deep);font-variant-numeric:tabular-nums}
+  .stat .l{font-size:var(--t-0);text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);margin-top:2px}
+  table{border-collapse:collapse;width:100%;font-size:var(--t-1)}
+  th{font:600 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);text-align:right;padding:5px 8px;border-bottom:1px solid var(--line)}
+  th:first-child{text-align:left}
+  td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:var(--t-0)}
+  td:first-child{text-align:left;font-family:var(--sans);font-size:var(--t-1)}
+  tr.total td{font-weight:700;border-top:2px solid var(--ink-2)}
+  .flagbox{font-size:var(--t-1);color:var(--ink-2);margin:7px 0;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-s);background:var(--flag-soft)}
+  .flagbox b{color:var(--flag);font:700 var(--t-0) var(--sans);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px}
+  .flagbox.warn{background:var(--warn-soft)} .flagbox.warn b{color:var(--warn)}
+  .flagbox.ok{background:var(--ok-soft)} .flagbox.ok b{color:var(--ok)}
+  .read{border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:var(--r-s);background:var(--blue-soft);padding:12px 14px;font-size:var(--t-1);color:var(--ink);line-height:1.65}
+  .sens td.mid{background:var(--blue-soft);font-weight:700}
+  .muted{color:var(--ink-3);font-size:var(--t-0)}
+  .about{border-top:1px solid var(--line);margin-top:30px;padding-top:16px;color:var(--ink-2)}
+  .about h2{font:600 var(--t-2) var(--serif);color:var(--ink);margin:0 0 4px}
+  .spec{margin:10px 0 0;padding:0;list-style:none}
+  .spec li{display:grid;grid-template-columns:1fr;gap:2px 18px;padding:9px 0;border-bottom:1px solid var(--line);font-size:var(--t-1)}
+  @media(min-width:760px){.spec li{grid-template-columns:230px 1fr}}
+  .spec b,.spec a{font:600 var(--t-1) var(--serif);color:var(--blue-deep)}
+  .spec a{color:var(--blue)}
+  .note{font-size:var(--t-1);color:var(--ink-3);max-width:80ch;margin-top:10px}
+  #results{display:none}
+  #results.on{display:block}
+</style>
+</head>
+<body>
+
+
+<header class="bar">
+  <div class="top">
+    <h1>First <span>Pass</span></h1>
+    <div class="who">Working prototype · <b>Russell Harris</b> · <a href="https://russh.work">russh.work</a><br>
+    Prepared for MIG Real Estate · AI Innovation Analyst application · July 2026</div>
+  </div>
+  <p class="sub"><b>Paste a rent roll. Get an underwriting read.</b> Copy units straight out of Excel, set the assumptions, and First Pass returns the parsed roll, a dual-scenario NOI (as presented vs adjusted), a valuation band, supportable debt with the binding constraint named, sensitivities, and data red flags.</p>
+  <span class="privacy">YOUR DATA NEVER LEAVES THIS PAGE · NO NETWORK CALLS · VIEW SOURCE TO VERIFY</span>
+</header>
+
+<main>
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h3>1 · Rent roll (paste from Excel or CSV)</h3>
+        <textarea id="roll" spellcheck="false" placeholder="Unit&#9;Type&#9;Status&#9;Rent
+101&#9;1BR&#9;Occupied&#9;1450
+102&#9;1BR&#9;Vacant&#9;0
+..."></textarea>
+        <p class="hintline">Columns detected by header: unit, type/BR, status, rent, and square feet if present. Tab, comma, or pipe separated. Rows that fail to parse are counted, not silently dropped.</p>
+        <div class="row">
+          <button class="btn" id="run">Run first pass</button>
+          <button class="btn ghost" id="sample">Load sample roll (24 units)</button>
+          <button class="btn ghost" id="copy" style="display:none">Copy summary for email</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>2 · Assumptions (editable, prefilled with defaults)</h3>
+        <div class="assume">
+          <div class="a"><label>Market rent / unit / mo</label><input id="mkt" type="text" placeholder="auto: rolls avg"></div>
+          <div class="a"><label>Economic vacancy %</label><input id="vac" type="text" value="7"></div>
+          <div class="a"><label>Opex / unit / yr</label><input id="opex" type="text" value="5800"></div>
+          <div class="a"><label>Mgmt fee % of EGI</label><input id="mgmt" type="text" value="3"></div>
+          <div class="a"><label>Reserves / unit / yr</label><input id="res" type="text" value="300"></div>
+          <div class="a"><label>Cap rate mid %</label><input id="cap" type="text" value="5.75"></div>
+          <div class="a"><label>Debt rate %</label><input id="rate" type="text" value="6.25"></div>
+          <div class="a"><label>Max LTV %</label><input id="ltv" type="text" value="65"></div>
+          <div class="a"><label>Min DSCR</label><input id="dscr" type="text" value="1.25"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="results">
+      <div class="statgrid" id="stats"></div>
+      <div class="card"><h3>The read</h3><div class="read" id="read"></div></div>
+      <div class="card"><h3>Dual-scenario NOI · A as presented, B adjusted</h3>
+        <table id="noi"></table>
+        <p class="muted" style="margin:8px 0 0">Same method my Claude Code underwriting agents run: conclusions key off Scenario B.</p>
+      </div>
+      <div class="card"><h3>Valuation and supportable debt (Scenario B)</h3><table id="val"></table></div>
+      <div class="card"><h3>Sensitivity · value at cap rate x vacancy</h3><table id="sens" class="sens"></table></div>
+      <div class="card"><h3>Data red flags</h3><div id="flags"></div></div>
+    </div>
+  </div>
+
+  <div class="about">
+    <h2>About this prototype</h2>
+    <p class="note" style="margin-top:4px">Fully client-side by design: paste anything, nothing is transmitted, stored, or logged. This is the first-pass layer; the production version grounds the same method in Yardi and RealPage data through governed connectors, with the full deliverable set (feasibility, counter-offer tiers, structure comparisons, loan packages) produced by the Claude Code agent suite my underwriting practice runs on.</p>
+    <ul class="spec">
+      <li><b>Method</b><span>Scenario A prices the roll as presented. Scenario B re-rents every unit to market, applies economic vacancy, normalizes management and reserves, and takes the larger of stated and benchmark expenses. Value and debt conclusions key off B.</span></li>
+      <li><b>Debt sizing</b><span>Supportable loan is the lesser of the LTV constraint and the DSCR constraint at a 30-year amortization; the output names which one binds.</span></li>
+      <li><a href="https://russh.work/portfolio-sentinel/">Portfolio Sentinel</a><span>Companion tool: portfolio-wide data validation (rent roll integrity, hotel ops consistency, T-12 completeness) with human-in-the-loop exceptions.</span></li>
+      <li><a href="https://russh.work">russh.work</a><span>Six production AI systems, built and operated end to end.</span></li>
+    </ul>
+    <p class="note">Built as a single deployable file by Russell Harris · <a href="https://russh.work" style="color:var(--blue)">russh.work</a> · harris.russell1@gmail.com · 302-824-0225</p>
+  </div>
+</main>
+
+<script>
+const SAMPLE=`Unit\tType\tStatus\tSqFt\tRent
+101\t1BR\tOccupied\t710\t1385
+102\t1BR\tOccupied\t710\t1420
+103\t1BR\tVacant\t710\t0
+104\t1BR\tOccupied\t710\t1150
+105\t2BR\tOccupied\t980\t1750
+106\t2BR\tOccupied\t980\t1795
+107\t2BR\tVacant\t980\t0
+108\t2BR\tOccupied\t980\t1400
+109\t1BR\tOccupied\t710\t1410
+110\t1BR\tOccupied\t710\t0
+201\t1BR\tOccupied\t710\t1445
+202\t1BR\tOccupied\t710\t1390
+203\t1BR\tOccupied\t710\t1375
+204\t2BR\tOccupied\t980\t1780
+205\t2BR\tOccupied\t980\t1730
+206\t2BR\tOccupied\t980\t2650
+207\t2BR\tOccupied\t980\t1745
+208\t1BR\tVacant\t710\t950
+209\t1BR\tOccupied\t710\t1405
+210\t1BR\tOccupied\t710\t1365
+301\t2BR\tOccupied\t980\t1760
+302\t2BR\tOccupied\t980\t1770
+303\t1BR\tOccupied\t710\t1395
+303\t1BR\tOccupied\t710\t1395`;
+
+const $=id=>document.getElementById(id);
+const num=v=>{const n=parseFloat(String(v).replace(/[$,%\s]/g,''));return isFinite(n)?n:NaN};
+const fmt$=v=>'$'+Math.round(v).toLocaleString();
+const fmtM=v=>v>=1e6?'$'+(v/1e6).toFixed(2)+'MM':'$'+Math.round(v/1000)+'M';
+
+function parseRoll(text){
+  const lines=text.split(/\r?\n/).map(l=>l.trim()).filter(l=>l);
+  if(!lines.length)return{units:[],skipped:0,noStatus:false};
+  const delim=lines[0].includes('\t')?'\t':lines[0].includes('|')?'|':',';
+  let rows=lines.map(l=>l.split(delim).map(c=>c.trim()));
+  let head=null;
+  if(rows[0].some(c=>/unit|apt|rent|status|type/i.test(c))){head=rows[0].map(c=>c.toLowerCase());rows=rows.slice(1);}
+  const col=(re,def)=>{if(!head)return def;const i=head.findIndex(h=>re.test(h));return i>=0?i:def};
+  const iUnit=col(/unit|apt/,0);
+  const iRent=col(/rent|charge|amount/,head?head.length-1:rows[0].length-1);
+  const iStatus=col(/status|occ/,-1);
+  const iType=col(/type|bed|br/,-1);
+  const iSqft=col(/sq|sf/,-1);
+  const units=[];let skipped=0;
+  rows.forEach(r=>{
+    const rent=num(r[iRent]);
+    if(isNaN(rent)){skipped++;return;}
+    const status=iStatus>=0?(/vac/i.test(r[iStatus])?'vacant':'occupied'):(rent>0?'occupied':'vacant');
+    units.push({unit:r[iUnit]||'?',type:iType>=0?r[iType]:'',sqft:iSqft>=0?num(r[iSqft]):NaN,rent,status});
+  });
+  return{units,skipped,noStatus:iStatus<0};
+}
+
+function median(a){const s=[...a].sort((x,y)=>x-y);const m=Math.floor(s.length/2);return s.length%2?s[m]:(s[m-1]+s[m])/2}
+function debtConstant(rate){const r=rate/100/12,n=360;return (r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1)*12}
+
+function run(){
+  const {units,skipped,noStatus}=parseRoll($('roll').value);
+  if(units.length<2){alert('Paste at least two parseable rows, or load the sample.');return}
+  const occ=units.filter(u=>u.status==='occupied');
+  const vacant=units.filter(u=>u.status==='vacant');
+  const occRents=occ.filter(u=>u.rent>0).map(u=>u.rent);
+  const med=occRents.length?median(occRents):0;
+  const avg=occRents.length?occRents.reduce((a,b)=>a+b,0)/occRents.length:0;
+  const mkt=num($('mkt').value)||Math.round(med);
+  const vac=num($('vac').value)/100, opexU=num($('opex').value), mgmt=num($('mgmt').value)/100,
+        resU=num($('res').value), capMid=num($('cap').value)/100, rate=num($('rate').value),
+        ltvMax=num($('ltv').value)/100, dscrMin=num($('dscr').value);
+
+  /* red flags */
+  const flags=[];
+  const zeroOcc=occ.filter(u=>u.rent===0);
+  if(zeroOcc.length)flags.push(['flag','Occupied units with $0 rent',zeroOcc.map(u=>u.unit).join(', ')+'. Either a data error or unbilled occupancy; both matter.']);
+  const vacRent=vacant.filter(u=>u.rent>0);
+  if(vacRent.length)flags.push(['warn','Vacant units carrying rent values',vacRent.map(u=>u.unit).join(', ')+'. Confirm whether these are asking rents or stale charges.']);
+  const ids={};const dups=[];
+  units.forEach(u=>{if(ids[u.unit])dups.push(u.unit);ids[u.unit]=1;});
+  if(dups.length)flags.push(['flag','Duplicate unit rows',[...new Set(dups)].join(', ')+'. GPR is overstated until de-duplicated.']);
+  const hi=occRents.filter(r=>r>1.5*med);
+  if(hi.length)flags.push(['warn','Rent outliers above 1.5x median',occ.filter(u=>u.rent>1.5*med).map(u=>u.unit+' ('+fmt$(u.rent)+')').join(', ')+'. Verify: corporate or furnished lease, or a typo.']);
+  if(noStatus)flags.push(['warn','No status column detected','Occupancy inferred from rent values. Add a status column for a cleaner read.']);
+  if(skipped)flags.push(['warn',skipped+' row(s) failed to parse','Counted, not silently dropped. Check for merged cells or footer totals in the paste.']);
+  if(!flags.length)flags.push(['ok','Roll is clean','No integrity flags. GPR and occupancy read as stated.']);
+
+  /* scenarios */
+  const n=units.length;
+  const physOcc=occ.length/n;
+  const inPlace=occRents.reduce((a,b)=>a+b,0);
+  const gprA=inPlace*12;
+  const opexA=opexU*n+resU*n+mgmt*gprA;
+  const noiA=gprA-opexA;
+  const gprB=mkt*n*12;
+  const egiB=gprB*(1-vac);
+  const opexB=opexU*n+resU*n+mgmt*egiB;
+  const noiB=egiB-opexB;
+  const lossToLease=(mkt-avg)*occ.length*12;
+
+  const capLo=capMid-0.005,capHi=capMid+0.005;
+  const valMid=noiB/capMid;
+  const dc=debtConstant(rate);
+  const loanLTV=ltvMax*valMid;
+  const loanDSCR=noiB/(dscrMin*dc);
+  const loan=Math.min(loanLTV,loanDSCR);
+  const binding=loanLTV<loanDSCR?'LTV':'DSCR';
+  const dscrAt=noiB/(loan*dc);
+
+  /* stats */
+  $('stats').innerHTML=[
+    [n+(skipped?' <span class="muted">(+'+skipped+' skipped)</span>':''),'units parsed'],
+    [(physOcc*100).toFixed(1)+'%','physical occupancy'],
+    [fmt$(avg),'avg in-place rent'],
+    [fmt$(mkt),'market rent used'],
+    [fmtM(noiB),'NOI, scenario B'],
+    [fmtM(valMid),'value at '+(capMid*100).toFixed(2)+'%'],
+  ].map(([n,l])=>'<div class="stat"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>').join('');
+
+  /* read */
+  const gap=mkt>0?(mkt-avg)/mkt:0;
+  let read='A '+n+'-unit roll at '+(physOcc*100).toFixed(0)+'% physical occupancy with in-place rents averaging '+fmt$(avg)+' against '+fmt$(mkt)+' market. ';
+  read+=gap>0.06
+    ?'In-place rents sit '+(gap*100).toFixed(0)+'% under market: a loss-to-lease of roughly '+fmtM(lossToLease)+' a year, which is the value-add story if renewals and turns can capture it. '
+    :'Rents are effectively at market, so this prices as a stabilized deal: the return comes from the basis and the exit, not the rent roll. ';
+  read+='Scenario B underwrites to '+fmtM(noiB)+' NOI, a '+fmtM(valMid)+' value at a '+(capMid*100).toFixed(2)+'% cap, and supports '+fmtM(loan)+' of debt with '+binding+' as the binding constraint (DSCR '+dscrAt.toFixed(2)+' at close). ';
+  read+=flags[0][0]==='ok'?'The roll itself is clean.':'Resolve the flagged data items before trusting the totals; two of them move GPR directly.';
+  $('read').textContent=read;
+
+  /* NOI table */
+  const r=(label,a,b_)=>'<tr><td>'+label+'</td><td>'+ (a===null?'':fmtM(a))+'</td><td>'+(b_===null?'':fmtM(b_))+'</td></tr>';
+  $('noi').innerHTML='<tr><th>Line</th><th>A · as presented</th><th>B · adjusted</th></tr>'
+    +r('Gross potential rent',gprA,gprB)
+    +'<tr><td>Economic vacancy</td><td>in place</td><td>('+fmtM(gprB*vac)+')</td></tr>'
+    +r('Effective gross income',gprA,egiB)
+    +r('Operating expenses + reserves',-opexA,-opexB).replace(/-\$/g,'($').replace(/MM<\/td>/g,'MM)</td>').replace(/M<\/td>/g,'M)</td>')
+    +'<tr class="total"><td>Net operating income</td><td>'+fmtM(noiA)+'</td><td>'+fmtM(noiB)+'</td></tr>';
+
+  /* valuation + debt */
+  $('val').innerHTML='<tr><th>Metric</th><th>Low</th><th>Mid</th><th>High</th></tr>'
+    +'<tr><td>Cap rate</td><td>'+(capHi*100).toFixed(2)+'%</td><td>'+(capMid*100).toFixed(2)+'%</td><td>'+(capLo*100).toFixed(2)+'%</td></tr>'
+    +'<tr><td>Value</td><td>'+fmtM(noiB/capHi)+'</td><td>'+fmtM(valMid)+'</td><td>'+fmtM(noiB/capLo)+'</td></tr>'
+    +'<tr><td>Per unit</td><td>'+fmt$(noiB/capHi/n)+'</td><td>'+fmt$(valMid/n)+'</td><td>'+fmt$(noiB/capLo/n)+'</td></tr>'
+    +'<tr class="total"><td>Supportable debt ('+binding+' binds)</td><td colspan="3">'+fmtM(loan)+' · LTV '+((loan/valMid)*100).toFixed(1)+'% · DSCR '+dscrAt.toFixed(2)+'</td></tr>';
+
+  /* sensitivity */
+  const caps=[capMid-0.005,capMid,capMid+0.005];
+  const vacs=[Math.max(0.03,vac-0.02),vac,vac+0.02];
+  let s='<tr><th>Value</th>'+caps.map(c=>'<th>'+(c*100).toFixed(2)+'% cap</th>').join('')+'</tr>';
+  vacs.forEach((v,vi)=>{
+    s+='<tr><td>'+(v*100).toFixed(0)+'% vacancy</td>';
+    caps.forEach((c,ci)=>{
+      const egi=gprB*(1-v);const noi=egi-(opexU*n+resU*n+mgmt*egi);
+      s+='<td'+(vi===1&&ci===1?' class="mid"':'')+'>'+fmtM(noi/c)+'</td>';
+    });
+    s+='</tr>';
+  });
+  $('sens').innerHTML=s;
+
+  /* flags */
+  $('flags').innerHTML=flags.map(([cls,t,d])=>'<div class="flagbox '+(cls==='flag'?'':cls)+'"><b>'+t+'</b>'+d+'</div>').join('');
+
+  $('results').classList.add('on');
+  $('copy').style.display='inline-block';
+  window._summary='FIRST PASS SUMMARY\n'
+    +n+' units, '+(physOcc*100).toFixed(1)+'% occupied, avg in-place '+fmt$(avg)+' vs '+fmt$(mkt)+' market\n'
+    +'Scenario B NOI: '+fmtM(noiB)+'  |  Value at '+(capMid*100).toFixed(2)+'%: '+fmtM(valMid)+' ('+fmt$(valMid/n)+'/unit)\n'
+    +'Supportable debt: '+fmtM(loan)+' ('+binding+' binds, DSCR '+dscrAt.toFixed(2)+')\n'
+    +'Loss-to-lease: '+fmtM(Math.max(0,lossToLease))+'/yr\n'
+    +'Flags: '+flags.map(f=>f[1]).join('; ')+'\n'
+    +'Generated client-side at russh.work/first-pass';
+}
+
+$('run').addEventListener('click',run);
+$('sample').addEventListener('click',()=>{$('roll').value=SAMPLE;run();});
+$('copy').addEventListener('click',()=>{navigator.clipboard.writeText(window._summary).then(()=>{$('copy').textContent='Copied';setTimeout(()=>$('copy').textContent='Copy summary for email',1500);});});
+</script>
+
+</body>
+</html>
