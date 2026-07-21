@@ -213,7 +213,7 @@ const PROFILES={
     rules:["4.2 No block billing","4.5 Narrative specificity"]},
 };
 const AI_PAT=/summariz|chronolog|cite-?check|proofread|first-?pass|privilege review|code documents/i;
-const BLOCK_PAT=/;.*(and|;)/i;
+const BLOCK_PAT=/;.*(\band\b|;)/i;  // \b prevents matching 'and' inside 'standard'/'handling' (caught by eval cases F14/F15)
 const VAGUE_PAT=/^(work on|attention to|review file|misc|file review)/i;
 const fmt$=v=>'$'+Math.round(v).toLocaleString();
 
