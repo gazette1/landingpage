@@ -18,33 +18,33 @@ By Russ. Field Note, 2026.
 
 ## The existing approach
 
-Most knowledge-work decisions get made with one of two patterns. Pattern one: pure intuition. You have done enough of these kinds of decisions that you know the answer in 30 seconds; the rest is rationalization. Pattern two: drown the decision in research. You read for hours, skim a dozen sources, accumulate context, then choose based on whatever fragment of all that reading you happen to remember when the choice surfaces.
+Most knowledge-work decisions get made with one of two patterns. Pattern one: pure intuition. You have done enough of these kinds of decisions that you know the answer in 30 seconds; the rest is rationalization. Pattern two: drown the decision in research. You read for hours, skim a dozen sources, accumulate context. Then you choose based on whatever fragment of all that reading you happen to remember when the choice surfaces.
 
-Pattern one fails on novel decisions where intuition has not been earned yet. Pattern two fails because synthesis at the moment of choice is the hardest part of the process and is the part most often skipped.
+Pattern one fails on novel decisions where intuition has not been earned yet. Pattern two fails because synthesis at the moment of choice is the hardest part of the process. It is also the part most often skipped.
 
 I run a third shape. Map the decision as a tree. Treat each node as a research prompt. Let a synthesis engine (Perplexity's deep research mode in my case) do the cross-source reading and produce a structured comparison. Come back to the node and decide based on the structured output, not on the raw reading.
 
-This is the same architectural pattern as the multi-pass orchestration in Marketing Bot v2: separate the synthesis pass from the decision pass; do not collapse them into one human moment.
+This is the same architectural pattern as the multi-pass orchestration in Marketing Bot v2. Separate the synthesis pass from the decision pass. Do not collapse them into one human moment.
 
 ## Where it works
 
 Three properties of my decision-making context make this shape work.
 
-1. **Most consequential decisions decompose into a tree of binary or trinary choices.** A career move is "stay vs leave" at the top, then "leave to do X vs Y vs Z" at the second level, then per-option "what are the deal-breakers" at the third. A system architecture is "framework A vs B" at the top, then per-framework "what does it cost" and "what does it constrain" at the second. A CRE acquisition is "go vs no-go" at the top, then per-go "what structure" and "what lender pool." Binary and trinary nodes are the natural granularity of consequential decisions; bigger fan-out usually means the wrong node.
+1. **Most consequential decisions decompose into a tree of binary or trinary choices.** A career move is "stay vs leave" at the top, then "leave to do X vs Y vs Z" at the second level, then per-option "what are the deal-breakers" at the third. A system architecture is "framework A vs B" at the top, then per-framework "what does it cost" and "what does it constrain" at the second. A CRE acquisition is "go vs no-go" at the top, then per-go "what structure" and "what lender pool." Binary and trinary nodes are the natural granularity of consequential decisions. Bigger fan-out usually means the wrong node.
 
 2. **Perplexity's deep research mode is shaped for this work.** It does multi-source web search with explicit citation, synthesizes across sources into a structured response, and tolerates long prompts with multiple sub-questions. It is the closest commercial tool I have used to "go read everything relevant to this specific choice and tell me what the sources agree and disagree about."
 
-3. **The cost-per-research-pass is low enough to do many of them.** A deep research run costs a small amount of credits, runs in 3 to 10 minutes, and produces 2,000 to 5,000 words of synthesized output with citations. At that cost, I can afford to run a fresh research pass per node in a tree rather than trying to reuse one big research dump across multiple decisions.
+3. **The cost-per-research-pass is low enough to do many of them.** A deep research run costs a small amount of credits, runs in 3 to 10 minutes, and produces 2,000 to 5,000 words of synthesized output with citations. At that cost, I can afford to run a fresh research pass per node in a tree. I do not have to reuse one big research dump across multiple decisions.
 
 ## Where it breaks
 
 Three failure modes show up.
 
-**Mode one: the tree is wrong before the research starts.** If the binary choice at the top of the tree is framed incorrectly, no amount of research at lower nodes will recover. Spending time on tree structure before any research saves more time than the research itself ever will. The discipline I run: before any prompt goes to Perplexity, the tree gets drafted and reviewed (often in Obsidian, often the next morning after the initial draft).
+**Mode one: the tree is wrong before the research starts.** If the binary choice at the top of the tree is framed incorrectly, no amount of research at lower nodes will recover. Spending time on tree structure before any research saves more time than the research itself ever will. The discipline I run: before any prompt goes to Perplexity, I draft and review the tree. This often happens in Obsidian, often the next morning after the initial draft.
 
 **Mode two: the prompts are too vague.** A prompt like "should I take this job?" produces useless synthesis. A prompt like "compare offers A and B against the following six criteria, with explicit sources for each criterion, and flag which criteria the public sources cannot answer" produces useful synthesis. The prompt engineering is the work.
 
-**Mode three: I let the synthesis make the decision.** This is the most dangerous failure mode and the one I have learned to discipline against. The synthesis is input to the decision; it is not the decision. The decision is made by me, with the synthesis as one of several inputs, and the synthesis is allowed to be wrong. If a synthesis says "take the offer" and my gut says "do not," the gut wins the argument until I can articulate specifically why the synthesis is wrong on a specific criterion.
+**Mode three: I let the synthesis make the decision.** This is the most dangerous failure mode and the one I have learned to discipline against. The synthesis is input to the decision. It is not the decision. I make the decision, with the synthesis as one of several inputs. The synthesis is allowed to be wrong. If a synthesis says "take the offer" and my gut says "do not," the gut wins the argument. It wins until I can articulate specifically why the synthesis is wrong on a specific criterion.
 
 ## What I actually do
 
@@ -60,7 +60,7 @@ The pattern is consistent across decisions.
 
 **Step five: review the tree as a whole.** Once every node has a decision, read the tree top to bottom. If the path of decisions makes sense as a whole, commit. If it does not, find the inconsistency and re-run the affected node.
 
-The whole process for a meaningful decision takes 60 to 120 minutes of my time across two or three days. The Perplexity passes do the reading; the markdown file is the audit trail; the final commit is the decision.
+The whole process for a meaningful decision takes 60 to 120 minutes of my time across two or three days. The Perplexity passes do the reading. The markdown file is the audit trail. The final commit is the decision.
 
 ## What it costs
 
@@ -72,17 +72,17 @@ The cost stack is small.
 
 **Time:** 60 to 120 minutes per consequential decision, spread across multiple sittings. The synthesis runs while I do other things, so the wall-clock time exceeds my attention time by a factor of 3 to 5.
 
-The value is harder to quantify but is real. Decisions made with this process have a higher hit rate than decisions I made before adopting it, by my own honest accounting. More importantly, the audit trail means that when a decision turns out wrong, I can read back what I knew at the time and what I did not know, and improve the tree or the prompt for the next decision of the same shape.
+The value is harder to quantify but is real. Decisions made with this process have a higher hit rate than decisions I made before adopting it, by my own honest accounting. More importantly, the audit trail means that when a decision turns out wrong, I can read back what I knew at the time and what I did not know. Then I can improve the tree or the prompt for the next decision of the same shape.
 
 ## What an AI architect would change
 
 If I were building this as a system instead of running it as a personal discipline, three changes.
 
-**A typed schema for decision-tree nodes.** Each node would have explicit fields: question, options (2 or 3), criteria, prompt, synthesis output, decision, reasoning, date. This would let the system surface patterns across decisions (which kinds of nodes do I get wrong most often, which criteria am I systematically under-weighting).
+**A typed schema for decision-tree nodes.** Each node would have explicit fields: question, options (2 or 3), criteria, prompt, synthesis output, decision, reasoning, date. This would let the system surface patterns across decisions (which kinds of nodes do I get wrong most often, which criteria am I under-weighting).
 
-**Auto-prompt generation from the node.** Given a node with a question and options and criteria, the system could generate the Perplexity prompt automatically using a template. I write a handful of templates by hand each year that I keep tuning; auto-generation would compress that.
+**Auto-prompt generation from the node.** Given a node with a question and options and criteria, the system could generate the Perplexity prompt automatically using a template. I write a handful of templates by hand each year that I keep tuning. Auto-generation would compress that.
 
-**A retrospective layer.** Three to twelve months after a decision, the system should prompt me for the outcome (did the decision work, what changed, what would I have decided with the information I have now). This closes the loop in a way that my current process does not, and is the thing most likely to make me better at trees over time.
+**A retrospective layer.** Three to twelve months after a decision, the system should prompt me for the outcome (did the decision work, what changed, what would I have decided with the information I have now). This closes the loop in a way that my current process does not. It is the thing most likely to make me better at trees over time.
 
 The system version is not for everyone. Most people do not make enough high-stakes decisions per quarter to justify the infrastructure. For someone running multiple projects, multiple side ventures, and an active job search at the same time, it would compound.
 

@@ -18,11 +18,11 @@ By Russ. Ship Note, 2026.
 
 Last night I built something kind of dumb and kind of delightful.
 
-The Knicks are up 2-0 in the Finals. Game 3 is at the Garden tonight, but with the President in the building, the city moved the outdoor watch party out of MSG and spread it across Bryant Park, Wollman Rink, and Brooklyn Bowl. So I built a way to watch the watch party.
+The Knicks are up 2-0 in the Finals. Game 3 is at the Garden tonight. But with the President in the building, the city moved the outdoor watch party out of MSG and spread it across Bryant Park, Wollman Rink, and Brooklyn Bowl. So I built a way to watch the watch party.
 
 Here is the trick. New York DOT publishes around 957 traffic cameras to the public. No API key, no login, just a still image at a URL that refreshes about once a second. Loop that image every two seconds and you have a passable live feed of any street corner in the city.
 
-Credit where it is due: I saw wttdotm's GardenCam pull this off for MSG and wanted my own. Then I pushed it one step further. Instead of hardcoding a handful of cameras, I pulled the full list, ran a quick distance calculation against each watch-party venue, and let the app find the nearest cameras to wherever the crowd actually is. Bryant Park. Brooklyn Bowl. Wherever the party moves next.
+Credit where it is due: I saw wttdotm's GardenCam pull this off for MSG and wanted my own. Then I pushed it one step further. Instead of hardcoding a handful of cameras, I pulled the full list and ran a quick distance calculation against each watch-party venue. Then I let the app find the nearest cameras to wherever the crowd actually is. Bryant Park. Brooklyn Bowl. Wherever the party moves next.
 
 Total build time was one evening.
 

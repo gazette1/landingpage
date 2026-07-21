@@ -81,9 +81,9 @@
 
 <p class="body">Two failure modes show up consistently.</p>
 
-<p class="body"><strong>Mode one: the Obsidian vault drifts from the live repo.</strong> If I edit a roadmap doc in Obsidian on my laptop and the repo is also being modified by Claude Code or by a git pull, the two views can disagree. Obsidian does not refresh automatically when the underlying file changes externally; you have to close and reopen the file or hit the reload command. I have lost a few paragraphs of planning to this. The discipline is: do not edit the same file in Obsidian and Claude Code simultaneously, and always git pull before opening a roadmap doc.</p>
+<p class="body"><strong>Mode one: the Obsidian vault drifts from the live repo.</strong> Say I edit a roadmap doc in Obsidian on my laptop. Meanwhile Claude Code or a git pull modifies the repo. The two views can now disagree. Obsidian does not refresh automatically when the underlying file changes externally. You have to close and reopen the file or hit the reload command. I have lost a few paragraphs of planning to this. The discipline is: do not edit the same file in Obsidian and Claude Code simultaneously, and always git pull before opening a roadmap doc.</p>
 
-<p class="body"><strong>Mode two: Obsidian's links and tags do not translate to Claude Code's mental model.</strong> Obsidian is great at backlinks (page A links to page B; the graph view shows the relationship). Claude Code reads files in sequence based on what is in context; it does not automatically follow Obsidian's <code>[[backlink]]</code> syntax. Linked planning in Obsidian becomes invisible to Claude Code unless I explicitly tell the model "also read X, which is linked from Y."</p>
+<p class="body"><strong>Mode two: Obsidian's links and tags do not translate to Claude Code's mental model.</strong> Obsidian is great at backlinks (page A links to page B; the graph view shows the relationship). Claude Code reads files in sequence based on what is in context. It does not automatically follow Obsidian's <code>[[backlink]]</code> syntax. Linked planning in Obsidian becomes invisible to Claude Code unless I explicitly tell the model "also read X, which is linked from Y."</p>
 
 <p class="body">Both modes are tractable. Both are why a more rigorous workflow would use a single source of truth with a thin viewing layer per tool, instead of two tools sharing files directly.</p>
 
@@ -124,7 +124,7 @@
 
 <p class="body"><strong>A decision-log enforcement step.</strong> Solo, I can rely on personal discipline to write every architectural decision into the log. On a team, the discipline has to be in the workflow: every PR that lands an architectural change requires a decision-log entry, enforced by a pre-merge check. This is the same pattern as voice validation in Atlas: enforce the discipline at the boundary, not at the call site.</p>
 
-<p class="body">The team version costs an Obsidian Sync subscription per person ($4-8/month each), a couple of hours of setup, and a few weeks of teaching the discipline to people who have not done ADR-style decision logs before.</p>
+<p class="body">The team version has three costs. An Obsidian Sync subscription per person ($4-8/month each). A couple of hours of setup. And a few weeks of teaching the discipline to people who have not done ADR-style decision logs before.</p>
 
 <hr class="rule">
 
@@ -134,9 +134,9 @@
 
 <p class="body"><strong>Auto-context loading.</strong> Right now I manually <code>@docs/decision-log.md</code> and <code>@docs/roadmap.md</code> at the start of every Claude Code session. A small hook that reads the CLAUDE.md at session start and pre-loads the named context files would save 30 seconds per session. Over 200 sessions a year, that is real time.</p>
 
-<p class="body"><strong>Bidirectional sync between the decision log and the commit log.</strong> Every commit that introduces an architectural change should append a stub entry to the decision log. The model can write the rationale before the commit; the commit message references the decision log entry. This makes the decision log self-maintaining as code changes happen.</p>
+<p class="body"><strong>Bidirectional sync between the decision log and the commit log.</strong> Every commit that introduces an architectural change should append a stub entry to the decision log. The model can write the rationale before the commit. The commit message references the decision log entry. This makes the decision log self-maintaining as code changes happen.</p>
 
-<p class="body"><strong>A typed schema for roadmap status.</strong> Currently the roadmap is freeform markdown. A YAML frontmatter block on each roadmap file (<code>current_phase: 3</code>, <code>next_milestone: 'TabPFN integration'</code>, <code>blocked_on: 'data ingestion'</code>) would let Claude Code parse the status programmatically and offer status-aware suggestions ("you're on phase 3, this looks like phase 4 work").</p>
+<p class="body"><strong>A typed schema for roadmap status.</strong> Currently the roadmap is freeform markdown. A YAML frontmatter block on each roadmap file (<code>current_phase: 3</code>, <code>next_milestone: 'TabPFN integration'</code>, <code>blocked_on: 'data ingestion'</code>) would let Claude Code parse the status programmatically. It could then offer status-aware suggestions ("you're on phase 3, this looks like phase 4 work").</p>
 
 <p class="body">None of these are heavy lifts. None are critical at solo scale.</p>
 
@@ -144,7 +144,7 @@
 
 <h2 class="h2">What would not change</h2>
 
-<p class="body">The two-surface, one-disk pattern is the right shape for solo AI-assisted work. I have tried single-tool setups (everything in Claude Code, no Obsidian) and they fail because the model is bad at the long-form reflective writing that the human needs to do to plan well. I have tried single-source planning tools (everything in Notion, sync to repo) and they fail because the sync is always behind the actual repo state.</p>
+<p class="body">The two-surface, one-disk pattern is the right shape for solo AI-assisted work. I have tried single-tool setups, everything in Claude Code, no Obsidian. They fail because the model is bad at the long-form reflective writing the human needs to do to plan well. I have tried single-source planning tools, everything in Notion synced to the repo. They fail because the sync is always behind the actual repo state.</p>
 
 <p class="body">The model writes code. I write plans. We meet at the markdown.</p>
 

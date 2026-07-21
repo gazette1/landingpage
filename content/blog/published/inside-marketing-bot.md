@@ -18,7 +18,7 @@ By Russ. Production version v2.0, 2026. Originated as a 19-pass orchestration in
 
 ## What this post is
 
-Marketing Bot v2 is a multi-pass orchestration system I built to turn a sector and an audience description into a senior-strategist-tier marketing deliverable in minutes, at a per-deliverable token cost that is a small fraction of what a human strategist charges. The system runs across multiple model providers (Anthropic Claude with web search, OpenAI image generation, plus structured-data services for search-volume validation and reference scraping). It ships a flagship long-form deliverable plus several module-scoped outputs that can be used standalone.
+Marketing Bot v2 is a multi-pass orchestration system I built. It turns a sector and an audience description into a senior-strategist-tier marketing deliverable in minutes. The per-deliverable token cost is a small fraction of what a human strategist charges. The system runs across multiple model providers (Anthropic Claude with web search, OpenAI image generation, plus structured-data services for search-volume validation and reference scraping). It ships a flagship long-form deliverable plus several module-scoped outputs that can be used standalone.
 
 This post is **not** a walkthrough of the modules. It is not the pass graph, it is not the prompt library, and it is not the schema for the structured outputs the orchestrator hands between passes. Those are the intellectual property that produces the per-deliverable cost-quality ratio the system achieves, and I am not handing them to a competitor.
 
@@ -34,7 +34,7 @@ A system that produces strategist-tier deliverables at software-tier cost operat
 
 2. **Citations are the difference between strategy and assertion.** A deliverable that asserts a recommendation without sourceable evidence is an essay. The same deliverable with traceable citations on every claim is a defensible recommendation. The architecture has to force evidence at the claim level, not at the document level. Most deliverables that look impressive at first read fall apart when a senior reviewer asks "how do you know that?" The system has to survive that question on every claim.
 
-3. **Cost-per-deliverable determines what tier of business the system serves.** At a low per-deliverable token cost, the deliverable is a high-margin product at consumer pricing tiers. At a higher cost, the same deliverable is still profitable but the customer-acquisition math changes. The architecture decisions that compress token cost without sacrificing quality are the choices that determine which markets the system can serve. This is FDAA-relevant in a specific way: clients ask about unit economics in the first conversation, and the answer they get determines whether the engagement is worth their budget.
+3. **Cost-per-deliverable determines what tier of business the system serves.** At a low per-deliverable token cost, the deliverable is a high-margin product at consumer pricing tiers. At a higher cost, the same deliverable is still profitable but the customer-acquisition math changes. The architecture decisions that compress token cost without sacrificing quality are the choices that determine which markets the system can serve. This is FDAA-relevant in a specific way. Clients ask about unit economics in the first conversation. The answer they get determines whether the engagement is worth their budget.
 
 Those three conditions are the lens for every decision below.
 
@@ -49,9 +49,9 @@ The first decision was the orchestration's basic shape. The candidates:
 
 Single-prompt was the default option, especially as model context windows expanded into the hundreds of thousands of tokens. The argument for it is operational simplicity: one call, one model, one billing line.
 
-The argument against it, which I judged decisive, is **quality stability across the deliverable**. Single-prompt output on a long, multi-section deliverable degrades meaningfully past the first few sections. The model produces strong opening sections, weaker middle sections, and surface-level closing sections. This is not a hypothesis; it is a reproducible failure mode that I observed across multiple model families before committing to the multi-pass architecture.
+The argument against it, which I judged decisive, is **quality stability across the deliverable**. Single-prompt output on a long, multi-section deliverable degrades meaningfully past the first few sections. The model produces strong opening sections, weaker middle sections, and surface-level closing sections. This is not a hypothesis. It is a reproducible failure mode I observed across multiple model families before I committed to the multi-pass architecture.
 
-A graph of bounded passes solves this by ensuring every section gets the model's full attention on a tight scope, with the prior section's structured output as part of its input. Cost is roughly comparable in tokens; quality on the back half of the deliverable is meaningfully higher.
+A graph of bounded passes solves this. Every section gets the model's full attention on a tight scope, with the prior section's structured output as part of its input. Cost is roughly comparable in tokens. Quality on the back half of the deliverable is meaningfully higher.
 
 ==The transferable lesson: when a single-prompt call produces quality that degrades across the output, the architecture wants to be a graph of smaller passes, not a longer single prompt. Context-window length is a red herring; attention-allocation across a long generation is the real constraint.==
 
@@ -91,7 +91,7 @@ The candidates:
 
 Claim-level enforcement is the only one that produces a defensible deliverable. The other two produce deliverables that pass surface review and fail under questioning.
 
-The implementation overhead is real: every pass that produces a claim has to attach a source pointer, every claim has to be checkable against the cited source, and the orchestrator has to enforce the gate before the claim ships downstream. The overhead is paid in token cost (more structured output per call) and in engineering cost (the citation infrastructure is non-trivial).
+The implementation overhead is real. Every pass that produces a claim has to attach a source pointer. Every claim has to be checkable against the cited source. The orchestrator has to enforce the gate before the claim ships downstream. The overhead is paid in token cost (more structured output per call) and in engineering cost (the citation infrastructure is non-trivial).
 
 It is worth it. The deliverable that survives a senior reviewer's "how do you know that?" on every claim is the deliverable a client actually pays for.
 
@@ -111,11 +111,11 @@ Some passes are tight: strict schema, well-defined transformation, low ambiguity
 
 The architecture supports per-pass model overrides as a first-class feature, not an afterthought. The per-pass model selection is part of the pass contract, not buried in the prompt.
 
-The cost outcome at the flagship deliverable tier is a token cost that is a small fraction of what the same deliverable would cost if every pass ran on the largest model. The quality outcome is indistinguishable in side-by-side reviews. The two together are the cost-architecture that makes the system economically viable at the price points it targets.
+The cost outcome at the flagship deliverable tier is low. The token cost is a small fraction of what the same deliverable would cost if every pass ran on the largest model. The quality outcome is indistinguishable in side-by-side reviews. The two together are the cost-architecture that makes the system economically viable at the price points it targets.
 
 ==The transferable lesson: in any multi-provider orchestration, the cost-per-deliverable economics are determined by per-pass model selection, not by global model selection. The architecture has to support per-pass overrides as a first-class concept.==
 
-The same lesson generalizes to any agentic system, any RAG pipeline, any multi-step tool-use chain. The naive approach picks one model and uses it for everything; the disciplined approach picks the smallest model that produces equivalent quality on each step.
+The same lesson generalizes to any agentic system, any RAG pipeline, any multi-step tool-use chain. The naive approach picks one model and uses it for everything. The disciplined approach picks the smallest model that produces equivalent quality on each step.
 
 ---
 
@@ -163,7 +163,7 @@ If you are a hiring committee and you want a walkthrough of the orchestration wi
 
 ## Closing
 
-Marketing Bot v2 is the project in my portfolio that most directly demonstrates how I make architectural decisions in a high-quality-bar long-context generation domain where the deliverable has to survive senior review and the per-deliverable economics determine which markets the system can serve.
+Marketing Bot v2 is the project in my portfolio that most directly shows how I make architectural decisions in a high-quality-bar long-context generation domain. In that domain the deliverable has to survive senior review. The per-deliverable economics determine which markets the system can serve.
 
 If you are building something similar in a different domain (regulated white-paper generation, financial research synthesis, due-diligence reports, audit findings, technical-design documents at scale), the questions worth asking are: how do you pick between single-prompt and multi-pass generation for a long deliverable; how do you handle structured-output failure modes without falling open; how do you enforce citations at the claim level without burying the model in instructions; how do you route calls across model sizes to compress per-deliverable cost; and how do you separate the rendering layer from the orchestration so the deliverable is portable across formats.
 

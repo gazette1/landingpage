@@ -28,11 +28,11 @@ I built it as the centerpiece of a buy-side Associate Analyst case. It is a pers
 
 ## The problem
 
-A growth-equity PM has more scenarios than analyst-hours. The valuable ideas are not the obvious first-order beneficiaries everyone already owns; they are the second and third-order names three links down the supply chain that no sell-side analyst covers yet. Finding them means reading a lot of filings.
+A growth-equity PM has more scenarios than analyst-hours. The valuable ideas are not the obvious first-order beneficiaries everyone already owns. They are the second and third-order names three links down the supply chain that no sell-side analyst covers yet. Finding them means reading a lot of filings.
 
 Three properties of this domain shape the architecture.
 
-1. **The output has to be auditable or it is worthless.** A PM cannot act on "the model says this company benefits." They can act on "this company's own 10-K, this sentence, says it supplies this component to this end market." An LLM assertion is a liability; a linked primary-source citation is an asset. The system is built so every factual claim is traceable to a filing sentence, and claims that cannot be sourced are dropped.
+1. **The output has to be auditable or it is worthless.** A PM cannot act on "the model says this company benefits." They can act on "this company's own 10-K, this sentence, says it supplies this component to this end market." An LLM assertion is a liability; a linked primary-source citation is an asset. Every factual claim traces to a filing sentence. Claims that cannot be sourced get dropped.
 
 2. **The retrieval system has its own grammar.** SEC EDGAR full-text search matches exact phrases. It does not understand analyst language. This single fact governs whether the map-to-company step works at all, and it is where the naive version fails.
 
@@ -71,7 +71,7 @@ Once candidates are found, they are scored on a six-dimension rubric: optionalit
 
 The decision that matters is that **the rubric arithmetic lives outside the model.** The LLM extracts and tags the evidence for each dimension. The weighting and the final ranking are ordinary arithmetic in application code, with the weights stored as editable configuration, not baked into a prompt.
 
-The payoff is an "argue with the weights" panel. A PM who thinks customer validation should matter more than catalyst density slides the weight and the entire ranking re-sorts live, with no model call and no rerun. The scoring is transparent, deterministic, and instantly tunable, because it is arithmetic the PM can see and change, not a black-box judgment buried in a generation.
+The payoff is an "argue with the weights" panel. A PM who thinks customer validation should matter more than catalyst density slides the weight. The entire ranking re-sorts live, with no model call and no rerun. The scoring is transparent, deterministic, and instantly tunable. It is arithmetic the PM can see and change, not a black-box judgment buried in a generation.
 
 ==The transferable lesson: keep the judgment the model is good at (reading and tagging evidence) inside the model, and keep the arithmetic the model is bad at (weighted ranking) outside it, where it is auditable and tunable. Do not ask the model to do math you want to be able to argue with.== This is the same principle as the deterministic validation layer in my CRE workflow: the model writes, deterministic code audits and computes.
 
@@ -91,7 +91,7 @@ The economics are the headline. Building the corpus across nearly two thousand i
 
 ## Never a recommendation
 
-The system is built to say no. The candidate universe is filtered to a defined small-and-mid-cap band, then most candidates are rejected at the customer-validation stage, which checks whether a company's own filings actually substantiate the exposure the theme implies. A dry run on a humanoid-robotics scenario mapped eighty companies, narrowed to thirty-four in the market-cap band, and surfaced three worth a full read. The other thirty-one did not clear the bar, and the system said so.
+The system is built to say no. The candidate universe is filtered to a defined small-and-mid-cap band. Most candidates are then rejected at the customer-validation stage. That stage checks whether a company's own filings actually substantiate the exposure the theme implies. A dry run on a humanoid-robotics scenario mapped eighty companies, narrowed to thirty-four in the market-cap band, and surfaced three worth a full read. The other thirty-one did not clear the bar, and the system said so.
 
 This is a feature, not a limitation. ==A research tool that mostly returns "no candidate clears the bar" is more trustworthy than one that always returns picks. A system that cannot say no is a system that is telling you what you want to hear.== The output per surviving name is a one-page thesis draft with every claim sourced, explicitly framed as leverage for the analyst's judgment, never as a buy signal. The PM decides. The system defends.
 

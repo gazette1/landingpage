@@ -20,7 +20,7 @@ By Russ. Production version v1.6, deployed 2026.
 
 TrialEdge predicts the outcome of FDA PDUFA catalysts. The system runs in production with 4,032 tracked biotech entities and 208 labeled PDUFA outcomes used for training and calibration. Held-out AUC sits at 0.686. The architecture is intentionally small, intentionally calibrated, and intentionally cheap to run.
 
-This post walks through the architecture decisions that matter, why each one was made, what I would change if I were starting over, and how the system is monitored in production. It is written for engineers and architects who are evaluating whether a similar shape applies to their domain, not for biotech investors looking for catalyst picks.
+This post walks through the architecture decisions that matter, why I made each one, what I would change if I were starting over, and how I monitor the system in production. It is written for engineers and architects who are evaluating whether a similar shape applies to their domain, not for biotech investors looking for catalyst picks.
 
 The parts most likely to be useful to a fellow architect are the modeling-and-calibration discussion, the eval rig, the cost economics, and the monitoring section. The biotech domain framing is a vehicle for those architectural points.
 
@@ -34,9 +34,9 @@ Three properties of this domain shape everything downstream:
 
 1. **Small N.** A few dozen PDUFA decisions per quarter across all of biotech. Even multi-year labeled sets stay in the low hundreds. This rules out architectures that need millions of examples.
 
-2. **Asymmetric payoff.** A 10 percent improvement in raw accuracy is worth far less than a 5 percent improvement in calibration. A model that says "0.7" and is right 70 percent of the time is more valuable than a model that says "0.95" and is right 80 percent of the time, because the first one lets you size positions correctly and the second one bankrupts you on the surprise misses.
+2. **Asymmetric payoff.** A 10 percent improvement in raw accuracy is worth far less than a 5 percent improvement in calibration. A model that says "0.7" and is right 70 percent of the time is more valuable than a model that says "0.95" and is right 80 percent of the time. The first one lets you size positions correctly. The second one bankrupts you on the surprise misses.
 
-3. **Sparse, biased signal.** Most of what is publicly known about a PDUFA outcome is in SEC filings, transcripts, and FDA documents, which are long, partial, and written by people with incentives. The features are not clean tabular data; they are extracted opinions about extracted facts.
+3. **Sparse, biased signal.** Most of what is publicly known about a PDUFA outcome is in SEC filings, transcripts, and FDA documents. Those documents are long, partial, and written by people with incentives. The features are not clean tabular data; they are extracted opinions about extracted facts.
 
 Most ML systems built for this domain have failed at one of those three. They either tried to be deep (small N kills you), or they optimized raw accuracy without calibration (asymmetric payoff destroys you), or they ignored the noise in the underlying source extraction.
 
@@ -84,17 +84,17 @@ The model is LightGBM. The wrapper around it is where the design lives.
 
 ### Why LightGBM, not a neural network
 
-With 208 labeled outcomes, a neural network is the wrong choice. Tree-based gradient boosting beats deep nets reliably at this sample size for tabular signal, with the additional benefits that splits are inspectable, training is fast enough to retrain on every label change, and the resulting model is small enough to deploy as a static artifact in R2.
+With 208 labeled outcomes, a neural network is the wrong choice. Tree-based gradient boosting beats deep nets reliably at this sample size for tabular signal. It has added benefits: splits are inspectable, training is fast enough to retrain on every label change, and the resulting model is small enough to deploy as a static artifact in R2.
 
-The features are 16 engineered signals derived from the structured filing extractions: indication area, mechanism of action class, FDA review division, prior CRL history for the sponsor, partner involvement, label-claim complexity, primary endpoint type, panel scheduling, and several derived flags that are cheap to compute and high signal in this domain. The exact list is in the repo; the design principle was: only signals a domain analyst would point at, no kitchen-sink feature engineering.
+The features are 16 engineered signals derived from the structured filing extractions: indication area, mechanism of action class, FDA review division, prior CRL history for the sponsor, partner involvement, label-claim complexity, primary endpoint type, panel scheduling, and several derived flags that are cheap to compute and high signal in this domain. The exact list is in the repo. The design principle was simple: only signals a domain analyst would point at, no kitchen-sink feature engineering.
 
 ### CalibratedDebateScorer
 
-The raw LightGBM probability output is calibrated and aggregated through a wrapper I call the CalibratedDebateScorer. The name describes its two jobs.
+A wrapper I call the CalibratedDebateScorer calibrates and aggregates the raw LightGBM probability output. The name describes its two jobs.
 
 **Calibration.** Raw boosted-tree outputs are systematically overconfident. The wrapper applies isotonic regression calibration fit on a held-out portion of the labeled set. Output of 0.7 from the calibrator means the underlying historical base rate at that confidence band was 70 percent, within sampling error.
 
-**Debate scoring.** For each candidate catalyst, the calibrator produces a bull-case probability and a bear-case probability from two slightly different feature framings of the same underlying signals. The final score is not their average; it is a function that penalizes the catalyst score when the two cases disagree sharply. A catalyst where the bull and bear cases both produce 0.7 is a higher-conviction call than a catalyst where bull is 0.85 and bear is 0.55, even though both average to 0.7. The disagreement penalty is a single tunable parameter fit on the calibration set.
+**Debate scoring.** For each candidate catalyst, the calibrator produces a bull-case probability and a bear-case probability from two slightly different feature framings of the same underlying signals. The final score is not their average. It is a function that penalizes the catalyst score when the two cases disagree sharply. A catalyst where the bull and bear cases both produce 0.7 is a higher-conviction call than a catalyst where bull is 0.85 and bear is 0.55, even though both average to 0.7. The disagreement penalty is a single tunable parameter fit on the calibration set.
 
 This pattern is structurally similar to debate-style inference architectures published more recently, but it predates them in this codebase. I am not claiming originality on the pattern, only that the wrapper was the difference between a model that scored well on AUC and a model that produced position-sizable probabilities.
 
@@ -102,7 +102,7 @@ This pattern is structurally similar to debate-style inference architectures pub
 
 AUC on the held-out set is 0.686. I want to be honest about what this means.
 
-AUC at this level is not Bloomberg-terminal-killer territory. It is meaningfully better than the published baselines for biotech catalyst prediction (most academic and industry baselines hover at 0.55 to 0.62) but it does not mean TrialEdge is "right" in any narrative sense most of the time. What it means is: when TrialEdge says 0.8, the catalyst hits at roughly an 80 percent rate; when TrialEdge says 0.3, the catalyst hits at roughly a 30 percent rate. ==Calibration is the product. Discrimination is the qualifier.==
+AUC at this level is not Bloomberg-terminal-killer territory. It is meaningfully better than the published baselines for biotech catalyst prediction. Most academic and industry baselines hover at 0.55 to 0.62. But it does not mean TrialEdge is "right" in any narrative sense most of the time. What it means is this: when TrialEdge says 0.8, the catalyst hits at roughly an 80 percent rate. When TrialEdge says 0.3, the catalyst hits at roughly a 30 percent rate. ==Calibration is the product. Discrimination is the qualifier.==
 
 For position sizing and portfolio construction, calibration is what you actually need. For headline accuracy claims, calibration looks worse than raw "I called it right" stories. I optimize for the first, not the second.
 
@@ -114,11 +114,11 @@ Every production AI system claim should be cashable as "and here is how I would 
 
 ### Three layers
 
-**Offline eval** runs on every code change. The held-out set is 20 percent of the labeled outcomes, stratified by year and indication area to prevent temporal or domain leakage. Metrics: AUC, Brier score, calibration curve max-deviation, and a custom metric I call "expected log-loss vs base rate" that compares the model's calibrated outputs to the rolling-3-year FDA approval base rate for the indication area. The third metric is what catches regressions where AUC stays flat but calibration drifts.
+**Offline eval** runs on every code change. The held-out set is 20 percent of the labeled outcomes, stratified by year and indication area to prevent temporal or domain leakage. Metrics: AUC, Brier score, calibration curve max-deviation, and a custom metric I call "expected log-loss vs base rate." That metric compares the model's calibrated outputs to the rolling-3-year FDA approval base rate for the indication area. The third metric is what catches regressions where AUC stays flat but calibration drifts.
 
 **Online eval** runs continuously against the editorial layer. The Google Sheets review surface logs every catalyst the model scored and the eventual outcome once the PDUFA date passes. A weekly cron computes the same metrics on the rolling 30, 90, and 365 day windows of newly-resolved catalysts. ==This is the eval rig that catches drift the offline set cannot, because the data distribution moves over time as new indication areas become active.==
 
-**Drift detection** runs at the feature level. Each of the 16 features has a rolling distribution baseline. Significant drift in any feature distribution (Wasserstein distance over threshold against the training-set baseline) raises an alert and a manual review of whether the model needs recalibration. This has fired twice in production, both times correctly identifying that the source filing-summarization prompts had shifted output distributions slightly after a Gemma model update on OpenRouter.
+**Drift detection** runs at the feature level. Each of the 16 features has a rolling distribution baseline. Significant drift in any feature distribution (Wasserstein distance over threshold against the training-set baseline) raises an alert and a manual review of whether the model needs recalibration. This has fired twice in production. Both times it correctly identified that the source filing-summarization prompts had shifted output distributions slightly after a Gemma model update on OpenRouter.
 
 ### What I do not do, and why
 
@@ -132,13 +132,13 @@ I do not run ensembles of LightGBM models. I tested it; the calibration improvem
 
 Per-unit economics get asked at every architecture review. Here are the numbers.
 
-**Per-catalyst cost (inference):** approximately $0.02 in OpenRouter calls. The cost is dominated by filing summarization, not by the LightGBM inference itself, which runs in milliseconds on a Cloudflare Worker for free at this volume.
+**Per-catalyst cost (inference):** about $0.02 in OpenRouter calls. The cost is dominated by filing summarization, not by the LightGBM inference itself. That inference runs in milliseconds on a Cloudflare Worker, free at this volume.
 
-**Per-filing cost (ingestion):** approximately $0.10 for a typical 10-K, scaling roughly linearly with filing length. A new 10-K hits the summarization pipeline once and produces structured outputs that feed many downstream catalyst scores, so the amortized cost per catalyst is well under the headline filing cost.
+**Per-filing cost (ingestion):** about $0.10 for a typical 10-K, scaling roughly linearly with filing length. A new 10-K hits the summarization pipeline once and produces structured outputs that feed many downstream catalyst scores. So the amortized cost per catalyst is well under the headline filing cost.
 
 **Total monthly run cost:** in the low double digits at current entity coverage. The cap on this number is not the system; it is how many filings hit the pipeline in a given month.
 
-**What I would change with more budget:** I would route higher-stakes catalysts (those with positions sized above a threshold) to a more expensive model for the final pre-decision summarization pass, while keeping bulk summarization on Gemma. This is a routing decision, not an architecture decision; the existing system already supports per-call model overrides. ==I have not made this change because the eval rig has not yet shown a quality lift that justifies the cost increase.==
+**What I would change with more budget:** I would route higher-stakes catalysts to a more expensive model for the final pre-decision summarization pass, while keeping bulk summarization on Gemma. Higher-stakes means a position sized above a threshold. This is a routing decision, not an architecture decision. The existing system already supports per-call model overrides. ==I have not made this change because the eval rig has not yet shown a quality lift that justifies the cost increase.==
 
 This is the discipline that separates "we should use the better model" from "we measured and decided." The second answer is the one that lands in technical interviews.
 
@@ -154,11 +154,11 @@ The monitoring is layered.
 
 2. **Feature distribution drift.** As described in the eval rig section. The interesting failures here have been upstream (the Gemma summarizer producing slightly different outputs after an OpenRouter model update), not in the LightGBM layer itself.
 
-3. **Output distribution monitoring.** The rolling distribution of CalibratedDebateScorer outputs is tracked weekly. A sudden shift in the output distribution that does not correspond to a known model change is treated as a signal something upstream broke silently.
+3. **Output distribution monitoring.** I track the rolling distribution of CalibratedDebateScorer outputs weekly. A sudden shift in the output distribution that does not correspond to a known model change signals something upstream broke silently.
 
 4. **Calibration tracking.** The most important monitor. Each new catalyst resolved by the editorial layer updates the calibration curve. A 7-day rolling calibration check flags any sustained deviation between predicted probability and realized base rate by 5 points or more, in either direction.
 
-5. **Editorial layer audit log.** Every change in the Google Sheets layer (catalyst added, outcome resolved, manual override applied) writes to a Supabase audit table. This is for forensics, not real-time monitoring, but it is how I have caught the two production issues that originated in upstream prompt changes rather than model code.
+5. **Editorial layer audit log.** Every change in the Google Sheets layer (catalyst added, outcome resolved, manual override applied) writes to a Supabase audit table. This is for forensics, not real-time monitoring. But it is how I caught the two production issues that originated in upstream prompt changes rather than model code.
 
 The discipline I bring from CRE credit underwriting matters here. ==In credit, you do not get to claim a deal is performing because you closed it; you have to defend it against the eventual realized outcomes.== I run TrialEdge the same way. The model that looks great in offline eval still has to defend itself against the actual PDUFA outcomes month after month.
 
@@ -168,11 +168,11 @@ The discipline I bring from CRE credit underwriting matters here. ==In credit, y
 
 Three things, in order.
 
-1. **Move the editorial layer off Google Sheets.** It works at this scale, but it does not scale to a team and it does not produce clean audit trails by default. I built it on Sheets because Sheets is where domain analysts already live; if I were starting over with the same constraint, I would build a thin web UI on Cloudflare Pages that wrote directly to Supabase, with Sheets as a read-only export rather than the source of truth.
+1. **Move the editorial layer off Google Sheets.** It works at this scale, but it does not scale to a team and it does not produce clean audit trails by default. I built it on Sheets because Sheets is where domain analysts already live. If I were starting over with the same constraint, I would build a thin web UI on Cloudflare Pages that wrote directly to Supabase, with Sheets as a read-only export rather than the source of truth.
 
 2. **Adopt a formal eval framework.** The current eval rig is hand-rolled Python that lives in the same repo as the model. RAGAS-style or DeepEval-style frameworks would let me run faithfulness checks against the filing summarizer outputs more rigorously, especially for the structured-extraction step where hallucination has been the hardest class of error to catch.
 
-3. **Externalize the debate scorer.** The CalibratedDebateScorer is currently one Python module wrapping LightGBM. A cleaner v2 would express the bull case and bear case as separate model calls, possibly using different feature representations or even different model families, with the disagreement penalty computed explicitly. The cost would roughly double; the architectural clarity would be worth it for portfolio and interview purposes alone.
+3. **Externalize the debate scorer.** The CalibratedDebateScorer is currently one Python module wrapping LightGBM. A cleaner v2 would express the bull case and bear case as separate model calls, possibly using different feature representations or even different model families, with the disagreement penalty computed explicitly. The cost would roughly double. The architectural clarity would be worth it for portfolio and interview purposes alone.
 
 ---
 

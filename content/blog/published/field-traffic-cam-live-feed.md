@@ -34,7 +34,7 @@ It returns a JPEG. No key, no login, nothing to sign up for. The only real snag 
 https://webcams.nyctmc.org/api/cameras/{id}/image?cacheAvoidance=1717800000000
 ```
 
-Stick the current timestamp on the end and every request is a new URL, so the browser actually goes and fetches a fresh frame. Reload every two seconds and it reads as live. I picked two seconds on purpose: the cameras themselves only refresh about once a second, so there is no point hammering faster, and two seconds stays honest about what the source actually is instead of pretending to be full-motion video.
+Stick the current timestamp on the end and every request is a new URL, so the browser actually goes and fetches a fresh frame. Reload every two seconds and it reads as live. I picked two seconds on purpose. The cameras themselves only refresh about once a second, so there is no point hammering faster. And two seconds stays honest about what the source actually is instead of pretending to be full-motion video.
 
 ## Finding the right cameras
 
@@ -44,7 +44,7 @@ The site also exposes a list of every camera:
 https://webcams.nyctmc.org/api/cameras
 ```
 
-That comes back as an array of roughly 957 entries, each with an id, a human name like "6 Ave @ 42 St", a latitude and longitude, and an online flag. I did not want to hand-pick cameras for every location, so I let geography do it. For each venue I have a coordinate, and I run a haversine distance against every online camera, sort by distance, and keep the nearest handful.
+That comes back as an array of roughly 957 entries, each with an id, a human name like "6 Ave @ 42 St", a latitude and longitude, and an online flag. I did not want to hand-pick cameras for every location, so I let geography do it. For each venue I have a coordinate. I run a haversine distance against every online camera, sort by distance, and keep the nearest handful.
 
 ```js
 function haversine(lat1, lng1, lat2, lng2) {
@@ -69,9 +69,9 @@ One shared timer ticks every two seconds, walks every tile, and swaps each image
 
 ## The CORS wall, and why I ship a hardcoded list
 
-Here is the one place the browser fights you. The image URL works cross-origin from an image tag with no trouble at all. The list URL does not send the headers a browser needs to read a cross-origin fetch, so calling the list from client-side JavaScript gets blocked.
+Here is the one place the browser fights you. The image URL works cross-origin from an image tag with no trouble at all. The list URL does not send the headers a browser needs to read a cross-origin fetch. So calling the list from client-side JavaScript gets blocked.
 
-There are two honest ways around that. Stand up a small proxy, or ship a hardcoded list of camera IDs with the app. For something I want to be a single static page that runs by opening a file, I went with the hardcoded list. The app tries the live list first, and when the fetch is blocked it quietly falls back to a vetted list of camera IDs per location. In practice the browser uses the fallback every time, and the live list is a bonus for environments that allow it.
+There are two honest ways around that. Stand up a small proxy, or ship a hardcoded list of camera IDs with the app. For something I want to be a single static page that runs by opening a file, I went with the hardcoded list. The app tries the live list first. When the fetch is blocked, it quietly falls back to a vetted list of camera IDs per location. In practice the browser uses the fallback every time, and the live list is a bonus for environments that allow it.
 
 ## Cameras die, so plan for it
 
@@ -84,7 +84,7 @@ Two small things bit me here:
 
 ## The bug that actually cost me time
 
-The one worth writing down: the RECONNECTING overlay was a div with display:flex in the stylesheet, and I was toggling the hidden attribute on it from JavaScript. The problem is that display:flex wins over the hidden attribute, so the overlay sat on top of every tile permanently, covering feeds that were loading perfectly well underneath.
+The one worth writing down: the RECONNECTING overlay was a div with display:flex in the stylesheet, and I was toggling the hidden attribute on it from JavaScript. The problem is that display:flex wins over the hidden attribute. So the overlay sat on top of every tile permanently, covering feeds that were loading perfectly well underneath.
 
 For a while the data was completely live and the screen looked dead. The JavaScript was telling the truth and the CSS was lying. The fix was one line that lets the attribute win:
 
@@ -92,7 +92,7 @@ For a while the data was completely live and the screen looked dead. The JavaScr
 .overlay[hidden] { display: none; }
 ```
 
-The lesson I am keeping: when a piece of state lives in both an HTML attribute and a stylesheet, make sure the stylesheet actually respects the attribute, or you will spend an hour debugging a network layer that was fine the whole time.
+The lesson I am keeping: when a piece of state lives in both an HTML attribute and a stylesheet, make sure the stylesheet actually respects the attribute. Otherwise you will spend an hour debugging a network layer that was fine the whole time.
 
 ## Closing
 

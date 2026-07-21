@@ -36,7 +36,7 @@ Three properties of this domain make the naive approach wrong.
 
 2. **A dumb baseline is already good.** Strikeouts per nine innings times innings per start gets you most of the way there. Any model that does not clearly beat that baseline is not worth the maintenance cost. This is the central honesty constraint: every gain has to be measured against the dumbest reasonable predictor, not against zero.
 
-3. **Leakage is trivially easy and fatally common.** Baseball data is a time series. Season-to-date stats, rolling averages, and opponent profiles all update after every game. It is extremely easy to accidentally build a feature that includes information from the game you are trying to predict, which produces a backtest that looks brilliant and a live model that is worthless. The architecture has to make leakage structurally hard, not rely on remembering to avoid it.
+3. **Leakage is trivially easy and fatally common.** Baseball data is a time series. Season-to-date stats, rolling averages, and opponent profiles all update after every game. It is extremely easy to accidentally build a feature that includes information from the game you are trying to predict. That produces a backtest that looks brilliant and a live model that is worthless. The architecture has to make leakage structurally hard, not rely on remembering to avoid it.
 
 StrikeOut Bot is shaped by these three constraints in order.
 
@@ -69,9 +69,9 @@ The feature layer turns staging tables into a fixed 40-column matrix, one row pe
 
 Two things about this layer matter architecturally.
 
-**Ordering is a dependency, not a convenience.** Pitcher Ability runs first, because it extracts the pitcher's primary velocity, which then feeds an Opponent Profile feature that measures how the opposing lineup chases against that specific velocity band. The orchestrator enforces the order. A failing feature group is wrapped in try/except and NaN-filled rather than crashing the whole matrix, and the missing values are imputed downstream with league-average fallbacks.
+**Ordering is a dependency, not a convenience.** Pitcher Ability runs first, because it extracts the pitcher's primary velocity. That velocity then feeds an Opponent Profile feature that measures how the opposing lineup chases against that specific velocity band. The orchestrator enforces the order. The pipeline wraps a failing feature group in try/except and NaN-fills it rather than crashing the whole matrix. League-average fallbacks impute the missing values downstream.
 
-**The metadata and the target are never in the feature slice.** The matrix carries the 40 features plus four metadata columns (pitcher id, game date, game id, opponent) plus, at training time, the target (actual strikeouts). The metadata and the target are structurally excluded from the model inputs, and that exclusion is verified by dedicated leakage-prevention tests. This is the first line of defense against the leakage failure mode.
+**The metadata and the target are never in the feature slice.** The matrix carries the 40 features plus four metadata columns (pitcher id, game date, game id, opponent) plus, at training time, the target (actual strikeouts). The model inputs structurally exclude the metadata and the target. Dedicated leakage-prevention tests verify that exclusion. This is the first line of defense against the leakage failure mode.
 
 ---
 
@@ -81,9 +81,9 @@ The model is where the interval-first design lives.
 
 ### Why quantile regression, not point prediction
 
-Instead of training one model to predict the mean strikeout count, StrikeOut Bot trains three LightGBM models with a quantile objective: one at the 5th percentile, one at the median, one at the 95th percentile. The median is the headline prediction; the 5th and 95th together form a 90 percent confidence interval.
+Instead of training one model to predict the mean strikeout count, StrikeOut Bot trains three LightGBM models with a quantile objective: one at the 5th percentile, one at the median, one at the 95th percentile. The median is the headline prediction. The 5th and 95th together form a 90 percent confidence interval.
 
-This is the architectural decision that makes the output useful. A point model tells you "7." The quantile stack tells you "median 7, interval 4 to 10," and critically it can tell you "median 7, interval 6 to 8" on a different pitcher where the model is genuinely more confident. The width of the interval is signal. Quantile regression is how you get it directly out of the model rather than bolting on a variance estimate after the fact.
+This is the architectural decision that makes the output useful. A point model tells you "7." The quantile stack tells you "median 7, interval 4 to 10." On a different pitcher where the model is genuinely more confident, it can tell you "median 7, interval 6 to 8." The width of the interval is signal. Quantile regression is how you get it directly out of the model rather than bolting on a variance estimate after the fact.
 
 The honesty check on this is interval calibration: across many predictions, roughly 90 percent of actual outcomes should fall inside the 90 percent interval. If only 70 percent do, the intervals are lying and the model is overconfident. Calibration at 90 is a first-class metric in every evaluation report.
 
@@ -91,13 +91,13 @@ The honesty check on this is interval calibration: across many predictions, roug
 
 The three quantile models produce a median. That median is not the final prediction. It is one input to a Ridge meta-learner that stacks three signals: the model's median prediction, the dumb baseline (strikeouts per nine times innings per start), and days of rest.
 
-The stacker exists for a specific reason. The LightGBM median is strong but occasionally drifts on edge cases; the baseline is weak but almost never catastrophically wrong; days of rest carries a small real effect the tree model under-weights. A Ridge regression with light regularization blends the three into a prediction that is more robust than any of them alone. The final output is clamped to a sane range and forced to respect its own interval bounds, so the stacked prediction can never fall outside the lower and upper quantiles.
+The stacker exists for a specific reason. The LightGBM median is strong but occasionally drifts on edge cases. The baseline is weak but almost never catastrophically wrong. Days of rest carries a small real effect the tree model under-weights. A Ridge regression with light regularization blends the three into a prediction that is more robust than any of them alone. The stacker clamps the final output to a sane range and forces it to respect its own interval bounds. So the stacked prediction can never fall outside the lower and upper quantiles.
 
 ==The pattern is the same one behind TrialEdge's CalibratedDebateScorer: the base model produces a signal, and a thin, inspectable wrapper turns that signal into something you can actually make a decision on.==
 
 ### Hyperparameters
 
-Tuned with Optuna's tree-structured Parzen estimator, then frozen: 63 leaves, learning rate 0.05, up to 1000 estimators with early stopping, feature and bagging fractions at 0.8, light L1 and L2 regularization, fixed seed, deterministic mode on. Deterministic training matters more than it sounds. It means a retrain on the same data produces the same model, which means when a metric moves I know it moved because the data changed, not because the RNG did.
+Tuned with Optuna's tree-structured Parzen estimator, then frozen: 63 leaves, learning rate 0.05, up to 1000 estimators with early stopping, feature and bagging fractions at 0.8, light L1 and L2 regularization, fixed seed, deterministic mode on. Deterministic training matters more than it sounds. It means a retrain on the same data produces the same model. So when a metric moves, I know it moved because the data changed, not because the RNG did.
 
 ---
 
@@ -135,7 +135,7 @@ If the model cannot beat the baselines on truly unseen data with honest interval
 
 ### The metrics that matter
 
-Mean absolute error is the headline: the average strikeout miss. But the report also breaks MAE down by strikeout tier, because a model can have a good overall MAE while failing badly on aces or on low-strikeout arms, and that segmented failure is exactly the kind of thing an aggregate number hides. Over-under accuracy against lines of 5.5, 6.5, 7.5, and 8.5 is the practical, decision-relevant metric. Calibration at 90 is the honesty metric. All four flow into a model-degradation alert that fires when rolling MAE drifts above the baseline in production.
+Mean absolute error is the headline: the average strikeout miss. But the report also breaks MAE down by strikeout tier. A model can have a good overall MAE while failing badly on aces or on low-strikeout arms. That segmented failure is exactly the kind of thing an aggregate number hides. Over-under accuracy against lines of 5.5, 6.5, 7.5, and 8.5 is the practical, decision-relevant metric. Calibration at 90 is the honesty metric. All four flow into a model-degradation alert that fires when rolling MAE drifts above the baseline in production.
 
 ---
 
@@ -156,7 +156,7 @@ None of these is clever. All of them are the kind of discipline that separates a
 
 Three things.
 
-1. **Model the pitch-level distribution, not just the start-level count.** Predicting total strikeouts is coarse. A richer version would predict the outcome distribution pitch by pitch and aggregate up, which would produce naturally calibrated intervals and let the model reason about pitch counts and times-through-the-order effects explicitly.
+1. **Model the pitch-level distribution, not just the start-level count.** Predicting total strikeouts is coarse. A richer version would predict the outcome distribution pitch by pitch and aggregate up. That would produce naturally calibrated intervals and let the model reason about pitch counts and times-through-the-order effects explicitly.
 
 2. **Add an explicit opponent-lineup model.** Opponent profile is currently a set of team-level aggregate features. The real signal is the specific nine hitters likely to be in the lineup and how each matches up against this pitcher's repertoire. That is a bigger data-engineering lift but it is where the remaining accuracy lives.
 
@@ -168,7 +168,7 @@ Three things.
 
 StrikeOut Bot is a small, honest ML system that solves a narrow prediction problem with calibrated intervals, a dumb-baseline honesty constraint, and a leakage-resistant eval rig. The architecture is not novel. The discipline is what makes the numbers trustworthy: quantile regression so the interval is real, a stacker so the prediction is robust, walk-forward validation and a stratified blind test so the backtest is not a lie.
 
-The through-line to the rest of my work is the same one that runs through TrialEdge and the MES trading model: at small signal and high noise, calibration beats raw accuracy, and the model that honestly says "I do not know" on the hard cases is worth more than the one that confidently guesses. If you are building something similar in a different small-signal domain, the questions worth asking are: is your useful output a point or an interval; what is the dumbest baseline you have to beat; is your validation actually temporal; and can a future code change reintroduce leakage without a test catching it.
+The through-line to the rest of my work is the same one that runs through TrialEdge and the MES trading model: at small signal and high noise, calibration beats raw accuracy. The model that honestly says "I do not know" on the hard cases is worth more than the one that confidently guesses. If you are building something similar in a different small-signal domain, the questions worth asking are: is your useful output a point or an interval; what is the dumbest baseline you have to beat; is your validation actually temporal; and can a future code change reintroduce leakage without a test catching it.
 
 For the production-ML calibration discipline that shaped this project, see [Inside TrialEdge](/blog/inside-trialedge.html). For the same anti-lookahead and beat-the-baseline discipline applied to markets, see [Inside MES Open](/blog/inside-mes-open.html).
 

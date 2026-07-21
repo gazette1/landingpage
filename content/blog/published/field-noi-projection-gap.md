@@ -22,32 +22,32 @@ Every hospitality acquisition involves two NOI numbers and a structural disagree
 
 The first number comes from an MAI appraisal. The appraiser is an arms-length, regulated professional working under USPAP standards. The appraisal includes a stabilized NOI projection that is, by professional discipline, conservative. Stabilized occupancy assumptions cluster in the mid-50s for transient hospitality in non-trophy markets. ADR assumptions track recent comp performance with a modest forward growth rate. Operating expense assumptions are benchmarked against industry surveys (HOST, STR, comparable property operating data).
 
-The second number comes from the sponsor's pro forma. The sponsor is an experienced operator (or an emerging operator with operator support) who has done the diligence on this specific asset, has a renovation plan that they believe will drive ADR uplift, has a brand-affiliation thesis or an independent-positioning thesis they believe will lift occupancy, and has expense-management levers they believe the appraisal cannot see.
+The second number comes from the sponsor's pro forma. The sponsor is an experienced operator, or an emerging operator with operator support. The sponsor has done the diligence on this specific asset. They have a renovation plan they believe will drive ADR uplift. They have a brand-affiliation thesis or an independent-positioning thesis they believe will lift occupancy. And they have expense-management levers they believe the appraisal cannot see.
 
-For a typical $20M to $30M coastal hospitality acquisition, the two numbers diverge by 10 to 20 percent. On a $25M asset, that is $200K to $500K of annual NOI difference, which valued at a 7 cap is $3M to $7M of valuation difference. The credit committee has to decide which number to underwrite to, and the answer determines whether the deal closes.
+For a typical $20M to $30M coastal hospitality acquisition, the two numbers diverge by 10 to 20 percent. On a $25M asset, that is $200K to $500K of annual NOI difference. Valued at a 7 cap, that is $3M to $7M of valuation difference. The credit committee has to decide which number to underwrite to, and the answer determines whether the deal closes.
 
 ## Where it works
 
-The disagreement is structurally honest. The appraiser is constrained by professional standards to project against observable comp performance. The sponsor is allowed (and expected) to underwrite against their specific business plan, which is by definition not yet observable in the market. Both numbers can be right.
+The disagreement is structurally honest. The appraiser is constrained by professional standards to project against observable comp performance. The sponsor is allowed and expected to underwrite against their specific business plan. That plan is by definition not yet observable in the market. Both numbers can be right.
 
 The disagreement works as a check on sponsor optimism when the credit committee is sophisticated enough to evaluate the gap. A 5 percent gap is normal. A 25 percent gap is a red flag. A 50 percent gap means one party is wrong.
 
 ## Where it breaks
 
-The break is that **no one in the conventional underwriting workflow systematically decomposes the gap**. The credit committee sees two numbers and a difference. The sponsor has a story for the difference. The committee either believes the story or does not.
+The break is that **no one in the conventional underwriting workflow decomposes the gap**. The credit committee sees two numbers and a difference. The sponsor has a story for the difference. The committee either believes the story or does not.
 
-The gap actually decomposes into four orthogonal components:
+The gap actually decomposes into four separate components:
 
 1. **Occupancy uplift**. The sponsor projects higher stabilized occupancy than the appraisal. The right question: what specifically drives the uplift (brand affiliation, renovation, market positioning), and what is the historical conversion of that lever on comparable assets?
 2. **ADR growth**. The sponsor projects ADR growing faster than the appraisal's stabilized rate. The right question: how much of the projected ADR is inflation, how much is brand uplift, how much is renovation-driven repositioning, and what proof of each component exists?
-3. **Expense efficiency**. The sponsor projects lower opex than the appraisal. The right question: is this management-fee structure savings (real, repeatable), one-time deferred-maintenance backlog clearance (real but non-recurring), or aspirational efficiency claims (often the largest single source of overstated NOI)?
+3. **Expense efficiency**. The sponsor projects lower opex than the appraisal. The right question: is this management-fee structure savings (real, repeatable), one-time deferred-maintenance backlog clearance (real but non-recurring), or hoped-for efficiency claims (often the largest single source of overstated NOI)?
 4. **Top-line monetization**. The sponsor may project ancillary revenue (F&B, parking, resort fees) that the appraisal does not credit at full value. The right question: what is the realized capture rate of each ancillary stream on comparable assets, and what is the sponsor's specific plan to lift it?
 
 Decomposing the gap is the work. Most credit-committee conversations skip the decomposition and end up arguing about the headline NOI instead.
 
 ## What an AI architect would change
 
-The current workflow on a hospitality acquisition produces two pro formas (appraisal and sponsor) and a credit memo that compares them at the top line. An AI-architected version produces a third artifact: a **gap decomposition** that systematically attributes the NOI delta to its four components, with comp-based reference rates for each.
+The current workflow on a hospitality acquisition produces two pro formas (appraisal and sponsor) and a credit memo that compares them at the top line. An AI-architected version produces a third artifact: a **gap decomposition**. It attributes the NOI delta to its four components, with comp-based reference rates for each.
 
 The architecture is straightforward:
 
@@ -57,9 +57,9 @@ The architecture is straightforward:
 
 **A decomposition pass.** Given the two input pro formas, decompose the gap into the four components. Produce a per-component delta in dollars and a comp-based reference rate for what that delta historically looks like across realized comparable transactions.
 
-**A narrative pass.** For each component, produce a structured assessment: is the sponsor's projected delta within the realized range, above the 75th percentile, or outside the comparable distribution? An ADR growth claim that sits at the 95th percentile is not wrong; it is a claim that should be defended on the specific drivers, not waved through.
+**A narrative pass.** For each component, produce a structured assessment: is the sponsor's projected delta within the realized range, above the 75th percentile, or outside the comparable distribution? An ADR growth claim that sits at the 95th percentile is not wrong. But the sponsor should defend it on the specific drivers, not wave it through.
 
-The output is a one-page artifact a credit committee reads in five minutes that decomposes the gap with comp-anchored reference rates. The committee then has a conversation about the components that look aspirational, not about whether to "trust the sponsor" at the top line.
+The output is a one-page artifact a credit committee reads in five minutes that decomposes the gap with comp-anchored reference rates. The committee then has a conversation about the components that look hoped-for, not about whether to "trust the sponsor" at the top line.
 
 ## What it would cost
 
@@ -77,7 +77,7 @@ The committee that wants to underwrite to a sponsor-optimistic NOI still can. Th
 
 ## Closing
 
-Hospitality is the asset class where the NOI projection gap is most pronounced because the business plan is most variable. The same pattern shows up in multifamily (rent growth assumptions), in industrial (lease renewal probability), in retail (tenant credit underwriting), and in office (return-to-work assumptions). Every asset class has its version of the appraisal-vs-sponsor disagreement, and every version is more productively addressed by decomposing the gap than by debating the headline.
+Hospitality is the asset class where the NOI projection gap is most pronounced because the business plan is most variable. The same pattern shows up in multifamily (rent growth assumptions), in industrial (lease renewal probability), in retail (tenant credit underwriting), and in office (return-to-work assumptions). Every asset class has its version of the appraisal-vs-sponsor disagreement. Decomposing the gap addresses each one more productively than debating the headline.
 
 If you are a credit committee, an LP underwriter, a debt-fund analyst, or a sponsor evaluating how to systematize the gap-decomposition workflow, the questions worth asking are: how do you parse the appraisal and the sponsor pro forma into a common schema; how do you maintain the comp-rate database against quarterly refresh requirements; how do you produce per-component narrative that the credit committee can read and the sponsor can defend; and how do you avoid the temptation to use the decomposition to "win" the disagreement rather than to structure it.
 

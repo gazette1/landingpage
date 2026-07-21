@@ -20,11 +20,11 @@ By Russ. Field Note, 2026.
 
 A 9 percent LIHTC application in any state is a competitive scoring exercise. The Qualified Allocation Plan (QAP) defines how state housing finance agencies (DSHA in Delaware, DHCD in Maryland, NJHMFA in New Jersey, on through every state) score applications against a fixed number of available credits. Projects compete on a per-point basis. The applicant with the higher score wins the allocation. Everything else is execution.
 
-Most emerging developers approach the QAP as a single-source scoring exercise: read the QAP, count the points your project earns by default, hope it is enough. The math rarely works. A first-time developer with no completed deal earns close to zero on the "experience" line, takes a known hit on the "balanced housing" geography line in jurisdictions that reward suburban siting, and ends up needing to make up 20 to 30 points elsewhere to compete.
+Most emerging developers approach the QAP as a single-source scoring exercise: read the QAP, count the points your project earns by default, hope it is enough. The math rarely works. A first-time developer with no completed deal earns close to zero on the "experience" line. They take a known hit on the "balanced housing" geography line in jurisdictions that reward suburban siting. They end up needing to make up 20 to 30 points elsewhere to compete.
 
-The competitive way to play the QAP is to **stack distress designations on the parcel** so the project earns points from multiple federal, state, and local programs at once, and to layer those designations against complementary funding sources that prefer the same geographies. Each designation does a different job:
+The competitive way to play the QAP is to **stack distress designations on the parcel** so the project earns points from multiple federal, state, and local programs at once. You also layer those designations against complementary funding sources that prefer the same geographies. Each designation does a different job:
 
-- **Qualified Census Tract (QCT).** HUD designation. Triggers the 30 percent eligible basis boost in LIHTC, which roughly translates to a third more equity per dollar of construction cost. Mapped by HUD annually; eligibility is determined by tract-level poverty and rent-to-income ratios.
+- **Qualified Census Tract (QCT).** HUD designation. Triggers the 30 percent eligible basis boost in LIHTC, which roughly translates to a third more equity per dollar of construction cost. Mapped by HUD annually. Tract-level poverty and rent-to-income ratios determine eligibility.
 - **Qualified Opportunity Zone (OZ).** IRS/Treasury designation, active through end of 2028 under OZ 1.0. Layers capital gains deferral and ten-year basis step-up on the equity side of the stack. Worth real money to investors and meaningfully expands the LP universe willing to commit to the project.
 - **Downtown Development District (DDD).** State or local designation. In Delaware, triggers a 20 percent rebate on Qualified Real Property Investment plus a dedicated state historic tax credit set-aside. Stacks cleanly with LIHTC.
 - **R/ECAP (Racially/Ethnically Concentrated Area of Poverty).** HUD definition. Does not directly add points but is required narrative framing for the fair-housing analysis and triggers eligibility for several CDBG and HOME funding streams.
@@ -34,7 +34,7 @@ A parcel that fires on all five gets a basis boost, a tax-advantaged investor ba
 
 ## Where it works
 
-The five-designation stack works because the agencies that issued the designations are not coordinating. Each program was designed independently. The applicant who knows how to look across all five gets compounding advantage that none of the program designers intended. The geography that produces a five-designation overlap is rare; Mosaic's recent Wilmington East Side work sits on a stack that fires on all five plus a sixth (CCRP, Community Center Revitalization Plan, for an additional state scoring tier).
+The five-designation stack works because the agencies that issued the designations are not coordinating. Each program was designed independently. The applicant who knows how to look across all five gets compounding advantage that none of the program designers intended. The geography that produces a five-designation overlap is rare. Mosaic's recent Wilmington East Side work sits on a stack that fires on all five plus a sixth (CCRP, Community Center Revitalization Plan, for an additional state scoring tier).
 
 The work to identify a five-designation stack is a research project of its own. It is also a research project that an AI architect can compress materially.
 
@@ -44,11 +44,11 @@ The break comes when the developer treats the designations as fungible. They are
 
 An emerging developer who confuses two of the five designations writes an application narrative that references the wrong program rules and loses scoring credibility. The state housing finance agencies catch these errors in the first read. The application gets ranked accordingly.
 
-The other break is that the geographies move. QCT designations refresh annually. OZ 1.0 expires end of 2028. DDD boundaries can be expanded or contracted by city council vote. An application that cites the FY2025 QCT designation for a tract that lost QCT status in FY2026 is wrong on the application date. The research is not one-time work; it is continuously stale.
+The other break is that the geographies move. QCT designations refresh annually. OZ 1.0 expires end of 2028. DDD boundaries can be expanded or contracted by city council vote. An application that cites the FY2025 QCT designation for a tract that lost QCT status in FY2026 is wrong on the application date. The research is not one-time work. It is continuously stale.
 
 ## What an AI architect would change
 
-The current Mosaic workflow on a new corridor opportunity takes roughly three weeks of senior-analyst time to compile a complete designation-stack profile, including direct queries against the Census Bureau ACS API, HUD's QCT and SADDA tables, the IRS OZ census tract lists, USDA's Food Access Research Atlas, and the relevant state DDD or equivalent programs. Cross-referencing those layers against the project site, the surrounding tracts, and the corridor-level demographic data is hand work in Excel and a working PDF dossier.
+The current Mosaic workflow on a new corridor opportunity takes roughly three weeks of senior-analyst time to compile a complete designation-stack profile. That work includes direct queries against the Census Bureau ACS API, HUD's QCT and SADDA tables, the IRS OZ census tract lists, USDA's Food Access Research Atlas, and the relevant state DDD or equivalent programs. Cross-referencing those layers against the project site, the surrounding tracts, and the corridor-level demographic data is hand work in Excel and a working PDF dossier.
 
 An AI architect would architect this differently:
 
@@ -58,7 +58,7 @@ An AI architect would architect this differently:
 
 **A QAP-mapping pass** that takes the designation stack and produces a per-line scoring estimate for the target QAP, with traceable references to the QAP section that awards each line. The underwriter sees a defensible score before they decide whether to commit time to the application.
 
-**A continuous-refresh discipline** that flags when a designation has changed since the last application review. The freshness is the value; a designation that flipped between application cycles is the kind of error that loses applications and reputations.
+**A continuous-refresh discipline** that flags when a designation has changed since the last application review. The freshness is the value. A designation that flipped between application cycles is the kind of error that loses applications and reputations.
 
 The architecture is not novel. It is the same multi-source data fusion pattern that powers off-market property scoring in [Atlas](/blog/inside-atlas.html), applied to a different domain. Public-records-first, paid-enrichment only on parcels that earn it, structured output the underwriter can read and defend.
 
@@ -66,13 +66,13 @@ The architecture is not novel. It is the same multi-source data fusion pattern t
 
 The compute cost is rounding error. Census, HUD, IRS, USDA, and DDD sources are all free. The LLM cost to produce a per-corridor designation-stack narrative is in the low single-digit dollars per corridor at current model pricing. The deterministic data layer runs on a small Postgres instance and a nightly cron.
 
-The labor cost is the real economics: three weeks of senior-analyst time per corridor at conventional rates, compressed to under an hour of operator review on the AI-produced output, including the manual validation pass that catches any designation the model misread.
+The labor cost is the real economics. Three weeks of senior-analyst time per corridor at conventional rates compresses to under an hour of operator review on the AI-produced output. That hour includes the manual validation pass that catches any designation the model misread.
 
 That compression is the difference between Mosaic evaluating one or two corridor opportunities per quarter and evaluating ten. It changes the firm's deal-sourcing economics, not the per-deal economics.
 
 ## What would not change
 
-The QAP itself is a state-by-state political artifact, and the application narrative still requires senior judgment about how to frame the project for the local housing finance agency. The narrative voice, the community-engagement letters, the partner-developer LOIs, the environmental and zoning posture, all stay senior-analyst work. The AI architect's job is to compress the data-gathering and pre-scoring work so the senior analyst spends time on the parts that actually move the application score.
+The QAP itself is a state-by-state political artifact. The application narrative still requires senior judgment about how to frame the project for the local housing finance agency. The narrative voice, the community-engagement letters, the partner-developer LOIs, the environmental and zoning posture, all stay senior-analyst work. The AI architect's job is to compress the data-gathering and pre-scoring work so the senior analyst spends time on the parts that actually move the application score.
 
 ==The architectural principle: an AI system that automates the data gathering and pre-scoring releases the senior analyst to do the parts only a senior analyst can do. The domain expertise does not get automated; the data-fetching does.==
 

@@ -20,9 +20,9 @@ By Russ. Phase 1 of 6, 2026. Targeting the Hercules DJControl Starlight and Mix.
 
 DeckTrainer is a Python project that turns a Hercules DJControl Starlight or Mix into a scored drill machine. Plug in the controller, pick a drill, get scored on timing, EQ work, and recovery. The output is a session log over time so a learner can see their hard-cut timing improve, their blend smoothness improve, their bass swap recovery improve. Six phases planned; Phase 1 (MIDI sniffing plus controller mapping verification) is shipped and verified against the controller hardware.
 
-The system is **not** a live-performance DJ app. That distinction is the most important architectural decision in the project, and stating it explicitly is the discipline. A live-performance DJ app needs a full audio engine, beat-grid sync, hot cues, loop control, sampler banks, FX chains, and a GUI you can operate while looking at a crowd. A coaching tool needs MIDI input, a small audio engine sufficient for two-deck playback with crossfading, a drill engine that can score the controller events against a beat grid, and a session log. The coaching tool is a strict subset of the performance app, and treating it as a subset rather than as a "smaller version of the same thing" is what keeps the scope tractable.
+The system is **not** a live-performance DJ app. That distinction is the most important architectural decision in the project. Stating it explicitly is the discipline. A live-performance DJ app needs a full audio engine, beat-grid sync, hot cues, loop control, sampler banks, FX chains, and a GUI you can operate while looking at a crowd. A coaching tool needs MIDI input, a small audio engine sufficient for two-deck playback with crossfading, a drill engine that can score the controller events against a beat grid, and a session log. The coaching tool is a strict subset of the performance app. Treating it as a subset rather than as a "smaller version of the same thing" is what keeps the scope tractable.
 
-This post is for engineers and architects evaluating how to scope a solo project with a clear quality bar (the user should improve at the skill being trained) but ambiguous "what does success look like" (which drills are the right drills, which scoring functions are the right functions, what makes a session feel like progress). The scoping discipline, the hardware-constraint surfacing, the phased build plan, and the drill-spec-as-data pattern are the parts most likely to transfer. The DJ training framing is the vehicle.
+This post is for engineers and architects evaluating how to scope a solo project. The quality bar is clear: the user should improve at the skill being trained. What success looks like stays ambiguous: which drills are the right drills, which scoring functions are the right functions, what makes a session feel like progress. The scoping discipline, the hardware-constraint surfacing, the phased build plan, and the drill-spec-as-data pattern are the parts most likely to transfer. The DJ training framing is the vehicle.
 
 ---
 
@@ -34,11 +34,11 @@ The professional path is "play gigs, get feedback from the crowd, iterate." That
 
 Three properties of this domain shape every architectural decision in DeckTrainer:
 
-1. **The scoring loop is the product.** A drill that does not score the user is not a drill; it is a demo. The architecture has to put deterministic scoring at the center of every interaction, not as a feature added later. Every drill in the system is defined as a tuple of (target event, observed event, scoring function); the engine is the pipeline that runs that tuple. ==Without scoring, there is no coaching. Without coaching, the project is a controller hello-world.==
+1. **The scoring loop is the product.** A drill that does not score the user is not a drill; it is a demo. The architecture has to put deterministic scoring at the center of every interaction, not as a feature added later. I define every drill in the system as a tuple of (target event, observed event, scoring function). The engine is the pipeline that runs that tuple. ==Without scoring, there is no coaching. Without coaching, the project is a controller hello-world.==
 
-2. **The hardware shapes the scope.** The Hercules DJControl Starlight and Mix share firmware. They both have *one* EQ knob per deck (Bass), plus a filter knob. There is no mid or high EQ. This is the single most consequential constraint in the system, because every "bass swap" or "EQ work" drill has to be expressed against the one EQ band the hardware provides. A drill designed against a 3-band Pioneer DJM that gets imported wholesale produces UI that does not map to the controller, and the user gets confused. The scope discipline is: design drills against the controller, not against a hypothetical perfect controller.
+2. **The hardware shapes the scope.** The Hercules DJControl Starlight and Mix share firmware. They both have *one* EQ knob per deck (Bass), plus a filter knob. There is no mid or high EQ. This is the single most consequential constraint in the system. Every "bass swap" or "EQ work" drill must map to the one EQ band the hardware provides. A drill designed against a 3-band Pioneer DJM that gets imported wholesale produces UI that does not map to the controller. The user gets confused. The scope discipline is: design drills against the controller, not against a hypothetical perfect controller.
 
-3. **Latency is the enemy.** A drill that scores "did you cut the deck on the 1" needs sub-50-millisecond MIDI-to-scoring latency, or the score is measuring the wrong thing. Bluetooth audio outputs add 100 to 300 ms of latency on most consumer setups and will silently destroy the scoring layer. The system explicitly requires wired audio output for the same reason a piano-coaching app requires the device's built-in audio: introducing latency in the feedback path invalidates the score.
+3. **Latency is the enemy.** A drill that scores "did you cut the deck on the 1" needs sub-50-millisecond MIDI-to-scoring latency, or the score is measuring the wrong thing. Bluetooth audio outputs add 100 to 300 ms of latency on most consumer setups and will silently destroy the scoring layer. The system explicitly requires wired audio output for the same reason a piano-coaching app requires the device's built-in audio. Introducing latency in the feedback path invalidates the score.
 
 DeckTrainer is shaped by these three constraints in order.
 
@@ -111,7 +111,7 @@ DeckTrainer ships in 6 phases, each independently demoable:
 
 Phases are designed so each one ships an independently usable product. ==Phase 1 alone is useful: it gives any DJ a verified MIDI-event display for their Hercules controller, which is non-trivial to build on Windows. Phase 4 is the first phase where DeckTrainer becomes the product it intends to be: a scored drill machine.==
 
-The phasing matters because solo projects fail when the "all features for v1" temptation produces a six-month build with no shippable interim. Each phase has its own commit history, its own test coverage, its own demoable artifact. If the project pauses after Phase 4, the user gets a one-drill scored coaching tool, which is still better than what they had.
+The phasing matters because solo projects fail when the "all features for v1" temptation produces a six-month build with no shippable interim. Each phase has its own commit history, its own test coverage, its own demoable artifact. If the project pauses after Phase 4, the user gets a one-drill scored coaching tool. That is still better than what they had.
 
 ---
 
@@ -136,7 +136,7 @@ def hard_cut(deck_a, deck_b, ctrl):
 
 Three architectural commitments are baked into this shape:
 
-**Drills are data, not code (mostly).** A drill spec is a JSON file plus a small Python function. New drills can be added by the user without touching the engine code, as long as they conform to the spec schema.
+**Drills are data, not code (mostly).** A drill spec is a JSON file plus a small Python function. The user can add new drills without touching the engine code, as long as they conform to the spec schema.
 
 **Scoring functions are pure.** The `score()` function takes the observed metrics and returns a number. It does not write to disk, it does not mutate state, it does not query the controller. This makes scoring testable in isolation and reproducible across sessions.
 
@@ -164,9 +164,9 @@ The CLAUDE.md file in the project repo lists what is explicitly out of scope. It
 
 Three things, in priority order, even at Phase 1.
 
-1. **Start with the mapping file before any audio code.** I did this, and it is the highest-leverage early decision in the project. Every minute spent verifying the mapping against the controller hardware pays back tenfold downstream because every drill, every scoring function, every test fixture is grounded in known-good MIDI bytes. If I were doing it again I would spend even more time on the mapping in Phase 1.
+1. **Start with the mapping file before any audio code.** I did this, and it is the highest-leverage early decision in the project. Every minute spent verifying the mapping against the controller hardware pays back tenfold downstream. Every drill, every scoring function, every test fixture is grounded in known-good MIDI bytes. If I were doing it again I would spend even more time on the mapping in Phase 1.
 
-2. **Treat drill specs as a first-class artifact.** The drill spec format is currently a sketch. It should be a versioned schema with explicit validation. Future contributors (mostly future me) will write drills against it; the schema is the contract that makes those drills durable.
+2. **Treat drill specs as a first-class artifact.** The drill spec format is currently a sketch. It should be a versioned schema with explicit validation. Future contributors (mostly future me) will write drills against it. The schema is the contract that makes those drills durable.
 
 3. **Resist the GUI temptation longer than feels natural.** The Stretch phase mentions GUI. The CLI is the right interface for the first five phases. A GUI is a vector for scope creep and a sink for engineering time that does not produce drill quality.
 

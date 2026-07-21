@@ -40,9 +40,9 @@ This is the same architectural pattern Atlas uses for source registry: separate 
 
 Two failure modes show up consistently.
 
-**Mode one: the Obsidian vault drifts from the live repo.** If I edit a roadmap doc in Obsidian on my laptop and the repo is also being modified by Claude Code or by a git pull, the two views can disagree. Obsidian does not refresh automatically when the underlying file changes externally; you have to close and reopen the file or hit the reload command. I have lost a few paragraphs of planning to this. The discipline is: do not edit the same file in Obsidian and Claude Code simultaneously, and always git pull before opening a roadmap doc.
+**Mode one: the Obsidian vault drifts from the live repo.** Say I edit a roadmap doc in Obsidian on my laptop. Meanwhile Claude Code or a git pull modifies the repo. The two views can now disagree. Obsidian does not refresh automatically when the underlying file changes externally. You have to close and reopen the file or hit the reload command. I have lost a few paragraphs of planning to this. The discipline is: do not edit the same file in Obsidian and Claude Code simultaneously, and always git pull before opening a roadmap doc.
 
-**Mode two: Obsidian's links and tags do not translate to Claude Code's mental model.** Obsidian is great at backlinks (page A links to page B; the graph view shows the relationship). Claude Code reads files in sequence based on what is in context; it does not automatically follow Obsidian's `[[backlink]]` syntax. Linked planning in Obsidian becomes invisible to Claude Code unless I explicitly tell the model "also read X, which is linked from Y."
+**Mode two: Obsidian's links and tags do not translate to Claude Code's mental model.** Obsidian is great at backlinks (page A links to page B; the graph view shows the relationship). Claude Code reads files in sequence based on what is in context. It does not automatically follow Obsidian's `[[backlink]]` syntax. Linked planning in Obsidian becomes invisible to Claude Code unless I explicitly tell the model "also read X, which is linked from Y."
 
 Both modes are tractable. Both are why a more rigorous workflow would use a single source of truth with a thin viewing layer per tool, instead of two tools sharing files directly.
 
@@ -80,7 +80,7 @@ The workflow is solo-shaped. Scaling it to a team would require three additions:
 
 **A decision-log enforcement step.** Solo, I can rely on personal discipline to write every architectural decision into the log. On a team, the discipline has to be in the workflow: every PR that lands an architectural change requires a decision-log entry, enforced by a pre-merge check. This is the same pattern as voice validation in Atlas: enforce the discipline at the boundary, not at the call site.
 
-The team version costs an Obsidian Sync subscription per person ($4-8/month each), a couple of hours of setup, and a few weeks of teaching the discipline to people who have not done ADR-style decision logs before.
+The team version has three costs. An Obsidian Sync subscription per person ($4-8/month each). A couple of hours of setup. And a few weeks of teaching the discipline to people who have not done ADR-style decision logs before.
 
 ## What an AI architect would change
 
@@ -88,15 +88,15 @@ The honest answer is that the solo workflow is already at its rough optimum for 
 
 **Auto-context loading.** Right now I manually `@docs/decision-log.md` and `@docs/roadmap.md` at the start of every Claude Code session. A small hook that reads the CLAUDE.md at session start and pre-loads the named context files would save 30 seconds per session. Over 200 sessions a year, that is real time.
 
-**Bidirectional sync between the decision log and the commit log.** Every commit that introduces an architectural change should append a stub entry to the decision log. The model can write the rationale before the commit; the commit message references the decision log entry. This makes the decision log self-maintaining as code changes happen.
+**Bidirectional sync between the decision log and the commit log.** Every commit that introduces an architectural change should append a stub entry to the decision log. The model can write the rationale before the commit. The commit message references the decision log entry. This makes the decision log self-maintaining as code changes happen.
 
-**A typed schema for roadmap status.** Currently the roadmap is freeform markdown. A YAML frontmatter block on each roadmap file (`current_phase: 3`, `next_milestone: 'TabPFN integration'`, `blocked_on: 'data ingestion'`) would let Claude Code parse the status programmatically and offer status-aware suggestions ("you're on phase 3, this looks like phase 4 work").
+**A typed schema for roadmap status.** Currently the roadmap is freeform markdown. A YAML frontmatter block on each roadmap file (`current_phase: 3`, `next_milestone: 'TabPFN integration'`, `blocked_on: 'data ingestion'`) would let Claude Code parse the status programmatically. It could then offer status-aware suggestions ("you're on phase 3, this looks like phase 4 work").
 
 None of these are heavy lifts. None are critical at solo scale.
 
 ## What would not change
 
-The two-surface, one-disk pattern is the right shape for solo AI-assisted work. I have tried single-tool setups (everything in Claude Code, no Obsidian) and they fail because the model is bad at the long-form reflective writing that the human needs to do to plan well. I have tried single-source planning tools (everything in Notion, sync to repo) and they fail because the sync is always behind the actual repo state.
+The two-surface, one-disk pattern is the right shape for solo AI-assisted work. I have tried single-tool setups, everything in Claude Code, no Obsidian. They fail because the model is bad at the long-form reflective writing the human needs to do to plan well. I have tried single-source planning tools, everything in Notion synced to the repo. They fail because the sync is always behind the actual repo state.
 
 The model writes code. I write plans. We meet at the markdown.
 
