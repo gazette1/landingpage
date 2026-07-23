@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inside my agentic workflow: spec, fan-out, verify / russh.work</title>
+  <meta name="description" content="How I actually ship with agents. Two shapes, a sequential contract pipeline and a parallel fan-out, both gated by evals. The spec comes before the prompt, the merge happens in plain code, and nothing ships unless the eval gate is green. A workflow map and the three systems it came from." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">METHOD</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">AGENTIC WORKFLOW</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.07.23</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">7 MIN / 1,350 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Inside my agentic workflow: spec, fan-out, verify</h1>
+
+      <p class="post-summary">How I actually ship with agents. Two shapes, a sequential contract pipeline and a parallel fan-out, both gated by evals. The spec comes before the prompt, the merge happens in plain code, and nothing ships unless the gate is green.</p>
+
+      <div class="post-tags">CLAUDE CODE / MULTI-AGENT / SPEC-DRIVEN / EVALS / CONTEXT ENGINEERING / GUARDRAILS</div>
+    </header>
+
+    <div class="post-body">
+
+<p class="body">By Russ. Written 2026.07, from systems I run.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What this is</h2>
+
+<p class="body">Not a tools list. This is the shape of how I get real work out of agents without shipping their mistakes. It is the same shape whether I am building a research engine, a resume system, or a document pipeline: write a contract, fan the work out, merge in plain code, and let an eval gate decide what ships.</p>
+
+<p class="body">Two concrete shapes recur. A <strong>sequential contract pipeline</strong>, where each pass hands a validated object to the next, and a <strong>parallel fan-out</strong>, where independent agents work at once and their outputs get reconciled at the end. I use both, often in the same project. The rest of this post is the parts that keep either one honest, drawn from three systems I have written up before: <a href="inside-fit-judge.html">the fit judge</a>, an LLM-as-judge with a regression suite; ODI Bot, a 19-pass multi-provider orchestration; and <a href="inside-trialedge.html">TrialEdge</a>, a production ML pipeline that is still running.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The shape</h2>
+
+<figure class="wf-figure" aria-labelledby="wf-cap">
+<svg viewBox="0 0 640 566" role="img" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+  <defs>
+    <marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0,0 L8,4.5 L0,9" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    </marker>
+  </defs>
+  <g font-family="'JetBrains Mono',monospace" fill="currentColor">
+    <!-- SPEC -->
+    <rect x="224" y="12" width="240" height="44" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <text x="344" y="34" text-anchor="middle" font-size="14" font-weight="500" letter-spacing="2">SPEC</text>
+    <text x="344" y="48" text-anchor="middle" font-size="9" fill="#8A8A8A" letter-spacing="0.4">the contract, versioned</text>
+    <line x1="344" y1="56" x2="344" y2="86" stroke="currentColor" stroke-width="1.2" marker-end="url(#ah)"/>
+
+    <!-- DECOMPOSE -->
+    <rect x="194" y="88" width="300" height="44" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <text x="344" y="110" text-anchor="middle" font-size="13" font-weight="500" letter-spacing="1.5">DECOMPOSE INTO SCOPED UNITS</text>
+    <text x="344" y="125" text-anchor="middle" font-size="9" fill="#8A8A8A" letter-spacing="0.4">each unit: a narrow spec + only its tools</text>
+
+    <!-- fan-out lines -->
+    <line x1="344" y1="132" x2="119" y2="188" stroke="#8A8A8A" stroke-width="1"/>
+    <line x1="344" y1="132" x2="269" y2="188" stroke="#8A8A8A" stroke-width="1"/>
+    <line x1="344" y1="132" x2="419" y2="188" stroke="#8A8A8A" stroke-width="1"/>
+    <line x1="344" y1="132" x2="569" y2="188" stroke="#8A8A8A" stroke-width="1" marker-end="url(#ah)"/>
+
+    <!-- parallel agents -->
+    <rect x="56"  y="188" width="126" height="58" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <rect x="206" y="188" width="126" height="58" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <rect x="356" y="188" width="126" height="58" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <rect x="506" y="188" width="126" height="58" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <text x="119" y="213" text-anchor="middle" font-size="11" font-weight="500" letter-spacing="1">AGENT</text>
+    <text x="269" y="213" text-anchor="middle" font-size="11" font-weight="500" letter-spacing="1">AGENT</text>
+    <text x="419" y="213" text-anchor="middle" font-size="11" font-weight="500" letter-spacing="1">AGENT</text>
+    <text x="569" y="213" text-anchor="middle" font-size="11" font-weight="500" letter-spacing="1">AGENT</text>
+    <text x="119" y="231" text-anchor="middle" font-size="10" fill="#8A8A8A" letter-spacing="1">01</text>
+    <text x="269" y="231" text-anchor="middle" font-size="10" fill="#8A8A8A" letter-spacing="1">02</text>
+    <text x="419" y="231" text-anchor="middle" font-size="10" fill="#8A8A8A" letter-spacing="1">03</text>
+    <text x="569" y="231" text-anchor="middle" font-size="10" fill="#8A8A8A" letter-spacing="1">04</text>
+
+    <!-- converge lines -->
+    <line x1="119" y1="246" x2="344" y2="308" stroke="#8A8A8A" stroke-width="1"/>
+    <line x1="269" y1="246" x2="344" y2="308" stroke="#8A8A8A" stroke-width="1"/>
+    <line x1="419" y1="246" x2="344" y2="308" stroke="#8A8A8A" stroke-width="1"/>
+    <line x1="569" y1="246" x2="344" y2="308" stroke="#8A8A8A" stroke-width="1" marker-end="url(#ah)"/>
+
+    <!-- MERGE -->
+    <rect x="224" y="308" width="240" height="44" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <text x="344" y="330" text-anchor="middle" font-size="13" font-weight="500" letter-spacing="1.5">MERGE + DEDUPE</text>
+    <text x="344" y="344" text-anchor="middle" font-size="9" fill="#8A8A8A" letter-spacing="0.4">deterministic code, not an agent</text>
+    <line x1="344" y1="352" x2="344" y2="384" stroke="currentColor" stroke-width="1.2" marker-end="url(#ah)"/>
+
+    <!-- VERIFY / eval gate (double stroke) -->
+    <rect x="214" y="388" width="260" height="52" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <rect x="219" y="393" width="250" height="42" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <text x="344" y="414" text-anchor="middle" font-size="14" font-weight="500" letter-spacing="2">VERIFY: EVAL GATE</text>
+    <text x="344" y="429" text-anchor="middle" font-size="9" fill="#8A8A8A" letter-spacing="0.4">golden set + self-consistency, CI-gated</text>
+
+    <!-- pass -->
+    <line x1="344" y1="440" x2="344" y2="502" stroke="currentColor" stroke-width="1.2" marker-end="url(#ah)"/>
+    <text x="356" y="474" font-size="10" fill="#8A8A8A" letter-spacing="1">pass</text>
+
+    <!-- SHIP -->
+    <rect x="264" y="504" width="160" height="44" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <text x="344" y="531" text-anchor="middle" font-size="14" font-weight="500" letter-spacing="2">SHIP</text>
+
+    <!-- fail loop back, routed in the left gutter clear of every box -->
+    <path d="M214,414 L24,414 L24,110 L194,110" fill="none" stroke="#8A8A8A" stroke-width="1" stroke-dasharray="3 4" marker-end="url(#ah)"/>
+    <text x="40" y="288" text-anchor="middle" font-size="10" fill="#8A8A8A" letter-spacing="1" transform="rotate(-90 40 288)">fail &#8594; regenerate</text>
+  </g>
+</svg>
+<figcaption id="wf-cap" class="wf-cap">The loop I run. The four agents run in parallel, scoped and blind to each other. The gate, not the model, decides what ships; a fail regenerates against the same spec rather than shipping a near miss.</figcaption>
+</figure>
+
+<p class="body">Read it top to bottom. A spec becomes scoped units, the units run as agents, their outputs converge, a deterministic merge reconciles them, and an eval gate is the only thing that lets work ship. The dashed line is the part people skip: a failed gate loops back and regenerates, it does not wave the work through with a note to fix later.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Spec first, because agents drift</h2>
+
+<p class="body">The single change that made agents reliable for me was writing the contract before the prompt. In ODI Bot every one of the 19 passes has an explicit input and output contract: this pass receives this shape, returns this shape, and nothing downstream runs until the shape validates. Generation is JSON-mode with a fallback parser and truncation detection, so a malformed response is caught at the boundary instead of poisoning the next pass. <mark class="callout">The prompt is the disposable part. The contract is the thing you version, test, and defend.</mark></p>
+
+<p class="body">Spec-driven is not ceremony. It is what lets a pipeline be long without being fragile. A 19-step chain where any step can silently return prose instead of the object the next step expects is a coin flip you run 19 times. Contracts turn that into a chain that either produces a valid object or stops loudly at the exact pass that broke.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Fan-out: scoped, blind, parallel</h2>
+
+<p class="body">When the work decomposes into independent pieces, I fan it out. Each agent gets a narrow scope and only the tools it needs, and critically, the agents are blind to each other. On a recent research job I ran ten agents at once, each scoped to a different slice of the source space, each required to verify its own findings against a primary source before returning anything. They did not see each other's work.</p>
+
+<p class="body">The blindness is deliberate. Agents that can see each other converge on the same answer, which means they also converge on the same blind spot. Independent agents fail independently, and independent failures are the ones a merge can catch. <mark class="callout">Diversity of failure is the entire point of running agents in parallel. Take it away and you have paid for redundancy without buying any coverage.</mark> Scope narrow, hand over only the necessary tools, and let them not talk.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The merge is where correctness is won or lost</h2>
+
+<p class="body">Four agents return four sets of results and now something has to reconcile them: dedupe overlaps, resolve conflicts, drop the ones that failed their own verification. I do this in plain deterministic code, every time. Keying, set logic, explicit conflict rules. It is boring and it is where the correctness actually lives.</p>
+
+<p class="body">The tempting mistake is to hand the merge to another agent because it is fiddly. That reintroduces exactly the nondeterminism the fan-out was supposed to contain, at the one point where every result funnels through a single decision. <mark class="callout">Use agents for the judgment that needs judgment, and plain code for the reconciliation that needs to be right the same way every time.</mark> A merge you cannot reproduce is not a merge, it is a fifth opinion.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The gate: evals, not vibes</h2>
+
+<p class="body">Nothing ships because it looked good in a demo. It ships because it passed a gate. The fit judge is the clearest version I have built: a rubric, a hand-labeled golden set, a regression suite that scores every case and fails the build on a miss. Building it taught me two things I now assume everywhere. The judge disagreed with my own labels twice and was right both times, so the golden set is not automatically ground truth. And a judge at temperature zero was not deterministic, so a single sample near a band boundary is a coin flip. The fix was self-consistency voting: sample an odd number of times, take the median per dimension, and the boundary cases stop flipping.</p>
+
+<p class="body">That gate is now a fixed cost I pay on every system worth trusting. <mark class="callout">An eval you trust blindly is worse than no eval, because it launders a guess into a number.</mark> The gate earns its keep on the cases your cheap checks get wrong, which is exactly the set you cannot see without it.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Reliability is a design feature, not a retry</h2>
+
+<p class="body">Reliability gets engineered in at the boundaries, not bolted on as a try-again. ODI Bot regenerates automatically on malformed output, tracks cost per run so a pipeline cannot quietly get expensive, and routes across Claude and OpenAI per pass rather than betting the whole chain on one model. It enforces citations at the claim level, so an unsupported sentence is a caught error, not a thing a reader discovers later. TrialEdge is calibrated and evaluated before deploy and monitored after, which is why it is still running rather than still being debugged.</p>
+
+<p class="body">None of that is glamorous and all of it is the difference between a thing that demos and a thing that runs. The demo proves the happy path exists. The guardrails are what you build for every other path, which is most of them.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Context engineering: the unglamorous 80 percent</h2>
+
+<p class="body">Most of the work that decides output quality is deciding what goes into the window. In ODI Bot the retrieval layer is Jina embeddings with reranking, so a pass sees the few passages that matter instead of everything that might. Tools are scoped so an agent is not handed capability it should not use. Context gets trimmed on the way in, not padded.</p>
+
+<p class="body">The model is rarely the bottleneck now. The bottleneck is whether the right facts, in the right shape, reached the agent at the moment it had to decide. <mark class="callout">Context engineering is unglamorous because it is plumbing, and it is the highest-leverage plumbing there is.</mark> I spend more time on what the agent sees than on how I ask it.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What I would tell someone building this way</h2>
+
+<p class="body">Six things, blunter than the systems they came from. Write the contract before the prompt, and version the contract. Fan out blind, because independent failures are the catchable ones. Merge in plain code, because the reconciliation has to be right the same way every time. Gate on evals, and let the eval argue with your labels. Engineer reliability at the boundaries, not as a retry. And spend your time on the context window, because that is where the quality actually comes from.</p>
+
+<p class="body">The tools change every few months. This shape has not. It is how I ship work I am willing to put my name on, alone, without a team behind me to catch what the agents get wrong.</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="inside-trialedge.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Inside TrialEdge</span>
+        </a>
+        <a class="next" href="inside-fit-judge.html">
+          <span class="k">NEXT</span>
+          <span class="v">Inside the fit judge</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / AI SOLUTIONS ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <style>
+    .wf-figure{margin:var(--space-7) 0;max-width:640px}
+    .wf-figure svg{color:var(--paper)}
+    .wf-cap{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--mid);margin-top:var(--space-4);line-height:1.5}
+  </style>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+  <script src="../scripts/menu.js"></script>
+</body>
+</html>
