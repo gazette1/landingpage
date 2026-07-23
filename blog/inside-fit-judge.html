@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inside the fit judge: an LLM-as-judge that corrected my own labels / russh.work</title>
+  <meta name="description" content="An LLM-as-judge scores how well a resume fits a role, gated by a regression suite over a human-labeled golden set. It disagreed with my labels twice and was right both times, caught overqualification that keyword matching cannot, and was non-deterministic at temperature zero until self-consistency voting fixed it. A field guide to building an eval you can actually trust." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">METHOD</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">FIT JUDGE v1</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.07.23</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">9 MIN / 1,850 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Inside the fit judge: an LLM-as-judge that corrected my own labels</h1>
+
+      <p class="post-summary">An LLM-as-judge scores how well a resume fits a role, gated by a regression suite over a human-labeled golden set. It disagreed with my labels twice and was right both times, caught overqualification that keyword matching cannot, and was non-deterministic at temperature zero until self-consistency voting fixed it. A field guide to building an eval you can actually trust.</p>
+
+      <div class="post-tags">EVAL / LLM-AS-JUDGE / RUBRIC / GOLDEN-SET / SELF-CONSISTENCY / GUARDRAILS</div>
+    </header>
+
+    <div class="post-body">
+
+<p class="body">By Russ. Built and validated 2026.07.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What this is</h2>
+
+<p class="body">A small system that scores how well a resume fits a specific job description, on a 0 to 100 fit score and a strong / fair / weak band. It exists to answer one question before an application goes out: is this the right resume for this role, and where is it weak against what they actually asked for.</p>
+
+<p class="body">The interesting part is not the scoring. It is the machinery that keeps the scoring honest: a rubric, a human-labeled golden set, two graders held to different bars, a regression suite that gates changes, and self-consistency voting to stabilize a judge that turned out not to be deterministic. This post is about that machinery, because it is the reusable part. The resume domain is a vehicle.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Why keyword matching is not enough</h2>
+
+<p class="body">The cheap version of this is an applicant-tracking-style keyword scorer: count how many of the job description's required terms appear in the resume, report a percentage, done. It is fast, free, and deterministic, and it is genuinely useful as a first pass. I kept it. But it is blind to the thing a recruiter actually does, which is judge fit.</p>
+
+<p class="body">The clearest example: overqualification. A strong senior resume dropped onto a junior data-entry role scores high on a keyword scorer, because it has all the skills and more. To a human it is a weak fit, because the person is aimed at the wrong level and will not be hired for it. <mark class="callout">Overqualification reads as strength on every surface signal, which is exactly why a keyword count cannot see it.</mark> You need something that reasons about the shape of the match, not just the overlap.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The rubric</h2>
+
+<p class="body">Five weighted dimensions, each scored 1 to 5 against written anchors: skills coverage (0.30), title and seniority alignment (0.20), quantified impact (0.20), domain relevance (0.15), and evidence of shipping and ownership (0.15). The weighted sum maps to a 0 to 100 score and a band.</p>
+
+<p class="body">The anchors matter more than the weights. Each score from 1 to 5 has an explicit written definition, so the grader is choosing between described states, not guessing on a bare number line. <mark class="callout">A 1-to-5 anchored scale beats a 1-to-10 open scale because "is this a 6 or a 7" is exactly where inter-rater agreement goes to die.</mark> Collapse that ambiguous middle and both a human and a model score more consistently. The rubric is the shared contract: the human labels against it, the graders score against it, and the regression suite is written against it, so all three speak the same five dimensions.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Two graders, held to different bars</h2>
+
+<p class="body">There are two graders behind one interface. A <strong>heuristic grader</strong> estimates each rubric dimension from signals it can compute deterministically: keyword coverage, title overlap, number density, shipping language. It needs no API key and runs instantly. And an <strong>LLM-as-judge</strong> that reads the rubric, the job description, and the resume, and returns per-dimension scores with reasoning.</p>
+
+<p class="body">The gates are grader-aware on purpose. The heuristic is a cheap proxy that cannot model overqualification, so it is held to "never wildly disagrees" (within one band of the human label) plus perfect stability. The LLM judge is held to exact band agreement, because judging the nuance is the entire reason it costs money. <mark class="callout">Holding a keyword proxy to the same bar as a reasoning judge would just be gaming the metric.</mark> Use the cheapest grader that answers the question, and hold each to the bar it can actually clear.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The regression suite, and three ways it embarrassed me</h2>
+
+<p class="body">The golden set is ten job-description-to-resume pairs I labeled by hand as strong, fair, or weak, including deliberate mismatches so the suite has to prove the judge scores bad fits low, not just that it rewards good ones. The regression runner scores every case, checks band agreement against my labels, checks consistency by running each case more than once, and fails the build if a gate is missed. Standard eval plumbing. Here is what it caught.</p>
+
+<h3 class="h3">One: the judge corrected my labels</h3>
+
+<p class="body">On the first validated run the judge disagreed with me on two cases, and both times it was right. I had labeled a role that hard-requires vector databases and distributed systems at scale as a "fair" fit for a candidate who lacks both. The judge called it weak. It is weak. A role gated on requirements you do not meet is not a fair fit with a gap, it is the wrong tool. I changed my label. <mark class="callout">Ground truth is not automatically whatever the human wrote down. The eval improved my judgment, not the other way around.</mark> This is the uncomfortable, useful part of eval work that people skip: sometimes the disagreement means your labels were lazy.</p>
+
+<h3 class="h3">Two: it caught the thing keyword matching cannot</h3>
+
+<p class="body">The overqualified-candidate case, an AI product resume dropped on an entry-level data-entry role, scored high on the keyword heuristic and correctly weak from the LLM judge. That single case is the entire argument for paying for the judge layer at all. If the judge only reproduced the keyword score, it would be an expensive way to count words. It earns its cost precisely on the cases the cheap grader gets wrong.</p>
+
+<h3 class="h3">Three: temperature zero was not deterministic</h3>
+
+<p class="body">I assumed temperature zero meant the same input returns the same output, ran each case once, and trusted the number. Then a case scored 66 on one run and 53 on the next, on identical input. That is a two-band swing on a supposedly deterministic call. Small instruct models are not fully deterministic even at temperature zero, and a single sample of a judge is a coin flip anywhere near a band boundary. <mark class="callout">An eval you trust blindly is worse than no eval, because it launders a guess into a number.</mark></p>
+
+<hr class="rule">
+
+<h2 class="h2">Self-consistency voting</h2>
+
+<p class="body">The fix for a non-deterministic judge is not to pretend it is deterministic. It is to sample it an odd number of times and take the median of each dimension. Three samples, median per dimension, and the boundary cases stopped flipping. Consistency went to 100 percent and stayed there across runs. Odd sample counts avoid median ties. This is the standard production move for LLM-as-judge, and I only reached for it because the regression suite made the instability impossible to ignore.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The line I would not cross</h2>
+
+<p class="body">This judge feeds a tailoring step that adjusts a resume per application. The hard rule is that tailoring never invents. It does two things only: it sets the headline to the exact role title when the underlying experience genuinely matches, and it surfaces job-description keywords into the skills section, but only the ones that already map to real experience. The system splits missing keywords into "true, surface these" and "cannot claim, flag for a human," and it will not auto-add anything in the second bucket. <mark class="callout">The value of an eval is that it tells you where you are weak so you can fix it honestly, not that it papers the weakness over.</mark> A judge that helped you lie would fail the moment a human read what the machine wrote.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Model choice: do not use a reasoning model as a judge</h2>
+
+<p class="body">My first instinct was to reach for a large reasoning model as the judge. It was the wrong instinct, and worth saying why. Reasoning models forced temperature to one, which is poison for a reproducible eval. They were slow, because they think before answering. And they burned the token budget on hidden chain-of-thought and returned empty output when the budget ran out. A judge does not need deep deliberation, it needs a stable score against a rubric. <mark class="callout">A small fast instruct model at temperature zero, four seconds a call, reliable JSON, is the right judge. Save the reasoning model for the task, not the grading of it.</mark></p>
+
+<hr class="rule">
+
+<h2 class="h2">What I would change</h2>
+
+<p class="body">Three things. The golden set is ten cases, which is enough to catch gross miscalibration but thin for the boundaries; the honest next step is to grow it from real disagreements as they surface, the way any golden set should grow. The judge is measurably more conservative than I am on genuinely adjacent roles, a one-band offset I would rather correct with a calibration pass than by moving thresholds until it agrees with me. And the tailoring's title extraction is naive on messy job posts with no clean title line, so it falls back to the untailored resume rather than guessing, which is the safe failure but not the useful one.</p>
+
+<p class="body">The reusable takeaways are smaller and blunter than the system. Anchor your rubric so the middle of the scale is not a coin flip. Hold cheap and expensive graders to different bars. Let the eval argue with your labels and be willing to lose. Do not trust a single sample of a judge. And pick the model for the job it is doing, which for judging is small, fast, and boring, not large and clever.</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="inside-adoption-chain.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Inside Adoption Chain</span>
+        </a>
+        <a class="next" href="inside-trialedge.html">
+          <span class="k">NEXT</span>
+          <span class="v">Inside TrialEdge</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / AI SOLUTIONS ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+  <script src="../scripts/menu.js"></script>
+</body>
+</html>
