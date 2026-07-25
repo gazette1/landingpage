@@ -35,8 +35,11 @@
   #filelist li { color:var(--mid); font-size:12px; }
   button { background:var(--paper); color:var(--void); border:0; font-family:var(--font-mono); font-weight:500; letter-spacing:.06em; padding:.7rem 1.6rem; cursor:pointer; font-size:13px; text-transform:uppercase; }
   button:disabled { opacity:.35; cursor:default; }
+  button.ghost { background:transparent; color:var(--paper); border:1px solid var(--line); }
+  button.ghost:hover { border-color:var(--paper); }
   .badge { display:inline-block; border:1px solid var(--paper); padding:.2rem .9rem; font-weight:500; letter-spacing:.1em; }
   .badge.KILL { background:var(--paper); color:var(--void); }
+  .badge.tag { border-color:var(--line); color:var(--mid); font-size:11px; padding:.15rem .6rem; letter-spacing:.08em; }
   table { border-collapse:collapse; width:100%; margin:.6rem 0 1.2rem; }
   th,td { text-align:left; padding:.35rem .6rem; border-bottom:1px solid var(--line); font-size:13px; }
   th { color:var(--mid); font-weight:400; font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
@@ -45,9 +48,12 @@
   .status-block .cur { display:inline-block; width:8px; height:14px; background:var(--paper); animation:blink 1.1s steps(1) infinite; vertical-align:middle; margin-right:6px; }
   @keyframes blink { 50% { opacity:0; } }
   .note { font-size:12px; color:var(--mid); margin:.6rem 0 0; }
-  #result { display:none; margin-top:2.2rem; border-top:1px solid var(--line); padding-top:1.4rem; }
   .steps li { font-size:12px; color:var(--mid); } .steps .ok::before { content:"OK "; color:var(--paper); } .steps .fail::before { content:"FAIL "; color:var(--paper); background:var(--paper); color:var(--void); padding:0 3px; margin-right:4px; }
   .foot { margin-top:5rem; border-top:1px solid var(--line); padding-top:1rem; font-size:12px; color:var(--mid); }
+  .live-toggle { margin-top:3.2rem; padding-top:1.6rem; border-top:1px solid var(--line); }
+  .live-panel { display:none; margin-top:1.2rem; }
+  .live-panel.open { display:block; }
+  .live-off { margin-top:3.2rem; padding-top:1.6rem; border-top:1px solid var(--line); font-size:13px; color:var(--mid); }
 </style>
 </head>
 <body>
@@ -64,43 +70,17 @@
     Built and operated by <a class="inv" href="/">Russell Harris</a> under Mosaic Capital Solutions.
   </div>
 
-  <h2><span class="num">01</span>Deal</h2>
-  <div class="grid">
-    <div><label>Deal name</label><input type="text" id="name" placeholder="Oceanfront Hotel Bridge"></div>
-    <div><label>Asset type</label>
-      <select id="type">
-        <option value="hotel">HOTEL</option>
-        <option value="industrial">INDUSTRIAL</option>
-        <option value="retail">RETAIL</option>
-        <option value="multifamily">MULTIFAMILY</option>
-        <option value="lihtc">LIHTC (AFFORDABLE)</option>
-        <option value="other" selected>OTHER</option>
-      </select>
-    </div>
-    <div><label>Location</label><input type="text" id="location" placeholder="City, ST"></div>
-  </div>
-
-  <h2><span class="num">02</span>Documents</h2>
-  <div id="drop">DROP FILES OR CLICK — PDF / XLSX / CSV / MD / TXT / PNG / JPG<br><span style="font-size:11px">image-based documents get an OCR pass</span></div>
-  <input type="file" id="picker" multiple style="display:none">
-  <ul id="filelist"></ul>
-
-  <h2><span class="num">03</span>Run</h2>
-  <div class="grid">
-    <div><label>Backend URL (blank = sample mode)</label><input type="text" id="backend" placeholder="https://mosaic-intake.onrender.com"></div>
-    <div><label>Passcode</label><input type="text" id="passcode" placeholder="required on hosted backend"></div>
-  </div>
-  <button id="go">Run the pipeline</button>
-  <div class="note" id="status">Sample mode replays a real run (anonymized) so the output shape is visible without a live backend.</div>
-
+  <h2><span class="num">01</span>Sample run <span class="badge tag">anonymized, real output</span></h2>
   <div id="result">
-    <h2 style="margin-top:0"><span class="num">04</span>Result <span id="verdict" class="badge"></span> <span id="risk" class="mid" style="font-size:12px"></span></h2>
+    <div style="margin-bottom:.6rem"><span id="verdict" class="badge"></span> <span id="risk" class="mid" style="font-size:12px"></span></div>
     <div class="note" id="cost"></div>
     <table id="metrics"></table>
     <table id="fields"></table>
     <ul class="steps" id="steps"></ul>
-    <a id="wb" style="display:none"><button>Download workbook</button></a>
+    <a id="wb" style="display:none"></a>
   </div>
+
+  <div id="liveToggleWrap"></div>
 
   <div class="foot">
     Deterministic core: parsing, debt math, DSCR, sensitivity, workbook formulas are code, not model output.
@@ -112,24 +92,14 @@
 
 <script>
   const $ = id => document.getElementById(id);
-  let files = [];
-  const backend = $('backend'), pass = $('passcode');
-  backend.value = localStorage.getItem('mosaicBackend') || '';
-  pass.value = localStorage.getItem('mosaicDemoKey') || '';
-  backend.addEventListener('change', () => { localStorage.setItem('mosaicBackend', backend.value.trim()); syncMode(); });
-  pass.addEventListener('change', () => localStorage.setItem('mosaicDemoKey', pass.value));
-  function syncMode() { $('mode').textContent = backend.value.trim() ? 'LIVE' : 'SAMPLE'; }
-  syncMode();
 
-  $('drop').addEventListener('click', () => $('picker').click());
-  $('picker').addEventListener('change', () => addFiles($('picker').files));
-  $('drop').addEventListener('dragover', e => { e.preventDefault(); $('drop').classList.add('hover'); });
-  $('drop').addEventListener('dragleave', () => $('drop').classList.remove('hover'));
-  $('drop').addEventListener('drop', e => { e.preventDefault(); $('drop').classList.remove('hover'); addFiles(e.dataTransfer.files); });
-  function addFiles(list) { files = files.concat([...list]).slice(0, 8);
-    $('filelist').innerHTML = files.map(f => `<li>${f.name} — ${(f.size/1024).toFixed(0)} KB</li>`).join(''); }
-
-  const b64 = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = rej; r.readAsDataURL(f); });
+  // Set this once the backend is deployed (see docs/DEPLOY-RUSSH-WORKS.md),
+  // e.g. 'https://mosaic-intake.onrender.com'. Empty = live mode stays hidden
+  // and every visitor only ever sees the sample run.
+  const BACKEND_URL = '';
+  // Dev-only override for testing before the constant above is set:
+  // https://russh.work/deal-intake/?backend=http://localhost:8787
+  const backendUrl = (new URLSearchParams(location.search).get('backend') || BACKEND_URL).trim();
 
   const SAMPLE = {
     verdict: 'CHASE', riskScore: 4, confidence: 0.38,
@@ -154,11 +124,11 @@
     estLlmCostUsd: 0,
   };
 
-  function render(j, live) {
+  function renderResult(j, live, passcode) {
     $('verdict').textContent = j.verdict || 'n/a';
     $('verdict').className = 'badge ' + (j.verdict || '');
     $('risk').textContent = `risk ${j.riskScore}/5 · confidence ${Math.round((j.confidence||0)*100)}%` + (j.killFlags?.length ? ` · flags: ${j.killFlags.join(', ')}` : '');
-    $('cost').textContent = (live ? '' : 'SAMPLE REPLAY of a real hotel-bridge run (anonymized). ') + (j.estLlmCostUsd ? `Model spend: $${j.estLlmCostUsd}` : 'Model spend: $0 — this run was fully deterministic.');
+    $('cost').textContent = (live ? '' : 'SAMPLE — a real hotel-bridge run, anonymized. ') + (j.estLlmCostUsd ? `Model spend: $${j.estLlmCostUsd}` : 'Model spend: $0 — this run was fully deterministic.');
     $('metrics').innerHTML = '<tr><th>Metric</th><th>Value</th><th>Conf</th></tr>' + Object.values(j.metrics).map(m => {
       let v = m.value; if (typeof v === 'number') v = m.unit === '%' ? v.toFixed(2)+'%' : m.unit === 'x' ? v.toFixed(2)+'x' : '$'+Math.round(v).toLocaleString();
       return `<tr><td>${m.name}</td><td>${v}</td><td class="mid">${(m.confidence??0).toFixed(2)}</td></tr>`; }).join('');
@@ -166,29 +136,87 @@
       `<tr><td>${f.field}</td><td>${String(f.value).substring(0,60)}</td><td class="mid">${f.confidence.toFixed(2)}</td></tr>`).join('');
     $('steps').innerHTML = j.steps.map(s => `<li class="${s.ok?'ok':'fail'}">${s.step}${s.detail?' — '+s.detail:''}</li>`).join('');
     if (live && j.workbookUrl) {
-      const key = pass.value ? '?key=' + encodeURIComponent(pass.value) : '';
-      $('wb').href = backend.value.trim().replace(/\/$/, '') + j.workbookUrl + key;
+      const key = passcode ? '?key=' + encodeURIComponent(passcode) : '';
+      $('wb').href = backendUrl.replace(/\/$/, '') + j.workbookUrl + key;
+      $('wb').innerHTML = '<button>Download workbook</button>';
       $('wb').style.display = 'inline-block';
     } else { $('wb').style.display = 'none'; }
-    $('result').style.display = 'block';
   }
 
-  $('go').addEventListener('click', async () => {
-    const url = backend.value.trim();
-    if (!url) { render(SAMPLE, false); $('status').textContent = 'Sample replay shown. Point Backend URL at a live deployment to run your own documents.'; return; }
-    if (!files.length) { $('status').textContent = 'Drop at least one document for a live run.'; return; }
-    $('go').disabled = true; $('status').textContent = 'Running pipeline on the backend...';
-    try {
-      const payload = { name: $('name').value || 'Untitled Deal', type: $('type').value, location: $('location').value, narrative: false,
-        files: await Promise.all(files.map(async f => ({ name: f.name, b64: await b64(f) }))) };
-      const res = await fetch(url.replace(/\/$/, '') + '/api/deal', { method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-demo-key': pass.value }, body: JSON.stringify(payload) });
-      const j = await res.json();
-      if (j.error) throw new Error(j.error);
-      $('status').textContent = ''; render(j, true);
-    } catch (e) { $('status').textContent = 'Backend error: ' + e.message; }
-    $('go').disabled = false;
-  });
+  // Sample renders immediately, no click required.
+  renderResult(SAMPLE, false);
+
+  // Live section: only exists in the DOM when a backend is configured.
+  if (backendUrl) {
+    $('mode').textContent = 'LIVE AVAILABLE';
+    const wrap = $('liveToggleWrap');
+    wrap.innerHTML = `
+      <div class="live-toggle">
+        <button class="ghost" id="liveBtn">Run your own documents live &rarr;</button>
+      </div>
+      <div class="live-panel" id="livePanel">
+        <h2 style="margin-top:0"><span class="num">02</span>Deal</h2>
+        <div class="grid">
+          <div><label>Deal name</label><input type="text" id="name" placeholder="Oceanfront Hotel Bridge"></div>
+          <div><label>Asset type</label>
+            <select id="type">
+              <option value="hotel">HOTEL</option>
+              <option value="industrial">INDUSTRIAL</option>
+              <option value="retail">RETAIL</option>
+              <option value="multifamily">MULTIFAMILY</option>
+              <option value="lihtc">LIHTC (AFFORDABLE)</option>
+              <option value="other" selected>OTHER</option>
+            </select>
+          </div>
+          <div><label>Location</label><input type="text" id="location" placeholder="City, ST"></div>
+        </div>
+        <h2><span class="num">03</span>Documents</h2>
+        <div id="drop">DROP FILES OR CLICK — PDF / XLSX / CSV / MD / TXT / PNG / JPG<br><span style="font-size:11px">image-based documents get an OCR pass</span></div>
+        <input type="file" id="picker" multiple style="display:none">
+        <ul id="filelist"></ul>
+        <div class="grid" style="margin-top:1rem">
+          <div><label>Passcode</label><input type="text" id="passcode" placeholder="ask Russ for one"></div>
+        </div>
+        <button id="go">Run the pipeline</button>
+        <div class="note" id="status">This runs your actual files through the live pipeline and spends real model tokens, so it's passcode-gated. Ask Russ for one if you want to try it live.</div>
+      </div>`;
+
+    $('liveBtn').addEventListener('click', () => $('livePanel').classList.toggle('open'));
+
+    let files = [];
+    const pass = $('passcode');
+    pass.value = localStorage.getItem('mosaicDemoKey') || '';
+    pass.addEventListener('change', () => localStorage.setItem('mosaicDemoKey', pass.value));
+
+    $('drop').addEventListener('click', () => $('picker').click());
+    $('picker').addEventListener('change', () => addFiles($('picker').files));
+    $('drop').addEventListener('dragover', e => { e.preventDefault(); $('drop').classList.add('hover'); });
+    $('drop').addEventListener('dragleave', () => $('drop').classList.remove('hover'));
+    $('drop').addEventListener('drop', e => { e.preventDefault(); $('drop').classList.remove('hover'); addFiles(e.dataTransfer.files); });
+    function addFiles(list) { files = files.concat([...list]).slice(0, 8);
+      $('filelist').innerHTML = files.map(f => `<li>${f.name} — ${(f.size/1024).toFixed(0)} KB</li>`).join(''); }
+
+    const b64 = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(',')[1]); r.onerror = rej; r.readAsDataURL(f); });
+
+    $('go').addEventListener('click', async () => {
+      if (!files.length) { $('status').textContent = 'Drop at least one document first.'; return; }
+      $('go').disabled = true; $('status').textContent = 'Running pipeline on the live backend...';
+      try {
+        const payload = { name: $('name').value || 'Untitled Deal', type: $('type').value, location: $('location').value, narrative: false,
+          files: await Promise.all(files.map(async f => ({ name: f.name, b64: await b64(f) }))) };
+        const res = await fetch(backendUrl.replace(/\/$/, '') + '/api/deal', { method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-demo-key': pass.value }, body: JSON.stringify(payload) });
+        const j = await res.json();
+        if (j.error) throw new Error(j.error);
+        $('status').textContent = 'Live result below (sample run above is unchanged).';
+        renderResult(j, true, pass.value);
+        $('result').scrollIntoView({ behavior: 'smooth' });
+      } catch (e) { $('status').textContent = 'Backend error: ' + e.message; }
+      $('go').disabled = false;
+    });
+  } else {
+    $('liveToggleWrap').innerHTML = '<div class="live-off">Live mode — run your own documents — is coming online. <a class="inv" href="mailto:harris.russell1@gmail.com">Email Russ</a> for a live walkthrough in the meantime.</div>';
+  }
 </script>
 </body>
 </html>
