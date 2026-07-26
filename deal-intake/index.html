@@ -70,7 +70,9 @@
     Built and operated by <a class="inv" href="/">Russell Harris</a> under Mosaic Capital Solutions.
   </div>
 
-  <h2><span class="num">01</span>Sample run <span class="badge tag">anonymized, real output</span></h2>
+  <div id="loomSlot"></div>
+
+  <h2><span class="num">01</span>Sample run <span class="badge tag">real deal, real output</span></h2>
   <div id="result">
     <div style="margin-bottom:.6rem"><span id="verdict" class="badge"></span> <span id="risk" class="mid" style="font-size:12px"></span></div>
     <div class="note" id="cost"></div>
@@ -97,6 +99,8 @@
   // e.g. 'https://mosaic-intake.onrender.com'. Empty = live mode stays hidden
   // and every visitor only ever sees the sample run.
   const BACKEND_URL = '';
+  // Set after the master Loom is recorded; shows a walkthrough link in the header.
+  const LOOM_URL = '';
   // Dev-only override for testing before the constant above is set:
   // https://russh.work/deal-intake/?backend=http://localhost:8787
   const backendUrl = (new URLSearchParams(location.search).get('backend') || BACKEND_URL).trim();
@@ -128,7 +132,7 @@
     $('verdict').textContent = j.verdict || 'n/a';
     $('verdict').className = 'badge ' + (j.verdict || '');
     $('risk').textContent = `risk ${j.riskScore}/5 · confidence ${Math.round((j.confidence||0)*100)}%` + (j.killFlags?.length ? ` · flags: ${j.killFlags.join(', ')}` : '');
-    $('cost').textContent = (live ? '' : 'SAMPLE — a real hotel-bridge run, anonymized. ') + (j.estLlmCostUsd ? `Model spend: $${j.estLlmCostUsd}` : 'Model spend: $0 — this run was fully deterministic.');
+    $('cost').textContent = (live ? '' : 'SAMPLE — output from a real hotel bridge deal. ') + (j.estLlmCostUsd ? `Model spend: $${j.estLlmCostUsd}` : 'Model spend: $0 — this run was fully deterministic.');
     $('metrics').innerHTML = '<tr><th>Metric</th><th>Value</th><th>Conf</th></tr>' + Object.values(j.metrics).map(m => {
       let v = m.value; if (typeof v === 'number') v = m.unit === '%' ? v.toFixed(2)+'%' : m.unit === 'x' ? v.toFixed(2)+'x' : '$'+Math.round(v).toLocaleString();
       return `<tr><td>${m.name}</td><td>${v}</td><td class="mid">${(m.confidence??0).toFixed(2)}</td></tr>`; }).join('');
@@ -145,6 +149,11 @@
 
   // Sample renders immediately, no click required.
   renderResult(SAMPLE, false);
+
+  if (LOOM_URL) {
+    $('loomSlot').innerHTML = `<div class="live-toggle" style="margin-top:0;border-top:0;padding-top:0">
+      <a class="inv" href="${LOOM_URL}" target="_blank" rel="noopener"><button>Watch the 3-minute walkthrough &rarr;</button></a></div>`;
+  }
 
   // Live section: only exists in the DOM when a backend is configured.
   if (backendUrl) {
