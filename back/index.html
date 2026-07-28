@@ -233,6 +233,17 @@
     } catch (e) { $('verdictRow').innerHTML = '<span class="muted">Screen failed: ' + e.message + '</span>'; }
   }
 
+  async function pollJob(key, label, btn) {
+    for (let i = 0; i < 120; i++) {
+      await new Promise(r => setTimeout(r, 5000));
+      const j = await fetch(base() + '/api/back/job?key=' + encodeURIComponent(key) + (pass.value ? '&key=' + encodeURIComponent(pass.value) : ''), { headers: hdrs() }).then(r => r.json());
+      if (j.status === 'done') return j.url;
+      if (j.status === 'error') throw new Error(j.error || 'job failed');
+      if (btn) btn.textContent = label + ' (' + ((i + 1) * 5) + 's)...';
+    }
+    throw new Error('timed out');
+  }
+
   $('screenBtn').addEventListener('click', runScreen);
 
   $('memoBtn').addEventListener('click', async () => {
@@ -244,7 +255,8 @@
         window.open(url, '_blank');
       } else {
         const j = await post('/api/back/memo', { dealId: dealMeta.dealId });
-        if (j.memoUrl) window.open(base() + j.memoUrl + (pass.value ? '?key=' + encodeURIComponent(pass.value) : ''), '_blank');
+        const url = await pollJob(j.jobKey, 'Drafting (K3 thinks for a few minutes)', $('memoBtn'));
+        window.open(base() + url + (pass.value ? '?key=' + encodeURIComponent(pass.value) : ''), '_blank');
       }
     } catch (e) { alert('Memo failed: ' + e.message); }
     $('memoBtn').disabled = false; $('memoBtn').textContent = 'Underwriting memo';
@@ -254,9 +266,10 @@
     $('wbBtn').disabled = true;
     try {
       const j = await post('/api/back/workbook', { dealId: dealMeta.dealId });
-      if (j.workbookUrl) window.location = base() + j.workbookUrl + (pass.value ? '?key=' + encodeURIComponent(pass.value) : '');
+      const url = await pollJob(j.jobKey, 'Building model (K3 designs for a few minutes)', $('wbBtn'));
+      window.location = base() + url + (pass.value ? '?key=' + encodeURIComponent(pass.value) : '');
     } catch (e) { alert('Workbook failed: ' + e.message); }
-    $('wbBtn').disabled = false;
+    $('wbBtn').disabled = false; $('wbBtn').textContent = 'Workbook (XLSX)';
   });
 
   function renderAgg() {
