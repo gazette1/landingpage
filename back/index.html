@@ -14,14 +14,14 @@
   .cfg b { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: #888; }
   .row { display: flex; gap: .8rem; flex-wrap: wrap; align-items: flex-end; margin: .6rem 0; }
   label { font-size: .75rem; color: #888; display: block; margin-bottom: .2rem; text-transform: uppercase; letter-spacing: .04em; }
-  input[type=text] { padding: .5rem .6rem; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: inherit; min-width: 200px; }
+  input[type=text], input[type=password] { padding: .5rem .6rem; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: inherit; min-width: 200px; }
   select { padding: .5rem .6rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: #111; }
   @media (prefers-color-scheme: dark) { select { background: #1e1e1e; color: #eee; } select option { background: #1e1e1e; color: #eee; } }
   button { background: var(--acc); color: #fff; border: 0; border-radius: 6px; padding: .55rem 1.2rem; font-size: .9rem; cursor: pointer; }
   button:disabled { opacity: .45; cursor: default; }
   button.alt { background: transparent; color: inherit; border: 1px solid var(--line); }
   .pill { display: inline-block; padding: .15rem .7rem; border-radius: 999px; font-size: .75rem; font-weight: 700; color: #fff; }
-  .on { background: var(--ok); } .off { background: var(--bad); }
+  .on { background: var(--ok); } .off { background: var(--bad); } .mid { background: var(--warn); }
   .cols { display: grid; grid-template-columns: 340px 1fr; gap: 1.6rem; align-items: start; }
   @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
   #drop { border: 2px dashed var(--line); border-radius: 10px; padding: 2rem 1rem; text-align: center; color: #888; cursor: pointer; }
@@ -39,6 +39,8 @@
   .badge { display: inline-block; padding: .22rem .8rem; border-radius: 999px; font-weight: 700; color: #fff; font-size: .85rem; }
   .CHASE { background: var(--ok); } .STRUCTURE, .DELEGATE { background: var(--warn); } .KILL { background: var(--bad); }
   .muted { color: #888; }
+  .sev { font-weight: 700; font-size: .72rem; }
+  .sev.SERIOUS { color: var(--bad); } .sev.CAUTION { color: var(--warn); } .sev.INFO { color: #888; }
   .actions { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: 1rem; }
   #spend { font-size: .8rem; color: #888; margin-top: .6rem; }
   .quote { color: #888; font-size: .76rem; }
@@ -47,16 +49,16 @@
 </head>
 <body>
 <h1>Mosaic Back Office — Deal Room Intake</h1>
-<div class="sub">Open a deal room, drag the whole document set in. Files process one at a time; the numbers board updates as each lands. Nothing is invented: every value carries its source document and confidence.</div>
+<div class="sub">Open a deal room, drag the whole document set in. Files process one at a time; the numbers board updates as each lands. Nothing is invented: every value carries its source document, confidence, and a verbatim quote.</div>
 
 <div class="cfg">
-  <b>Backend</b> <span id="beState" class="pill off">NOT CONFIGURED</span>
+  <b>Pipeline</b> <span id="beState" class="pill mid">THIS SITE (SERVERLESS)</span>
   <div class="row">
-    <div><label>Backend URL</label><input type="text" id="backend" placeholder="https://mosaic-intake.onrender.com"></div>
-    <div><label>Passcode</label><input type="text" id="passcode" placeholder="required on hosted backend"></div>
-    <button class="alt" id="checkBtn">Check connection</button>
+    <div><label>Passcode</label><input type="password" id="passcode" placeholder="required"></div>
+    <div><label>Custom backend URL (optional)</label><input type="text" id="backend" placeholder="blank = run on this site"></div>
+    <button class="alt" id="checkBtn">Check</button>
   </div>
-  <div class="muted" id="beNote" style="font-size:.8rem">This page is the UI shell. It drives a Mosaic intake backend (Render deploy or a tunnel to the desk machine). Paste the backend URL and passcode once; they persist in this browser only.</div>
+  <div class="muted" id="beNote" style="font-size:.8rem">Serverless mode runs extraction, structure flags, doctrine screen, and the memo through this site's own functions (Kimi K3 server-side, key never in the page). The full Excel model needs the desk backend or Render: paste its URL to switch modes.</div>
 </div>
 
 <div class="row">
@@ -72,7 +74,7 @@
     </select>
   </div>
   <div><label>Location</label><input type="text" id="location" placeholder="City, ST"></div>
-  <button id="open" disabled>Open deal room</button>
+  <button id="open">Open deal room</button>
   <span id="dealTag" class="muted"></span>
 </div>
 
@@ -82,18 +84,19 @@
     <ul class="queue" id="queue"></ul>
     <div class="actions">
       <button id="screenBtn" class="alt" disabled>Re-run screen</button>
-      <button id="wbBtn" class="alt" disabled>Workbook (XLSX)</button>
-      <button id="narBtn" class="alt" disabled>Draft narrative</button>
       <button id="memoBtn" class="alt" disabled>Underwriting memo</button>
+      <button id="wbBtn" class="alt" disabled title="Full Excel model requires the desk backend or Render">Workbook (XLSX)</button>
     </div>
     <div id="spend"></div>
   </div>
 
   <div>
     <h2>Verdict</h2>
-    <div id="verdictRow"><span class="muted">Configure the backend, open a deal room, then drop documents.</span></div>
+    <div id="verdictRow"><span class="muted">Enter the passcode, open a deal room, then drop documents.</span></div>
     <h2>Numbers</h2>
     <table id="numbers"><tr><td class="muted">Waiting for documents.</td></tr></table>
+    <h2>Structure flags <span id="flagCount" class="muted"></span></h2>
+    <table id="flags"></table>
     <h2>Extracted fields <span id="fieldCount" class="muted"></span></h2>
     <table id="fields"></table>
   </div>
@@ -103,60 +106,58 @@
 
 <script>
   const $ = id => document.getElementById(id);
-  let dealId = null, busy = false;
+  let opened = false, busy = false, dealMeta = {};
   const queue = [];
+  // Aggregated analysis (serverless mode): confidence-wins per field
+  const agg = { fields: new Map(), flags: new Map(), spend: 0 };
+  let lastScreen = null;
 
-  // Backend config: constant, then ?backend= override, then localStorage
-  const BACKEND_URL = '';
-  const qs = new URLSearchParams(location.search);
   const backend = $('backend'), pass = $('passcode');
-  backend.value = (qs.get('backend') || localStorage.getItem('mosaicBackend') || BACKEND_URL).trim();
+  backend.value = (new URLSearchParams(location.search).get('backend') || localStorage.getItem('mosaicBackend') || '').trim();
   pass.value = localStorage.getItem('mosaicDemoKey') || '';
-  backend.addEventListener('change', () => { localStorage.setItem('mosaicBackend', backend.value.trim()); syncState(false); });
+  backend.addEventListener('change', () => { localStorage.setItem('mosaicBackend', backend.value.trim()); syncState(); });
   pass.addEventListener('change', () => localStorage.setItem('mosaicDemoKey', pass.value));
 
+  const serverless = () => !backend.value.trim();
   const base = () => backend.value.trim().replace(/\/$/, '');
-  const api = (path, body) => fetch(base() + path, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-demo-key': pass.value },
-    body: JSON.stringify(body),
-  }).then(r => r.json());
+  const hdrs = () => ({ 'Content-Type': 'application/json', 'x-pass': pass.value, 'x-demo-key': pass.value });
+  const post = (path, body) => fetch((serverless() ? '' : base()) + path, { method: 'POST', headers: hdrs(), body: JSON.stringify(body) }).then(async r => { const j = await r.json(); if (j.error) throw new Error(j.error); return j; });
   const money = v => '$' + Math.round(v).toLocaleString();
-  const keyq = () => (pass.value ? '?key=' + encodeURIComponent(pass.value) : '');
 
-  function syncState(connected) {
+  function syncState() {
     const st = $('beState');
-    if (!base()) { st.textContent = 'NOT CONFIGURED'; st.className = 'pill off'; $('open').disabled = true; return; }
-    st.textContent = connected ? 'CONNECTED' : 'UNTESTED';
-    st.className = connected ? 'pill on' : 'pill off';
-    $('open').disabled = false;
+    if (serverless()) { st.textContent = 'THIS SITE (SERVERLESS)'; st.className = 'pill mid'; $('wbBtn').style.display = 'none'; }
+    else { st.textContent = 'CUSTOM BACKEND'; st.className = 'pill on'; $('wbBtn').style.display = ''; }
   }
-  syncState(false);
+  syncState();
 
   $('checkBtn').addEventListener('click', async () => {
-    if (!base()) { syncState(false); return; }
     try {
-      const r = await fetch(base() + '/back', { method: 'GET' });
-      syncState(r.ok);
-      $('beNote').textContent = r.ok ? 'Backend reachable.' : 'Backend responded ' + r.status + '. Check the URL.';
-    } catch (e) {
-      syncState(false);
-      $('beNote').textContent = 'Cannot reach the backend: ' + e.message + '. Is it running and public?';
-    }
+      if (serverless()) {
+        const r = await fetch('/api/screen', { method: 'POST', headers: hdrs(), body: '{}' });
+        const j = await r.json();
+        $('beNote').textContent = r.status === 401 ? 'Passcode rejected.' : r.status === 503 ? (j.error || 'Functions not configured yet.') : 'Serverless pipeline ready.';
+      } else {
+        const r = await fetch(base() + '/back');
+        $('beNote').textContent = r.ok ? 'Backend reachable.' : 'Backend responded ' + r.status;
+      }
+    } catch (e) { $('beNote').textContent = 'Check failed: ' + e.message; }
   });
 
   $('open').addEventListener('click', async () => {
-    $('open').disabled = true;
-    try {
-      const j = await api('/api/back/deal', { name: $('name').value || 'Untitled Deal', type: $('type').value, location: $('location').value });
-      if (j.error) throw new Error(j.error);
-      dealId = j.dealId;
-      $('dealTag').textContent = dealId;
+    dealMeta = { name: $('name').value || 'Untitled Deal', assetType: $('type').value, location: $('location').value };
+    if (serverless()) {
+      opened = true;
+      $('dealTag').textContent = 'deal room open (serverless)';
       $('drop').classList.remove('offz');
-      syncState(true);
-      renderSnapshot(j.snapshot);
-    } catch (e) {
-      alert('Could not open a deal room: ' + e.message);
+    } else {
+      $('open').disabled = true;
+      try {
+        const j = await post('/api/back/deal', { name: dealMeta.name, type: dealMeta.assetType, location: dealMeta.location });
+        dealMeta.dealId = j.dealId; opened = true;
+        $('dealTag').textContent = j.dealId;
+        $('drop').classList.remove('offz');
+      } catch (e) { alert('Could not open a deal room: ' + e.message); }
       $('open').disabled = false;
     }
   });
@@ -180,89 +181,148 @@
     pump();
   }
 
+  function mergeAnalysis(fileName, j) {
+    for (const f of j.fields || []) {
+      const cur = agg.fields.get(f.field);
+      if (!cur || f.confidence > cur.confidence) agg.fields.set(f.field, { ...f, source: fileName });
+    }
+    for (const fl of j.structureFlags || []) {
+      const key = fl.flag.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(' ').slice(0, 5).join(' ');
+      if (!agg.flags.has(key)) agg.flags.set(key, { ...fl, source: fileName });
+    }
+    if (j.usage) agg.spend += ((j.usage.inputTokens || 0) * 0.8 + (j.usage.outputTokens || 0) * 3.0) / 1e6;
+  }
+
   async function pump() {
-    if (busy || !dealId) return;
+    if (busy || !opened) return;
     const item = queue.find(q => !q.done);
-    if (!item) { await autoScreen(); return; }
+    if (!item) { await runScreen(); return; }
     busy = true;
     const st = item.li.querySelector('.st');
-    st.textContent = 'ingesting'; st.className = 'st run';
+    st.textContent = 'analyzing'; st.className = 'st run';
     try {
-      const j = await api('/api/back/ingest', { dealId, file: { name: item.f.name, b64: await b64(item.f) } });
-      if (j.error) { st.textContent = 'error'; st.className = 'st err'; item.li.title = j.error; }
-      else if (j.skipped) { st.textContent = 'skipped'; st.className = 'st skip'; item.li.title = j.reason; }
-      else {
-        const extra = j.ocrPass ? ' +OCR' : j.llmPass ? ' +LLM' : '';
-        st.textContent = `${j.kind}${extra}`; st.className = 'st done';
+      if (serverless()) {
+        const j = await post('/api/analyze', { file: { name: item.f.name, b64: await b64(item.f) } });
+        mergeAnalysis(item.f.name, j);
+        st.textContent = `+${(j.fields || []).length}f +${(j.structureFlags || []).length}flags`; st.className = 'st done';
+        renderAgg();
+      } else {
+        const j = await post('/api/back/ingest', { dealId: dealMeta.dealId, file: { name: item.f.name, b64: await b64(item.f) } });
+        if (j.skipped) { st.textContent = 'skipped'; st.className = 'st skip'; item.li.title = j.reason; }
+        else { st.textContent = `${j.kind}${j.ocrPass ? ' +OCR' : j.llmPass ? ' +LLM' : ''}`; st.className = 'st done'; }
+        if (j.snapshot) renderBackendSnapshot(j.snapshot);
       }
-      if (j.snapshot) renderSnapshot(j.snapshot);
     } catch (e) { st.textContent = 'error'; st.className = 'st err'; item.li.title = e.message; }
     item.done = true;
     busy = false;
     pump();
   }
 
-  async function autoScreen() {
-    if (!dealId || !$('queue').children.length) return;
-    const j = await api('/api/back/screen', { dealId });
-    if (j.snapshot) renderSnapshot(j.snapshot);
-    $('screenBtn').disabled = $('wbBtn').disabled = $('narBtn').disabled = $('memoBtn').disabled = false;
+  async function runScreen() {
+    if (!opened || !$('queue').children.length) return;
+    try {
+      if (serverless()) {
+        lastScreen = await post('/api/screen', { fields: [...agg.fields.values()], structureFlags: [...agg.flags.values()] });
+        renderAgg();
+      } else {
+        const j = await post('/api/back/screen', { dealId: dealMeta.dealId });
+        if (j.snapshot) renderBackendSnapshot(j.snapshot);
+      }
+      $('screenBtn').disabled = $('memoBtn').disabled = false;
+      if (!serverless()) $('wbBtn').disabled = false;
+    } catch (e) { $('verdictRow').innerHTML = '<span class="muted">Screen failed: ' + e.message + '</span>'; }
   }
 
-  $('screenBtn').addEventListener('click', autoScreen);
-  $('wbBtn').addEventListener('click', async () => {
-    $('wbBtn').disabled = true;
-    const j = await api('/api/back/workbook', { dealId });
-    $('wbBtn').disabled = false;
-    if (j.workbookUrl) window.location = base() + j.workbookUrl + keyq();
-  });
-  $('narBtn').addEventListener('click', async () => {
-    $('narBtn').disabled = true; $('narBtn').textContent = 'Drafting...';
-    const j = await api('/api/back/narrative', { dealId });
-    $('narBtn').disabled = false; $('narBtn').textContent = 'Draft narrative';
-    if (j.snapshot) renderSnapshot(j.snapshot);
-    if (j.narrativeUrl) window.open(base() + j.narrativeUrl + keyq(), '_blank');
-  });
+  $('screenBtn').addEventListener('click', runScreen);
+
   $('memoBtn').addEventListener('click', async () => {
-    $('memoBtn').disabled = true; $('memoBtn').textContent = 'Drafting...';
-    const j = await api('/api/back/memo', { dealId });
+    $('memoBtn').disabled = true; $('memoBtn').textContent = 'Drafting (1-2 min)...';
+    try {
+      if (serverless()) {
+        const j = await post('/api/memo', { ...dealMeta, fields: [...agg.fields.values()], structureFlags: [...agg.flags.values()], screen: lastScreen });
+        const url = URL.createObjectURL(new Blob([j.html], { type: 'text/html' }));
+        window.open(url, '_blank');
+      } else {
+        const j = await post('/api/back/memo', { dealId: dealMeta.dealId });
+        if (j.memoUrl) window.open(base() + j.memoUrl + (pass.value ? '?key=' + encodeURIComponent(pass.value) : ''), '_blank');
+      }
+    } catch (e) { alert('Memo failed: ' + e.message); }
     $('memoBtn').disabled = false; $('memoBtn').textContent = 'Underwriting memo';
-    if (j.snapshot) renderSnapshot(j.snapshot);
-    if (j.memoUrl) window.open(base() + j.memoUrl + keyq(), '_blank');
   });
 
-  function renderSnapshot(s) {
+  $('wbBtn').addEventListener('click', async () => {
+    $('wbBtn').disabled = true;
+    try {
+      const j = await post('/api/back/workbook', { dealId: dealMeta.dealId });
+      if (j.workbookUrl) window.location = base() + j.workbookUrl + (pass.value ? '?key=' + encodeURIComponent(pass.value) : '');
+    } catch (e) { alert('Workbook failed: ' + e.message); }
+    $('wbBtn').disabled = false;
+  });
+
+  function renderAgg() {
+    $('spend').textContent = `Model spend this deal: ~$${agg.spend.toFixed(4)} (est.)`;
+    const fields = [...agg.fields.values()];
+    const get = n => { const f = agg.fields.get(n); return f && typeof f.value === 'number' ? f.value : null; };
+    const rows = [];
+    if (get('askingPrice') !== null) rows.push(['Price / basis', money(get('askingPrice'))]);
+    if (get('noi') !== null) rows.push(['NOI', money(get('noi')) + '/yr']);
+    if (get('keys') !== null) rows.push(['Keys', get('keys')]);
+    if (get('adr') !== null) rows.push(['ADR', money(get('adr'))]);
+    if (get('occupancy') !== null) rows.push(['Occupancy', (get('occupancy') * 100).toFixed(1) + '%']);
+    if (lastScreen) for (const m of Object.values(lastScreen.metrics || {})) {
+      if (typeof m.value !== 'number') continue;
+      const v = m.unit === '%' ? m.value.toFixed(2) + '%' : m.unit === 'x' ? m.value.toFixed(2) + 'x' : money(m.value);
+      rows.push([m.name, v, m.confidence]);
+    }
+    $('numbers').innerHTML = rows.length
+      ? '<tr><th>Metric</th><th>Value</th><th>Conf</th></tr>' + rows.map(r => `<tr><td>${r[0]}</td><td class="v">${r[1]}</td><td class="muted">${r[2] != null ? Number(r[2]).toFixed(2) : ''}</td></tr>`).join('')
+      : '<tr><td class="muted">Nothing extracted yet.</td></tr>';
+    if (lastScreen) {
+      $('verdictRow').innerHTML = `<span class="badge ${lastScreen.verdict}">${lastScreen.verdict}</span>
+        <span class="muted"> risk ${lastScreen.riskScore}/5 · confidence ${Math.round((lastScreen.confidence||0)*100)}% · Mosaic: ${lastScreen.mosaicVerdict}`
+        + ((lastScreen.killFlags||[]).length ? ` · flags: ${lastScreen.killFlags.join(', ')}` : '') + '</span>';
+    }
+    const flags = [...agg.flags.values()];
+    $('flagCount').textContent = flags.length ? `(${flags.length})` : '';
+    $('flags').innerHTML = flags.length
+      ? '<tr><th>Sev</th><th>Flag</th><th>Detail</th><th>Evidence</th></tr>' + flags.map(f =>
+          `<tr><td class="sev ${f.severity.toUpperCase()}">${f.severity.toUpperCase()}</td><td>${f.flag}</td><td>${f.detail}</td><td class="quote">${(f.quote||'').replace(/</g,'&lt;')}</td></tr>`).join('')
+      : '';
+    $('fieldCount').textContent = fields.length ? `(${fields.length})` : '';
+    $('fields').innerHTML = fields.length
+      ? '<tr><th>Field</th><th>Value</th><th>Conf</th><th>Source</th><th>Evidence</th></tr>' + fields.map(f =>
+          `<tr><td>${f.field}</td><td class="v">${String(f.value).substring(0, 40)}</td><td class="muted">${f.confidence.toFixed(2)}</td><td class="muted">${f.source}</td><td class="quote">${(f.quote||'').replace(/</g,'&lt;')}</td></tr>`).join('')
+      : '';
+  }
+
+  function renderBackendSnapshot(s) {
     if (!s) return;
-    const spend = s.estLlmCostUsd || 0;
-    $('spend').textContent = spend ? `Model spend this deal: $${spend.toFixed(4)}` : 'Model spend this deal: $0 — deterministic so far';
+    $('spend').textContent = s.estLlmCostUsd ? `Model spend this deal: $${s.estLlmCostUsd.toFixed(4)}` : 'Model spend this deal: $0';
     const rows = [];
     if (s.price != null) rows.push(['Price / basis', money(s.price)]);
     if (s.noi != null) rows.push(['NOI' + (s.noiIsProxy ? ' (proxy)' : ''), money(s.noi) + '/yr']);
-    if (s.hotel) {
-      if (s.hotel.keys != null) rows.push(['Keys', s.hotel.keys]);
-      if (s.hotel.adr != null) rows.push(['ADR', money(s.hotel.adr)]);
-      if (s.hotel.occupancy != null) rows.push(['Occupancy', (s.hotel.occupancy * 100).toFixed(1) + '%']);
-      if (s.hotel.revpar != null) rows.push(['RevPAR', money(s.hotel.revpar)]);
-    }
-    if (s.screen) {
-      for (const m of Object.values(s.screen.metrics)) {
-        if (typeof m.value !== 'number') continue;
-        const v = m.unit === '%' ? m.value.toFixed(2) + '%' : m.unit === 'x' ? m.value.toFixed(2) + 'x' : money(m.value);
-        rows.push([m.name, v, m.confidence]);
-      }
+    if (s.screen) for (const m of Object.values(s.screen.metrics || {})) {
+      if (typeof m.value !== 'number') continue;
+      const v = m.unit === '%' ? m.value.toFixed(2) + '%' : m.unit === 'x' ? m.value.toFixed(2) + 'x' : money(m.value);
+      rows.push([m.name, v, m.confidence]);
     }
     $('numbers').innerHTML = rows.length
-      ? '<tr><th>Metric</th><th>Value</th><th>Conf</th></tr>' + rows.map(r =>
-          `<tr><td>${r[0]}</td><td class="v">${r[1]}</td><td class="muted">${r[2] != null ? Number(r[2]).toFixed(2) : ''}</td></tr>`).join('')
+      ? '<tr><th>Metric</th><th>Value</th><th>Conf</th></tr>' + rows.map(r => `<tr><td>${r[0]}</td><td class="v">${r[1]}</td><td class="muted">${r[2] != null ? Number(r[2]).toFixed(2) : ''}</td></tr>`).join('')
       : '<tr><td class="muted">Nothing extracted yet.</td></tr>';
     if (s.screen) {
       $('verdictRow').innerHTML = `<span class="badge ${s.screen.verdict}">${s.screen.verdict}</span>
         <span class="muted"> risk ${s.screen.riskScore}/5 · confidence ${Math.round((s.screen.confidence||0)*100)}%`
-        + (s.screen.killFlags.length ? ` · flags: ${s.screen.killFlags.join(', ')}` : '') + '</span>';
+        + ((s.screen.killFlags||[]).length ? ` · flags: ${s.screen.killFlags.join(', ')}` : '') + '</span>';
     }
-    $('fieldCount').textContent = s.fields.length ? `(${s.fields.length})` : '';
-    $('fields').innerHTML = s.fields.length
-      ? '<tr><th>Field</th><th>Value</th><th>Conf</th><th>Source</th><th>Evidence</th></tr>' + s.fields.map(f =>
+    const fields = s.fields || [];
+    const flags = fields.filter(f => f.field === 'structureFlag');
+    const plain = fields.filter(f => f.field !== 'structureFlag');
+    $('flagCount').textContent = flags.length ? `(${flags.length})` : '';
+    $('flags').innerHTML = flags.length
+      ? '<tr><th>Flag</th><th>Evidence</th></tr>' + flags.map(f => `<tr><td>${String(f.value)}</td><td class="quote">${(f.quote||'').replace(/</g,'&lt;')}</td></tr>`).join('') : '';
+    $('fieldCount').textContent = plain.length ? `(${plain.length})` : '';
+    $('fields').innerHTML = plain.length
+      ? '<tr><th>Field</th><th>Value</th><th>Conf</th><th>Source</th><th>Evidence</th></tr>' + plain.map(f =>
           `<tr><td>${f.field}</td><td class="v">${String(f.value).substring(0, 40)}</td><td class="muted">${f.confidence.toFixed(2)}</td><td class="muted">${f.source}</td><td class="quote">${(f.quote||'').replace(/</g,'&lt;')}</td></tr>`).join('')
       : '';
   }
