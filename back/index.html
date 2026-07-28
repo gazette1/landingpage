@@ -124,6 +124,18 @@
   const post = (path, body) => fetch((serverless() ? '' : base()) + path, { method: 'POST', headers: hdrs(), body: JSON.stringify(body) }).then(async r => { const j = await r.json(); if (j.error) throw new Error(j.error); return j; });
   const money = v => '$' + Math.round(v).toLocaleString();
 
+  // Translate the browser's opaque errors into the actual cause
+  function diagnose(e) {
+    const m = String(e && e.message || e);
+    if (/Failed to fetch|NetworkError|Load failed/i.test(m)) {
+      if (base().startsWith('http://')) return 'blocked: this page is HTTPS, so an http:// backend is refused by the browser. Use the https tunnel URL.';
+      if (!base()) return 'no backend configured.';
+      return 'backend unreachable. Check the server is running and the tunnel URL is current (quick tunnels change every restart).';
+    }
+    if (/passcode/i.test(m)) return 'passcode rejected. It must match DEMO_PASSCODE in the backend .env.';
+    return m;
+  }
+
   function syncState() {
     const st = $('beState');
     if (serverless()) { st.textContent = 'THIS SITE (SERVERLESS)'; st.className = 'pill mid'; $('wbBtn').style.display = 'none'; }
@@ -157,7 +169,7 @@
         dealMeta.dealId = j.dealId; opened = true;
         $('dealTag').textContent = j.dealId;
         $('drop').classList.remove('offz');
-      } catch (e) { alert('Could not open a deal room: ' + e.message); }
+      } catch (e) { alert('Could not open a deal room: ' + diagnose(e)); }
       $('open').disabled = false;
     }
   });
@@ -209,10 +221,16 @@
       } else {
         const j = await post('/api/back/ingest', { dealId: dealMeta.dealId, file: { name: item.f.name, b64: await b64(item.f) } });
         if (j.skipped) { st.textContent = 'skipped'; st.className = 'st skip'; item.li.title = j.reason; }
-        else { st.textContent = `${j.kind}${j.ocrPass ? ' +OCR' : j.llmPass ? ' +LLM' : ''}`; st.className = 'st done'; }
-        if (j.snapshot) renderBackendSnapshot(j.snapshot);
+        else {
+          // Async: OCR on a large PDF outruns any proxy timeout
+          st.textContent = j.kind + ' 0s';
+          const done = await pollIngest(j.jobKey, j.kind, st);
+          st.textContent = `${j.kind}${done.ocrPass ? ' +OCR' : done.llmPass ? ' +LLM' : ''} +${done.fields ?? 0}f`;
+          st.className = 'st done';
+          if (done.snapshot) renderBackendSnapshot(done.snapshot);
+        }
       }
-    } catch (e) { st.textContent = 'error'; st.className = 'st err'; item.li.title = e.message; }
+    } catch (e) { st.textContent = 'error'; st.className = 'st err'; item.li.title = diagnose(e); console.error(item.f.name, e); }
     item.done = true;
     busy = false;
     pump();
@@ -230,19 +248,34 @@
       }
       $('screenBtn').disabled = $('memoBtn').disabled = false;
       if (!serverless()) $('wbBtn').disabled = false;
-    } catch (e) { $('verdictRow').innerHTML = '<span class="muted">Screen failed: ' + e.message + '</span>'; }
+    } catch (e) { $('verdictRow').innerHTML = '<span class="muted">Screen failed: ' + diagnose(e) + '</span>'; }
   }
 
-  async function pollJob(key, label, btn) {
-    for (let i = 0; i < 120; i++) {
-      await new Promise(r => setTimeout(r, 5000));
-      const j = await fetch(base() + '/api/back/job?key=' + encodeURIComponent(key) + (pass.value ? '&key=' + encodeURIComponent(pass.value) : ''), { headers: hdrs() }).then(r => r.json());
-      if (j.status === 'done') return j.url;
+  // Poll resilience: a single transient fetch failure must not kill a job that
+  // is still running server-side. Tolerate consecutive misses before giving up.
+  async function pollUntil(key, label, el, stepSec) {
+    let misses = 0;
+    for (let i = 0; i < 240; i++) {
+      await new Promise(r => setTimeout(r, stepSec * 1000));
+      let j;
+      try {
+        j = await fetch(base() + '/api/back/job?key=' + encodeURIComponent(key), { headers: hdrs() }).then(r => r.json());
+        misses = 0;
+      } catch (e) {
+        if (++misses >= 5) throw new Error('lost contact with the backend (is the tunnel still up?)');
+        if (el) el.textContent = label + ' reconnecting...';
+        continue;
+      }
+      if (j.status === 'done') return j;
       if (j.status === 'error') throw new Error(j.error || 'job failed');
-      if (btn) btn.textContent = label + ' (' + ((i + 1) * 5) + 's)...';
+      if (j.status === 'unknown' && ++misses >= 5) throw new Error('job vanished (backend restarted mid-run)');
+      if (el) el.textContent = label + ' ' + ((i + 1) * stepSec) + 's';
     }
-    throw new Error('timed out');
+    throw new Error('timed out after 12 minutes');
   }
+
+  async function pollIngest(key, kind, st) { return pollUntil(key, kind, st, 3); }
+  async function pollJob(key, label, btn) { return (await pollUntil(key, label, btn, 5)).url; }
 
   $('screenBtn').addEventListener('click', runScreen);
 
@@ -258,7 +291,7 @@
         const url = await pollJob(j.jobKey, 'Drafting (K3 thinks for a few minutes)', $('memoBtn'));
         window.open(base() + url + (pass.value ? '?key=' + encodeURIComponent(pass.value) : ''), '_blank');
       }
-    } catch (e) { alert('Memo failed: ' + e.message); }
+    } catch (e) { alert('Memo failed: ' + diagnose(e)); }
     $('memoBtn').disabled = false; $('memoBtn').textContent = 'Underwriting memo';
   });
 
@@ -268,7 +301,7 @@
       const j = await post('/api/back/workbook', { dealId: dealMeta.dealId });
       const url = await pollJob(j.jobKey, 'Building model (K3 designs for a few minutes)', $('wbBtn'));
       window.location = base() + url + (pass.value ? '?key=' + encodeURIComponent(pass.value) : '');
-    } catch (e) { alert('Workbook failed: ' + e.message); }
+    } catch (e) { alert('Workbook failed: ' + diagnose(e)); }
     $('wbBtn').disabled = false; $('wbBtn').textContent = 'Workbook (XLSX)';
   });
 
