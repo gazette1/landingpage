@@ -1,7 +1,33 @@
 {
-  "generated": "2026-07-02T20:00:00Z",
-  "count": 20,
+  "generated": "2026-08-02T18:00:00Z",
+  "count": 22,
   "posts": [
+    {
+      "title": "Field Note: what 1,000 inputs found in an extraction pipeline",
+      "slug": "field-cookspec-eval",
+      "url": "blog/field-cookspec-eval.html",
+      "archetype": "field-note",
+      "date": "2026-08-02",
+      "project": "cookspec",
+      "version": "v1 / 2026",
+      "tags": ["evaluation", "llm-as-judge", "validation-gates", "extraction", "measurement", "fdaa"],
+      "summary": "One user report became a 2,000-compile evaluation across five channels. It surfaced two bugs in my own metrics before it surfaced any in the product, the worst defect never threw an error, and the fix that mattered was moving a rule out of the prompt into code that can fail.",
+      "word_count": 2100,
+      "read_time_min": 10
+    },
+    {
+      "title": "Inside CookSpec: compiling any recipe into one merge table",
+      "slug": "inside-cookspec",
+      "url": "blog/inside-cookspec.html",
+      "archetype": "thesis",
+      "date": "2026-08-02",
+      "project": "cookspec",
+      "version": "v1 / 2026",
+      "tags": ["extraction", "multimodal", "gemini", "deepseek", "validation-loops", "cloudflare-workers", "supabase", "schema-org"],
+      "summary": "A recipe notation from 2004 that solved the format problem and was ignored for twenty years, rebuilt as an extraction pipeline. Any TikTok, Reel, article or photo compiles into one merge table with every unit normalized and checked against a density table.",
+      "word_count": 1900,
+      "read_time_min": 9
+    },
     {
       "title": "Inside Adoption Chain: an auditable second-order research engine for small-cap equity",
       "slug": "inside-adoption-chain",

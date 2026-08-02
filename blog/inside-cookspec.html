@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inside CookSpec: compiling any recipe into one merge table / russh.work</title>
+  <meta name="description" content="A 1970s recipe notation nobody adopted, rebuilt as an extraction pipeline. Any TikTok, Reel, article or photo compiles into a single merge table with every unit checked against a density table." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">THESIS</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">COOKSPEC / COOKSPEC.XYZ</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.08.02</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">9 MIN / 1,900 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Inside CookSpec: compiling any recipe into one merge table</h1>
+
+      <p class="post-summary">A recipe notation from 2004 that solved the format problem and was then ignored for twenty years. I rebuilt it as an extraction pipeline: paste a TikTok, a Reel, an article, or a photo, get back a single table with the ingredients on the left folding column by column into the finished dish, every unit normalized and checked against a density table. This is the architecture and the decisions that carried it.</p>
+
+      <div class="post-tags">EXTRACTION / MULTIMODAL / GEMINI / DEEPSEEK / VALIDATION-LOOPS / CLOUDFLARE-WORKERS / SUPABASE</div>
+    </header>
+
+    <div class="post-body">
+
+<p class="body">By Russ. Thesis, 2026.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The inspiration</h2>
+
+<p class="body">Someone posted a screenshot of a brownie recipe with the line, roughly: I cannot believe someone solved recipe design decades ago and everyone decided to ignore it.</p>
+
+<p class="body">The screenshot was Michael Chu's tabular notation from Cooking for Engineers, which he has been publishing at cookingforengineers.com since 2004. Ingredients run down the left edge. Operations sit in cells to the right, each one spanning the rows it consumes, merging column by column until a single cell on the far right holds the finished dish. It is a dependency graph rendered as a table.</p>
+
+<p class="body">The format answers the two questions a recipe page normally buries. What goes with what, and in what order. You read the merge structure in one look instead of reconstructing it from twelve numbered paragraphs. It is dense, it prints on one page, and it survives being glanced at with wet hands.</p>
+
+<p class="body">It never spread. Every recipe surface built since has moved the other way: longer preambles, more photography, a video where the quantities are spoken once and never written down. The format was correct and the distribution went to the opposite format.</p>
+
+<p class="body">The interesting part is not that the notation is good. It is that producing it by hand is real work, which is exactly why it never spread, and that work is now cheap. Reading an unstructured source and emitting a dependency graph is a task language models are genuinely suited to. The bottleneck that killed the format in 2004 is a solved problem in 2026.</p>
+
+<p class="body"><mark class="callout">The thesis in one line: a format fails when the labor to produce it exceeds the value it delivers. Change the cost of the labor and the format becomes viable without changing anything about the format.</mark></p>
+
+<hr class="rule">
+
+<h2 class="h2">What it does</h2>
+
+<p class="body">CookSpec takes a recipe from wherever the user found it and returns one card. Accepted inputs are TikTok links, Instagram Reels, YouTube videos, article URLs, pasted text, photos of a recipe or a cookbook page, photos of a finished dish, and uploaded video files.</p>
+
+<p class="body">It does two things beyond restructuring. It normalizes every quantity to grams where a density is known, and it checks the source's own arithmetic. The brownie recipe that started this listed one third of a cup of cocoa as 80 grams. Hershey's label puts cocoa at 5 grams per tablespoon, which makes a full cup about 80 grams and a third of a cup about 27. The card shows 27, strikes the 80, and states the reasoning on tap. Silently fixing it would have been worse, because the user would never learn the tool was worth using.</p>
+
+<p class="body">Every quantity carries a status: stated, converted, corrected, estimated, or researched. Nothing renders without one. A validation strip at the top of the card counts them, and each count filters the table to the cells it covers.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Six decisions</h2>
+
+<h2 class="h2">1. Model the recipe as a tree, render the table from the tree</h2>
+
+<p class="body">The card is not the data structure. The data structure is a set of ingredients and a set of operations, each operation naming the inputs it merges. That is a tree with the finished dish at the root. The renderer walks it and computes the row spans and column positions.</p>
+
+<p class="body">Keeping those separate is what made the second projection possible later. Six operation columns are unreadable on a phone, and most first sessions arrive from TikTok on a phone. Rather than inventing a second recipe format, the phone gets a second projection of the same tree: one operation at a time, full width, with the ingredients feeding it and a small map showing position in the merge. Same data, different traversal.</p>
+
+<h2 class="h2">2. The hard layout constraint belongs in code, not in the prompt</h2>
+
+<p class="body">The notation requires that every operation's inputs occupy contiguous rows. Otherwise a cell would need to span a gap, which a table cannot do. My first version asked the model to order ingredients so this held. It failed constantly, and the failures were tedious to repair.</p>
+
+<p class="body">The constraint has a closed-form solution. Because the graph is a tree, a depth-first walk from the root emits every subtree's ingredient leaves consecutively. So the model stopped being asked about ordering entirely, the instruction came out of the prompt, and a twelve-line function orders the list after extraction. That failure class disappeared.</p>
+
+<p class="body">This is the pattern the whole system is built on, and it recurs below in a more interesting form.</p>
+
+<h2 class="h2">3. Cheap model plus a validation loop, not an expensive model</h2>
+
+<p class="body">Structuring runs on a small fast model. The output goes through schema validation, then tree validation, then a rule that catches recipes claiming a staple was already cooked. A failure is not an error, it is a message back into the loop naming exactly what was wrong. Three attempts, and the third one escalates to a different model as the reliability anchor.</p>
+
+<p class="body">A typical compile is about four tenths of a cent and two to five seconds for an article. The validation loop, not the model tier, is doing most of the quality work.</p>
+
+<h2 class="h2">4. Structured data first, prose second</h2>
+
+<p class="body">Most recipe sites embed schema.org Recipe markup. When it is present, the pipeline reads ingredients and instructions directly and hands the model clean structured input rather than a page full of navigation and life story. When it is absent it falls back to readable text extraction.</p>
+
+<p class="body">Two consequences. Article compiles are faster and more accurate than video compiles by a wide margin. And on the sites that publish it, that markup doubles as ground truth for evaluation, which is what later made it possible to measure ingredient coverage without hand-labeling anything.</p>
+
+<h2 class="h2">5. Media in one call, not two</h2>
+
+<p class="body">The first video path was two calls: a vision model described the video, then the text model structured the description. It worked and it was slow, and the intermediate description lost timing detail.</p>
+
+<p class="body">The current path sends the media and the structuring rules in a single call and gets the tree back directly. The two-step version survives as the fallback when the single call fails validation twice. YouTube ingestion needs no scraper at all, since the model accepts the video URL directly. That discovery removed a whole vendor dependency from the roadmap.</p>
+
+<h2 class="h2">6. Deduplicate on the canonical URL, not the raw one</h2>
+
+<p class="body">A viral video gets pasted by many people, with different tracking parameters attached each time. The pipeline canonicalizes first, hashes the canonical URL, and checks the database before spending anything. A repeat compile returns in about sixty milliseconds at zero marginal cost, and every compile becomes a permanent public page, so the library grows as a byproduct of use rather than as a seeding project.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Where it runs</h2>
+
+<p class="body">Next.js on Cloudflare Workers through the OpenNext adapter. Supabase for Postgres, auth, and storage, with row-level security. Gemini for vision and fast structuring, DeepSeek as the reliability anchor, a scraper vendor for the two platforms that require one. Deploys run from GitHub Actions on push. The card is a real DOM table, never an image, because an image loses selection, search, print, and screen readers.</p>
+
+<p class="body">It is live at <a href="https://cookspec.xyz">cookspec.xyz</a>.</p>
+
+<hr class="rule">
+
+<h2 class="h2">What this project is actually about</h2>
+
+<p class="body">The cooking is incidental. The transferable problem is turning unstructured multimodal sources into a strict schema that downstream code can render and validate, cheaply enough to run on every request, with honest provenance on every field and a refusal path when the source does not contain what the user asked for.</p>
+
+<p class="body">That is the same problem as extracting terms from a lease, figures from an operating statement, or obligations from a contract. The domain here is forgiving, which is exactly why it is a good place to develop the machinery: when the extraction is wrong, dinner is worse, and nobody underwrites a loan against it.</p>
+
+<p class="body">The second half of the story is what happened when I ran a thousand real inputs through it and graded the output. That is the <a href="field-cookspec-eval.html">Field Note</a>.</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="inside-agentic-workflow.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Inside my agentic workflow</span>
+        </a>
+        <a class="next" href="field-cookspec-eval.html">
+          <span class="k">NEXT</span>
+          <span class="v">Field Note: what 1,000 inputs found</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to writing index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / AI SOLUTIONS ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+  <script src="../scripts/menu.js"></script>
+</body>
+</html>

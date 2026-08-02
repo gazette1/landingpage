@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Field Note: what 1,000 inputs found in an extraction pipeline / russh.work</title>
+  <meta name="description" content="One user report became a 2,000-compile evaluation. It surfaced two bugs in my own metrics before it surfaced any in the product, and the worst defect never threw an error." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./">Writing</a>
+    <a href="./#field-notes" aria-current="page">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">FIELD NOTE</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">COOKSPEC / EVALUATION</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.08.02</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">10 MIN / 2,100 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Field Note: what 1,000 inputs found in an extraction pipeline</h1>
+
+      <p class="post-summary">A user reported one bad output. Verifying it properly took 2,000 compiles across five channels, and it surfaced two bugs in my own evaluation before it surfaced any in the product. The worst defect in the system never threw an error, and the fix that mattered most was moving a rule out of the prompt and into code that can fail.</p>
+
+      <div class="post-tags">EVALUATION / LLM-AS-JUDGE / VALIDATION-GATES / EXTRACTION / MEASUREMENT / FDAA</div>
+    </header>
+
+    <div class="post-body">
+
+<p class="body">By Russ. Field Note, 2026. Companion to <a href="inside-cookspec.html">Inside CookSpec</a>.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The report</h2>
+
+<p class="body">Someone compiled a mango sticky rice recipe on CookSpec and got a card that assumed the rice and the mango were already prepared. The phrasing in the report was precise and worth keeping: it should start from boiling the rice.</p>
+
+<p class="body">The source was the kind of caption people actually paste. Two cups cooked sticky rice, coconut milk, sugar, salt, a mango, sesame seeds. Warm the coconut milk with the sugar and salt, pour it over the rice, let it sit, plate it.</p>
+
+<p class="body">The card came back with three operations. Warm the coconut milk. Pour it over the rice. Plate with mango. Not one of them cooks rice. The same dish compiled from a full article was correct, soaking and steaming included, so this was not a general extraction failure. It was specific to terse sources.</p>
+
+<p class="body"><mark class="callout">The generalization is the part worth keeping. An extraction system reproduces its source's frame, including the source's omissions. The creator wrote from a stocked kitchen and the model preserved that assumption faithfully. Faithfulness to the source and usefulness to the user are different objectives, and nothing in the pipeline was expressing the second one.</mark></p>
+
+<hr class="rule">
+
+<h2 class="h2">Building the measurement before the fix</h2>
+
+<p class="body">The temptation was to patch the prompt and move on. One report is one data point, and a prompt change that fixes one input routinely breaks three others without saying so. So the first build was the harness.</p>
+
+<p class="body">The corpus is 1,003 items across five channels. Articles sampled from sitemaps across twenty recipe domains, with robots.txt fetched and honored per domain before any request, which meant several domains correctly yielded nothing. Video from YouTube channel RSS feeds, which need no API key, plus bounded scraper sampling for the two platforms that require one.</p>
+
+<p class="body">The fifth channel is the one worth explaining. Sampling enough real captions that happen to contain the failure pattern is slow and noisy. Instead I took public-domain government recipes, where the full method is known, and degraded them the way a caption degrades a recipe: quantities dropped, method collapsed into a run-on, staples rephrased as pre-cooked. The original structured data stays attached as ground truth, so for those items I know exactly what the card should still teach. One of them is a perfect adversarial case where the ingredient line says cooked rice while the method says to add uncooked rice and simmer it for fifteen minutes.</p>
+
+<p class="body">Grading runs in two layers. Deterministic checks on every item, costing nothing: schema validity, board width, ingredient coverage against ground truth, unresolved-quantity rate, ingredients naming a preparation no operation performs, and heat operations carrying no time or temperature. Then a rubric judge on a sample, scoring fidelity, completeness, quantity integrity, and structure.</p>
+
+<p class="body">The judge runs on a different model family than either model in the extraction path. Grading a model with its own family is not a measurement you can defend.</p>
+
+<p class="body">Two runner decisions paid for themselves. The judge is an order of magnitude slower than a compile, roughly two minutes against four seconds, so it runs on a thirty-five percent sample while the free deterministic layer covers everything. And every run stores the card it produced, so when a metric definition changes, old runs re-score for free instead of being repurchased.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Two of my own metrics were wrong</h2>
+
+<p class="body">The first report claimed the pipeline was dropping 12.6 percent of source ingredients. That would have been the most serious finding in the run. Before writing it down I recompiled the worst offender, a lemon blueberry yogurt cake, and read the card.</p>
+
+<p class="body">The card was complete. It had the sugar, the lemons, and the blueberries. My matcher compared word overlap against the whole source line, and parenthetical brand asides diluted real matches below the threshold. One cup sugar, followed by a note that the author used organic cane sugar, scored as a miss. Actual coverage is 99.3 percent.</p>
+
+<p class="body">The second bad metric counted purchased prepared forms as failures. Toasted sesame oil and roasted red peppers were being flagged as ingredients the card should have taught the user to make.</p>
+
+<p class="body"><mark class="callout">Verify the instrument on a case you can read end to end before you report anything it produces. An eval that is wrong in your favor wastes a sprint. An eval that is wrong against you is worse, because you will then change working code to satisfy it.</mark></p>
+
+<hr class="rule">
+
+<h2 class="h2">What the baseline showed</h2>
+
+<p class="body">Across 998 items the pipeline compiled 95.6 percent of what it was handed. The judge scored completeness 3.73 out of 5 and flagged 12.8 percent of cards as not actually cookable as written. Raw-start failures ran 8 percent by the deterministic check and 16.8 percent by the judge.</p>
+
+<p class="body">The worst finding was not in any of those columns. Roundup pages, the twenty-five-best-side-dishes genre, and technique explainers were producing cards. Some were empty shells with a single placeholder ingredient. Some were worse. The judge's verdict on one of them: the source is only a roundup blurb with no actual recipe, so nearly all quantities and steps are invented.</p>
+
+<p class="body">Silent fabrication presented as extraction. The product's own specification says never present a researched value as a sourced one, and this violated it in the most damaging way available: confidently, in a well-formatted card, with no signal to the user. It never threw an error, so it never appeared in a failure rate.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Three fixes, and what each one taught</h2>
+
+<h2 class="h2">Teach from raw, with a carve-out the eval forced</h2>
+
+<p class="body">The first version of the rule fixed sticky rice and then did this to a weeknight bowl: it read one pound of shredded rotisserie chicken, replaced it with a whole chicken, and added an operation to bake it for forty-five minutes and shred it.</p>
+
+<p class="body">Rotisserie chicken is a thing people buy. Teaching someone to roast their own changes the recipe and makes it worse. The rule needed a distinction the first draft did not have: teach the components a cook has to produce, keep the ones people purchase in that form. Canned goods, toasted sesame oil, roasted red peppers, store-bought crust. That distinction only surfaced because the harness ran a case I would not have thought to write.</p>
+
+<h2 class="h2">Prompt instructions are probabilistic, gates are deterministic</h2>
+
+<p class="body">With the rule in the prompt, the model complied most of the time and evaded twice, both times inventively. Once by moving the word cooked out of the ingredient name and into the quantity text, so the name looked raw while the claim survived. Once by moving the cooking stage into a prep note, off the table entirely.</p>
+
+<p class="body">So the rule became a validation function. A staple that cannot be eaten raw, with no operation on the table that cooks it, fails validation and the card returns to the repair loop with a message naming the ingredient.</p>
+
+<p class="body">My first version of that gate had a hole of its own. The cooking-verb list included warm and heat, which matched the incidental wording in pour warm coconut mixture and in preheat the oven. It passed the exact card it existed to reject. Narrowing the verb list, reading the quantity text as well as the name, and refusing to accept a prep note as evidence closed it.</p>
+
+<p class="body"><mark class="callout">When a constraint matters, express it as code that can fail, not as a sentence the model is asked to honor. The model is a generator inside the loop. The loop is where correctness lives.</mark></p>
+
+<h2 class="h2">Refuse rather than invent</h2>
+
+<p class="body">Extraction now returns a not-a-recipe signal with a stated reason when the source is a roundup, an explainer, a category page, or a promotional post, and the product surfaces that instead of fabricating.</p>
+
+<p class="body">Narrowing the rule mattered as much as adding it. A recipe offering a slow-cooker variant alongside a pressure-cooker variant is still one recipe. A thin video caption is thin rather than absent, and should still compile with the gaps marked estimated. Both were being refused by the first draft, and both were corrected before the measurement run.</p>
+
+<p class="body">157 sources in the corpus are now declined. A sample of what the system had previously been turning into recipes: a website privacy policy, an educational animation about dishwashers, a live-event announcement, and a travel photograph whose hashtag had autocorrected from Recife to recipe.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Results</h2>
+
+<p class="body">999 items per run, five channels, judge on a thirty-five percent sample. Both runs together cost about nine dollars.</p>
+
+<ul>
+  <li class="body">Genuine compile failures: 4.4 percent to 2.3 percent</li>
+  <li class="body">Placeholder cards from non-recipe pages: 6.7 percent to 1.1 percent</li>
+  <li class="body">Judge, card not cookable as written: 12.8 percent to 5.0 percent</li>
+  <li class="body">Judge, does not start from raw ingredients: 16.8 percent to 9.2 percent</li>
+  <li class="body">Judge completeness, out of 5: 3.73 to 4.09</li>
+  <li class="body">Judge structure, out of 5: 4.62 to 4.86</li>
+  <li class="body">Heat operations with no timing: 20.5 percent to 16.7 percent</li>
+  <li class="body">Ingredient coverage against ground truth: 99.3 percent, unchanged</li>
+</ul>
+
+<p class="body">One number moved the wrong way on its face. Raw compile rate fell from 95.6 percent to 82 percent. That entire gap is the refusals, and the corpus was sampled indiscriminately from sitemaps and hashtags, so it holds far more non-recipes than real usage will. Reporting refusals as failures would have hidden the improvement, so the report counts them in a separate column.</p>
+
+<p class="body"><mark class="callout">A system that learned to say no should not look like a system that broke. If your reporting cannot tell a correct refusal from a failure, you will optimize away the refusal.</mark></p>
+
+<hr class="rule">
+
+<h2 class="h2">What is next</h2>
+
+<p class="body">YouTube is the weakest channel by a distance. Thirty-eight percent of its cards still carry an untimed heat operation and the judge flags thirty-six percent for not starting from raw. Long-form video summarized into a recipe loses timing detail, and the fix is probably transcript or keyframe segmentation rather than more prompt.</p>
+
+<p class="body">Per-operation provenance is the honest next change. The new rules add cooking steps the source never stated. Quantities already carry provenance, so an estimated amount is marked on the card, but an added operation is not, and the specification's own honesty rule argues it should be. That touches the schema, the renderer, and the validation strip, so it is a real change rather than a tweak.</p>
+
+<p class="body">And the judge sample deserves calibration. Thirty-five percent was the right call for latency, but the cheap deterministic checks and the expensive judge disagree in interesting places, and grading a human-reviewed slice against both is the next honest step.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Six notes for anyone building similar</h2>
+
+<ul>
+  <li class="body">The failure that costs you users is rarely the one that throws. It is the confident, well-formatted, wrong output, and your error rate will look fine the entire time it is happening.</li>
+  <li class="body">Build the harness before the fix, especially when the fix looks obvious.</li>
+  <li class="body">Verify the instrument before you trust what it prints.</li>
+  <li class="body">Store the artifact each run produces. Metric definitions change more often than models do, and re-scoring stored output is free while recompiling is not.</li>
+  <li class="body">Grade with a model family that is not in the pipeline.</li>
+  <li class="body">Separate correct refusals from failures in every report.</li>
+</ul>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="inside-cookspec.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Inside CookSpec</span>
+        </a>
+        <a class="next" href="inside-agentic-workflow.html">
+          <span class="k">NEXT</span>
+          <span class="v">Inside my agentic workflow</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to writing index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / AI SOLUTIONS ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+  <script src="../scripts/menu.js"></script>
+</body>
+</html>

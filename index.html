@@ -259,6 +259,32 @@ const score = w.optionality*o + w.customerValidation*c + ...;
 </code></pre>
         </li>
 
+        <li class="project-row" data-href="blog/inside-cookspec.html">
+          <span class="num">10</span>
+          <span class="title">COOKSPEC</span>
+          <div class="meta">
+            <span class="row strong">v1 / 2026</span>
+            <span class="row">MULTIMODAL RECIPE EXTRACTION</span>
+            <span class="row">CLOUDFLARE WORKERS / SUPABASE</span>
+            <span class="row">GEMINI + DEEPSEEK / VALIDATION LOOP</span>
+            <span class="row">1,003-ITEM EVAL, 5 CHANNELS</span>
+            <span class="row">NOT-COOKABLE 12.8% &rarr; 5.0%</span>
+            <span class="row">~$0.004 PER COMPILE</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code>// prompt wording was evaded twice: "cooked" moved into the
+// quantity text, then the cooking stage into a prep note.
+// so the rule became code that can fail.
+export function validateRawStaplesCooked(doc) {
+  for (const ing of doc.ingredients) {
+    if (!isMustCook(ing)) continue;
+    if (!COOK_VERB.test(downstreamLabels(doc, ing.id)))
+      return `${ing.name} is never cooked by any operation`;
+  }
+  return null;  // failure re-enters the repair loop
+}
+</code></pre>
+        </li>
+
       </ol>
     </section>
 
