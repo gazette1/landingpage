@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Moon Juice: Competitive Dossier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF7F1; --bg2:#FFFFFF; --bg3:#F1EBE1;
+  --ink:#1F1A14; --ink2:#5C5347; --ink3:#8A7F70;
+  --line:#E4DCCE; --line2:#CFC4B1;
+  --accent:#5B3FA8; --accent-ink:#FFFFFF; --accent-soft:#EEE9F8;
+  --good:#2E6B4F; --warn:#9A5B1F;
+  --r-xs:2px; --r-sm:4px; --r-md:8px; --r-lg:14px;
+  --serif:'Fraunces',Georgia,serif; --sans:'Hanken Grotesk',system-ui,sans-serif; --mono:'IBM Plex Mono',Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{overflow-x:clip}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+header{border-bottom:1px solid var(--line);padding:34px 0 0;background:var(--bg2)}
+.kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(1.9rem,4.4vw,3rem);line-height:1.1;margin:10px 0 8px}
+h1 em{font-style:italic;color:var(--accent)}
+.sub{color:var(--ink2);max-width:62ch;margin-bottom:22px}
+nav{display:flex;gap:2px;flex-wrap:wrap}
+nav button{font-family:var(--mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;background:none;border:none;border-bottom:3px solid transparent;padding:10px 14px;color:var(--ink2);cursor:pointer}
+nav button.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:500}
+nav button:hover{color:var(--ink)}
+section.tab{display:none;padding:34px 0 60px}
+section.tab.on{display:block}
+h2{font-family:var(--serif);font-weight:600;font-size:1.55rem;margin:34px 0 12px}
+h2:first-child{margin-top:0}
+h3{font-size:1.05rem;font-weight:700;margin:20px 0 8px}
+p{margin:0 0 12px;max-width:74ch}
+.lede{font-size:1.14rem;line-height:1.5;max-width:66ch}
+.statrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:22px 0}
+.stat{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px}
+.stat b{display:block;font-family:var(--serif);font-size:1.7rem;font-weight:600;line-height:1.1}
+.stat span{font-size:.8rem;color:var(--ink2)}
+.stat.hot{border-color:var(--accent);background:var(--accent-soft)}
+.cardgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:16px 0}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 20px}
+.card h4{font-family:var(--serif);font-weight:600;font-size:1.12rem;margin-bottom:2px}
+.card .meta{font-family:var(--mono);font-size:.7rem;color:var(--ink3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px}
+.card p{font-size:.92rem;margin-bottom:8px}
+.card ul{margin:0 0 8px 18px;font-size:.92rem}
+.card li{margin-bottom:5px}
+.tag{display:inline-block;font-family:var(--mono);font-size:.66rem;letter-spacing:.05em;text-transform:uppercase;background:var(--bg3);border-radius:var(--r-sm);padding:2px 7px;margin:0 4px 4px 0;color:var(--ink2)}
+.tag.v{background:var(--accent);color:var(--accent-ink)}
+table{width:100%;border-collapse:collapse;font-size:.9rem;margin:14px 0}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r-md);background:var(--bg2)}
+th{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;text-align:left;color:var(--ink3);padding:10px 12px;border-bottom:1px solid var(--line2);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td b{font-weight:700}
+.num{font-family:var(--mono);font-size:.84rem;white-space:nowrap}
+.bar{height:10px;background:var(--accent);border-radius:var(--r-xs);display:inline-block;vertical-align:middle}
+.bar.mj{background:var(--warn)}
+.quote{border-left:3px solid var(--line2);padding:2px 0 2px 14px;margin:10px 0;font-size:.95rem;color:var(--ink2);font-style:italic}
+.quote b{color:var(--ink);font-style:normal}
+.src{font-size:.76rem;color:var(--ink3)}
+.src a{color:var(--ink3);text-decoration:underline}
+.callout{background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--r-lg);padding:18px 22px;margin:20px 0}
+.callout p{margin-bottom:6px}
+.play{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px 24px;margin:14px 0;display:grid;grid-template-columns:52px 1fr;gap:16px}
+.play .n{font-family:var(--serif);font-size:2rem;font-weight:600;color:var(--accent);line-height:1}
+.play h4{font-family:var(--serif);font-size:1.15rem;font-weight:600;margin-bottom:6px}
+.play p{font-size:.94rem}
+.timeline{margin:14px 0;border-left:2px solid var(--line2);padding-left:18px}
+.timeline div{margin-bottom:12px;font-size:.93rem}
+.timeline b{font-family:var(--mono);font-size:.76rem;color:var(--accent);display:block}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:760px){.twocol{grid-template-columns:1fr}.play{grid-template-columns:1fr}}
+footer{border-top:1px solid var(--line);padding:18px 0 40px;font-size:.78rem;color:var(--ink3)}
+.legend{font-family:var(--mono);font-size:.68rem;color:var(--ink3)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="kicker">Prepared for Jael Harris · Brand + Content Strategist application · Moon Juice · August 11, 2026</div>
+    <h1>Moon Juice invented this category's language.<br>Its competitors are <em>out-talking</em> it.</h1>
+    <p class="sub">A competitive dossier: the social landscape, what static and video ads are working across the category, how competitor CPG sites convert, and the strategy Moon Juice's next Brand + Content Strategist should walk in with.</p>
+    <nav id="nav">
+      <button data-t="read" class="on">The Read</button>
+      <button data-t="mj">Moon Juice Today</button>
+      <button data-t="land">Landscape</button>
+      <button data-t="ads">Ad Intelligence</button>
+      <button data-t="sites">Site Teardowns</button>
+      <button data-t="plan">The Strategy</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ THE READ ============ -->
+<section class="tab on" id="read"><div class="wrap">
+  <p class="lede">Moon Juice is a 15-year-old brand with a founder story few in wellness can match, a hero SKU with a quantified clinical claim, and a February 2026 launch into 755 Target stores. Yet on every content surface that decides this category in 2026, it is being outworked by younger brands.</p>
+  <div class="statrow">
+    <div class="stat hot"><b>18</b><span>Moon Juice active Meta ads (Ad Library, Aug 11, 2026)</span></div>
+    <div class="stat"><b>~660</b><span>Arrae active Meta ads, same day</span></div>
+    <div class="stat"><b>~17.6K</b><span>Moon Juice TikTok followers vs 827K for Lemme</span></div>
+    <div class="stat"><b>26.7M</b><span>views on Sleepy Girl Mocktail, a trend about Magnesi-Om that creators owned, not the brand</span></div>
+  </div>
+  <h2>Five findings that matter</h2>
+  <div class="cardgrid">
+    <div class="card"><h4>1. The paid-social gap is structural, not budgetary</h4><p>Moon Juice's 18 active ads are brand-page-only, discount-led, and product-shot heavy. Arrae (660 ads), Cymbiotika (450) and Lemme (370) each run a machine Moon Juice does not have: whitelisted creator ads, mechanism-education hooks, and weekly refresh cycles.</p></div>
+    <div class="card"><h4>2. The category's growth engine moved to creator flywheels</h4><p>Lemme: 13,000+ TikTok Shop affiliates, $13M in one month. Apothékary: $1M in its first TikTok Shop month on a 20% commission community. Bloom: 5,600 creators, 12B views. Moon Juice has no visible program.</p></div>
+    <div class="card"><h4>3. Moon Juice's biggest moment was earned by someone else</h4><p>The Sleepy Girl Mocktail (Magnesi-Om + tart cherry juice) was started by a creator in March 2023 and peaked at 26.7M+ hashtag views. The brand responded well (trademark, cherry SKU) but the reach lived on creators' accounts.</p></div>
+    <div class="card"><h4>4. The founder asset is parked</h4><p>Amanda Chantal Bacon has one of wellness's most storied arcs (autoimmune remission, the 2016 Elle food-diary backlash she turned into growth) and roughly 33.6K followers. Arrae, Bloom, Golde and The Nue Co all run founder-as-face engines.</p></div>
+    <div class="card"><h4>5. Target changes who the audience is</h4><p>755 Target stores as of February 2026, with wholesale projected up 40%. The current insider-coded content deliberately excludes beginners. Nobody owns "adaptogens explained for the Target shopper." That is the open lane.</p></div>
+  </div>
+  <div class="callout">
+    <p><b>The one-line read:</b> Moon Juice does not need a rebrand. It needs a content engine that matches the equity it already has: founder-led education, a creator flywheel around its magnesium franchise, and a beginner layer timed to mass retail.</p>
+  </div>
+  <p class="src">Sources: Meta Ad Library advertiser pages pulled Aug 11, 2026; <a href="https://www.creatorsblueprint.co/p/how-kourtney-kardashian-built-a-30m">Creators Blueprint on Lemme</a>; <a href="https://www.inc.com/annabel-burba/this-wellness-brand-made-1-million-on-tiktok-shop-in-one-month-heres-its-playbook/91339242">Inc. on Apothékary</a>; <a href="https://www.inc.com/sydney-sladovnik/how-an-army-of-tiktokers-drove-12-billion-video-views-for-my-company.html">Inc. on Bloom</a>; <a href="https://wwd.com/beauty-industry-news/beauty-features/the-makings-of-a-viral-sleepy-girl-mocktail-1236117724/">WWD on Sleepy Girl Mocktail</a>; <a href="https://wwd.com/beauty-industry-news/wellness/moon-juice-target-supplements-mass-retail-1238611054/">WWD on the Target launch</a>.</p>
+</div></section>
+
+<!-- ============ MOON JUICE TODAY ============ -->
+<section class="tab" id="mj"><div class="wrap">
+  <h2>The brand</h2>
+  <p>Founded 2011 by Amanda Chantal Bacon as a Venice juice shop after she put a thyroid condition into remission through diet. Grew on celebrity endorsement (Paltrow via Goop) and organic social. Quality platform: Source, Dose, Form. 100% traceable, third-party tested, clinically informed doses, bioavailable forms. Current tagline: "Feel life differently. Supplements built for how women actually live."</p>
+  <div class="twocol">
+    <div>
+      <h3>Voice arc: woo to clinical, dated</h3>
+      <div class="timeline">
+        <div><b>2011 to 2016</b>Mystic era. Moon dusts, cosmic cookbook, the Elle food-diary mockery cycle (Brain Dust, shilajit) that grew the business anyway.</div>
+        <div><b>2018</b>Sephora and skincare expansion; first real marketing hires.</div>
+        <div><b>2019 to 2020</b>Clinical pivot. SuperYou ships with a quantified claim (reduces cortisol 24%). Magnesi-Om launches.</div>
+        <div><b>2023</b>Accessible "Cellular Waters" line (Ting, Mini Dew). Sleepy Girl Mocktail goes viral on TikTok.</div>
+        <div><b>Aug 2025</b>Federico Troiani (ex-Ka'Chava CCO) named CEO. Mandate: omnichannel growth, women's health innovation.</div>
+        <div><b>Feb 2026</b>Target: 755 stores, three magnesium SKUs at $21.99 to $43.99. Wholesale projected +40%.</div>
+      </div>
+      <p class="src">Sources: <a href="https://www.forbes.com/sites/elanagross/2018/08/13/moon-juice-amanda-chantal-bacon/">Forbes</a>, <a href="https://www.glossy.co/beauty/moon-juice-founder-amanda-chantal-bacon-on-breaking-into-skin-care-and-bringing-sex-dust-to-the-masses/">Glossy</a>, <a href="https://www.refinery29.com/en-us/2016/02/102910/amanda-chantal-bacon-food-diary-reaction">Refinery29</a>, <a href="https://wwd.com/beauty-industry-news/wellness/moon-juice-federico-troiani-ceo-growth-innovation-1238033712/">WWD (CEO)</a>, <a href="https://wwd.com/beauty-industry-news/wellness/moon-juice-target-supplements-mass-retail-1238611054/">WWD (Target)</a>, <a href="https://www.prnewswire.com/news-releases/moon-juice-launches-mini-dew-2-in-1-daily-electrolytes--minerals-301895491.html">PR Newswire</a>.</p>
+    </div>
+    <div>
+      <h3>Social scorecard</h3>
+      <div class="tablewrap"><table>
+        <tr><th>Surface</th><th>Where it stands</th></tr>
+        <tr><td><b>Instagram @moonjuice</b></td><td>468K followers. Playful, taboo-friendly top-of-funnel. Competitive with Ritual (~450K), Sakara (~462K).</td></tr>
+        <tr><td><b>TikTok @moonjuice</b></td><td>~17.6K followers. The glaring hole given the Sleepy Girl moment happened on TikTok about their product.</td></tr>
+        <tr><td><b>Founder IG</b></td><td>~33.6K. No short-form founder engine despite a founder narrative no peer brand can copy.</td></tr>
+        <tr><td><b>YouTube</b></td><td>Negligible footprint. No long-form education despite science-heavy claims.</td></tr>
+        <tr><td><b>Blog</b></td><td>SEO-functional, modest. Adaptogen glossary and expert series are above category standard, but no flagship editorial franchise.</td></tr>
+        <tr><td><b>Offers</b></td><td>Site leads with free-gift acquisition (free Acid Potion); paid ads lead with 30% off first month, 10% forever.</td></tr>
+      </table></div>
+      <p class="src">Counts fetched Aug 2026: <a href="https://www.instagram.com/moonjuice/">Instagram</a>, <a href="https://www.tiktok.com/@moonjuice">TikTok</a>, <a href="https://www.instagram.com/amandachantalbacon/">founder IG</a>. Treat as approximate snapshots.</p>
+    </div>
+  </div>
+  <h2>Hero products</h2>
+  <div class="tablewrap"><table>
+    <tr><th>Product</th><th>Job</th><th>From (sub)</th><th>Signal</th></tr>
+    <tr><td><b>Magnesi-Om</b> (+ Sleepy, Neuro)</td><td>Relaxation, sleep, cognition</td><td class="num">$30.80</td><td>Franchise hero. Over a million jars sold per current ad copy. Now at Target.</td></tr>
+    <tr><td><b>SuperYou</b></td><td>Stress, cortisol</td><td class="num">$37.80</td><td>Quantified claim: reduces cortisol 24%. 3,200+ reviews at 4.8 stars.</td></tr>
+    <tr><td><b>SuperHair / SuperBeauty</b></td><td>Hair, skin</td><td class="num">$46.20</td><td>Longest-running current Meta ad (since Jul 2).</td></tr>
+    <tr><td><b>Ting / Mini Dew</b></td><td>Energy, hydration</td><td class="num">$29.40</td><td>The accessible entry layer; Mini Dew ads test a pregnancy angle.</td></tr>
+    <tr><td><b>Sex Dust / Brain Dust</b></td><td>Legacy dusts</td><td class="num">$26.60</td><td>The original vocabulary; nearly absent from current paid.</td></tr>
+  </table></div>
+  <p class="src">Prices from <a href="https://moonjuice.com/collections/best-sellers">moonjuice.com best sellers</a> and <a href="https://moonjuice.com/products/superyou">product pages</a>, Aug 2026.</p>
+</div></section>
+
+<!-- ============ LANDSCAPE ============ -->
+<section class="tab" id="land"><div class="wrap">
+  <h2>The competitive set, one screen</h2>
+  <p>Followers are approximate public snapshots (Aug 2026). Active-ad counts pulled from Meta Ad Library advertiser pages on Aug 11, 2026. Bars scale to active ads, the cleanest public proxy for paid-social investment.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Brand</th><th>IG</th><th>TikTok</th><th>Active Meta ads</th><th></th><th>Signature engine</th><th>Scale signal</th></tr>
+    <tr><td><b>Moon Juice</b></td><td class="num">468K</td><td class="num">17.6K</td><td class="num">18</td><td><span class="bar mj" style="width:4px"></span></td><td>Heritage brand voice, earned moments</td><td>Target 755 stores, Feb 2026</td></tr>
+    <tr><td><b>Arrae</b></td><td class="num">291K</td><td class="num">41K</td><td class="num">~660</td><td><span class="bar" style="width:132px"></span></td><td>Always-on creator gifting + whitelisted UGC ads</td><td>$100M revenue late 2025</td></tr>
+    <tr><td><b>Cymbiotika</b></td><td class="num">514K</td><td class="num">n/a</td><td class="num">~450</td><td><span class="bar" style="width:90px"></span></td><td>Filmable gold sachet + celebrity investors (Alix Earle)</td><td>$150M revenue 2025</td></tr>
+    <tr><td><b>Lemme</b></td><td class="num">452K</td><td class="num">827K</td><td class="num">~370</td><td><span class="bar" style="width:74px"></span></td><td>Celebrity + 13K TikTok Shop affiliates</td><td>$13M TikTok Shop, Nov 2025</td></tr>
+    <tr><td><b>AG1</b></td><td class="num">682K</td><td class="num">n/a</td><td class="num">~370</td><td><span class="bar" style="width:74px"></span></td><td>Podcast machine (~$2.2M/mo) + sports IP</td><td>21,897 sponsored episodes</td></tr>
+    <tr><td><b>Hum Nutrition</b></td><td class="num">270K</td><td class="num">~5K</td><td class="num">~140</td><td><span class="bar" style="width:28px"></span></td><td>RD-authority education + ingredient SEO commerce</td><td>Target, Walmart doors</td></tr>
+    <tr><td><b>Apothékary</b></td><td class="num">332K</td><td class="num">n/a</td><td class="num">~120</td><td><span class="bar" style="width:24px"></span></td><td>Herbalist education + 20%-commission affiliate community</td><td>$1M first TikTok Shop month</td></tr>
+    <tr><td><b>Ritual</b></td><td class="num">450K</td><td class="num">n/a</td><td class="num">~80</td><td><span class="bar" style="width:16px"></span></td><td>Traceability theater ("Trace Like a Motherf*cker")</td><td>$250M+ retail sales 2024</td></tr>
+    <tr><td><b>Sakara</b></td><td class="num">462K</td><td class="num">n/a</td><td class="num">n/a</td><td></td><td>Partnerships and IRL (15% of sales from partnerships)</td><td>$3.6M media impact value 2024</td></tr>
+    <tr><td><b>Golde</b></td><td class="num">180K</td><td class="num">n/a</td><td class="num">n/a</td><td></td><td>Founder transparency, approachable ritual</td><td>Smaller engine</td></tr>
+    <tr><td><b>The Nue Co</b></td><td class="num">112K</td><td class="num">n/a</td><td class="num">n/a</td><td></td><td>Nervous-system-regulation UGC, functional fragrance</td><td>Category inventor</td></tr>
+    <tr><td><b>Bloom</b></td><td class="num">n/a</td><td class="num">n/a</td><td class="num">n/a</td><td></td><td>5,600 creators, 12B views, founder story</td><td>Creator-volume benchmark</td></tr>
+  </table></div>
+  <h2>The four engines that win in 2025 to 2026</h2>
+  <div class="cardgrid">
+    <div class="card"><h4>Mass affiliate flywheels</h4><p>No-strings gifting plus TikTok Shop commissions. Affiliates drive an estimated 60 to 70% of US TikTok Shop GMV. Lemme, Apothékary and Bloom are the proof cases.</p><p class="src"><a href="https://www.advertisepurple.com/tiktok-shop-affiliate-ecosystem-overview-for-2025/">Advertise Purple</a></p></div>
+    <div class="card"><h4>Founder as face</h4><p>Siff Haider (Arrae), Mari Llewellyn (Bloom), Trinity Mouzon Wofford (Golde), Jules Miller (The Nue Co). Weekly founder talking-head video is the trust unit no influencer replicates.</p><p class="src"><a href="https://www.glossy.co/beauty/siff-haider-arrae-influencer-brand/">Glossy</a></p></div>
+    <div class="card"><h4>Authority education</h4><p>Credentialed experts as content: Hum's RD team, Apothékary's herbalist Q&amp;As, AG1's podcast scientists, Ritual's peer-reviewed funnel.</p><p class="src"><a href="https://www.glossy.co/podcasts/hum-nutritions-walter-faulstroh-we-dont-dumb-down-the-message/">Glossy podcast</a></p></div>
+    <div class="card"><h4>Symptom-led micro-trend launches</h4><p>Each launch engineered as its own trend timed to a peaking conversation: Lemme Purr, GLP-1 Daily, Arrae's creatine-for-women drop, Apothékary's sober-curious line.</p><p class="src"><a href="https://femfounded.org/case-studies/lemme/">Femfounded</a></p></div>
+  </div>
+  <div class="callout"><p><b>Where the white space sits for Moon Juice:</b> the clinical-adaptogen position between Ritual's traceability and Cymbiotika's celebrity aesthetic is unoccupied. Magnesium and nervous-system content is the defining supplement story of 2025 to 2026, and the brand that named the category is not the loudest voice in it.</p></div>
+</div></section>
+
+<!-- ============ AD INTELLIGENCE ============ -->
+<section class="tab" id="ads"><div class="wrap">
+  <h2>What is actually running, brand by brand</h2>
+  <p>All observations from Meta Ad Library, US, active ads, pulled Aug 11, 2026. Longevity (start date still active) is the standard public proxy for a winning ad: losers get turned off. "Whitelisted" means the ad runs from a creator's page with the brand as partner, a format Moon Juice currently does not use.</p>
+
+  <div class="cardgrid">
+    <div class="card">
+      <h4>Moon Juice</h4><div class="meta">~18 active · brand page only · refresh Jul 29 + Aug 11</div>
+      <span class="tag v">Video 0:10 to 1:32</span><span class="tag">Static product cards</span><span class="tag">Discount-led</span>
+      <p><b>Longest runner:</b> SuperHair catalog ad since Jul 2. Core batch (Magnesi-Om, Mini Dew) since Jul 29; fresh SuperYou tests started the day of this pull.</p>
+      <div class="quote">"PMS isn't something you just deal with." · "If you only take one thing, it should be magnesium." · "Water was never enough." · <b>SuperYou:</b> "Puffy, foggy, cranky?"</div>
+      <p><b>Read:</b> solid symptom-led copy, but every ad funnels to the same 30%-off offer, and there is no creator face, no mechanism-education unit, no social proof beyond "over a million jars."</p>
+    </div>
+    <div class="card">
+      <h4>Arrae</h4><div class="meta">~660 active · launch blitz Aug 3 to 7</div>
+      <span class="tag v">Creator UGC 0:14 to 1:31</span><span class="tag v">Whitelisted pages</span><span class="tag">Benefit-list statics</span>
+      <p><b>What performs:</b> the Tone creatine-gummies launch as a wall of creator video. Whitelisted ads from Lexi Hidalgo, TM_Fitness, Glow with Dani. Claim-heavy statics for MB-1 Max (up to 21% waist reduction in 10 weeks).</p>
+      <div class="quote">"Creatine that tastes like candy??" · "Grow your booty, without the bloat" · "Over 30? You need Tone."</div>
+      <p><b>Read:</b> the taste-first hook plus a body-composition promise, delivered by faces the audience already follows. Volume itself is the strategy: dozens of variants per angle.</p>
+    </div>
+    <div class="card">
+      <h4>Lemme</h4><div class="meta">~370 active · oldest winner running since May 21</div>
+      <span class="tag v">Video 0:12 to 0:50</span><span class="tag">Clean statics</span><span class="tag">Sweepstakes</span>
+      <p><b>What performs:</b> GLP-1 story (Lemme Reset) in three video cuts; Grow hair chews running unchanged since Jun 12 (a 60-day winner); Akkermansia metabolism explainer since May 21. Plus a $20,000-getaway sweepstakes and 45%-off subscription pushes.</p>
+      <div class="quote">"Keeping it off is the hardest part" · "Growth looks good on you" · "Meet Lemme Reset"</div>
+      <p><b>Read:</b> short, claim-forward, celebrity halo mostly implicit. Promo mechanics (sweepstakes, bundle math) do the conversion work.</p>
+    </div>
+    <div class="card">
+      <h4>Cymbiotika</h4><div class="meta">~450 active · winners running since May 20</div>
+      <span class="tag v">Mechanism video 0:05 to 1:13</span><span class="tag v">Founder whitelist</span><span class="tag">Proof statics</span>
+      <p><b>What performs:</b> absorption as the whole story. A negative-hook education ad ("Don't buy Cymbiotika supplements... until you understand why most supplements never reach your cells") has run since Jun 2. Starter-pack creative duplicated across 8 to 12 placements, the classic scaling signal. Founder Chervin Jafarieh runs whitelisted ads.</p>
+      <div class="quote">"The most expensive supplement is the one your body barely uses." · "100+ million packets sold" · "50,000+ 5-star reviews"</div>
+      <p><b>Read:</b> the closest analog to what Moon Juice could run: science-mechanism education with hard social proof, no celebrity needed.</p>
+    </div>
+    <div class="card">
+      <h4>Apothékary</h4><div class="meta">~120 active · education + scarcity</div>
+      <span class="tag v">Quiz video</span><span class="tag">Clinical-claim statics</span><span class="tag">Mystery-bag scarcity</span>
+      <p><b>What performs:</b> format education (why tinctures absorb, running since Jun 16), the tongue-diagnosis quiz ("the tongue is one of the only internal organs visible to the naked eye"), and Wine Down's trial claim. Fukubukuro mystery bag ($210 value for $99, sold out twice) manufactures urgency without discounting the line.</p>
+      <div class="quote">"In a double-blind clinical trial, 97% of participants drank less after 2 weeks."</div>
+      <p><b>Read:</b> proof + curiosity hooks from a herbal-first brand at Moon Juice's price tier. The playbook transfers almost one-to-one.</p>
+    </div>
+    <div class="card">
+      <h4>Hum · Ritual · AG1</h4><div class="meta">~140 · ~80 · ~370 active</div>
+      <span class="tag">GLP-1 angle</span><span class="tag">Mechanism</span><span class="tag">Welcome kit</span>
+      <p><b>Hum:</b> Flatter Me Fiber rides the GLP-1 wave ("doubles GLP-1 levels, debloats in 30 minutes"). <b>Ritual:</b> few ads, long runners (since Mar 4): delayed-release capsule mechanism, "For Skeptics, By Skeptics." <b>AG1:</b> welcome-kit offer running since Feb 24, clinical-studies framing, 50K verified reviews.</p>
+      <p><b>Read:</b> even the science-first brands sell one mechanism per ad, one proof point, one offer. Nobody wins with generic lifestyle imagery.</p>
+    </div>
+  </div>
+
+  <h2>Pattern synthesis: what wins in this category's paid social</h2>
+  <div class="twocol">
+    <div>
+      <h3>Static winners</h3>
+      <ul class="card" style="list-style:none;padding:16px 20px">
+        <li>· Symptom callout in the first line ("Puffy, foggy, cranky?")</li>
+        <li>· One quantified proof point (97% drank less; cortisol down 24%)</li>
+        <li>· Social-proof counters (100M packets, 1M jars, 50K reviews)</li>
+        <li>· Benefit checklists with emoji for scanability</li>
+        <li>· Scarcity mechanics that protect price (mystery bags, gifts with purchase, sweepstakes) over blanket discounts</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Video winners</h3>
+      <ul class="card" style="list-style:none;padding:16px 20px">
+        <li>· Creator UGC testimonial, 15 to 60 seconds, whitelisted from the creator's own page</li>
+        <li>· Mechanism explainers, 30 to 75 seconds (absorption, GLP-1, delayed release)</li>
+        <li>· Negative hooks ("Don't buy... until") and myth-flips ("Water was never enough")</li>
+        <li>· Founder talking-head as a trust unit (Cymbiotika's Jafarieh)</li>
+        <li>· Taste and texture as the opener for ingestibles ("tastes like candy")</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============ SITE TEARDOWNS ============ -->
+<section class="tab" id="sites"><div class="wrap">
+  <h2>How competitor CPG sites convert</h2>
+  <p>Eleven sites torn down Aug 11, 2026. The pattern matrix first, then what each brand does that Moon Juice does not.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Pattern</th><th>Status</th><th>Who runs it</th></tr>
+    <tr><td>Subscribe-and-save (20 to 40%)</td><td><b>Standard</b></td><td>All 11</td></tr>
+    <tr><td>Bundles and stacks with tiered savings</td><td><b>Standard</b></td><td>All 11</td></tr>
+    <tr><td>First-order discount via email capture</td><td><b>Standard</b></td><td>8 of 11 (Hum most aggressive at 40%)</td></tr>
+    <tr><td>Blog or journal</td><td><b>Standard</b></td><td>All except a thin Lemme</td></tr>
+    <tr><td>Review counts near products</td><td><b>Standard</b></td><td>9 of 11</td></tr>
+    <tr><td>Personalization quiz</td><td>Common</td><td>Moon Juice, Cymbiotika, Hum, Apothékary</td></tr>
+    <tr><td>Published clinical-studies hub</td><td><b>Differentiator</b></td><td>Ritual, AG1, Cymbiotika</td></tr>
+    <tr><td>Ingredient traceability hub</td><td><b>Differentiator</b></td><td>Ritual, The Nue Co</td></tr>
+    <tr><td>Shoppable ingredient SEO pages</td><td><b>Differentiator</b></td><td>Hum</td></tr>
+    <tr><td>Loyalty cash-back or membership</td><td><b>Differentiator</b></td><td>Arrae, Lemme, AG1</td></tr>
+    <tr><td>Free expert consults or HCP channel</td><td><b>Differentiator</b></td><td>Apothékary, Ritual, AG1</td></tr>
+    <tr><td>Gamified promos (sweepstakes, mystery)</td><td><b>Differentiator</b></td><td>Lemme, Arrae, Golde</td></tr>
+  </table></div>
+  <h3>One line per brand: the thing worth stealing</h3>
+  <div class="tablewrap"><table>
+    <tr><th>Site</th><th>Frame</th><th>Steal this</th></tr>
+    <tr><td><b>arrae.com</b></td><td>Targeted, press-logo credibility</td><td>Cash-back loyalty layered on subscription: a retention flywheel Moon Juice lacks.</td></tr>
+    <tr><td><b>lemmelive.com</b></td><td>Celebrity wrapped in science words</td><td>Gamified urgency: $20K trip sweepstakes where every dollar is an entry.</td></tr>
+    <tr><td><b>cymbiotika.com</b></td><td>Clinical, quantified</td><td>Homepage trial numbers (+50% glutathione, 3x absorption), percentages not adjectives.</td></tr>
+    <tr><td><b>apothekary.com</b></td><td>Herbal tradition, modernized</td><td>Bookable free 15-minute herbalist consults: a human touchpoint for high-consideration buyers.</td></tr>
+    <tr><td><b>thenueco.com</b></td><td>Neuroscience ritual</td><td>Category invention: functional fragrance gives an emotional product no adaptogen brand copies.</td></tr>
+    <tr><td><b>golde.co</b></td><td>Warm, founder-led ritual</td><td>Moon Juice already beats Golde on education depth; note it as the floor, not a model.</td></tr>
+    <tr><td><b>humnutrition.com</b></td><td>Clinical, RD-fronted</td><td>Shoppable ingredient pages (Berberine, Magnesium) that monetize search demand a glossary leaves on the table.</td></tr>
+    <tr><td><b>ritual.com</b></td><td>Radical transparency</td><td>Published supplier-level traceability: the proof structure "Source, Dose, Form" claims but does not show.</td></tr>
+    <tr><td><b>drinkag1.com</b></td><td>One-SKU system</td><td>Welcome-kit subscription architecture that makes subscribing the default, not an upsell.</td></tr>
+    <tr><td><b>sakara.com</b></td><td>Aspirational program</td><td>Ecosystem selling: supplements attach to a program and a calendar, raising order value and lock-in.</td></tr>
+    <tr><td><b>moonjuice.com</b></td><td>Science-meets-ritual (baseline)</td><td>Above standard on quiz, glossary, expert series. Behind on published proof and retention architecture.</td></tr>
+  </table></div>
+  <p class="src">Full teardown notes available; each row cites the live site fetched Aug 11, 2026.</p>
+</div></section>
+
+<!-- ============ STRATEGY ============ -->
+<section class="tab" id="plan"><div class="wrap">
+  <h2>The strategy: how Moon Juice gets there</h2>
+  <p class="lede">Five plays, each mapped to a responsibility in the Brand + Content Strategist role. This is the plan a candidate can defend in the interview and start executing in week one.</p>
+
+  <div class="play"><div class="n">1</div><div>
+    <h4>Own the nervous system era with a flagship content franchise</h4>
+    <p>Magnesium and stress content is the category's defining story and Magnesi-Om is already at Target. Build the repeatable editorial franchise (weekly ingredient-mechanism explainers in the brand's voice: what cortisol does at 3pm, why three forms of magnesium absorb differently) across TikTok, Reels, email and the blog. Cymbiotika proves mechanism education scales in paid; Moon Juice has better source material and a 24% cortisol claim it barely uses.</p>
+    <p class="src">JD fit: "build repeatable content franchises, editorial formats, and storytelling frameworks that scale across channels."</p>
+  </div></div>
+
+  <div class="play"><div class="n">2</div><div>
+    <h4>Restart the founder engine</h4>
+    <p>Amanda Chantal Bacon's arc (autoimmune remission, the 2016 internet mockery she outlasted, 15 years of formulation) is a trust asset no competitor can copy and it currently reaches 33.6K people. A weekly founder format (kitchen-counter talking head, "what I actually take and why," reacting to wellness trends with taste and science) plus whitelisted founder ads, the exact unit Arrae and Cymbiotika run today.</p>
+    <p class="src">JD fit: "founder content... founder-led ideas" named twice in the role description.</p>
+  </div></div>
+
+  <div class="play"><div class="n">3</div><div>
+    <h4>Build the creator flywheel the Sleepy Girl moment proved</h4>
+    <p>The audience already made Moon Juice go viral once without being asked. Formalize it: always-on gifting in the Arrae mold, a TikTok Shop affiliate community at Apothékary-grade commission, and whitelisting agreements so winning creator videos become the ad account's backbone. Target: from 18 brand-page ads to a majority-creator ad mix in two quarters.</p>
+    <p class="src">JD fit: "social, creator moments, community-driven programs"; balancing "storytelling with performance."</p>
+  </div></div>
+
+  <div class="play"><div class="n">4</div><div>
+    <h4>Meet the Target shopper with a beginner layer</h4>
+    <p>755 stores of first-time adaptogen buyers need an on-ramp the insider-coded feed does not provide. An "adaptogens, explained" beginner series, retail-moment content (end-cap to phone via QR), and cultural-calendar programming built around real usage moments: PMS week, Sunday-scaries, back-to-school cortisol. This is the cultural programming calendar the JD says the role owns, filled with ideas that have a reason to exist.</p>
+    <p class="src">JD fit: "own the brand's cultural programming calendar... translate business priorities into consumer-facing ideas."</p>
+  </div></div>
+
+  <div class="play"><div class="n">5</div><div>
+    <h4>Show the proof, then codify the voice</h4>
+    <p>Publish the receipts the brand already holds: a clinical-studies and traceability hub (the Ritual/AG1 differentiator), quantified claims pulled forward into ads and PDPs, and the formal editorial style guide the JD names as a deliverable, locking the science-meets-pleasure hybrid voice so a team of channel owners cannot drift it.</p>
+    <p class="src">JD fit: "codify Moon Juice's tone of voice into a formal editorial style guide... serve as the internal authority on voice."</p>
+  </div></div>
+
+  <h2>First 90 days</h2>
+  <div class="cardgrid">
+    <div class="card"><h4>Days 1 to 30: audit and codify</h4><ul><li>Voice audit across every touchpoint; draft the editorial style guide with the VP of Brand.</li><li>Stand up the cultural calendar with the next two quarters of moments.</li><li>Inventory every quantified claim and clinical asset the brand can legally push forward.</li></ul></div>
+    <div class="card"><h4>Days 31 to 60: launch the engines</h4><ul><li>Ship the first content franchise (nervous-system education) on TikTok and email.</li><li>First founder-format episodes filmed and tested organically.</li><li>Creator gifting wave one; negotiate first whitelisting agreements.</li></ul></div>
+    <div class="card"><h4>Days 61 to 90: prove and scale</h4><ul><li>Whitelisted creator ads live against the 30%-off control.</li><li>One cultural activation shipped (a Sleepy-Girl-scale bid the brand owns this time).</li><li>Recap loop: what earned attention, what converted, what becomes franchise.</li></ul></div>
+  </div>
+
+  <div class="callout">
+    <p><b>The interview line:</b> "Moon Juice taught this category its vocabulary. The brands outgrowing it are running engines, not campaigns: creator flywheels, founder faces, mechanism education. Moon Juice already owns the hardest parts, the story, the science and the shelf. I would build the engine."</p>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  Compiled Aug 11, 2026. Sources: Meta Ad Library (US, active ads, advertiser-page pulls), brand sites fetched same day, and cited press (WWD, Forbes, Glossy, Inc., Fortune, PR Newswire). Follower counts are approximate public snapshots. Prepared as application research for the Moon Juice Brand + Content Strategist role ($135K, remote).
+</div></footer>
+
+<script>
+const nav=document.getElementById('nav');
+nav.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('section.tab').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  document.getElementById(b.dataset.t).classList.add('on');
+  window.scrollTo({top:0});
+});
+</script>
+</body>
+</html>
