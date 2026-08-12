@@ -42,26 +42,26 @@
 
       <h1 class="post-title">Inside Content Bot: the questions that became the architecture</h1>
 
-      <p class="post-summary">My operating partner was rebuilding the same ChatGPT context every morning: re-pasting her rules, watching the model ignore them, regenerating, losing the thread, fixing the same violations by hand. We replaced that loop with a system that carries her rules permanently and enforces them mechanically. This post is about the part that made it work, which was not the pipeline. It was the discovery interview. The questions I asked her, the answers that became hard-coded rules, and the Forward Deployed engineering decisions that followed. The client is real, the numbers are from production, and the operator graded the first output five out of ten, which is exactly the point.</p>
+      <p class="post-summary">A client came to me tired of arguing with ChatGPT: re-pasting her rules every morning, watching the model ignore them, regenerating, losing the thread, fixing the same violations by hand. We replaced that loop with a system that carries her rules permanently and enforces them mechanically. This post is about the part that made it work, which was not the pipeline. It was the discovery interview. The questions I asked, the answers that became hard-coded rules, and the Forward Deployed engineering decisions that followed. The client is real, the numbers are from production, and she graded the first output five out of ten, which is exactly the point.</p>
 
       <div class="post-tags">FDE / OPERATOR DISCOVERY / RULE REGISTRY / VERIFICATION-FIRST / COST ARCHITECTURE / SEO</div>
     </header>
 
     <div class="post-body">
 
-<p class="body">By Russ. Production 2026.08, live behind an access-keyed operator page. Built for a working SEO strategist serving a Canadian addiction and mental-health treatment provider. Client name withheld; everything else is real.</p>
+<p class="body">By Russ. Production 2026.08, live behind an access-keyed operator page. The client is a working SEO strategist serving a Canadian addiction and mental-health treatment provider. Names withheld; everything else is real.</p>
 
 <hr class="rule">
 
 <h2 class="h2">The use case, stated the way the operator stated it</h2>
 
-<p class="body">Amanda writes SEO articles for a living. Her process before this system: research keywords by hand in SEMrush tab by tab, read the top ten results for each target by clicking every link, brief herself, then draft in ChatGPT. And then the part that made her want to throw the laptop: ChatGPT does not follow its own rules. She would paste her writing standards into the chat, get a draft that ignored half of them, correct it, regenerate, and watch the correction wash out two turns later as the context window silently forgot. Every article restarted the same argument with the same model about the same rules.</p>
+<p class="body">The client writes SEO articles for a living. Her process before this system: research keywords by hand in SEMrush tab by tab, read the top ten results for each target by clicking every link, brief herself, then draft in ChatGPT. And then the part that made her want to throw the laptop: ChatGPT does not follow its own rules. She would paste her writing standards into the chat, get a draft that ignored half of them, correct it, regenerate, and watch the correction wash out two turns later as the context window silently forgot. Every article restarted the same argument with the same model about the same rules.</p>
 
 <p class="body">When we sat down to scope, she ranked her three problems. Keyword analysis takes the most time. Content analysis is second. The rules problem is the one that made her angriest, and it is the easiest of the three to solve mechanically, which is a useful mismatch to notice: the operator's emotional priority and the engineering difficulty ranking are different lists. We built the enforcement layer first because it earns trust fastest, and trust is what lets you build the rest.</p>
 
 <h2 class="h2">Discovery: the questions are the product</h2>
 
-<p class="body">The standard discovery failure is asking an expert to describe their process. You get the org-chart version: I research keywords, I analyze competitors, I write the article. That description is true and useless. It contains none of the judgment, and the judgment is the only thing worth automating. Amanda had been doing this work so long that her real criteria were subconscious. The interview's job was to surface numbers she did not know she used.</p>
+<p class="body">The standard discovery failure is asking an expert to describe their process. You get the org-chart version: I research keywords, I analyze competitors, I write the article. That description is true and useless. It contains none of the judgment, and the judgment is the only thing worth automating. She had been doing this work so long that her real criteria were subconscious. The interview's job was to surface numbers she did not know she used.</p>
 
 <p class="body">So instead of what do you do, the interview ran on questions built to force specifics. These are the actual questions from the call transcripts, and what each one turned into.</p>
 
@@ -85,7 +85,7 @@
 
 <p class="body"><strong>Deterministic lint before model judgment.</strong> Every rule that can be code is code: keyword placement, mention counts against her floor and cap, section lengths, link anchors under four words, em-dash bans, meta lengths. A second model, never the writer, judges only what code cannot: voice, intent focus, fabricated claims, duplicated coverage. Splitting the two keeps the expensive judgment calls rare and the cheap checks absolute.</p>
 
-<p class="body"><strong>Three strikes, then a human, with the rule named.</strong> A failing draft gets precise revision instructions and two more chances. After the third failure it escalates to Amanda as a document plus a one-page summary where every rejection names the rule it broke. That naming is her sovereignty clause: she can fix the draft or overrule the rule, and either action improves the system.</p>
+<p class="body"><strong>Three strikes, then a human, with the rule named.</strong> A failing draft gets precise revision instructions and two more chances. After the third failure it escalates to the client as a document plus a one-page summary where every rejection names the rule it broke. That naming is her sovereignty clause: she can fix the draft or overrule the rule, and either action improves the system.</p>
 
 <p class="body"><strong>Every link gets an HTTP request.</strong> Her review of the first article found five dead links the model had invented. The fix is not a better prompt, it is a verifier: every external link in every draft now gets hit with a live request before the draft can pass. Fabricated citations changed from an embarrassment she catches to a failure class the machine catches.</p>
 
