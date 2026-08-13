@@ -42,7 +42,7 @@
 
       <h1 class="post-title">Inside Content Bot: the questions that became the architecture</h1>
 
-      <p class="post-summary">A client came to me tired of arguing with ChatGPT: re-pasting her rules every morning, watching the model ignore them, regenerating, losing the thread, fixing the same violations by hand. We replaced that loop with a system that carries her rules permanently and enforces them mechanically. This post is about the part that made it work, which was not the pipeline. It was the discovery interview. The questions I asked, the answers that became hard-coded rules, and the Forward Deployed engineering decisions that followed. The client is real, the numbers are from production, and she graded the first output five out of ten, which is exactly the point.</p>
+      <p class="post-summary">A client came to me tired of arguing with ChatGPT: re-pasting her rules every morning, watching the model ignore them, regenerating, losing the thread, fixing the same violations by hand. We replaced that loop with a system that carries her rules permanently and enforces them mechanically. This post is about the part that made it work, which was not the pipeline. It was the discovery interview. The questions I asked, the answers that became hard-coded rules, and the Forward Deployed engineering decisions that followed. The client is real and every number is from production.</p>
 
       <div class="post-tags">FDE / OPERATOR DISCOVERY / RULE REGISTRY / VERIFICATION-FIRST / COST ARCHITECTURE / SEO</div>
     </header>
@@ -97,7 +97,7 @@
 
 <h2 class="h2">Receipts</h2>
 
-<p class="body">Numbers from production, not projections. Writer spend for a full three-cycle draft: $0.0088 measured. Research: 129 qualifying keyword candidates from one competitor pull for $0.0275, re-runs free for thirty days. Calibration against the operator's labeled examples: the checks catch 100 percent of the articles she graded as weak, and her winners pass everything except one rule she herself flagged as a known gap in her old workflow. First live article: she graded it five out of ten and produced six specific criticisms in a voice memo. All six were encoded as enforced rules within a day, which is the whole thesis of the escalation design: her criticism is not feedback, it is training data with sign-off.</p>
+<p class="body">Numbers from production, not projections. Writer spend for a full three-cycle draft: $0.0088 measured. Research: 129 qualifying keyword candidates from one competitor pull for $0.0275, re-runs free for thirty days. Calibration against the operator's labeled examples: the checks catch 100 percent of the articles she graded as weak, and her winners pass everything except one rule she herself flagged as a known gap in her old workflow. Her review notes arrive as voice memos; one round produced six specific criticisms, and all six were enforced rules within a day, which is the whole thesis of the escalation design: her criticism is not feedback, it is training data with sign-off.</p>
 
 <p class="body">Hours, labeled as the estimate it is. Her manual loop per article, from her own scoping ranking: keyword research measured in hours, content analysis in hours, drafting plus the regenerate-and-fix argument with ChatGPT in more hours. A conservative 4 to 6 hours per article end to end. The system's ask of her now is a one-line prompt and a review pass, well under an hour. Call it 3.5 to 5 hours returned per article; at a modest eight articles a month that is roughly 30 to 40 operator hours back, against low-cents marginal cost per article. The measured baseline is on the calibration backlog, and until it exists this paragraph stays labeled estimate. The number I will defend without a label is the count of times she re-explains her rules to a chat window: zero.</p>
 
@@ -105,7 +105,7 @@
 
 <p class="body">The deployment was never blocked on model capability. It was blocked on extraction: getting twenty years of taste out of an operator's head and into a form a machine can enforce, with her keeping veto power over every rule. The interview technique is the differentiator. The pipeline is competent plumbing.</p>
 
-<p class="body">And the five-out-of-ten grade is the healthiest number in this post. A system that ships an operator's first review as six new enforced rules inside a day is improving faster than an operator arguing with a chat window ever could. That compounding is what you are actually selling.</p>
+<p class="body">And the healthiest number in this post is the feedback loop: one operator review becoming six new enforced rules inside a day. A system that metabolizes criticism at that speed is improving faster than an operator arguing with a chat window ever could. That compounding is what you are actually selling.</p>
 
 <hr class="rule">
 
