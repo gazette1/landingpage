@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QAP Engine / cited Q&A over LIHTC allocation plans</title>
+<meta name="description" content="Retrieval-augmented Q&A over the Maryland 2025 QAP, Maryland 2025 MRFP Guide, and DC 2025 QAP. Every answer cites document and page. Built by Russ, russh.work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --bg:#0d1117; --panel:#141b24; --panel2:#1a2330; --line:#243040;
+    --ink:#e6edf3; --mut:#8b98a5; --dim:#5c6b7a;
+    --acc:#4ba3ff; --acc2:#2ea28a; --warn:#d4a72c; --bad:#e5534b;
+    --mono:'JetBrains Mono',Menlo,Consolas,monospace;
+    --disp:'Inter Tight','Inter',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:14px;line-height:1.55}
+  a{color:var(--acc);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  .topbar{display:flex;align-items:center;gap:14px;padding:10px 20px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .topbar .brand{font-family:var(--disp);font-weight:800;letter-spacing:-.02em;font-size:16px}
+  .topbar .crumb{color:var(--mut);font-size:12px}
+  .topbar .env{margin-left:auto;font-size:11px;color:var(--warn);border:1px solid var(--warn);border-radius:3px;padding:2px 8px}
+  .topbar .who{font-size:11px;color:var(--mut)}
+
+  .shell{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 45px)}
+  @media(max-width:900px){.shell{grid-template-columns:1fr}}
+
+  .rail{border-right:1px solid var(--line);background:var(--panel);padding:18px 16px;display:flex;flex-direction:column;gap:18px}
+  .rail h2{font-family:var(--disp);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+  .doc{border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:8px;background:var(--panel2)}
+  .doc .t{font-size:12.5px;font-weight:500}
+  .doc .m{font-size:11px;color:var(--mut);margin-top:3px}
+  .chip{display:inline-block;font-size:10px;padding:1px 7px;border-radius:10px;border:1px solid var(--line);color:var(--mut);margin-right:6px}
+  .chip.md{color:#e3b341;border-color:#57452a}
+  .chip.dc{color:#79c0ff;border-color:#2c4a6e}
+
+  .scorecard{border:1px solid var(--acc2);border-radius:6px;padding:12px;background:rgba(46,162,138,.06)}
+  .scorecard .big{font-family:var(--disp);font-size:26px;font-weight:800;color:var(--acc2)}
+  .scorecard .lbl{font-size:11px;color:var(--mut);margin-top:2px}
+  .scorecard .note{font-size:11px;color:var(--mut);margin-top:8px;line-height:1.5}
+
+  .main{padding:26px 30px;max-width:880px}
+  h1{font-family:var(--disp);font-weight:800;font-size:26px;letter-spacing:-.02em}
+  .sub{color:var(--mut);font-size:13px;margin:6px 0 22px;max-width:640px}
+
+  .askbox{display:flex;gap:10px;margin-bottom:10px}
+  .askbox input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:6px;color:var(--ink);font-family:var(--mono);font-size:14px;padding:12px 14px;outline:none}
+  .askbox input:focus{border-color:var(--acc)}
+  .askbox button{background:var(--acc);border:0;border-radius:6px;color:#06121f;font-family:var(--disp);font-weight:600;font-size:14px;padding:0 22px;cursor:pointer}
+  .askbox button:disabled{opacity:.4;cursor:default}
+
+  .presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+  .presets button{background:none;border:1px solid var(--line);border-radius:14px;color:var(--mut);font-family:var(--mono);font-size:11.5px;padding:5px 12px;cursor:pointer}
+  .presets button:hover{border-color:var(--acc);color:var(--acc)}
+
+  .status{font-size:12px;color:var(--dim);margin-bottom:16px;min-height:16px}
+  .status .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--acc);margin-right:7px;animation:pulse 1s infinite alternate}
+  @keyframes pulse{from{opacity:.3}to{opacity:1}}
+
+  .answer{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:18px 20px;margin-bottom:18px;display:none;white-space:pre-wrap;font-size:13.5px}
+  .answer.refused{border-color:var(--warn)}
+  .answer .head{font-family:var(--disp);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:10px;white-space:normal}
+  .answer .cite{color:var(--acc);font-weight:500}
+
+  .sources{display:none;margin-bottom:26px}
+  .sources h3{font-family:var(--disp);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+  .src{border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:4px;background:var(--panel2);padding:10px 14px;margin-bottom:8px;font-size:12px}
+  .src .l1{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+  .src .n{color:var(--acc);font-weight:500}
+  .src .d{font-weight:500}
+  .src .pg{color:var(--mut)}
+  .src .sim{margin-left:auto;color:var(--dim);font-size:11px}
+  .src .snip{color:var(--mut);margin-top:5px;line-height:1.5}
+
+  details{border:1px solid var(--line);border-radius:6px;background:var(--panel);margin-bottom:12px}
+  details summary{cursor:pointer;padding:12px 16px;font-family:var(--disp);font-weight:600;font-size:13px;color:var(--ink)}
+  details .inner{padding:2px 18px 16px;color:var(--mut);font-size:12.5px}
+  details .inner p{margin-bottom:9px}
+  details .inner li{margin:0 0 7px 16px}
+  details .inner strong{color:var(--ink);font-weight:500}
+
+  .foot{border-top:1px solid var(--line);margin-top:30px;padding-top:16px;font-size:12px;color:var(--dim)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">QAP ENGINE</span>
+  <span class="crumb">mosaic tools / lihtc / allocation-plan q&amp;a</span>
+  <span class="env">DEMO</span>
+  <span class="who">built by <a href="https://russh.work">russh.work</a></span>
+</div>
+
+<div class="shell">
+  <aside class="rail">
+    <div>
+      <h2>Corpus / 505 chunks / 186 pages</h2>
+      <div class="doc"><div class="t">Maryland QAP</div><div class="m"><span class="chip md">MD</span>2025 final draft, 30 pages</div></div>
+      <div class="doc"><div class="t">Maryland MRFP Guide</div><div class="m"><span class="chip md">MD</span>2025, 106 pages, scoring detail</div></div>
+      <div class="doc"><div class="t">DC QAP</div><div class="m"><span class="chip dc">DC</span>2025, 50 pages</div></div>
+    </div>
+    <div class="scorecard">
+      <div class="big">16/16</div>
+      <div class="lbl">retrieval eval, hit@5, gate 85%</div>
+      <div class="note">Golden set of 15 practitioner questions plus one out-of-corpus hard negative. First run scored 13/16; the misses drove state-filtered retrieval and a coverage-based refusal path, then the suite passed. The suite gates every reindex.</div>
+    </div>
+    <div>
+      <h2>Pipeline</h2>
+      <div class="doc"><div class="m">pypdfium2 extraction &rarr; section-aware chunking (~1,400 chars, 200 overlap) &rarr; text-embedding-3-small @ 256 dims &rarr; in-memory dot product on a Cloudflare Pages Function &rarr; Kimi K3 cited generation, gpt-4o-mini fallback</div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <h1>Ask the allocation plans.</h1>
+    <p class="sub">Natural-language questions over real LIHTC Qualified Allocation Plans. Every factual claim in the answer cites document and page. When the corpus cannot answer, it says so instead of guessing.</p>
+
+    <div class="askbox">
+      <input id="q" maxlength="400" placeholder="e.g. How are developer fees limited in Maryland?" autocomplete="off">
+      <button id="go">Ask</button>
+    </div>
+    <div class="presets" id="presets"></div>
+    <div class="status" id="status"></div>
+
+    <div class="answer" id="answer"></div>
+    <div class="sources" id="sources"></div>
+
+    <details>
+      <summary>What this system cannot do</summary>
+      <div class="inner">
+        <li><strong>It is not legal or application advice.</strong> QAPs are amended, clarified, and superseded; this corpus is a snapshot of three published documents (MD 2025 QAP final draft, MD 2025 MRFP Guide, DC 2025 QAP). Verify anything that matters against the agency's current publication.</li>
+        <li><strong>Two jurisdictions only.</strong> Questions naming any other state are refused rather than answered from the wrong plan. That refusal is deliberate product behavior, not a failure.</li>
+        <li><strong>Cross-references can break.</strong> QAPs constantly say "as defined in Section X." If Section X is not among the retrieved passages, the answer will be incomplete. The model is instructed to say so rather than fill the gap.</li>
+        <li><strong>Tables lose structure.</strong> Point tables and fee schedules are extracted as flowing text. Simple tables survive; wide matrices can garble. Numbers are quoted verbatim from the extracted text, which is not the same as verbatim from the printed table.</li>
+        <li><strong>Rate-limited demo.</strong> 15 questions per hour per visitor. This is a portfolio demonstration of a RAG architecture, not a hardened production service.</li>
+      </div>
+    </details>
+
+    <details>
+      <summary>How it works, and what Phase 2 would be</summary>
+      <div class="inner">
+        <p><strong>Retrieval.</strong> 505 chunks, section-aware so a chunk never straddles two scoring criteria, each carrying document, state, section, and page metadata. Embeddings are text-embedding-3-small truncated to 256 dimensions: at this corpus size the quality loss is small and the whole index fits in the serverless function's memory, so there is no vector database to operate. Adding one at 505 vectors would be architecture theater.</p>
+        <p><strong>State routing.</strong> A query naming Maryland or DC filters retrieval to that state's documents. A query naming only an uncovered state is refused before any model call. Both behaviors exist because the eval suite caught the failures they fix: cross-state bleed and confident answers about states the corpus has never seen.</p>
+        <p><strong>Generation.</strong> The model answers only from the retrieved passages, cites every claim by bracket number, and is instructed to say when the passages do not answer. Thresholds and point values are quoted verbatim.</p>
+        <p><strong>Phase 2, if this were a client engagement:</strong> expand to every state the client applies in; move the index to a managed vector store once corpus size justifies it; table-aware parsing for the scoring matrices; and year-over-year QAP diffing, because what changed since last cycle is the question developers actually pay to answer.</p>
+      </div>
+    </details>
+
+    <div class="foot">
+      QAP Engine is a portfolio build by Russ (<a href="https://russh.work">russh.work</a>), a finance-native AI engineer working in LIHTC and CRE credit. Related: <a href="https://russh.work/first-pass">First Pass</a>, <a href="https://russh.work/deal-intake">Deal Intake</a>, <a href="https://russh.work/realization-guard">Realization Guard</a>. Source documents: Maryland DHCD and DC DHCD public publications.
+    </div>
+  </main>
+</div>
+
+<script>
+const PRESETS = [
+  "How are developer fees limited in Maryland?",
+  "What does the DC QAP say about the 30 percent basis boost?",
+  "What set-asides does DC establish?",
+  "What energy standards must new construction meet in Maryland?",
+  "What is the extended use requirement?",
+  "What is the California QAP tiebreaker formula?"
+];
+const $ = id => document.getElementById(id);
+const presetsEl = $("presets");
+PRESETS.forEach(p => {
+  const b = document.createElement("button");
+  b.textContent = p;
+  b.onclick = () => { $("q").value = p; ask(); };
+  presetsEl.appendChild(b);
+});
+
+let busy = false;
+async function ask() {
+  if (busy) return;
+  const q = $("q").value.trim();
+  if (q.length < 5) return;
+  busy = true; $("go").disabled = true;
+  $("answer").style.display = "none";
+  $("sources").style.display = "none";
+  $("status").innerHTML = '<span class="dot"></span>retrieving, then generating. 5 to 20 seconds.';
+  try {
+    const r = await fetch("/api/qap", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: q })
+    });
+    const j = await r.json();
+    $("status").textContent = "";
+    if (j.error) {
+      $("answer").className = "answer refused";
+      $("answer").innerHTML = '<div class="head">Error</div>' + esc(j.error);
+      $("answer").style.display = "block";
+      return;
+    }
+    $("answer").className = "answer" + (j.refused ? " refused" : "");
+    $("answer").innerHTML =
+      '<div class="head">' + (j.refused ? "Refused, and why" :
+        "Answer" + (j.stateFilter && j.stateFilter.length ? " / retrieval filtered to " + j.stateFilter.join(", ") : "")) +
+      '</div>' + esc(j.answer).replace(/\[(\d+)\]/g, '<span class="cite">[$1]</span>');
+    $("answer").style.display = "block";
+    if (j.sources && j.sources.length) {
+      $("sources").innerHTML = "<h3>Sources retrieved</h3>" + j.sources.map(s =>
+        '<div class="src"><div class="l1"><span class="n">[' + s.n + ']</span>' +
+        '<span class="d">' + esc(s.doc) + '</span>' +
+        '<span class="pg">' + esc((s.section ? s.section + ", " : "") + s.pages) + '</span>' +
+        '<span class="sim">sim ' + s.sim + '</span></div>' +
+        '<div class="snip">' + esc(s.snippet) + '&hellip;</div></div>'
+      ).join("");
+      $("sources").style.display = "block";
+    }
+  } catch (e) {
+    $("status").textContent = "Request failed: " + e.message;
+  } finally {
+    busy = false; $("go").disabled = false;
+  }
+}
+function esc(s) { return (s || "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+$("go").onclick = ask;
+$("q").addEventListener("keydown", e => { if (e.key === "Enter") ask(); });
+</script>
+</body>
+</html>
