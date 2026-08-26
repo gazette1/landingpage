@@ -561,3 +561,116 @@
   text-transform: uppercase;
   color: var(--mid);
 }
+
+/* ============================================================
+   §HIRE — The Pipeline Sprint offer (§ 04)
+   Broadside voice: mono body, hairline rules, one inverted CTA.
+   ============================================================ */
+
+.hire-wrap {
+  max-width: 880px;
+  margin-left: auto;
+  margin-right: var(--page-margin);
+  padding: 0 var(--page-margin) var(--space-9);
+}
+
+.hire-lead {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--paper);
+  max-width: 56ch;
+  margin: 0 0 var(--space-7);
+}
+
+.hire-list {
+  list-style: none;
+  margin: 0 0 var(--space-7);
+  padding: 0;
+}
+
+.hire-list li {
+  display: flex;
+  gap: var(--space-5);
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--mid);
+}
+
+.hire-list li:last-child {
+  border-bottom: 1px solid var(--hairline);
+}
+
+.hire-list .num {
+  color: var(--dim);
+  flex: 0 0 auto;
+}
+
+.hire-list strong {
+  color: var(--paper);
+  font-weight: var(--weight-medium);
+}
+
+.hire-receipts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 0 var(--space-7);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mid);
+}
+
+.hire-terms .price {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--paper);
+  margin: 0 0 var(--space-3);
+}
+
+.hire-terms .k {
+  color: var(--dim);
+  letter-spacing: 0.08em;
+  margin-right: var(--space-3);
+}
+
+.hire-terms .fine {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--mid);
+  margin: var(--space-4) 0 var(--space-6);
+}
+
+.hire-cta {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--paper);
+  text-decoration: none;
+  border: 1px solid var(--paper);
+  padding: var(--space-4) var(--space-6);
+  transition: background-color var(--dur-base) var(--ease-precision), color var(--dur-base) var(--ease-precision);
+}
+
+.hire-cta:hover,
+.hire-cta:focus-visible {
+  background-color: var(--paper);
+  color: var(--void);
+}
+
+@media (max-width: 768px) {
+  .hire-wrap {
+    margin-left: 0;
+    max-width: none;
+  }
+}
