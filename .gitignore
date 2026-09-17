@@ -17,3 +17,4 @@
 Thumbs.db
 dist/
 node_modules/
+.dev.vars

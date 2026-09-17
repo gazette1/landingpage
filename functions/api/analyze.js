@@ -2,26 +2,19 @@
  * Cloudflare Pages Function: POST /api/analyze
  * Serverless document analysis for russh.work/back. One file per call.
  *
- * Heavy lifting is delegated: PDF/DOCX/image content extraction runs on
- * Moonshot's files API, field + structure-flag extraction on Kimi K3. The
- * key lives in Cloudflare env vars (MOONSHOT_API_KEY), never in the page
- * or the repo. PASSCODE env var gates every call.
+ * Content extraction for PDF/DOCX/image runs on Moonshot's files API. The
+ * field pass is TYPED first: deterministic regex finds every figure in the
+ * document, TypeSafe Jev picks which candidate answers each field (or NONE)
+ * and scores the structure flags, the document class, and the injection
+ * likelihood as probabilities, one request, well under a second. Kimi K3
+ * prose extraction is the fallback when TYPESAFE_API_KEY is not set or the
+ * typed call fails.
+ *
+ * Keys live in Cloudflare env vars (MOONSHOT_API_KEY, TYPESAFE_API_KEY),
+ * never in the page or the repo. PASSCODE env var gates every call.
  */
 
-const SANITY = {
-  askingPrice: [250000, 5000000000],
-  noi: [25000, 500000000],
-  capRate: [0.005, 0.25],
-  occupancy: [0.01, 1.0],
-  adr: [30, 2500],
-  revpar: [5, 2000],
-  keys: [10, 2500],
-  totalUnits: [1, 10000],
-  totalSF: [500, 50000000],
-  yearBuilt: [1850, 2035],
-  loanRequest: [250000, 5000000000],
-  capexTotal: [10000, 2000000000],
-};
+import { buildTypedQuestions, interpretTypedAnswers, classifyDocument, AUTHORITY, SANITY } from '../../lib/jev-core.js';
 
 const FIELDS = Object.keys(SANITY).concat(['address', 'cityState']);
 
@@ -36,6 +29,8 @@ Respond with one JSON object: { "fields": { <fieldName>: {...} }, "structureFlag
 Field names allowed: ${FIELDS.join(', ')}.`;
 
 const TEXT_EXT = ['md', 'txt', 'csv'];
+const JEV_PRICE_PER_M_INPUT = 0.042; // USD; output tokens are free (typesafe.ai, 2026-09-15)
+const K3_PRICE = { input: 0.8, output: 3.0 };
 
 function b64ToBytes(b64) {
   const bin = atob(b64);
@@ -93,6 +88,82 @@ async function k3Json(env, system, user, maxTokens) {
   return { data: JSON.parse(content), usage: j.usage || {} };
 }
 
+/**
+ * One typed request per document. 429 and 529 retry with backoff per the
+ * TypeSafe API reference; anything else throws to the K3 fallback.
+ */
+async function jevAsk(env, state, questions) {
+  let lastErr;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const res = await fetch('https://api.typesafe.ai/v1/systemone', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.TYPESAFE_API_KEY}` },
+      body: JSON.stringify({ model: 'jev-latest', state, questions }),
+    });
+    if (res.ok) {
+      const j = await res.json();
+      if (!j.answers) throw new Error('typed response carried no answers');
+      return j;
+    }
+    lastErr = new Error(`typed model HTTP ${res.status}: ${(await res.text()).substring(0, 160)}`);
+    if (res.status !== 429 && res.status !== 529) throw lastErr;
+    await new Promise(r => setTimeout(r, 400 * 2 ** attempt));
+  }
+  throw lastErr;
+}
+
+async function typedAnalysis(env, doc, filename) {
+  const set = buildTypedQuestions(doc, {});
+  const t0 = Date.now();
+  const j = await jevAsk(env, doc, set.questions);
+  const out = interpretTypedAnswers(j.answers, set, doc, filename);
+  const inputTokens = j.usage?.input_tokens || 0;
+  return {
+    ...out,
+    engine: 'typed',
+    model: j.model || 'jev-latest',
+    latencyMs: Date.now() - t0,
+    usage: { inputTokens, outputTokens: j.usage?.output_tokens || 0, estCostUsd: (inputTokens * JEV_PRICE_PER_M_INPUT) / 1e6 },
+    candidates: set.candidates.length,
+    askedFields: set.askedFields.length,
+  };
+}
+
+async function proseAnalysis(env, doc, filename) {
+  const t0 = Date.now();
+  const out = await k3Json(env, SYSTEM, `Extract deal facts from this document:\n\n${doc}`, 3000);
+  const fields = [];
+  const rawFields = out.data.fields || {};
+  for (const [name, hit] of Object.entries(rawFields)) {
+    if (!FIELDS.includes(name) || !hit || hit.value === null || hit.value === undefined) continue;
+    const range = SANITY[name];
+    if (range && typeof hit.value === 'number' && (hit.value < range[0] || hit.value > range[1])) continue;
+    fields.push({
+      field: name,
+      value: hit.value,
+      confidence: Math.max(0.3, Math.min(0.85, Number(hit.confidence) || 0.6)),
+      quote: String(hit.quote || '').substring(0, 90),
+    });
+  }
+  const structureFlags = (out.data.structureFlags || [])
+    .filter(f => f && f.flag && ['info', 'caution', 'serious'].includes(f.severity))
+    .slice(0, 10)
+    .map(f => ({ flag: String(f.flag), detail: String(f.detail || ''), quote: String(f.quote || '').substring(0, 90), severity: f.severity }));
+  const cls = classifyDocument(filename, doc.substring(0, 4000));
+  const inputTokens = out.usage.prompt_tokens || 0;
+  const outputTokens = out.usage.completion_tokens || 0;
+  return {
+    fields,
+    structureFlags,
+    injectionProbability: null,
+    docClass: { docClass: cls.docClass, authority: AUTHORITY[cls.docClass] || 10, why: cls.why, revised: false },
+    engine: 'prose',
+    model: 'kimi-k3',
+    latencyMs: Date.now() - t0,
+    usage: { inputTokens, outputTokens, estCostUsd: (inputTokens * K3_PRICE.input + outputTokens * K3_PRICE.output) / 1e6 },
+  };
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   const json = (code, obj) => new Response(JSON.stringify(obj), {
@@ -128,36 +199,25 @@ export async function onRequestPost(context) {
   }
 
   const doc = text.length > 60000 ? text.substring(0, 60000) : text;
-  let out;
-  try {
-    out = await k3Json(env, SYSTEM, `Extract deal facts from this document:\n\n${doc}`, 3000);
-  } catch (e) {
-    return json(502, { error: `extraction failed: ${String(e.message).substring(0, 160)}` });
+  let result;
+  let typedError = null;
+  if (env.TYPESAFE_API_KEY && body.engine !== 'prose') {
+    try {
+      result = await typedAnalysis(env, doc, file.name);
+    } catch (e) {
+      typedError = String(e.message).substring(0, 160);
+    }
   }
-
-  const fields = [];
-  const rawFields = out.data.fields || {};
-  for (const [name, hit] of Object.entries(rawFields)) {
-    if (!FIELDS.includes(name) || !hit || hit.value === null || hit.value === undefined) continue;
-    const range = SANITY[name];
-    if (range && typeof hit.value === 'number' && (hit.value < range[0] || hit.value > range[1])) continue;
-    fields.push({
-      field: name,
-      value: hit.value,
-      confidence: Math.max(0.3, Math.min(0.85, Number(hit.confidence) || 0.6)),
-      quote: String(hit.quote || '').substring(0, 90),
-    });
+  if (!result) {
+    try {
+      result = await proseAnalysis(env, doc, file.name);
+      if (typedError) result.fallbackFrom = typedError;
+      else if (!env.TYPESAFE_API_KEY) result.note = 'typed model not configured (TYPESAFE_API_KEY); prose extraction';
+    } catch (e) {
+      return json(502, { error: `extraction failed: ${String(e.message).substring(0, 160)}${typedError ? ' (typed: ' + typedError + ')' : ''}` });
+    }
   }
-  const structureFlags = (out.data.structureFlags || [])
-    .filter(f => f && f.flag && ['info', 'caution', 'serious'].includes(f.severity))
-    .slice(0, 10)
-    .map(f => ({ flag: String(f.flag), detail: String(f.detail || ''), quote: String(f.quote || '').substring(0, 90), severity: f.severity }));
-
-  return json(200, {
-    fields,
-    structureFlags,
-    usage: { inputTokens: out.usage.prompt_tokens || 0, outputTokens: out.usage.completion_tokens || 0 },
-  });
+  return json(200, result);
 }
 
 export async function onRequestOptions() {

@@ -86,7 +86,7 @@
 
   <div class="foot">
     Deterministic core: parsing, debt math, DSCR, sensitivity, workbook formulas are code, not model output.
-    Model calls are price-routed and fire only when deterministic extraction runs thin; every field carries a verbatim quote.
+    Extraction is typed: regex finds every figure on the page, a typed model (TypeSafe Jev) picks which candidate answers each field or NONE, with a calibrated probability and the candidate's own context as the quote. A model cannot invent a number that is not on the page. Prose extraction is the fallback, not the default.
     Eval harness: golden set, tool unit tests, regression diff on every change.<br><br>
     RUSSH.WORK · harris.russell1@gmail.com · 302-824-0225
   </div>

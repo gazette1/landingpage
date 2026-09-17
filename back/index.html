@@ -58,7 +58,7 @@
     <div><label>Custom backend URL (optional)</label><input type="text" id="backend" placeholder="blank = run on this site"></div>
     <button class="alt" id="checkBtn">Check</button>
   </div>
-  <div class="muted" id="beNote" style="font-size:.8rem">Serverless mode runs extraction, structure flags, doctrine screen, and the memo through this site's own functions (Kimi K3 server-side, key never in the page). The full Excel model needs the desk backend or Render: paste its URL to switch modes.</div>
+  <div class="muted" id="beNote" style="font-size:.8rem">Serverless mode runs extraction, structure flags, doctrine screen, and the memo through this site's own functions (keys never in the page). Extraction is typed: regex finds every figure in the document, TypeSafe Jev picks which one answers each field or NONE, and scores the structure flags, the document class, and the injection likelihood as probabilities. Kimi K3 prose extraction is the fallback. The full Excel model needs the desk backend or Render: paste its URL to switch modes.</div>
 </div>
 
 <div class="row">
@@ -195,16 +195,28 @@
     pump();
   }
 
+  // Authority first, confidence second: the same rule the desk ledger uses.
+  // A marketing teaser stating a price clearly still loses to a term sheet.
+  // A personal financial statement describes a person, so its figures never
+  // fill property fields at all.
+  const PROPERTY_FIELDS = new Set(['address', 'cityState', 'totalSF', 'totalUnits', 'askingPrice', 'loanRequest', 'noi', 'stabilizedNoi', 'totalProjectCost', 'capRate', 'occupancy', 'adr', 'revpar', 'keys', 'capexTotal', 'yearBuilt']);
   function mergeAnalysis(fileName, j) {
+    const cls = j.docClass || { docClass: 'unknown', authority: 10 };
     for (const f of j.fields || []) {
+      if (cls.docClass === 'personal_financial_statement' && PROPERTY_FIELDS.has(f.field)) continue;
       const cur = agg.fields.get(f.field);
-      if (!cur || f.confidence > cur.confidence) agg.fields.set(f.field, { ...f, source: fileName });
+      const wins = !cur || cls.authority > (cur.authority || 0) || (cls.authority === (cur.authority || 0) && f.confidence > cur.confidence);
+      if (wins) agg.fields.set(f.field, { ...f, source: fileName, docClass: cls.docClass, authority: cls.authority, engine: j.engine || 'prose' });
     }
     for (const fl of j.structureFlags || []) {
       const key = fl.flag.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(' ').slice(0, 5).join(' ');
       if (!agg.flags.has(key)) agg.flags.set(key, { ...fl, source: fileName });
     }
-    if (j.usage) agg.spend += ((j.usage.inputTokens || 0) * 0.8 + (j.usage.outputTokens || 0) * 3.0) / 1e6;
+    if (j.usage) {
+      agg.spend += typeof j.usage.estCostUsd === 'number'
+        ? j.usage.estCostUsd
+        : ((j.usage.inputTokens || 0) * 0.8 + (j.usage.outputTokens || 0) * 3.0) / 1e6;
+    }
   }
 
   async function pump() {
@@ -218,7 +230,11 @@
       if (serverless()) {
         const j = await post('/api/analyze', { file: { name: item.f.name, b64: await b64(item.f) } });
         mergeAnalysis(item.f.name, j);
-        st.textContent = `+${(j.fields || []).length}f +${(j.structureFlags || []).length}flags`; st.className = 'st done';
+        const cls = j.docClass ? `${j.docClass.docClass} (${j.docClass.authority})${j.docClass.revised ? ' reclassified' : ''}` : '';
+        const eng = j.engine === 'typed' ? `typed ${j.latencyMs != null ? j.latencyMs + 'ms' : ''}` : (j.engine === 'prose' ? 'prose' : '');
+        st.textContent = `${eng ? eng + ' ' : ''}+${(j.fields || []).length}f +${(j.structureFlags || []).length}flags${cls ? ' ' + cls : ''}`; st.className = 'st done';
+        if (j.fallbackFrom) item.li.title = 'typed pass failed, prose fallback: ' + j.fallbackFrom;
+        else if (j.docClass) item.li.title = j.docClass.why || '';
         renderAgg();
       } else {
         const j = await post('/api/back/ingest', { dealId: dealMeta.dealId, file: { name: item.f.name, b64: await b64(item.f) } });
@@ -355,7 +371,7 @@
     $('fieldCount').textContent = fields.length ? `(${fields.length})` : '';
     $('fields').innerHTML = fields.length
       ? '<tr><th>Field</th><th>Value</th><th>Conf</th><th>Source</th><th>Evidence</th></tr>' + fields.map(f =>
-          `<tr><td>${f.field}</td><td class="v">${String(f.value).substring(0, 40)}</td><td class="muted">${f.confidence.toFixed(2)}</td><td class="muted">${f.source}</td><td class="quote">${(f.quote||'').replace(/</g,'&lt;')}</td></tr>`).join('')
+          `<tr><td>${f.field}</td><td class="v">${String(f.value).substring(0, 40)}</td><td class="muted">${f.confidence.toFixed(2)}</td><td class="muted">${f.source}${f.docClass ? ` <i>${f.docClass} (${f.authority})</i>` : ''}${f.engine === 'typed' ? ' <i>typed</i>' : ''}</td><td class="quote">${(f.quote||'').replace(/</g,'&lt;')}</td></tr>`).join('')
       : '';
   }
 
