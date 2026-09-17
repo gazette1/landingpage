@@ -3,115 +3,216 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mosaic Back Office — Deal Room Intake</title>
+<title>DEAL ROOM · RUSSH.WORK</title>
+<meta name="description" content="Mosaic back office. Drop a deal room; typed extraction, doctrine screen, memo. Every figure carries its source, its authority tier, and a verbatim quote.">
 <meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-  :root { color-scheme: light dark; --acc: #1a5c9e; --ok: #2e7d32; --warn: #b26a00; --bad: #c62828; --line: #8884; }
-  body { font-family: system-ui, sans-serif; max-width: 1160px; margin: 1.6rem auto 4rem; padding: 0 1.2rem; }
-  h1 { font-size: 1.25rem; margin-bottom: .15rem; }
-  .sub { color: #888; font-size: .85rem; margin-bottom: 1rem; }
-  .cfg { border: 1px solid var(--line); border-radius: 10px; padding: .8rem 1rem; margin-bottom: 1.2rem; }
-  .cfg b { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: #888; }
-  .row { display: flex; gap: .8rem; flex-wrap: wrap; align-items: flex-end; margin: .6rem 0; }
-  label { font-size: .75rem; color: #888; display: block; margin-bottom: .2rem; text-transform: uppercase; letter-spacing: .04em; }
-  input[type=text], input[type=password] { padding: .5rem .6rem; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: inherit; min-width: 200px; }
-  select { padding: .5rem .6rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: #111; }
-  @media (prefers-color-scheme: dark) { select { background: #1e1e1e; color: #eee; } select option { background: #1e1e1e; color: #eee; } }
-  button { background: var(--acc); color: #fff; border: 0; border-radius: 6px; padding: .55rem 1.2rem; font-size: .9rem; cursor: pointer; }
-  button:disabled { opacity: .45; cursor: default; }
-  button.alt { background: transparent; color: inherit; border: 1px solid var(--line); }
-  .pill { display: inline-block; padding: .15rem .7rem; border-radius: 999px; font-size: .75rem; font-weight: 700; color: #fff; }
-  .on { background: var(--ok); } .off { background: var(--bad); } .mid { background: var(--warn); }
-  .cols { display: grid; grid-template-columns: 340px 1fr; gap: 1.6rem; align-items: start; }
-  @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
-  #drop { border: 2px dashed var(--line); border-radius: 10px; padding: 2rem 1rem; text-align: center; color: #888; cursor: pointer; }
-  #drop.hover { border-color: var(--acc); color: var(--acc); }
-  #drop.offz { opacity: .4; pointer-events: none; }
-  .queue { margin-top: .8rem; font-size: .82rem; }
-  .queue li { margin: .3rem 0; list-style: none; }
-  .queue .st { display: inline-block; min-width: 74px; font-weight: 600; }
-  .st.wait { color: #888; } .st.run { color: var(--warn); } .st.done { color: var(--ok); } .st.err { color: var(--bad); } .st.skip { color: #888; }
-  h2 { font-size: .95rem; margin: 1.4rem 0 .5rem; text-transform: uppercase; letter-spacing: .05em; color: #888; }
-  table { border-collapse: collapse; width: 100%; font-size: .86rem; }
-  th, td { text-align: left; padding: .32rem .55rem; border-bottom: 1px solid var(--line); }
-  th { color: #888; font-weight: 500; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; }
-  td.v { font-variant-numeric: tabular-nums; font-weight: 600; }
-  .badge { display: inline-block; padding: .22rem .8rem; border-radius: 999px; font-weight: 700; color: #fff; font-size: .85rem; }
-  .CHASE { background: var(--ok); } .STRUCTURE, .DELEGATE { background: var(--warn); } .KILL { background: var(--bad); }
-  .muted { color: #888; }
-  .sev { font-weight: 700; font-size: .72rem; }
-  .sev.SERIOUS { color: var(--bad); } .sev.CAUTION { color: var(--warn); } .sev.INFO { color: #888; }
-  .actions { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: 1rem; }
-  #spend { font-size: .8rem; color: #888; margin-top: .6rem; }
-  .quote { color: #888; font-size: .76rem; }
-  .foot { margin-top: 3rem; border-top: 1px solid var(--line); padding-top: .8rem; font-size: .78rem; color: #888; }
+  /* Tokens per design.md. Monochrome by mandate: hierarchy is size, weight,
+     position, opacity. Corners are all-sharp; nothing on this page is rounded. */
+  :root { --void:#0A0A0A; --paper:#F4F4F4; --mid:#8A8A8A; --dim:#404040; --hairline:rgba(244,244,244,.12); --rule:rgba(244,244,244,.32);
+    --font-display:'Inter Tight','Inter','Helvetica Neue',Arial,sans-serif;
+    --font-mono:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;
+    --ease-precision:cubic-bezier(.4,0,.2,1); --ease-decel:cubic-bezier(0,0,.2,1);
+    --dur-quick:100ms; --dur-base:240ms; --dur-deliberate:480ms; --margin:28px; }
+  * { box-sizing:border-box; margin:0; }
+  html { color-scheme:dark; }
+  body { background:var(--void); color:var(--paper); font-family:var(--font-mono); font-size:13px; line-height:1.55; padding:0 0 7rem; overflow-x:clip; font-variant-numeric:tabular-nums; }
+  a { color:var(--paper); text-decoration:none; }
+  a.inv { padding:2px 6px; transition:background var(--dur-quick) var(--ease-precision), color var(--dur-quick) var(--ease-precision); }
+  a.inv:hover { background:var(--paper); color:var(--void); }
+  .wordmark { position:fixed; top:24px; left:var(--margin); font-size:14px; font-weight:500; letter-spacing:.16em; z-index:5; }
+  .wordmark span { color:var(--mid); }
+  .status-block { position:fixed; bottom:28px; right:var(--margin); text-align:right; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--mid); z-index:5; line-height:1.6; }
+  .status-block .cur { display:inline-block; width:8px; height:14px; background:var(--paper); animation:blink 1.2s steps(2,end) infinite; vertical-align:middle; margin-right:6px; }
+  .status-block b { color:var(--paper); font-weight:500; }
+  @keyframes blink { 50% { opacity:0; } }
+
+  .wrap { max-width:1240px; margin:0 auto; padding:0 var(--margin); }
+  header.poster { display:grid; grid-template-columns:1fr auto; align-items:end; gap:2rem; margin:6.5rem 0 2.6rem; }
+  h1 { font-family:var(--font-display); font-weight:800; font-size:clamp(3rem,9vw,7.5rem); line-height:.9; letter-spacing:-.03em; text-transform:uppercase; margin-left:-4px; }
+  h1 .thin { font-weight:200; display:block; }
+  .lede { color:var(--mid); max-width:44ch; font-size:12px; line-height:1.6; padding-bottom:.6rem; }
+  .lede b { color:var(--paper); font-weight:500; }
+  @media (max-width:820px) { header.poster { grid-template-columns:1fr; } .lede { padding-bottom:0; } }
+
+  h2 { font-family:var(--font-display); font-weight:600; font-size:1rem; letter-spacing:.08em; text-transform:uppercase; margin:2.2rem 0 .7rem; display:flex; align-items:baseline; gap:.6em; }
+  h2 .num { color:var(--mid); font-family:var(--font-mono); font-size:11px; font-weight:500; letter-spacing:.12em; }
+  h2 .count { color:var(--mid); font-family:var(--font-mono); font-size:11px; font-weight:400; letter-spacing:.08em; }
+
+  label { display:block; font-size:11px; color:var(--mid); letter-spacing:.1em; text-transform:uppercase; margin-bottom:.3rem; }
+  input[type=text], input[type=password], select { width:100%; background:var(--void); color:var(--paper); border:1px solid var(--dim); padding:.55rem .6rem; font-family:var(--font-mono); font-size:13px; transition:border-color var(--dur-quick) var(--ease-precision); }
+  input:focus-visible, select:focus-visible, button:focus-visible { outline:1px solid var(--paper); outline-offset:2px; }
+  input:hover, select:hover { border-color:var(--mid); }
+  select option { background:#111; color:var(--paper); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:.8rem; align-items:end; }
+  .grid .wide { grid-column:span 2; }
+  @media (max-width:560px) { .grid .wide { grid-column:span 1; } }
+
+  button { background:var(--paper); color:var(--void); border:1px solid var(--paper); font-family:var(--font-mono); font-weight:500; letter-spacing:.06em; padding:.62rem 1.3rem; cursor:pointer; font-size:12px; text-transform:uppercase; transition:background var(--dur-quick) var(--ease-precision), color var(--dur-quick) var(--ease-precision), transform var(--dur-quick) var(--ease-precision); }
+  button:hover { background:var(--void); color:var(--paper); }
+  button:active { transform:translateY(1px); }
+  button:disabled { opacity:.3; cursor:default; transform:none; }
+  button:disabled:hover { background:var(--paper); color:var(--void); }
+  button.ghost { background:transparent; color:var(--paper); border-color:var(--dim); }
+  button.ghost:hover { border-color:var(--paper); background:transparent; }
+  button.ghost:disabled:hover { background:transparent; }
+
+  .rig { border-top:1px solid var(--hairline); padding:1.2rem 0 .2rem; margin-top:1.4rem; }
+  .rig-head { display:flex; justify-content:space-between; align-items:baseline; gap:1rem; flex-wrap:wrap; }
+  .pill { display:inline-block; border:1px solid var(--paper); padding:.15rem .7rem; font-size:11px; letter-spacing:.1em; text-transform:uppercase; font-weight:500; }
+  .pill.on { background:var(--paper); color:var(--void); }
+  .pill.mid { border-color:var(--dim); color:var(--mid); }
+  .note { font-size:12px; color:var(--mid); margin:.7rem 0 0; max-width:88ch; line-height:1.6; }
+
+  .cols { display:grid; grid-template-columns:minmax(300px,380px) 1fr; gap:3rem; align-items:start; margin-top:.4rem; }
+  @media (max-width:900px) { .cols { grid-template-columns:1fr; gap:1.4rem; } }
+
+  #drop { border:1px dashed var(--mid); padding:2.6rem 1rem; text-align:center; color:var(--mid); cursor:pointer; margin-top:.9rem; font-size:12px; letter-spacing:.06em; text-transform:uppercase; transition:border-color var(--dur-base) var(--ease-precision), color var(--dur-base) var(--ease-precision); }
+  #drop span { display:block; font-size:11px; text-transform:none; letter-spacing:0; margin-top:.4rem; }
+  #drop.hover { border-color:var(--paper); color:var(--paper); border-style:solid; }
+  #drop.offz { opacity:.35; pointer-events:none; }
+
+  .queue { margin-top:.9rem; font-size:12px; list-style:none; padding:0; }
+  .queue li { display:grid; grid-template-columns:1fr; gap:.15rem; padding:.55rem 0; border-bottom:1px solid var(--hairline); animation:rise var(--dur-deliberate) var(--ease-decel) both; }
+  .queue li .fname { color:var(--paper); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .queue li .fname small { color:var(--mid); margin-left:.5em; }
+  .queue .st { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--mid); }
+  .st.wait { color:var(--dim); } .st.run { color:var(--paper); } .st.run::before { content:""; display:inline-block; width:6px; height:11px; background:var(--paper); margin-right:6px; vertical-align:-1px; animation:blink .9s steps(2,end) infinite; }
+  .st.done { color:var(--paper); } .st.err { color:var(--paper); background:var(--paper); color:var(--void); padding:0 4px; display:inline-block; } .st.skip { color:var(--dim); }
+  .actions { display:flex; gap:.6rem; flex-wrap:wrap; margin-top:1.1rem; }
+  #spend { font-size:11px; color:var(--mid); margin-top:.9rem; letter-spacing:.06em; text-transform:uppercase; line-height:1.7; }
+  #spend b { color:var(--paper); font-weight:500; }
+
+  /* Receipt strip: the typed pass as instrument readout. Three numbers in
+     display 800, labels in mono xs (the ship-note metric strip pattern). */
+  .receipt { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:1rem 1.6rem; border-top:1px solid var(--hairline); border-bottom:1px solid var(--hairline); padding:1rem 0; margin:.4rem 0 .2rem; }
+  .receipt div { animation:rise var(--dur-deliberate) var(--ease-decel) both; }
+  .receipt .v { font-family:var(--font-display); font-weight:800; font-size:1.9rem; line-height:1; letter-spacing:-.02em; }
+  .receipt .l { font-size:11px; color:var(--mid); letter-spacing:.1em; text-transform:uppercase; margin-top:.3rem; }
+  .receipt.empty .v { color:var(--dim); }
+
+  table { border-collapse:collapse; width:100%; margin:.2rem 0 .6rem; }
+  th, td { text-align:left; padding:.4rem .6rem .4rem 0; border-bottom:1px solid var(--hairline); font-size:12.5px; vertical-align:top; }
+  th { color:var(--mid); font-weight:500; font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+  tr { animation:rise var(--dur-base) var(--ease-decel) both; }
+  td.v { font-weight:500; white-space:nowrap; }
+  td i { font-style:normal; color:var(--mid); font-size:11px; letter-spacing:.04em; }
+  .muted { color:var(--mid); }
+  .quote { color:var(--mid); font-size:11.5px; }
+  .empty { color:var(--dim); font-size:12px; padding:.5rem 0; border-bottom:1px solid var(--hairline); }
+  .skeleton td { padding:.55rem .6rem .55rem 0; }
+  .skeleton td::before { content:""; display:block; height:9px; width:70%; background:var(--dim); opacity:.6; animation:pulse 1.2s var(--ease-precision) infinite; }
+  @keyframes pulse { 50% { opacity:.25; } }
+
+  .badge { display:inline-block; border:1px solid var(--paper); padding:.22rem .9rem; font-weight:500; letter-spacing:.12em; font-size:12px; text-transform:uppercase; }
+  .badge.KILL, .badge.PASS { background:var(--paper); color:var(--void); }
+  .badge.STRUCTURE, .badge.DELEGATE, .badge.MONITOR { border-color:var(--mid); color:var(--paper); }
+  #verdictRow { display:flex; align-items:center; gap:.9rem; flex-wrap:wrap; font-size:12px; color:var(--mid); }
+  .sev { font-size:11px; letter-spacing:.1em; font-weight:500; text-transform:uppercase; white-space:nowrap; }
+  .sev.SERIOUS { color:var(--void); background:var(--paper); padding:0 4px; } .sev.CAUTION { color:var(--paper); } .sev.INFO { color:var(--mid); }
+  tr.conflict td { color:var(--paper); border-left:2px solid var(--paper); padding-left:.6rem; }
+  tr.conflict b { font-weight:500; letter-spacing:.08em; text-transform:uppercase; font-size:11px; margin-right:.5em; }
+
+  .foot { margin-top:5rem; border-top:1px solid var(--hairline); padding-top:1rem; font-size:12px; color:var(--mid); max-width:80ch; line-height:1.6; }
+
+  @keyframes rise { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation:none !important; transition:none !important; } }
 </style>
 </head>
 <body>
-<h1>Mosaic Back Office — Deal Room Intake</h1>
-<div class="sub">Open a deal room, drag the whole document set in. Files process one at a time; the numbers board updates as each lands. Nothing is invented: every value carries its source document, confidence, and a verbatim quote.</div>
+<a class="wordmark" href="/">RUSSH<span>.</span>WORK</a>
+<div class="status-block"><span class="cur"></span>SYSTEM: DEAL ROOM<br>MODE: <b id="modeTag">SERVERLESS</b><br>ENGINE: <b id="engineTag">TYPED, PROSE FALLBACK</b></div>
 
-<div class="cfg">
-  <b>Pipeline</b> <span id="beState" class="pill mid">THIS SITE (SERVERLESS)</span>
-  <div class="row">
-    <div><label>Passcode</label><input type="password" id="passcode" placeholder="required"></div>
-    <div><label>Custom backend URL (optional)</label><input type="text" id="backend" placeholder="blank = run on this site"></div>
-    <button class="alt" id="checkBtn">Check</button>
-  </div>
-  <div class="muted" id="beNote" style="font-size:.8rem">Serverless mode runs extraction, structure flags, doctrine screen, and the memo through this site's own functions (keys never in the page). Extraction is typed: regex finds every figure in the document, TypeSafe Jev picks which one answers each field or NONE, and scores the structure flags, the document class, and the injection likelihood as probabilities. Kimi K3 prose extraction is the fallback. The full Excel model needs the desk backend or Render: paste its URL to switch modes.</div>
-</div>
+<div class="wrap">
+  <header class="poster">
+    <h1>Deal<span class="thin">Room</span></h1>
+    <p class="lede">Open a room, drag the whole document set in. Files process one at a time and the board updates as each lands. Nothing is invented: every figure carries its <b>source document</b>, its <b>authority tier</b>, and a <b>verbatim quote</b>.</p>
+  </header>
 
-<div class="row">
-  <div><label>Deal name</label><input type="text" id="name" placeholder="Oceanfront Hotel Bridge"></div>
-  <div><label>Asset type</label>
-    <select id="type">
-      <option value="hotel">Hotel</option>
-      <option value="industrial">Industrial</option>
-      <option value="retail">Retail</option>
-      <option value="multifamily">Multifamily</option>
-      <option value="lihtc">LIHTC (affordable)</option>
-      <option value="other" selected>Other</option>
-    </select>
-  </div>
-  <div><label>Location</label><input type="text" id="location" placeholder="City, ST"></div>
-  <button id="open">Open deal room</button>
-  <span id="dealTag" class="muted"></span>
-</div>
-
-<div class="cols">
-  <div>
-    <div id="drop" class="offz">Drop the deal room here<br><span style="font-size:.75rem">PDF · XLSX · DOCX · CSV · MD · TXT · PNG · JPG — as many as you have</span></div>
-    <ul class="queue" id="queue"></ul>
-    <div class="actions">
-      <button id="screenBtn" class="alt" disabled>Re-run screen</button>
-      <button id="memoBtn" class="alt" disabled>Underwriting memo</button>
-      <button id="wbBtn" class="alt" disabled title="Full Excel model requires the desk backend or Render">Workbook (XLSX)</button>
+  <div class="rig">
+    <div class="rig-head">
+      <div><span class="num" style="color:var(--mid);font-size:11px;letter-spacing:.12em;margin-right:.6em">01</span><span style="font-family:var(--font-display);font-weight:600;letter-spacing:.08em;text-transform:uppercase">Pipeline</span></div>
+      <span id="beState" class="pill mid">THIS SITE (SERVERLESS)</span>
     </div>
-    <div id="spend"></div>
+    <div class="grid" style="margin-top:.9rem">
+      <div><label>Passcode</label><input type="password" id="passcode" placeholder="required" autocomplete="off"></div>
+      <div class="wide"><label>Custom backend URL (optional)</label><input type="text" id="backend" placeholder="blank = run on this site"></div>
+      <div><button class="ghost" id="checkBtn">Check</button></div>
+    </div>
+    <p class="note" id="beNote">Serverless mode runs extraction, structure flags, doctrine screen, and the memo through this site's own functions (keys never in the page). Extraction is typed: regex finds every figure in the document, TypeSafe Jev picks which one answers each field or NONE, and scores the structure flags, the document class, and the injection likelihood as probabilities. Kimi K3 prose extraction is the fallback. The full Excel model needs the desk backend or Render: paste its URL to switch modes.</p>
   </div>
 
-  <div>
-    <h2>Verdict</h2>
-    <div id="verdictRow"><span class="muted">Enter the passcode, open a deal room, then drop documents.</span></div>
-    <h2>Numbers</h2>
-    <table id="numbers"><tr><td class="muted">Waiting for documents.</td></tr></table>
-    <h2>Structure flags <span id="flagCount" class="muted"></span></h2>
-    <table id="flags"></table>
-    <h2>Source adjudication <span id="provCount" class="muted"></span></h2>
-    <table id="prov"></table>
-    <h2>Extracted fields <span id="fieldCount" class="muted"></span></h2>
-    <table id="fields"></table>
+  <h2><span class="num">02</span>Deal</h2>
+  <div class="grid">
+    <div><label>Deal name</label><input type="text" id="name" placeholder="Oceanfront Hotel Bridge"></div>
+    <div><label>Asset type</label>
+      <select id="type">
+        <option value="hotel">HOTEL</option>
+        <option value="industrial">INDUSTRIAL</option>
+        <option value="retail">RETAIL</option>
+        <option value="multifamily">MULTIFAMILY</option>
+        <option value="lihtc">LIHTC (AFFORDABLE)</option>
+        <option value="other" selected>OTHER</option>
+      </select>
+    </div>
+    <div><label>Location</label><input type="text" id="location" placeholder="City, ST"></div>
+    <div><button id="open">Open deal room</button></div>
+  </div>
+  <p class="note" id="dealTag"></p>
+
+  <div class="cols">
+    <div>
+      <h2><span class="num">03</span>Documents</h2>
+      <div id="drop" class="offz">Drop the deal room here<span>PDF, XLSX, DOCX, CSV, MD, TXT, PNG, JPG. As many as you have.</span></div>
+      <ul class="queue" id="queue"></ul>
+      <div class="actions">
+        <button id="screenBtn" class="ghost" disabled>Re-run screen</button>
+        <button id="memoBtn" class="ghost" disabled>Underwriting memo</button>
+        <button id="wbBtn" class="ghost" disabled title="Full Excel model requires the desk backend or Render">Workbook (XLSX)</button>
+      </div>
+      <div id="spend"></div>
+      <div id="status" class="note"></div>
+    </div>
+
+    <div>
+      <h2><span class="num">04</span>Typed pass <span class="count" id="receiptNote">no documents yet</span></h2>
+      <div class="receipt empty" id="receipt">
+        <div><div class="v" id="rFields">0</div><div class="l">fields picked</div></div>
+        <div><div class="v" id="rLatency">0 ms</div><div class="l">median latency</div></div>
+        <div><div class="v" id="rTokens">0</div><div class="l">input tokens</div></div>
+        <div><div class="v" id="rCost">$0.0000</div><div class="l">model spend</div></div>
+      </div>
+
+      <h2><span class="num">05</span>Verdict</h2>
+      <div id="verdictRow"><span class="muted">Enter the passcode, open a deal room, then drop documents.</span></div>
+      <h2><span class="num">06</span>Numbers</h2>
+      <table id="numbers"></table>
+      <h2><span class="num">07</span>Structure flags <span class="count" id="flagCount"></span></h2>
+      <table id="flags"></table>
+      <h2><span class="num">08</span>Source adjudication <span class="count" id="provCount"></span></h2>
+      <table id="prov"></table>
+      <h2><span class="num">09</span>Extracted fields <span class="count" id="fieldCount"></span></h2>
+      <table id="fields"></table>
+    </div>
+  </div>
+
+  <div class="foot">
+    Deterministic core: parsing, debt math, DSCR, sensitivity, workbook formulas are code, not model output.
+    Typed extraction cannot invent a number that is not on the page: the options are the page.
+    Authority decides which document to believe; confidence only breaks ties. Disagreements between sources are shown, never averaged.<br><br>
+    Mosaic Capital Solutions · internal tooling · <a class="inv" href="/">russh.work</a>
   </div>
 </div>
-
-<div class="foot">Mosaic Capital Solutions · internal tooling · <a href="/">russh.work</a></div>
 
 <script>
   const $ = id => document.getElementById(id);
   let opened = false, busy = false, dealMeta = {};
   const queue = [];
-  // Aggregated analysis (serverless mode): confidence-wins per field
-  const agg = { fields: new Map(), flags: new Map(), spend: 0 };
+  // Aggregated analysis (serverless mode): authority first, confidence second
+  const agg = { fields: new Map(), flags: new Map(), spend: 0, runs: [] };
   let lastScreen = null;
 
   const backend = $('backend'), pass = $('passcode');
@@ -125,6 +226,8 @@
   const hdrs = () => ({ 'Content-Type': 'application/json', 'x-pass': pass.value, 'x-demo-key': pass.value });
   const post = (path, body) => fetch((serverless() ? '' : base()) + path, { method: 'POST', headers: hdrs(), body: JSON.stringify(body) }).then(async r => { const j = await r.json(); if (j.error) throw new Error(j.error); return j; });
   const money = v => '$' + Math.round(v).toLocaleString();
+  const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const say = msg => { $('status').textContent = msg; };
 
   // Translate the browser's opaque errors into the actual cause
   function diagnose(e) {
@@ -140,10 +243,11 @@
 
   function syncState() {
     const st = $('beState');
-    if (serverless()) { st.textContent = 'THIS SITE (SERVERLESS)'; st.className = 'pill mid'; $('wbBtn').style.display = 'none'; }
-    else { st.textContent = 'CUSTOM BACKEND'; st.className = 'pill on'; $('wbBtn').style.display = ''; }
+    if (serverless()) { st.textContent = 'THIS SITE (SERVERLESS)'; st.className = 'pill mid'; $('wbBtn').style.display = 'none'; $('modeTag').textContent = 'SERVERLESS'; }
+    else { st.textContent = 'CUSTOM BACKEND'; st.className = 'pill on'; $('wbBtn').style.display = ''; $('modeTag').textContent = 'DESK BACKEND'; }
   }
   syncState();
+  renderEmpty();
 
   $('checkBtn').addEventListener('click', async () => {
     try {
@@ -162,16 +266,16 @@
     dealMeta = { name: $('name').value || 'Untitled Deal', assetType: $('type').value, location: $('location').value };
     if (serverless()) {
       opened = true;
-      $('dealTag').textContent = 'deal room open (serverless)';
+      $('dealTag').textContent = 'Deal room open (serverless). Drop documents below.';
       $('drop').classList.remove('offz');
     } else {
       $('open').disabled = true;
       try {
         const j = await post('/api/back/deal', { name: dealMeta.name, type: dealMeta.assetType, location: dealMeta.location });
         dealMeta.dealId = j.dealId; opened = true;
-        $('dealTag').textContent = j.dealId;
+        $('dealTag').textContent = 'Deal room ' + j.dealId + ' open. Drop documents below.';
         $('drop').classList.remove('offz');
-      } catch (e) { alert('Could not open a deal room: ' + diagnose(e)); }
+      } catch (e) { $('dealTag').textContent = 'Could not open a deal room: ' + diagnose(e); }
       $('open').disabled = false;
     }
   });
@@ -188,7 +292,7 @@
   function enqueue(list) {
     for (const f of list) {
       const li = document.createElement('li');
-      li.innerHTML = `<span class="st wait">queued</span>${f.name} <span class="muted">${(f.size/1024).toFixed(0)} KB</span>`;
+      li.innerHTML = `<span class="fname">${esc(f.name)}<small>${(f.size/1024).toFixed(0)} KB</small></span><span class="st wait">queued</span>`;
       $('queue').appendChild(li);
       queue.push({ f, li });
     }
@@ -212,11 +316,43 @@
       const key = fl.flag.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(' ').slice(0, 5).join(' ');
       if (!agg.flags.has(key)) agg.flags.set(key, { ...fl, source: fileName });
     }
+    let cost = 0;
     if (j.usage) {
-      agg.spend += typeof j.usage.estCostUsd === 'number'
+      cost = typeof j.usage.estCostUsd === 'number'
         ? j.usage.estCostUsd
         : ((j.usage.inputTokens || 0) * 0.8 + (j.usage.outputTokens || 0) * 3.0) / 1e6;
+      agg.spend += cost;
     }
+    agg.runs.push({ engine: j.engine || 'prose', fields: (j.fields || []).length, latencyMs: j.latencyMs ?? null, tokens: j.usage?.inputTokens || 0, cost });
+    renderReceipt();
+  }
+
+  function renderReceipt() {
+    const typed = agg.runs.filter(r => r.engine === 'typed');
+    const lat = typed.map(r => r.latencyMs).filter(v => typeof v === 'number').sort((a, b) => a - b);
+    const median = lat.length ? lat[Math.floor(lat.length / 2)] : null;
+    $('rFields').textContent = agg.runs.reduce((s, r) => s + r.fields, 0);
+    $('rLatency').textContent = median === null ? (agg.runs.length ? 'prose' : '0 ms') : (median >= 1000 ? (median / 1000).toFixed(2) + ' s' : median + ' ms');
+    $('rTokens').textContent = agg.runs.reduce((s, r) => s + r.tokens, 0).toLocaleString();
+    $('rCost').textContent = '$' + agg.spend.toFixed(4);
+    $('receipt').classList.toggle('empty', !agg.runs.length);
+    const prose = agg.runs.length - typed.length;
+    $('receiptNote').textContent = agg.runs.length
+      ? `${agg.runs.length} document${agg.runs.length === 1 ? '' : 's'}, ${typed.length} typed${prose ? ', ' + prose + ' prose fallback' : ''}`
+      : 'no documents yet';
+  }
+
+  function skeleton(id, cols) {
+    const el = $(id);
+    if (el.querySelector('tr:not(.skeleton) td')) return; // real rows already there
+    el.innerHTML = `<tr class="skeleton">${'<td></td>'.repeat(cols)}</tr><tr class="skeleton">${'<td></td>'.repeat(cols)}</tr>`;
+  }
+
+  function renderEmpty() {
+    $('numbers').innerHTML = '<tr><td class="empty">No figures yet. The board fills as each document lands.</td></tr>';
+    $('flags').innerHTML = '<tr><td class="empty">No structure flags yet. Approvals, consents, litigation, receivables, fee overhangs, and seller paper show here.</td></tr>';
+    $('prov').innerHTML = '<tr><td class="empty">No adjudication yet. When two documents disagree, both claims show with the winner and its basis.</td></tr>';
+    $('fields').innerHTML = '<tr><td class="empty">No fields yet.</td></tr>';
   }
 
   async function pump() {
@@ -226,6 +362,7 @@
     busy = true;
     const st = item.li.querySelector('.st');
     st.textContent = 'analyzing'; st.className = 'st run';
+    skeleton('fields', 5); skeleton('numbers', 3);
     try {
       if (serverless()) {
         const j = await post('/api/analyze', { file: { name: item.f.name, b64: await b64(item.f) } });
@@ -248,7 +385,7 @@
           if (done.snapshot) renderBackendSnapshot(done.snapshot);
         }
       }
-    } catch (e) { st.textContent = 'error'; st.className = 'st err'; item.li.title = diagnose(e); console.error(item.f.name, e); }
+    } catch (e) { st.textContent = 'error'; st.className = 'st err'; item.li.title = diagnose(e); say(item.f.name + ': ' + diagnose(e)); console.error(item.f.name, e); }
     item.done = true;
     busy = false;
     pump();
@@ -266,7 +403,7 @@
       }
       $('screenBtn').disabled = $('memoBtn').disabled = false;
       if (!serverless()) $('wbBtn').disabled = false;
-    } catch (e) { $('verdictRow').innerHTML = '<span class="muted">Screen failed: ' + diagnose(e) + '</span>'; }
+    } catch (e) { $('verdictRow').innerHTML = '<span class="muted">Screen failed: ' + esc(diagnose(e)) + '</span>'; }
   }
 
   // Poll resilience: a single transient fetch failure must not kill a job that
@@ -298,7 +435,7 @@
   $('screenBtn').addEventListener('click', runScreen);
 
   $('memoBtn').addEventListener('click', async () => {
-    $('memoBtn').disabled = true; $('memoBtn').textContent = 'Drafting (1-2 min)...';
+    $('memoBtn').disabled = true; $('memoBtn').textContent = 'Drafting (1-2 min)';
     try {
       if (serverless()) {
         const j = await post('/api/memo', { ...dealMeta, fields: [...agg.fields.values()], structureFlags: [...agg.flags.values()], screen: lastScreen });
@@ -309,7 +446,7 @@
         const url = await pollJob(j.jobKey, 'Drafting (K3 thinks for a few minutes)', $('memoBtn'));
         window.open(base() + url + (pass.value ? '?key=' + encodeURIComponent(pass.value) : ''), '_blank');
       }
-    } catch (e) { alert('Memo failed: ' + diagnose(e)); }
+    } catch (e) { say('Memo failed: ' + diagnose(e)); }
     $('memoBtn').disabled = false; $('memoBtn').textContent = 'Underwriting memo';
   });
 
@@ -319,12 +456,18 @@
       const j = await post('/api/back/workbook', { dealId: dealMeta.dealId });
       const url = await pollJob(j.jobKey, 'Building model (K3 designs for a few minutes)', $('wbBtn'));
       window.location = base() + url + (pass.value ? '?key=' + encodeURIComponent(pass.value) : '');
-    } catch (e) { alert('Workbook failed: ' + diagnose(e)); }
+    } catch (e) { say('Workbook failed: ' + diagnose(e)); }
     $('wbBtn').disabled = false; $('wbBtn').textContent = 'Workbook (XLSX)';
   });
 
+  function numbersTable(rows) {
+    $('numbers').innerHTML = rows.length
+      ? '<tr><th>Metric</th><th>Value</th><th>Conf</th></tr>' + rows.map(r => `<tr><td>${esc(r[0])}</td><td class="v">${esc(r[1])}</td><td class="muted">${r[2] != null ? Number(r[2]).toFixed(2) : ''}</td></tr>`).join('')
+      : '<tr><td class="empty">No figures yet. The board fills as each document lands.</td></tr>';
+  }
+
   function renderAgg() {
-    $('spend').textContent = `Model spend this deal: ~$${agg.spend.toFixed(4)} (est.)`;
+    $('spend').innerHTML = `Model spend this deal <b>$${agg.spend.toFixed(4)}</b> (est.)`;
     const fields = [...agg.fields.values()];
     const get = n => { const f = agg.fields.get(n); return f && typeof f.value === 'number' ? f.value : null; };
     const rows = [];
@@ -338,46 +481,35 @@
       const v = m.unit === '%' ? m.value.toFixed(2) + '%' : m.unit === 'x' ? m.value.toFixed(2) + 'x' : money(m.value);
       rows.push([m.name, v, m.confidence]);
     }
-    $('numbers').innerHTML = rows.length
-      ? '<tr><th>Metric</th><th>Value</th><th>Conf</th></tr>' + rows.map(r => `<tr><td>${r[0]}</td><td class="v">${r[1]}</td><td class="muted">${r[2] != null ? Number(r[2]).toFixed(2) : ''}</td></tr>`).join('')
-      : '<tr><td class="muted">Nothing extracted yet.</td></tr>';
+    numbersTable(rows);
     if (lastScreen) {
-      $('verdictRow').innerHTML = `<span class="badge ${lastScreen.verdict}">${lastScreen.verdict}</span>
-        <span class="muted"> risk ${lastScreen.riskScore}/5 · confidence ${Math.round((lastScreen.confidence||0)*100)}% · Mosaic: ${lastScreen.mosaicVerdict}`
-        + ((lastScreen.killFlags||[]).length ? ` · flags: ${lastScreen.killFlags.join(', ')}` : '') + '</span>';
+      $('verdictRow').innerHTML = `<span class="badge ${esc(lastScreen.verdict)}">${esc(lastScreen.verdict)}</span>
+        <span>risk ${lastScreen.riskScore}/5 · confidence ${Math.round((lastScreen.confidence||0)*100)}% · Mosaic: ${esc(lastScreen.mosaicVerdict)}`
+        + ((lastScreen.killFlags||[]).length ? ` · flags: ${esc(lastScreen.killFlags.join(', '))}` : '') + '</span>';
     }
     const flags = [...agg.flags.values()];
-    $('flagCount').textContent = flags.length ? `(${flags.length})` : '';
+    $('flagCount').textContent = flags.length ? `${flags.length}` : '';
     $('flags').innerHTML = flags.length
       ? '<tr><th>Sev</th><th>Flag</th><th>Detail</th><th>Evidence</th></tr>' + flags.map(f =>
-          `<tr><td class="sev ${f.severity.toUpperCase()}">${f.severity.toUpperCase()}</td><td>${f.flag}</td><td>${f.detail}</td><td class="quote">${(f.quote||'').replace(/</g,'&lt;')}</td></tr>`).join('')
-      : '';
-    // Provenance: which document won each field, and what it beat
-    const prov = s.provenance || [];
-    $('provCount').textContent = prov.length ? `(${prov.length} fields)` : '';
-    const confl = s.conflicts || [];
-    let provHtml = '';
-    if (confl.length) {
-      provHtml += confl.map(c => `<tr><td colspan="4" style="background:#c6282822;border-left:3px solid #c62828"><b>${c.severity.toUpperCase()} CONFLICT</b> ${c.message}</td></tr>`).join('');
-    }
-    if (prov.length) {
-      provHtml += '<tr><th>Field</th><th>Winner</th><th>Authority</th><th>Beat</th></tr>' + prov.map(p =>
-        `<tr><td>${p.field}</td><td class="v">${String(p.value).substring(0,28)}</td>` +
-        `<td class="muted">${p.docClass} (${p.authority})</td>` +
-        `<td class="muted">${p.beat.length ? p.beat.map(b => `${String(b.value).substring(0,16)} <i>${b.docClass}</i>`).join(', ') : '-'}</td></tr>`).join('');
-    }
-    $('prov').innerHTML = provHtml;
-
-    $('fieldCount').textContent = fields.length ? `(${fields.length})` : '';
+          `<tr><td class="sev ${esc(f.severity.toUpperCase())}">${esc(f.severity)}</td><td>${esc(f.flag)}</td><td>${esc(f.detail)}</td><td class="quote">${esc(f.quote)}</td></tr>`).join('')
+      : '<tr><td class="empty">No structure flags on this document set.</td></tr>';
+    // Serverless mode has no ledger; adjudication is authority-then-confidence per field
+    const byField = fields.filter(f => f.docClass);
+    $('provCount').textContent = byField.length ? `${byField.length} fields` : '';
+    $('prov').innerHTML = byField.length
+      ? '<tr><th>Field</th><th>Winner</th><th>Authority</th><th>Engine</th></tr>' + byField.map(p =>
+          `<tr><td>${esc(p.field)}</td><td class="v">${esc(String(p.value).substring(0, 28))}</td><td><i>${esc(p.docClass)} (${p.authority})</i> ${esc(p.source)}</td><td><i>${esc(p.engine)}</i></td></tr>`).join('')
+      : '<tr><td class="empty">No adjudication yet.</td></tr>';
+    $('fieldCount').textContent = fields.length ? `${fields.length}` : '';
     $('fields').innerHTML = fields.length
       ? '<tr><th>Field</th><th>Value</th><th>Conf</th><th>Source</th><th>Evidence</th></tr>' + fields.map(f =>
-          `<tr><td>${f.field}</td><td class="v">${String(f.value).substring(0, 40)}</td><td class="muted">${f.confidence.toFixed(2)}</td><td class="muted">${f.source}${f.docClass ? ` <i>${f.docClass} (${f.authority})</i>` : ''}${f.engine === 'typed' ? ' <i>typed</i>' : ''}</td><td class="quote">${(f.quote||'').replace(/</g,'&lt;')}</td></tr>`).join('')
-      : '';
+          `<tr><td>${esc(f.field)}</td><td class="v">${esc(String(f.value).substring(0, 40))}</td><td class="muted">${f.confidence.toFixed(2)}</td><td class="muted">${esc(f.source)}${f.docClass ? ` <i>${esc(f.docClass)} (${f.authority})</i>` : ''}${f.engine === 'typed' ? ' <i>typed</i>' : ''}</td><td class="quote">${esc(f.quote)}</td></tr>`).join('')
+      : '<tr><td class="empty">No fields yet.</td></tr>';
   }
 
   function renderBackendSnapshot(s) {
     if (!s) return;
-    $('spend').textContent = s.estLlmCostUsd ? `Model spend this deal: $${s.estLlmCostUsd.toFixed(4)}` : 'Model spend this deal: $0';
+    $('spend').innerHTML = s.estLlmCostUsd ? `Model spend this deal <b>$${s.estLlmCostUsd.toFixed(4)}</b>` : 'Model spend this deal <b>$0</b>';
     const rows = [];
     if (s.price != null) rows.push(['Price / basis', money(s.price)]);
     if (s.noi != null) rows.push(['NOI' + (s.noiIsProxy ? ' (proxy)' : ''), money(s.noi) + '/yr']);
@@ -386,25 +518,39 @@
       const v = m.unit === '%' ? m.value.toFixed(2) + '%' : m.unit === 'x' ? m.value.toFixed(2) + 'x' : money(m.value);
       rows.push([m.name, v, m.confidence]);
     }
-    $('numbers').innerHTML = rows.length
-      ? '<tr><th>Metric</th><th>Value</th><th>Conf</th></tr>' + rows.map(r => `<tr><td>${r[0]}</td><td class="v">${r[1]}</td><td class="muted">${r[2] != null ? Number(r[2]).toFixed(2) : ''}</td></tr>`).join('')
-      : '<tr><td class="muted">Nothing extracted yet.</td></tr>';
+    numbersTable(rows);
     if (s.screen) {
-      $('verdictRow').innerHTML = `<span class="badge ${s.screen.verdict}">${s.screen.verdict}</span>
-        <span class="muted"> risk ${s.screen.riskScore}/5 · confidence ${Math.round((s.screen.confidence||0)*100)}%`
-        + ((s.screen.killFlags||[]).length ? ` · flags: ${s.screen.killFlags.join(', ')}` : '') + '</span>';
+      $('verdictRow').innerHTML = `<span class="badge ${esc(s.screen.verdict)}">${esc(s.screen.verdict)}</span>
+        <span>risk ${s.screen.riskScore}/5 · confidence ${Math.round((s.screen.confidence||0)*100)}%`
+        + ((s.screen.killFlags||[]).length ? ` · flags: ${esc(s.screen.killFlags.join(', '))}` : '') + '</span>';
     }
     const fields = s.fields || [];
     const flags = fields.filter(f => f.field === 'structureFlag');
     const plain = fields.filter(f => f.field !== 'structureFlag');
-    $('flagCount').textContent = flags.length ? `(${flags.length})` : '';
+    $('flagCount').textContent = flags.length ? `${flags.length}` : '';
     $('flags').innerHTML = flags.length
-      ? '<tr><th>Flag</th><th>Evidence</th></tr>' + flags.map(f => `<tr><td>${String(f.value)}</td><td class="quote">${(f.quote||'').replace(/</g,'&lt;')}</td></tr>`).join('') : '';
-    $('fieldCount').textContent = plain.length ? `(${plain.length})` : '';
+      ? '<tr><th>Flag</th><th>Evidence</th></tr>' + flags.map(f => `<tr><td>${esc(String(f.value))}</td><td class="quote">${esc(f.quote)}</td></tr>`).join('')
+      : '<tr><td class="empty">No structure flags on this document set.</td></tr>';
+    // Provenance: which document won each field, and what it beat
+    const prov = s.provenance || [];
+    $('provCount').textContent = prov.length ? `${prov.length} fields` : '';
+    const confl = s.conflicts || [];
+    let provHtml = '';
+    if (confl.length) {
+      provHtml += confl.map(c => `<tr class="conflict"><td colspan="4"><b>${esc(c.severity)} conflict</b>${esc(c.message)}</td></tr>`).join('');
+    }
+    if (prov.length) {
+      provHtml += '<tr><th>Field</th><th>Winner</th><th>Authority</th><th>Beat</th></tr>' + prov.map(p =>
+        `<tr><td>${esc(p.field)}</td><td class="v">${esc(String(p.value).substring(0,28))}</td>` +
+        `<td class="muted">${esc(p.docClass)} (${p.authority})</td>` +
+        `<td class="muted">${p.beat.length ? p.beat.map(b => `${esc(String(b.value).substring(0,16))} <i>${esc(b.docClass)}</i>`).join(', ') : '-'}</td></tr>`).join('');
+    }
+    $('prov').innerHTML = provHtml || '<tr><td class="empty">No adjudication yet.</td></tr>';
+    $('fieldCount').textContent = plain.length ? `${plain.length}` : '';
     $('fields').innerHTML = plain.length
       ? '<tr><th>Field</th><th>Value</th><th>Conf</th><th>Source</th><th>Evidence</th></tr>' + plain.map(f =>
-          `<tr><td>${f.field}</td><td class="v">${String(f.value).substring(0, 40)}</td><td class="muted">${f.confidence.toFixed(2)}</td><td class="muted">${f.source}</td><td class="quote">${(f.quote||'').replace(/</g,'&lt;')}</td></tr>`).join('')
-      : '';
+          `<tr><td>${esc(f.field)}</td><td class="v">${esc(String(f.value).substring(0, 40))}</td><td class="muted">${f.confidence.toFixed(2)}</td><td class="muted">${esc(f.source)}</td><td class="quote">${esc(f.quote)}</td></tr>`).join('')
+      : '<tr><td class="empty">No fields yet.</td></tr>';
   }
 </script>
 </body>

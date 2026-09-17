@@ -18,3 +18,7 @@ Thumbs.db
 dist/
 node_modules/
 .dev.vars
+# Agent skills installed with npx skills add (Leonxlnx/taste-skill): local tooling, not site content
+.agents/
+.claude/skills/
+skills-lock.json

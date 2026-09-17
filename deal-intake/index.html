@@ -122,7 +122,8 @@
       { field: 'loanRequest', value: '18400000', confidence: 0.85 },
     ],
     steps: [
-      { step: 'create deal', ok: true }, { step: 'ingest bridge memo (om_text) — 10 fields', ok: true },
+      { step: 'create deal', ok: true }, { step: 'ingest bridge memo (om_text), 10 fields by regex', ok: true },
+      { step: 'typed pass (TypeSafe Jev): 13 fields asked, 11 picked, 1 flag, 0.93 s, $0.0021', ok: true },
       { step: 'screen (doctrine, SOFR + 400bps stressed)', ok: true }, { step: 'workbook (6 sheets, live formulas)', ok: true },
     ],
     estLlmCostUsd: 0,
