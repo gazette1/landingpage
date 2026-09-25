@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<title>Two Incomes, One House</title>
+<meta name="description" content="Household money review and Q4 2026 budget for Russ and Jael. Unlisted.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/styles/tokens.css">
+<style>
+/* Built against design.md (2026-05-19b). Tokens come from /styles/tokens.css. Monochrome, no radius, no shadow, dark only. */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--void);color-scheme:dark;scroll-behavior:smooth}
+body{font-family:var(--font-mono);font-weight:400;font-size:15px;line-height:1.6;color:var(--paper);background:var(--void);min-height:100vh;overflow-x:clip;font-variant-numeric:tabular-nums}
+::selection{background:var(--paper);color:var(--void)}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit;color:inherit;background:none;border:0}
+ol,ul{list-style:none}
+svg{display:block;max-width:100%}
+:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+.display{font-family:var(--font-display);letter-spacing:-.02em}
+.h1{font-family:var(--font-display);font-weight:800;font-size:clamp(48px,6vw,96px);line-height:.95;letter-spacing:-.03em;text-wrap:balance}
+.h2{font-family:var(--font-display);font-weight:600;font-size:clamp(32px,4vw,56px);line-height:1;letter-spacing:-.02em;text-wrap:balance}
+.h3{font-family:var(--font-display);font-weight:600;font-size:24px;line-height:1.2;letter-spacing:-.01em}
+.mono-xs{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;line-height:1.35}
+.mono-sm{font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;line-height:1.4}
+.body-lg{font-size:18px;line-height:1.55}
+.body-sm{font-size:13px;line-height:1.5}
+.mid{color:var(--mid)}
+.dim{color:var(--dim)}
+
+/* chrome */
+.wordmark{position:fixed;top:var(--page-margin);left:var(--page-margin);z-index:10;font-size:14px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;mix-blend-mode:difference}
+.wordmark .dot{color:var(--mid)}
+.index{position:fixed;top:var(--page-margin);right:var(--page-margin);z-index:10;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.index a{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);padding:4px 8px;transition:background var(--dur-quick) var(--ease-precision),color var(--dur-quick) var(--ease-precision)}
+.index a:hover,.index a:focus-visible{background:var(--paper);color:var(--void);outline:none}
+@media (max-width:1100px){.index{display:none}}
+
+/* hero */
+.hero{min-height:100vh;position:relative;padding:var(--page-margin)}
+.hero .poster{position:absolute;left:var(--page-margin);top:18vh;font-family:var(--font-display);font-weight:200;font-size:clamp(64px,13.5vw,240px);line-height:.85;letter-spacing:-.04em;max-width:100%}
+.hero .poster b{font-weight:800}
+.hero .brief{position:absolute;right:var(--page-margin);bottom:calc(var(--page-margin) + 96px);max-width:520px;text-align:right}
+.hero .brief p{font-size:15px;line-height:1.6;color:var(--paper)}
+.hero .brief .meta{margin-top:var(--space-5);display:grid;gap:4px;color:var(--mid)}
+.hero .status{position:absolute;left:var(--page-margin);bottom:var(--page-margin);font-size:12px;line-height:1.7;color:var(--mid)}
+.hero .status .k{color:var(--paper)}
+.hero .status .cursor{display:inline-block;width:8px;height:14px;background:var(--paper);vertical-align:-2px;animation:blink 600ms steps(2,end) infinite}
+@keyframes blink{50%{opacity:0}}
+@media (max-width:760px){
+  .hero{min-height:auto;padding-top:calc(var(--page-margin) + 64px);padding-bottom:var(--space-8)}
+  .hero .poster{position:static;font-size:clamp(56px,17vw,120px);margin-bottom:var(--space-7)}
+  .hero .brief{position:static;text-align:left;max-width:100%;margin-bottom:var(--space-7)}
+  .hero .status{position:static}
+}
+
+/* sections */
+.section{position:relative;padding:0 var(--page-margin);border-top:1px solid var(--hairline);scroll-margin-top:16px}
+.opener{padding:var(--space-10) 0 var(--space-8);max-width:900px}
+.opener.right{margin-left:auto;text-align:right}
+.opener .label{display:block;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);margin-bottom:var(--space-4)}
+.opener .lede{margin-top:var(--space-5);font-size:15px;line-height:1.6;max-width:62ch;color:var(--paper)}
+.opener.right .lede{margin-left:auto}
+@media (max-width:760px){.opener{padding:var(--space-8) 0 var(--space-6)}.opener.right{text-align:left;margin-left:0}.opener.right .lede{margin-left:0}}
+.col{max-width:640px}
+.col.offset{margin-left:25%}
+@media (max-width:1000px){.col.offset{margin-left:0}}
+.pad-b{padding-bottom:var(--space-10)}
+@media (max-width:760px){.pad-b{padding-bottom:var(--space-8)}}
+
+/* metric strip (§7.7) */
+.strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.strip>div{padding:var(--space-5) var(--space-4) var(--space-5) 0;border-left:1px solid var(--hairline);padding-left:var(--space-4)}
+.strip>div:first-child{border-left:0;padding-left:0}
+.strip .v{font-family:var(--font-display);font-weight:800;font-size:clamp(36px,4.2vw,64px);line-height:.95;letter-spacing:-.03em}
+.strip .v small{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.08em;color:var(--mid);margin-left:6px}
+.strip .l{margin-top:var(--space-3);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid)}
+.strip .d{margin-top:var(--space-3);font-size:13px;line-height:1.5;color:var(--paper)}
+@media (max-width:900px){.strip{grid-template-columns:repeat(2,minmax(0,1fr))}.strip>div:nth-child(3){border-left:0;padding-left:0}.strip>div:nth-child(n+3){border-top:1px solid var(--hairline)}}
+@media (max-width:480px){.strip{grid-template-columns:1fr}.strip>div{border-left:0;padding-left:0}.strip>div+div{border-top:1px solid var(--hairline)}}
+
+/* prose blocks */
+.block{border-top:1px solid var(--hairline);padding:var(--space-6) 0}
+.block .k{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);margin-bottom:var(--space-3)}
+.block p+p{margin-top:var(--space-3)}
+.block.flag{background:var(--paper);color:var(--void);padding:var(--space-6) var(--space-5);margin-top:var(--space-6)}
+.block.flag .k{color:var(--void)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8)}
+@media (max-width:900px){.two{grid-template-columns:1fr;gap:0}}
+.list li{padding:var(--space-3) 0;border-top:1px solid var(--hairline);display:grid;grid-template-columns:1fr auto;gap:var(--space-4);align-items:baseline}
+.list li:last-child{border-bottom:1px solid var(--hairline)}
+.list .amt{white-space:nowrap}
+.list .tot{font-weight:500}
+.list .tot .amt{font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:-.02em}
+.plain li{padding:var(--space-3) 0;border-top:1px solid var(--hairline);font-size:14px;line-height:1.6}
+.plain li:last-child{border-bottom:1px solid var(--hairline)}
+.plain b{font-weight:500;color:var(--paper)}
+ol.steps li{display:grid;grid-template-columns:40px 1fr;gap:var(--space-4);padding:var(--space-4) 0;border-top:1px solid var(--hairline);font-size:14px;line-height:1.6}
+ol.steps li:last-child{border-bottom:1px solid var(--hairline)}
+ol.steps .n{font-size:11px;font-weight:500;letter-spacing:.12em;color:var(--mid);padding-top:5px}
+
+/* income cards as rows, not cards */
+.streams{border-top:1px solid var(--rule)}
+.stream{display:grid;grid-template-columns:160px 1fr 1fr;gap:var(--space-6);padding:var(--space-7) 0;border-bottom:1px solid var(--hairline)}
+.stream .who{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid)}
+.stream .who b{display:block;color:var(--paper);font-family:var(--font-display);font-weight:800;font-size:clamp(28px,3vw,44px);letter-spacing:-.03em;line-height:1;margin-top:var(--space-2);text-transform:none}
+.stream .fig{font-family:var(--font-display);font-weight:800;font-size:clamp(32px,3.6vw,56px);letter-spacing:-.03em;line-height:1}
+.stream .fig small{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--mid);display:block;margin-top:var(--space-2)}
+.stream p{font-size:14px;line-height:1.6;margin-top:var(--space-4)}
+.stream p.mid{margin-top:var(--space-3);font-size:13px}
+@media (max-width:900px){.stream{grid-template-columns:1fr;gap:var(--space-4)}}
+
+/* charts */
+.chart{position:relative}
+.legend{display:flex;flex-wrap:wrap;gap:var(--space-2) var(--space-5);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);margin:var(--space-5) 0}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend i{width:14px;height:10px;display:inline-block}
+.sw-russ{background:var(--paper)} .sw-jael{background:var(--mid)} .sw-llc{background:var(--dim)} .sw-pers{background:var(--paper);background-image:repeating-linear-gradient(135deg,var(--void) 0 2px,transparent 2px 5px)}
+svg text{font-family:var(--font-mono);fill:var(--paper);font-size:12px}
+svg text.ax{fill:var(--mid);font-size:11px;letter-spacing:.08em}
+svg text.lab{fill:var(--paper);font-size:12.5px}
+svg .grid line{stroke:var(--hairline)}
+svg .hit{fill:transparent}
+.toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:var(--space-3);padding:var(--space-4) 0;border-top:1px solid var(--rule)}
+.btn{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:12px 14px;border:1px solid var(--rule);cursor:pointer;min-height:44px;transition:background var(--dur-quick) var(--ease-precision),color var(--dur-quick) var(--ease-precision)}
+.btn:hover,.btn:focus-visible{background:var(--paper);color:var(--void);outline:none}
+.tip{position:fixed;pointer-events:none;background:var(--paper);color:var(--void);font-size:12px;line-height:1.5;padding:8px 10px;max-width:260px;z-index:20;opacity:0;transition:opacity var(--dur-quick)}
+.tip b{font-weight:500}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:10px 12px 10px 0;text-align:left;border-bottom:1px solid var(--hairline);vertical-align:top;line-height:1.5}
+th{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);border-bottom:1px solid var(--rule)}
+td.r,th.r{text-align:right;padding-right:0;padding-left:12px}
+td.n{white-space:nowrap}
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tscroll table{min-width:640px}
+.tscroll.wide table{min-width:820px}
+
+/* fairness bars */
+.bar{height:10px;background:var(--dim);display:flex;margin:var(--space-3) 0 var(--space-4)}
+.bar i{display:block;height:100%}
+
+/* budget tool */
+.tool{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8)}
+@media (max-width:900px){.tool{grid-template-columns:1fr;gap:var(--space-6)}}
+.group{margin-top:var(--space-6)}
+.group .k{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);padding-bottom:var(--space-3);border-bottom:1px solid var(--rule)}
+.line{display:grid;grid-template-columns:1fr 120px;gap:var(--space-4);align-items:center;padding:8px 0;border-bottom:1px solid var(--hairline)}
+.line label{font-size:14px;line-height:1.4}
+.line label small{display:block;font-size:12px;color:var(--mid);line-height:1.4}
+.line input{width:100%;min-height:44px;padding:8px 10px;text-align:right;font-size:15px;border:1px solid var(--rule);background:var(--void);color:var(--paper);font-variant-numeric:tabular-nums}
+.line input:focus{outline:none;background:var(--paper);color:var(--void);border-color:var(--paper)}
+.line input::-webkit-outer-spin-button,.line input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.line input[type=number]{-moz-appearance:textfield}
+.sum{display:flex;justify-content:space-between;padding:var(--space-3) 0;font-weight:500;border-bottom:1px solid var(--rule)}
+.sum .amt{font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:-.02em}
+.radio{display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--rule)}
+.radio label{flex:1 1 auto;display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:8px 12px;font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-left:1px solid var(--rule);text-align:center}
+.radio label:first-child{border-left:0}
+.radio label:has(input:checked){background:var(--paper);color:var(--void)}
+.radio input{position:absolute;opacity:0;width:0;height:0}
+.res{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-top:var(--space-6)}
+@media (max-width:760px){.res{grid-template-columns:1fr}}
+.res .p{border-top:1px solid var(--rule);padding-top:var(--space-4)}
+.res .p .who{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid)}
+.res .p .big{font-family:var(--font-display);font-weight:800;font-size:clamp(40px,5vw,72px);letter-spacing:-.03em;line-height:1;margin:var(--space-2) 0}
+.res .p .big small{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--mid);margin-left:8px}
+.res .p .sub{font-size:13px;line-height:1.6;color:var(--paper)}
+.res .p .kv{margin-top:var(--space-4);display:grid;grid-template-columns:1fr auto;gap:4px 16px;font-size:13px;color:var(--mid)}
+.res .p .kv .amt{color:var(--paper)}
+.res .p .kv .neg{background:var(--paper);color:var(--void);padding:0 6px}
+.verdict{margin-top:var(--space-6);padding:var(--space-5);border:1px solid var(--rule);font-size:14px;line-height:1.6}
+.verdict.bad{background:var(--paper);color:var(--void);border-color:var(--paper)}
+.verdict b{font-weight:500}
+
+footer{padding:var(--space-9) var(--page-margin) var(--space-8);border-top:1px solid var(--hairline);display:grid;gap:var(--space-3);font-size:12px;color:var(--mid);max-width:70ch}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0ms!important;animation-iteration-count:1!important;transition-duration:0ms!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="wordmark" href="/">Russh<span class="dot">.</span>work</a>
+<nav class="index" aria-label="Sections">
+  <a href="#summary">Summary</a><a href="#income">Income</a><a href="#spend">Spending</a><a href="#fair">Fair share</a><a href="#llc">The LLC</a><a href="#owed">Owed</a><a href="#habits">Habits</a><a href="#q4">Q4 budget</a><a href="#migrate">Migration</a><a href="#rules">Rules</a><a href="#data">Data</a>
+</nav>
+
+<main>
+<section class="hero" aria-label="Title">
+  <h1 class="poster">two incomes,<br><b>one house.</b></h1>
+  <div class="brief">
+    <p>Where Russ and Jael's money came from and went between June and August 2026, what is owed, and a Q4 plan for one joint account that both fund in proportion to what they take home. Every number comes from the statements, with one update from Russ on 2026-09-25: Jael has left Mary and Main, earns $3,000 a month from that work instead, and Merch the Moment is counted at $2,000 a month all in.</p>
+    <div class="meta mono-xs">
+      <span>2,799 transactions / 65 statement sections reconciled to the penny</span>
+      <span>Run rate window Jun 1 to Aug 31, 2026</span>
+      <span>Unlisted page. Anyone with the link can read it.</span>
+    </div>
+  </div>
+  <div class="status" aria-hidden="true">
+    &gt; <span class="k">BUILT:</span> 2026.09.25<br>
+    &gt; <span class="k">SOURCES:</span> capital one 360 / unfcu / amex gold / wells fargo business<br>
+    &gt; <span class="k">STATUS:</span> q4 plan, awaiting sign-off <span class="cursor"></span>
+  </div>
+</section>
+
+<section class="section" id="summary">
+  <header class="opener">
+    <span class="label">§ 01 / Summary</span>
+    <h2 class="h1">Four numbers.</h2>
+    <p class="lede">Monthly figures are the June to August average unless marked. "Take-home" is money that actually landed in an account.</p>
+  </header>
+  <div class="strip">
+    <div><div class="v">$11,478<small>/MO</small></div><div class="l">Combined take-home, going forward</div><div class="d">Russ $6,478 from two PBS paychecks. Jael $3,000 from Mary and Main plus $2,000 from Merch the Moment. It was $16,709 while the biweekly paychecks ran.</div></div>
+    <div><div class="v">$14,753<small>/MO</small></div><div class="l">Combined personal spend</div><div class="d">June to August habits, all accounts, including $4,041 a month of personal bills the LLC paid. Against the new income that is $3,275 a month too much before a dollar is saved.</div></div>
+    <div><div class="v">-$12,388</div><div class="l">Cash change, Jun 1 to Aug 31</div><div class="d">Russ -$942, Jael personal -$1,128, LLC -$10,318. The Amex balance also grew by about $1,770 over the same window.</div></div>
+    <div><div class="v">$20,540</div><div class="l">Left the visible accounts</div><div class="d">In three months: $9,900 of LLC payroll to an account not in the package, plus $10,640 withdrawn in cash on Aug 14. Where it went is not in the statements.</div></div>
+  </div>
+  <div class="col offset pad-b" style="margin-top:var(--space-8)">
+    <div class="block"><div class="k">The plain reading</div><p>Both of you spend what comes in. Russ ends most months where he started. Jael's personal accounts are flat too, but only because the LLC pays about $4,000 a month of household and personal bills, and its balance fell $10,318 in three months while revenue dropped from $11,341 in June to $4,131 in August.</p><p>With the Mary and Main paychecks gone, June to August habits cannot continue. The household has to take about $3,300 a month out of spending to break even, and more to save. The habit table and the Q4 budget below do exactly that.</p></div>
+    <div class="block"><div class="k">What is already working</div><p>The rent has been shared, not carried by one person. Russ pays $1,690 of shared costs directly and the LLC pays $2,182 on Jael's behalf: 44 percent to 56 percent. With the new incomes ($6,478 against $5,000) Russ now earns 56 percent, so a fair split moves the other way: Russ carries more of the joint account, Jael less. The bigger problems are that nothing is being saved and that the business is carrying personal costs.</p></div>
+  </div>
+</section>
+
+<section class="section" id="income">
+  <header class="opener right">
+    <span class="label">§ 02 / Income</span>
+    <h2 class="h1">Three streams.</h2>
+    <p class="lede">Two are steady. The third is the LLC, which is volatile and already spoken for.</p>
+  </header>
+  <div class="streams pad-b">
+    <div class="stream">
+      <div class="who">Russ<b>PBS salary</b></div>
+      <div><div class="fig">$3,239.24<small>per paycheck, biweekly</small></div><p>$1,943.54 lands in the Leisure checking and $1,295.70 in Performance Savings, then most of the savings half is swept back to checking within the month. Two-paycheck months bring $6,478; January and July 2026 had three ($9,718). Q4 has exactly two per month: Oct 9 and 23, Nov 6 and 20, Dec 4 and 18.</p></div>
+      <div><p class="mid">Mosaic Capital Zelle deposits in February to May ($2,335 total) are excluded at Russ's request.</p></div>
+    </div>
+    <div class="stream">
+      <div class="who">Jael<b>Mary and Main</b></div>
+      <div><div class="fig">$3,000<small>per month, going forward</small></div><p>Through August this was a $3,465.38 biweekly paycheck ($6,931 a month) deposited into the More Media Co business account. Jael has left the job and now earns $3,000 a month from that work. The budget uses $3,000 landing once a month; the statements cannot yet confirm the timing.</p></div>
+      <div><p class="mid">Have the $3,000 paid into Jael's own checking, not the LLC. That single change removes most of the commingling.</p></div>
+    </div>
+    <div class="stream">
+      <div class="who">LLC<b>Merch the Moment</b></div>
+      <div><div class="fig">$2,000<small>to Jael, all in</small></div><div class="chart" id="rev-chart" style="margin-top:var(--space-5)"></div></div>
+      <div><p>Square and PayPal payouts averaged $7,475 a month and fell every month. True operating costs (software, contractors, printing, taxes) averaged $4,394 including a one-time $4,787 payment to the Comptroller of Maryland; about $2,800 without it. That left roughly $4,175 a month before Jael's own pay in the summer.</p><p class="mid">Russ and Jael are calling her take from the business $2,000 a month for now, which leaves room for a tax reserve and for the swings the chart shows. Anything above $2,000 stays in the LLC until January.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="spend">
+  <header class="opener">
+    <span class="label">§ 03 / Spending</span>
+    <h2 class="h1">Where it goes.</h2>
+    <p class="lede">Monthly average, June to August 2026, by who paid. "LLC" means the business account paid a personal or household bill. Hover or tap a bar for the split; the table has every figure.</p>
+  </header>
+  <div class="toolbar">
+    <div class="legend" style="margin:0"><span><i class="sw-russ"></i>Russ, Capital One</span><span><i class="sw-jael"></i>Jael, UNFCU and Amex</span><span><i class="sw-llc"></i>LLC paid it, Wells Fargo</span></div>
+    <button class="btn" id="spend-toggle" type="button" aria-pressed="false">Show table</button>
+  </div>
+  <div class="chart" id="spend-chart"></div>
+  <div id="spend-table" class="tscroll" hidden></div>
+  <div class="two pad-b" style="margin-top:var(--space-8)">
+    <div>
+      <h3 class="h3">Russ, the honest list</h3>
+      <p class="body-sm mid" style="margin:var(--space-3) 0 var(--space-4)">Spends about $7,600 a month against $6,478 to $7,558 of income depending on the paycheck count.</p>
+      <ul class="plain">
+        <li><b>Dining out and coffee, $1,012 a month.</b> The single largest discretionary line in the household. Starbucks alone appears 22 times since March.</li>
+        <li><b>AI and dev tools, $611 a month.</b> Claude subscription $212, plus Anthropic API, OpenAI, SerpAPI, Cloudflare, Perplexity, Runpod and similar. With no business income attached, this is a hobby cost.</li>
+        <li><b>Cash, Zelle and Apple Cash sent, $542 a month.</b> Recipients are people, not merchants, so the statements cannot say what it bought.</li>
+        <li><b>Golf, $348 a month.</b> Peak Golf Institute $650, a PGA lesson pack $330, plus rounds and gear.</li>
+        <li><b>Debt payments, $934 a month.</b> Capital One credit card ($693 to $963) and Navy Federal ($250 to $300). Those balances are not in the package, so the card spend is invisible here.</li>
+        <li><b>Fitness $263, tithe $320, therapy $180, New York Life $114.</b> Fixed and reasonable; listed so the total is complete.</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="h3">Jael, the honest list</h3>
+      <p class="body-sm mid" style="margin:var(--space-3) 0 var(--space-4)">About $3,190 a month from her own accounts plus $4,041 a month of personal bills paid by the LLC, roughly $7,230 in total.</p>
+      <ul class="plain">
+        <li><b>The LLC pays the household.</b> Rent $1,575, BGE $197, T-Mobile $129, Verizon $57, cleaning $75, the Honda payment $360, and a further $1,650 a month of dining, Amazon, beauty, health and Apple Cash. None of it is a business expense.</li>
+        <li><b>Car, $1,352 a month on Amex and UNFCU.</b> Mostly the Honda bought June 2 ($3,460 down payment on Amex) plus Progressive at $191 a month. Steady state is about $630.</li>
+        <li><b>Shopping, $784 a month combined.</b> Amazon accounts for $2,046 since March across 28 orders, plus Temu, TJ Maxx and Fashion Nova.</li>
+        <li><b>Health and therapy, $547 a month combined.</b> RxWellness chiropractic $200 a month, McGuire Therapeutic copays, a $863 CMC medical bill in July, laser and dermatology.</li>
+        <li><b>Beauty and personal care, $399 a month.</b> Sephora, Ulta, nails, hair and laser.</li>
+        <li><b>Amex is the pressure point.</b> Charges of $34,591 since January against $30,503 of payments. A March interest charge shows the balance has been carried at least once.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="fair">
+  <header class="opener right">
+    <span class="label">§ 04 / Fair share</span>
+    <h2 class="h1">Is the split fair?</h2>
+    <p class="lede">Shared costs are rent, utilities, internet, phones, security and cleaning: $3,872 a month. Who pays them now, and what proportional looks like on the new incomes.</p>
+  </header>
+  <div class="two">
+    <div>
+      <div class="mono-xs mid">Who pays shared costs now</div>
+      <div class="bar"><i style="width:44%;background:var(--paper)"></i><i style="width:56%;background:var(--mid)"></i></div>
+      <ul class="list">
+        <li><span>Russ, direct from Capital One</span><span class="amt">$1,690 / 44%</span></li>
+        <li><span>Jael, via UNFCU and the LLC</span><span class="amt">$2,182 / 56%</span></li>
+      </ul>
+      <p class="body-sm mid" style="margin-top:var(--space-4)">Russ: rent $1,575, Vivint $60, plus $55 a month of extras to the landlord. Jael: rent $1,575, BGE $197, T-Mobile $253, Verizon $57, cleaning $100.</p>
+    </div>
+    <div>
+      <div class="mono-xs mid">Take-home shares</div>
+      <div class="bar"><i style="width:56%;background:var(--paper)"></i><i style="width:44%;background:var(--mid)"></i></div>
+      <ul class="list">
+        <li><span>Going forward: $6,478 against $5,000</span><span class="amt">56% / 44%</span></li>
+        <li><span>Going forward, if Merch the Moment pays nothing</span><span class="amt">68% / 32%</span></li>
+        <li><span>June to August, with the old paychecks</span><span class="amt">39% / 61%</span></li>
+      </ul>
+      <p class="body-sm mid" style="margin-top:var(--space-4)">Jael has been paying 56 percent of shared costs; on the new incomes her fair share is 44 percent. The proportional split below moves about $460 a month of shared cost from Jael to Russ.</p>
+    </div>
+  </div>
+  <div class="col offset pad-b" style="margin-top:var(--space-8)">
+    <div class="block"><div class="k">Where the stress actually comes from</div><p>Three things the statements show clearly. First, neither person saves: Russ's Performance Savings has ended every month since September 2025 between $440 and $2,745, and Jael's UNFCU savings has held $675 since March. Second, the LLC is subsidizing household life at about $4,000 a month, which makes Jael's true cost of living hard to see and the business look poorer than it is. Third, the household spends on things that are easy to disagree about (dining, AI tools, golf, beauty, Amazon) at a combined $3,900 a month, and none of it is agreed in advance.</p></div>
+  </div>
+</section>
+
+<section class="section" id="llc">
+  <header class="opener">
+    <span class="label">§ 05 / The LLC</span>
+    <h2 class="h1">The business is quietly funding the house.</h2>
+    <p class="lede">More Media Co's Wells Fargo balance by month end, and what flowed through it. Jael's Mary and Main paychecks are shown separately because they are not business revenue.</p>
+  </header>
+  <div class="two">
+    <div>
+      <div class="mono-xs mid" style="margin-bottom:var(--space-4)">Wells Fargo balance, month end</div>
+      <div class="chart" id="llc-bal"></div>
+      <p class="body-sm mid" style="margin-top:var(--space-4)">June 1: $30,984. August 31: $20,666. July rose only because no large draw was taken that month.</p>
+    </div>
+    <div>
+      <div class="mono-xs mid">Money out of the LLC, monthly</div>
+      <div class="legend"><span><i class="sw-llc"></i>Business costs</span><span><i class="sw-jael"></i>Payroll and draws to Jael</span><span><i class="sw-russ"></i>Personal bills paid by the LLC</span><span><i style="width:14px;height:0;border-top:2px dashed var(--paper)"></i>Revenue</span></div>
+      <div class="chart" id="llc-flow"></div>
+      <div id="llc-table" class="tscroll" style="margin-top:var(--space-4)"></div>
+    </div>
+  </div>
+  <div class="col offset pad-b" style="margin-top:var(--space-8)">
+    <div class="block flag"><div class="k">Three items to explain before any budget holds</div><p>$10,000 and $640 withdrawn in cash at a branch on Aug 14. A $3,300 payroll debit each month (Jun 3, Jul 2, Aug 4) to an account that is not in the package, alongside smaller payroll runs of $850, $650 and, from Aug 14, $477.85 biweekly through Intuit that does land in Jael's UNFCU. And $4,787 to the Comptroller of Maryland on Jun 1, which reads as a tax payment and should be planned for as a recurring cost.</p></div>
+    <div class="block"><div class="k">What "stop commingling" costs</div><p>If the LLC stops paying rent, utilities, phones, the car and personal cards, Jael's personal accounts need to absorb about $4,041 a month out of $5,000 of income. The Q4 plan handles that by fixing her business take at $2,000, routing every shared bill through the joint account, and cutting her personal lines to what $5,000 can carry.</p></div>
+  </div>
+</section>
+
+<section class="section" id="owed">
+  <header class="opener right">
+    <span class="label">§ 06 / Owed and upcoming</span>
+    <h2 class="h1">What has to clear.</h2>
+    <p class="lede">The cruise and both trips are already on the Amex. These are the amounts the Q4 budget has to clear or fund.</p>
+  </header>
+  <div class="two pad-b">
+    <div>
+      <h3 class="h3">On the Amex now (Jael's card)</h3>
+      <ul class="list" style="margin-top:var(--space-4)">
+        <li><span class="mono-xs mid">Joint travel</span><span></span></li>
+        <li><span>Norwegian Cruise Line, charged Sep 21</span><span class="amt">$2,877</span></li>
+        <li><span>Orlando, Dec 22 to 30: American Airlines out, two tickets</span><span class="amt">$455</span></li>
+        <li><span>Orlando: JetBlue back, two tickets</span><span class="amt">$145</span></li>
+        <li class="tot"><span>Joint travel on the card</span><span class="amt">$3,477</span></li>
+        <li><span class="mono-xs mid">Jael's February trip</span><span></span></li>
+        <li><span>Southwest, BWI to Montego Bay, Feb 15, charged Sep 17</span><span class="amt">$472</span></li>
+        <li><span>Remaining trip cost per Jael's $1,158 estimate</span><span class="amt">$686</span></li>
+        <li><span class="mono-xs mid">Card position</span><span></span></li>
+        <li><span>Charges minus payments, Jan 1 to Sep 24</span><span class="amt">+$4,088</span></li>
+      </ul>
+      <p class="body-sm mid" style="margin-top:var(--space-4)">The download does not show the opening balance, so the true balance is at least $4,088 and likely higher. Check the Amex app and enter the real figure in the budget. The $2,200 cruise figure Russ gave is $677 lower than the charge; if part was prepaid or will be refunded, adjust the line.</p>
+    </div>
+    <div>
+      <h3 class="h3">Other obligations in the statements</h3>
+      <ul class="list" style="margin-top:var(--space-4)">
+        <li><span>Honda loan (Jael), monthly</span><span class="amt">$360</span></li>
+        <li><span>Capital One credit card (Russ), monthly payments seen</span><span class="amt">$693 to $963</span></li>
+        <li><span>Navy Federal (Russ), monthly</span><span class="amt">$250 to $300</span></li>
+        <li><span>Student loan (Russ), one debit seen in May</span><span class="amt">$271</span></li>
+        <li><span>Progressive auto (Jael), monthly</span><span class="amt">$191</span></li>
+        <li><span>Lemonade renters insurance, paid Apr 3 for the year</span><span class="amt">$261</span></li>
+      </ul>
+      <p class="body-sm mid" style="margin-top:var(--space-4)">Balances and rates for the Capital One card, Navy Federal and the student loan are not in the package. They belong in the next version of this review because they decide whether the card should be paid before the home fund is started.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="habits">
+  <header class="opener">
+    <span class="label">§ 07 / Habit ceilings</span>
+    <h2 class="h1">What each habit gets.</h2>
+    <p class="lede">A structured plan built from what you actually did in June to August. Each line has the current monthly figure, the Q4 ceiling, and the habit that gets you there. Together they take spending from $14,753 to about $10,950 a month, which is what $11,478 of income can carry with a small margin.</p>
+  </header>
+  <div class="tscroll wide">
+    <table>
+      <thead><tr><th>Habit</th><th>Who</th><th class="r">Jun to Aug</th><th class="r">Q4 ceiling</th><th class="r">Saved</th><th>The rule</th></tr></thead>
+      <tbody>
+        <tr><td>Coffee and solo meals</td><td>Russ</td><td class="r n">$1,012</td><td class="r n">$250</td><td class="r n">$762</td><td>Coffee out twice a week, not daily (Starbucks 22 visits since March). Lunch from home four days. Meals together go on the joint card, not this line.</td></tr>
+        <tr><td>AI and dev tools</td><td>Russ</td><td class="r n">$611</td><td class="r n">$150</td><td class="r n">$461</td><td>One Claude plan at the $100 tier or below. Cancel Perplexity, Runpod, SerpAPI, Higgsfield and the second OpenAI and Google Cloud projects until a project pays for itself.</td></tr>
+        <tr><td>Cash, Zelle, Apple Cash sent</td><td>Russ</td><td class="r n">$542</td><td class="r n">$100</td><td class="r n">$442</td><td>Every transfer gets a memo. Anything over $50 is agreed on Sunday.</td></tr>
+        <tr><td>Golf</td><td>Russ</td><td class="r n">$348</td><td class="r n">$100</td><td class="r n">$248</td><td>No lesson packs until spring. Rounds only from the golf line.</td></tr>
+        <tr><td>Fitness</td><td>Russ</td><td class="r n">$263</td><td class="r n">$100</td><td class="r n">$163</td><td>Solidcore or DMV Iron Gym, not both. Pause the other through March.</td></tr>
+        <tr><td>Shopping, games, subscriptions</td><td>Russ</td><td class="r n">$351</td><td class="r n">$100</td><td class="r n">$251</td><td>No Xbox or PlayStation purchases in Q4. Keep one music and one video service; cancel Rocket Money, Tidal and duplicates.</td></tr>
+        <tr><td>Amazon and shopping</td><td>Jael</td><td class="r n">$784</td><td class="r n">$150</td><td class="r n">$634</td><td>One Amazon order a month, built in a cart over the month with a 48-hour wait. Temu, Fashion Nova and TJ Maxx paused.</td></tr>
+        <tr><td>Solo meals and coffee</td><td>Jael</td><td class="r n">$515</td><td class="r n">$200</td><td class="r n">$315</td><td>Same rule as Russ. Shared meals move to the joint card.</td></tr>
+        <tr><td>Beauty and personal care</td><td>Jael</td><td class="r n">$399</td><td class="r n">$150</td><td class="r n">$249</td><td>Nails and laser on a monthly cadence instead of every two to three weeks. Sephora and Ulta from this line only.</td></tr>
+        <tr><td>Chiropractic, therapy, medical</td><td>Jael</td><td class="r n">$547</td><td class="r n">$250</td><td class="r n">$297</td><td>Keep therapy. Ask RxWellness for a package price or move to every other week; the $200 monthly charge is the lever.</td></tr>
+        <tr><td>Cash and Apple Cash sent</td><td>Jael</td><td class="r n">$271</td><td class="r n">$75</td><td class="r n">$196</td><td>Same memo rule. Business reimbursements go through the LLC, not Apple Cash.</td></tr>
+        <tr><td>Groceries and convenience</td><td>Both</td><td class="r n">$826</td><td class="r n">$500</td><td class="r n">$326</td><td>One weekly Lidl or Giant run on the joint card. The leak is the small stops: Aerospace Dash, 7-Eleven and Wawa were $213 a month on Russ's card alone.</td></tr>
+        <tr><td>Shared meals out</td><td>Both</td><td class="r n">in the lines above</td><td class="r n">$200</td><td class="r n"></td><td>Two dinners a month from the joint card. This is the line that protects date night from the cuts.</td></tr>
+        <tr><td>Cleaning and laundry</td><td>Both</td><td class="r n">$100</td><td class="r n">$50</td><td class="r n">$50</td><td>Office cleaning stops being a personal cost; laundromat runs drop to twice a month.</td></tr>
+        <tr><td>Car costs</td><td>Both</td><td class="r n">$1,953</td><td class="r n">$836</td><td class="r n">$1,117</td><td>The June Honda down payment falls out. Honda $360, Progressive $191, fuel and tolls $285 stay.</td></tr>
+        <tr><td>Rent, utilities, phones, security, insurance, giving, debts, therapy, life insurance</td><td>Both</td><td class="r n">$5,640</td><td class="r n">$5,470</td><td class="r n">$170</td><td>Treated as commitments, not habits. The only change is that the extra payments to the landlord stop and BGE is budgeted at $200.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="strip" style="margin-top:var(--space-8);grid-template-columns:repeat(3,minmax(0,1fr))">
+    <div><div class="v">$10,956</div><div class="l">Monthly spend after ceilings</div><div class="d">Against $11,478 of income. About $520 of margin, most of it in Russ's column.</div></div>
+    <div><div class="v">$3,797</div><div class="l">Net cut from June to August habits</div><div class="d">Gross habit cuts of about $5,500 (Russ $2,327, Jael $1,691, shared $1,493) less the temporary Amex, trip and home fund lines. Each cut sits where the discretionary money was going.</div></div>
+    <div><div class="v">$1,925</div><div class="l">Temporary lines that end in December</div><div class="d">Cruise and Orlando flights $1,159, Orlando spending $333, February trip fund $229, Jael's Amex carry $204. From January this money goes to the home fund.</div></div>
+  </div>
+  <div class="col offset pad-b" style="margin-top:var(--space-8)">
+    <div class="block"><div class="k">Why the cuts land where they do</div><p>Rent, utilities, debts, giving and health are treated as commitments and left alone. Every cut comes from the six discretionary habits where the money actually went. Russ gives up more dollars because his discretionary spending was larger; Jael gives up a larger share of her income because her income fell. Both statements are true, and the split below reflects the second one.</p></div>
+  </div>
+</section>
+
+<section class="section" id="q4">
+  <header class="opener right">
+    <span class="label">§ 08 / Q4 budget</span>
+    <h2 class="h1">October to December.</h2>
+    <p class="lede">One joint checking account for everything shared, one joint savings account for the home. Each of you moves your share in on payday and keeps the rest in your own account under a personal ceiling. The defaults are the habit ceilings above; edit any figure and the shares recompute. Edits stay in this browser only.</p>
+  </header>
+  <div class="tool">
+    <div>
+      <div class="group" style="margin-top:0">
+        <div class="k">Take-home per month, planning figures</div>
+        <div class="line"><label for="incR">Russ, PBS, two paychecks<small>Statements show $3,239.24 per check</small></label><input id="incR" type="number" inputmode="decimal" step="1" value="6478"></div>
+        <div class="line"><label for="incJ">Jael, Mary and Main, monthly<small>Was $6,931 in biweekly checks through August</small></label><input id="incJ" type="number" inputmode="decimal" step="1" value="3000"></div>
+        <div class="line"><label for="incL">Jael, Merch the Moment, all in<small>Fixed monthly take; the rest stays in the LLC</small></label><input id="incL" type="number" inputmode="decimal" step="1" value="2000"></div>
+      </div>
+      <div class="group">
+        <div class="k">How to split the joint deposit</div>
+        <div class="radio" role="radiogroup" aria-label="Split method" style="margin-top:var(--space-4)">
+          <label><input type="radio" name="method" value="prop" id="m-prop" checked>Proportional</label>
+          <label><input type="radio" name="method" value="equal" id="m-equal">Equal leftover</label>
+          <label><input type="radio" name="method" value="half" id="m-half">50 / 50</label>
+        </div>
+        <p class="body-sm mid" style="margin-top:var(--space-3)">Proportional is the usual answer when incomes differ, and here it means Russ carries 56 percent. Equal leftover is fairer if one person's fixed personal costs are much higher, but it depends on both personal budgets being honest. 50/50 would leave Jael short.</p>
+      </div>
+      <div class="group">
+        <div class="k">Joint account lines, monthly</div>
+        <div id="jointLines"></div>
+      </div>
+    </div>
+    <div>
+      <div class="group" style="margin-top:0">
+        <div class="k">Russ personal ceiling, monthly</div>
+        <div id="russLines"></div>
+      </div>
+      <div class="group">
+        <div class="k">Jael personal ceiling, monthly</div>
+        <div id="jaelLines"></div>
+      </div>
+    </div>
+  </div>
+  <div class="toolbar" style="margin-top:var(--space-8)">
+    <h3 class="h3">What each of you moves on payday</h3>
+    <button class="btn" id="resetBtn" type="button">Reset to proposal</button>
+  </div>
+  <div class="res" id="results"></div>
+  <div id="verdict" class="verdict"></div>
+  <div style="margin-top:var(--space-8)" class="pad-b">
+    <h3 class="h3">Q4 month by month</h3>
+    <p class="body-sm mid" style="margin:var(--space-3) 0 var(--space-4)">Russ deposits half his share on each PBS payday. Jael deposits hers the day the $3,000 lands and tops up from the business transfer. The table tracks the Amex travel balance and the home fund.</p>
+    <div class="tscroll" id="q4table"></div>
+  </div>
+</section>
+
+<section class="section" id="migrate">
+  <header class="opener">
+    <span class="label">§ 09 / Migration plan</span>
+    <h2 class="h1">Moving the bills.</h2>
+    <p class="lede">Dated so nothing falls through. October rent is already paid the old way, so the first joint rent is November 1. Bills move in the order they fall due.</p>
+  </header>
+  <div class="tscroll wide">
+    <table>
+      <thead><tr><th>By</th><th>Step</th><th>Who</th><th>Detail</th></tr></thead>
+      <tbody>
+        <tr><td class="n">Sep 28</td><td>Agree the numbers</td><td>Both</td><td>Read this page together once. Settle the split method and the three LLC questions (Aug 14 cash, the $3,300 payroll destination, the Comptroller payment). Sign off on the habit ceilings.</td></tr>
+        <tr><td class="n">Oct 3</td><td>Open two joint accounts</td><td>Both</td><td>Joint checking for bills and a joint high-yield savings for the home fund, both names on both. Order two debit cards on the checking. Nothing else is opened.</td></tr>
+        <tr><td class="n">Oct 3</td><td>Redirect Jael's income</td><td>Jael</td><td>Mary and Main $3,000 to UNFCU checking. Set a standing $2,000 transfer from Wells Fargo to UNFCU on the 1st. The LLC makes no other personal payment from this date.</td></tr>
+        <tr><td class="n">Oct 9</td><td>First Russ deposit</td><td>Russ</td><td>Standing transfer from Capital One Leisure to joint checking on every PBS payday, half the monthly share each time. Turn off the sweep between Leisure and Performance Savings; the home fund replaces it.</td></tr>
+        <tr><td class="n">Oct 10</td><td>First Jael deposit</td><td>Jael</td><td>Standing transfer from UNFCU to joint checking on the day the $3,000 lands, for the full monthly share. If timing is tight in October, split it across the 10th and the 1st.</td></tr>
+        <tr><td class="n">Oct 14</td><td>Move the mid-month bills</td><td>Jael</td><td>BGE (due about the 15th), Verizon (15th) and T-Mobile (about the 20th) autopay switched from Wells Fargo to joint checking. Vivint moves from Capital One the same day.</td></tr>
+        <tr><td class="n">Oct 15</td><td>Groceries on the joint card</td><td>Both</td><td>From this date all grocery and shared-meal spending is on the joint debit card. Personal cards stop at Lidl and Giant.</td></tr>
+        <tr><td class="n">Oct 28</td><td>First Amex payment from joint</td><td>Jael</td><td>$1,159 from joint checking to the Amex, against the cruise and Orlando flights. Jael's own $204 and the personal charges are paid from UNFCU. No new business charges on the card from October 1.</td></tr>
+        <tr><td class="n">Nov 1</td><td>First joint rent</td><td>Both</td><td>One $3,150 Zelle to Lisa-Marie Thompson from joint checking. Russ's and the LLC's separate $1,575 payments stop. Move the $300 home fund transfer the same day.</td></tr>
+        <tr><td class="n">Nov 2</td><td>First Sunday review</td><td>Both</td><td>Fifteen minutes: joint balance, both personal ceilings, next week's bills. Repeat every Sunday.</td></tr>
+        <tr><td class="n">Nov 28</td><td>Second Amex payment</td><td>Jael</td><td>$1,159. Travel balance on the card down to $1,159.</td></tr>
+        <tr><td class="n">Dec 15</td><td>Orlando money moved</td><td>Both</td><td>$1,000 accumulated in joint checking for Dec 22 to 30. Spend from the joint card only.</td></tr>
+        <tr><td class="n">Dec 28</td><td>Amex at zero</td><td>Jael</td><td>Third $1,159 payment clears the travel. Jael's personal carry is also cleared. Card is paid in full every month from here.</td></tr>
+        <tr><td class="n">Jan 1</td><td>Raise the home fund</td><td>Both</td><td>The $1,925 of temporary lines ends. Home fund transfer goes from $300 to at least $2,200 a month, split proportionally. February trip is paid from Jael's fund, already saved.</td></tr>
+        <tr><td class="n">Jan 11</td><td>January review</td><td>Both</td><td>Rerun this review on October to December statements. Pull the Capital One card and Navy Federal balances in. Reset the ceilings for 2027.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="two pad-b" style="margin-top:var(--space-8)">
+    <div class="block"><div class="k">What comfortable looks like in January</div><p>Rent and every bill leave one account nobody has to think about. The Amex is at zero. Each of you has a personal account with a ceiling you agreed to, and the home fund grows by $2,200 to $2,700 a month, which is $26,000 to $32,000 over 2027 before any business upside.</p></div>
+    <div class="block flag" style="margin-top:0"><div class="k">Plan B if Merch the Moment cannot pay $2,000</div><p>Jael's income falls to $3,000 and the household to $9,478. Pause the home fund, keep the Amex payoff, cut shared meals to $100 and each personal discretionary line by a third, and Russ's share moves to 68 percent. That balances with almost no margin, which is why the LLC transfer should be fixed at a number it can always meet.</p></div>
+  </div>
+</section>
+
+<section class="section" id="rules">
+  <header class="opener right">
+    <span class="label">§ 10 / Joint account rules</span>
+    <h2 class="h1">Seven rules.</h2>
+    <p class="lede">Short enough to remember. The budget only works if the plumbing changes with it.</p>
+  </header>
+  <ol class="steps col offset pad-b">
+    <li><span class="n">01</span><span><b>Open one joint checking account and put every shared bill on autopay from it:</b> rent to Lisa-Marie Thompson, BGE, Verizon, T-Mobile, Vivint, renters insurance, cleaning. Groceries and shared meals go on one joint debit card.</span></li>
+    <li><span class="n">02</span><span><b>Each person sends their share the day the money lands,</b> as a standing transfer, not a manual one. Russ: half his share on each PBS payday. Jael: her share the day the $3,000 arrives, topped up from the business transfer on the 1st.</span></li>
+    <li><span class="n">03</span><span><b>The LLC pays only LLC costs plus one fixed $2,000 transfer to Jael on the 1st.</b> No rent, no Honda, no BGE, no Amazon from the Wells Fargo account. The $3,000 from Mary and Main lands in Jael's personal checking, not the LLC.</span></li>
+    <li><span class="n">04</span><span><b>The Amex becomes a personal card with a hard rule: no business charges.</b> If the LLC needs a card, it gets its own. Pay the Amex in full from the joint travel line and Jael's personal line until it is at zero, then keep it there.</span></li>
+    <li><span class="n">05</span><span><b>The home fund is a separate high-yield savings account in both names,</b> funded only from the joint account, never swept back. Russ's Performance Savings has been used as a holding tank; this one is not.</span></li>
+    <li><span class="n">06</span><span><b>Fifteen minutes every Sunday.</b> Open the joint account, check the two personal ceilings, and note anything that will break next week. No blame in the meeting; the numbers do the talking.</span></li>
+    <li><span class="n">07</span><span><b>Explain the three LLC items</b> (the Aug 14 cash, the $3,300 payroll destination, the Comptroller payment) before the January review, and pull the Capital One and Navy Federal balances into the next version.</span></li>
+  </ol>
+</section>
+
+<section class="section" id="data">
+  <header class="opener">
+    <span class="label">§ 11 / Data notes and gaps</span>
+    <h2 class="h2">What this is built on.</h2>
+  </header>
+  <ul class="plain col offset pad-b">
+    <li><b>Sources.</b> Russ: Capital One 360 (Leisure checking, 360 Checking, Savings, Performance Savings), Sep 2025 to Aug 2026 (October 2025 is missing from the combined PDF). Jael: UNFCU checking, savings and membership share, Mar to Aug 2026; American Express Gold, Jan 1 to Sep 24, 2026. Business: More Media Co LLC Wells Fargo Initiate Business Checking, Jun to Aug 2026.</li>
+    <li><b>Reconciliation.</b> Every statement section was parsed and checked against its own opening and closing balance or its credit and debit totals. All 65 checks pass, so the transaction set matches the statements exactly. Categories were assigned by merchant rules and are a judgment; the biggest ambiguity is Zelle and Apple Cash to individuals.</li>
+    <li><b>Income change, stated by Russ on 2026-09-25.</b> Jael has left Mary and Main; the $3,465.38 biweekly paychecks stop and she earns $3,000 a month from that work. Merch the Moment is counted at $2,000 a month to Jael, all in. Neither figure appears in the statements yet; the January refresh should confirm both.</li>
+    <li><b>Not in the package.</b> Russ's Capital One credit card and Navy Federal statements (only the payments are visible). The account that receives the LLC's $3,300 monthly payroll and made most of the Amex payments. The destination of the $10,640 cash withdrawal. The Amex opening balance on Jan 1.</li>
+    <li><b>Assumptions.</b> Rent is treated as $3,150 a month, split $1,575 each, because both Russ and the LLC pay Lisa-Marie Thompson $1,575 on the first of the month. T-Mobile is treated as a shared family plan because no separate phone bill appears for Russ. The Orlando trip's spending money and the $686 balance of Jael's February trip are estimates, not statement figures.</li>
+    <li><b>Privacy.</b> This page is unlisted and marked noindex. It is not linked from anywhere on the site. Anyone who has the address can read it, so share the link only with each other.</li>
+  </ul>
+</section>
+</main>
+
+<footer>
+  <span>Prepared from statements supplied on 2026-09-25. Figures are monthly averages for June to August 2026 unless stated. A household budgeting aid, not financial advice.</span>
+  <span>Built against the russh.work design spec, 2026-05-19b. Monochrome by mandate: the three payers are three tones, and every chart has a table.</span>
+</footer>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+(function(){
+"use strict";
+const CATS=[{"group":"Rent","Russ":1630,"Jael":0,"LLC":1575},{"group":"Car (Honda, insurance, fuel, tolls)","Russ":210,"Jael":1352,"LLC":391},{"group":"Dining out and coffee","Russ":1012,"Jael":254,"LLC":261},{"group":"Shopping (Amazon, retail)","Russ":179,"Jael":504,"LLC":280},{"group":"Debt payments (Capital One, Navy Federal)","Russ":934,"Jael":0,"LLC":0},{"group":"Groceries and convenience","Russ":610,"Jael":69,"LLC":147},{"group":"Cash, Zelle, Apple Cash sent","Russ":542,"Jael":50,"LLC":221},{"group":"Health and therapy","Russ":180,"Jael":259,"LLC":288},{"group":"Utilities, internet, phone, security","Russ":60,"Jael":149,"LLC":457},{"group":"AI and dev tools (Russ)","Russ":611,"Jael":0,"LLC":21},{"group":"Travel and rideshare","Russ":143,"Jael":205,"LLC":150},{"group":"Giving","Russ":320,"Jael":0,"LLC":144},{"group":"Beauty and personal care","Russ":0,"Jael":250,"LLC":149},{"group":"Golf (Russ)","Russ":348,"Jael":0,"LLC":0},{"group":"Fitness","Russ":263,"Jael":77,"LLC":0},{"group":"Entertainment and subscriptions","Russ":172,"Jael":14,"LLC":138},{"group":"Life insurance (Russ)","Russ":114,"Jael":0,"LLC":0},{"group":"Other","Russ":13,"Jael":4,"LLC":0}];
+const REV=[{m:"Jun",v:11341},{m:"Jul",v:6952},{m:"Aug",v:4131}];
+const LLCBAL=[{m:"Jun 1",v:30984},{m:"Jun 30",v:25582},{m:"Jul 31",v:29686},{m:"Aug 31",v:20666}];
+const LLCFLOW=[{m:"Jun",ops:11119,pay:8650,pers:3916,rev:11341},{m:"Jul",ops:1135,pay:3950,pers:4693,rev:6952},{m:"Aug",ops:925,pay:15166,pers:4056,rev:4131}];
+const fmt=n=>(n<0?"-":"")+"$"+Math.abs(Math.round(n)).toLocaleString("en-US");
+const tip=document.getElementById("tip");
+function showTip(e,html){tip.innerHTML=html;tip.style.opacity=1;moveTip(e);}
+function moveTip(e){const w=tip.offsetWidth,h=tip.offsetHeight;let x=e.clientX+14,y=e.clientY+14;if(x+w>window.innerWidth-8)x=e.clientX-w-14;if(y+h>window.innerHeight-8)y=e.clientY-h-14;tip.style.left=x+"px";tip.style.top=y+"px";}
+function hideTip(){tip.style.opacity=0;}
+const NS="http://www.w3.org/2000/svg";
+function el(n,a,txt){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;return e;}
+const C={paper:"#F4F4F4",mid:"#8A8A8A",dim:"#404040",void:"#0A0A0A"};
+function hover(node,html){node.addEventListener("mouseenter",e=>showTip(e,html));node.addEventListener("mousemove",moveTip);node.addEventListener("mouseleave",hideTip);node.addEventListener("touchstart",e=>{showTip(e.touches[0],html);setTimeout(hideTip,2200);},{passive:true});}
+
+function drawSpend(){
+  const host=document.getElementById("spend-chart");host.innerHTML="";
+  const W=Math.max(320,host.clientWidth||900),narrow=W<640,labelW=narrow?0:260,rowH=narrow?46:30,top=narrow?8:12,right=72;
+  const H=top+CATS.length*rowH+34;
+  const max=Math.max(...CATS.map(c=>c.Russ+c.Jael+c.LLC));
+  const x0=labelW,x1=W-right,sx=v=>x0+(v/max)*(x1-x0);
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,width:"100%",height:H,role:"img","aria-label":"Monthly spending by category and payer"});
+  const g=el("g",{class:"grid"});const step=1000;
+  for(let v=0;v<=max;v+=step){g.appendChild(el("line",{x1:sx(v),x2:sx(v),y1:top,y2:top+CATS.length*rowH}));svg.appendChild(el("text",{x:sx(v),y:H-8,"text-anchor":"middle",class:"ax"})).textContent=v===0?"$0":"$"+(v/1000)+"k";}
+  svg.appendChild(g);
+  const series=[["Russ",C.paper],["Jael",C.mid],["LLC",C.dim]];
+  CATS.forEach((c,i)=>{
+    const rowTop=top+i*rowH;const y=narrow?rowTop+20:rowTop+7,h=narrow?14:16;
+    const tot=c.Russ+c.Jael+c.LLC;
+    if(narrow){svg.appendChild(el("text",{x:0,y:rowTop+13,class:"lab"})).textContent=c.group;}
+    else{svg.appendChild(el("text",{x:x0-12,y:y+h/2+4,"text-anchor":"end",class:"lab"})).textContent=c.group;}
+    let acc=0;
+    series.forEach(([k,col])=>{const v=c[k];if(!v)return;const xa=sx(acc)+(acc>0?2:0),xb=sx(acc+v);svg.appendChild(el("rect",{x:xa,y,width:Math.max(0,xb-xa),height:h,fill:col}));acc+=v;});
+    svg.appendChild(el("text",{x:sx(tot)+8,y:y+h/2+4})).textContent=fmt(tot);
+    const hit=el("rect",{x:0,y:rowTop,width:W,height:rowH,class:"hit"});
+    hover(hit,`<b>${c.group}</b><br>Russ ${fmt(c.Russ)} / Jael ${fmt(c.Jael)} / LLC ${fmt(c.LLC)}<br>Total ${fmt(tot)} per month`);
+    svg.appendChild(hit);
+  });
+  host.appendChild(svg);
+}
+function spendTable(){
+  let s='<table><thead><tr><th>Category</th><th class="r">Russ</th><th class="r">Jael</th><th class="r">LLC paid</th><th class="r">Total / mo</th></tr></thead><tbody>';
+  let tr=0,tj=0,tl=0;
+  CATS.forEach(c=>{tr+=c.Russ;tj+=c.Jael;tl+=c.LLC;s+=`<tr><td>${c.group}</td><td class="r n">${fmt(c.Russ)}</td><td class="r n">${fmt(c.Jael)}</td><td class="r n">${fmt(c.LLC)}</td><td class="r n">${fmt(c.Russ+c.Jael+c.LLC)}</td></tr>`;});
+  s+=`<tr><td>Total</td><td class="r n">${fmt(tr)}</td><td class="r n">${fmt(tj)}</td><td class="r n">${fmt(tl)}</td><td class="r n">${fmt(tr+tj+tl)}</td></tr></tbody></table>`;
+  document.getElementById("spend-table").innerHTML=s;
+}
+document.getElementById("spend-toggle").addEventListener("click",function(){const t=document.getElementById("spend-table"),c=document.getElementById("spend-chart");const show=t.hidden;t.hidden=!show;c.hidden=show;this.textContent=show?"Show chart":"Show table";this.setAttribute("aria-pressed",String(show));});
+
+function drawRev(){
+  const host=document.getElementById("rev-chart");host.innerHTML="";
+  const W=Math.max(200,host.clientWidth||300),H=120,bw=Math.min(64,(W)/REV.length-24);
+  const max=Math.max(...REV.map(r=>r.v));const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,width:"100%",height:H,role:"img","aria-label":"LLC revenue by month: June 11,341, July 6,952, August 4,131"});
+  REV.forEach((r,i)=>{const cx=(i+0.5)*(W/REV.length);const h=(r.v/max)*(H-46);const y=H-26-h;
+    svg.appendChild(el("rect",{x:cx-bw/2,y,width:bw,height:h,fill:C.mid}));
+    svg.appendChild(el("text",{x:cx,y:y-8,"text-anchor":"middle"})).textContent=fmt(r.v);
+    svg.appendChild(el("text",{x:cx,y:H-6,"text-anchor":"middle",class:"ax"})).textContent=r.m.toUpperCase();});
+  svg.appendChild(el("line",{x1:0,x2:W,y1:H-26,y2:H-26,stroke:C.dim}));
+  host.appendChild(svg);
+}
+function drawBal(){
+  const host=document.getElementById("llc-bal");host.innerHTML="";
+  const W=Math.max(280,host.clientWidth||440),H=220,L=52,R=16,T=24,B=30;
+  const min=15000,max=35000;
+  const sx=i=>L+i*((W-L-R)/(LLCBAL.length-1)),sy=v=>T+(1-(v-min)/(max-min))*(H-T-B);
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,width:"100%",height:H,role:"img","aria-label":"LLC balance by month end"});
+  const g=el("g",{class:"grid"});
+  for(let v=min;v<=max;v+=5000){g.appendChild(el("line",{x1:L,x2:W-R,y1:sy(v),y2:sy(v)}));svg.appendChild(el("text",{x:L-10,y:sy(v)+4,"text-anchor":"end",class:"ax"})).textContent="$"+(v/1000)+"K";}
+  svg.appendChild(g);
+  const d=LLCBAL.map((p,i)=>(i?"L":"M")+sx(i)+","+sy(p.v)).join(" ");
+  svg.appendChild(el("path",{d,fill:"none",stroke:C.paper,"stroke-width":2,"stroke-linejoin":"round"}));
+  LLCBAL.forEach((p,i)=>{svg.appendChild(el("rect",{x:sx(i)-4,y:sy(p.v)-4,width:8,height:8,fill:C.paper}));
+    svg.appendChild(el("text",{x:sx(i),y:sy(p.v)-12,"text-anchor":i===0?"start":i===LLCBAL.length-1?"end":"middle"})).textContent=fmt(p.v);
+    svg.appendChild(el("text",{x:sx(i),y:H-8,"text-anchor":i===0?"start":i===LLCBAL.length-1?"end":"middle",class:"ax"})).textContent=p.m.toUpperCase();
+    const hit=el("rect",{x:sx(i)-30,y:0,width:60,height:H,class:"hit"});hover(hit,`<b>${p.m}</b><br>Balance ${fmt(p.v)}`);svg.appendChild(hit);});
+  host.appendChild(svg);
+}
+function drawFlow(){
+  const host=document.getElementById("llc-flow");host.innerHTML="";
+  const W=Math.max(280,host.clientWidth||440),H=230,L=52,R=12,T=20,B=28;
+  const max=22000;const n=LLCFLOW.length,cw=(W-L-R)/n,bw=Math.min(72,cw*0.55);
+  const sy=v=>T+(1-v/max)*(H-T-B);
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,width:"100%",height:H,role:"img","aria-label":"LLC outflows by month"});
+  const g=el("g",{class:"grid"});
+  for(let v=0;v<=max;v+=5000){g.appendChild(el("line",{x1:L,x2:W-R,y1:sy(v),y2:sy(v)}));svg.appendChild(el("text",{x:L-10,y:sy(v)+4,"text-anchor":"end",class:"ax"})).textContent="$"+(v/1000)+"K";}
+  svg.appendChild(g);
+  const parts=[["ops",C.dim],["pay",C.mid],["pers",C.paper]];
+  LLCFLOW.forEach((d,i)=>{const cx=L+(i+0.5)*cw;let acc=0;
+    parts.forEach(([k,c],j)=>{const v=d[k];const y=sy(acc+v),h=sy(acc)-y-(j?2:0);svg.appendChild(el("rect",{x:cx-bw/2,y,width:bw,height:Math.max(0,h),fill:c}));acc+=v;});
+    svg.appendChild(el("text",{x:cx,y:sy(acc)-8,"text-anchor":"middle"})).textContent=fmt(acc);
+    const ry=sy(d.rev);svg.appendChild(el("line",{x1:cx-bw/2-10,x2:cx+bw/2+10,y1:ry,y2:ry,stroke:C.paper,"stroke-width":2,"stroke-dasharray":"4 3"}));
+    svg.appendChild(el("text",{x:cx,y:H-8,"text-anchor":"middle",class:"ax"})).textContent=d.m.toUpperCase();
+    const hit=el("rect",{x:cx-cw/2,y:0,width:cw,height:H,class:"hit"});
+    hover(hit,`<b>${d.m}</b><br>Business costs ${fmt(d.ops)}<br>Payroll and draws ${fmt(d.pay)}<br>Personal bills ${fmt(d.pers)}<br>Out ${fmt(acc)} vs revenue ${fmt(d.rev)}`);svg.appendChild(hit);});
+  host.appendChild(svg);
+  document.getElementById("llc-table").innerHTML='<table><thead><tr><th>Month</th><th class="r">Revenue</th><th class="r">Business costs</th><th class="r">Payroll, draws, cash</th><th class="r">Personal bills</th></tr></thead><tbody>'+LLCFLOW.map(d=>`<tr><td>${d.m}</td><td class="r n">${fmt(d.rev)}</td><td class="r n">${fmt(d.ops)}</td><td class="r n">${fmt(d.pay)}</td><td class="r n">${fmt(d.pers)}</td></tr>`).join("")+'</tbody></table><p class="body-sm mid" style="margin-top:var(--space-3)">June business costs include the $4,787 Comptroller payment and $3,500 to a videographer. August payroll and draws include the $10,640 cash withdrawal.</p>';
+}
+
+const JOINT=[
+  ["rent","Rent to Lisa-Marie Thompson","Both halves, paid once from joint",3150],
+  ["util","BGE electric and gas","Jun to Aug averaged $197, rising into winter",200],
+  ["net","Verizon internet","",85],
+  ["phone","T-Mobile family plan","Confirm both lines are on it",140],
+  ["sec","Vivint home security","",60],
+  ["ins","Renters insurance (Lemonade)","$261 a year",22],
+  ["clean","Cleaning and laundry","Currently $100",50],
+  ["groc","Groceries and household","Currently $826 across three payers",500],
+  ["dine","Shared meals out","Two dinners a month; solo meals are personal",200],
+  ["cruise","Cruise and Orlando flights on Amex","$3,477 cleared over three months",1159],
+  ["orl","Orlando Dec 22 to 30 spending","Lodging and spending money, your estimate",333],
+  ["home","First home fund","$300 in Q4 while the Amex is cleared; $2,200 or more from January",300]
+];
+const RUSS=[
+  ["r_debt","Capital One card and Navy Federal","Payments as seen; balances unknown",1000],
+  ["r_nyl","New York Life","",114],
+  ["r_tithe","Tithe","",320],
+  ["r_ther","Therapy","",180],
+  ["r_fit","Solidcore or gym, not both","Currently $263",100],
+  ["r_car","Fuel, tolls, parking","Currently $210",210],
+  ["r_ai","AI and dev tools","Currently $611; one Claude plan, APIs paused",150],
+  ["r_dine","Solo dining and coffee","Currently $1,012; coffee twice a week",250],
+  ["r_golf","Golf","Currently $348; off season",100],
+  ["r_cash","Cash, Zelle, Apple Cash","Currently $542",100],
+  ["r_shop","Shopping, games, subscriptions","Currently $351",100]
+];
+const JAEL=[
+  ["j_honda","Honda payment","",360],
+  ["j_prog","Progressive auto","",191],
+  ["j_fuel","Fuel and tolls","",75],
+  ["j_health","Chiropractic, therapy, medical","Currently $547",250],
+  ["j_beauty","Beauty and personal care","Currently $399",150],
+  ["j_shop","Amazon and shopping","Currently $784",150],
+  ["j_dine","Solo dining and coffee","Currently $515",200],
+  ["j_cash","Cash, Zelle, Apple Cash","Currently $271",75],
+  ["j_ent","Entertainment and subscriptions","",50],
+  ["j_gym","Gym","",55],
+  ["j_give","Zion Church and giving","Currently $144",144],
+  ["j_feb","February trip fund","$686 left of $1,158 after the Southwest ticket",229],
+  ["j_amex","Amex personal balance","Southwest ticket and personal carry, cleared by December",204]
+];
+const KEY="tioh-q4-v2";
+let state={};
+try{state=JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch(e){state={};}
+function val(id,def){const v=state[id];return (typeof v==="number"&&isFinite(v))?v:def;}
+function renderLines(hostId,lines){
+  const h=document.getElementById(hostId);h.innerHTML="";
+  lines.forEach(([id,name,note,def])=>{
+    const row=document.createElement("div");row.className="line";
+    const l=document.createElement("label");l.htmlFor=id;l.innerHTML=`${name}${note?`<small>${note}</small>`:""}`;
+    const i=document.createElement("input");i.type="number";i.inputMode="decimal";i.step="1";i.id=id;i.value=val(id,def);
+    i.addEventListener("input",()=>{const n=parseFloat(i.value);state[id]=isFinite(n)?n:0;save();compute();});
+    row.appendChild(l);row.appendChild(i);h.appendChild(row);});
+  const s=document.createElement("div");s.className="sum";s.id=hostId+"-sum";h.appendChild(s);
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+function sum(lines){return lines.reduce((a,[id,,,def])=>a+val(id,def),0);}
+function num(id,def){const e=document.getElementById(id);const n=parseFloat(e.value);return isFinite(n)?n:def;}
+function compute(){
+  const incR=num("incR",6478),incJ=num("incJ",3000)+num("incL",2000);
+  const J=sum(JOINT),pR=sum(RUSS),pJ=sum(JAEL);
+  document.getElementById("jointLines-sum").innerHTML=`<span>Joint total per month</span><span class="amt">${fmt(J)}</span>`;
+  document.getElementById("russLines-sum").innerHTML=`<span>Russ personal total</span><span class="amt">${fmt(pR)}</span>`;
+  document.getElementById("jaelLines-sum").innerHTML=`<span>Jael personal total</span><span class="amt">${fmt(pJ)}</span>`;
+  const method=document.querySelector('input[name="method"]:checked').value;
+  let cR;
+  if(method==="half")cR=J/2;
+  else if(method==="equal")cR=Math.min(J,Math.max(0,(incR-pR-incJ+pJ+J)/2));
+  else cR=J*(incR/(incR+incJ));
+  const cJ=J-cR;const shareR=incR+incJ>0?incR/(incR+incJ):0.5;
+  const leftR=incR-cR-pR,leftJ=incJ-cJ-pJ;
+  document.getElementById("results").innerHTML=`
+    <div class="p"><div class="who">Russ moves</div><div class="big">${fmt(cR)}<small>a month</small></div><div class="sub">${fmt(cR/2)} per PBS paycheck (Oct 9, 23; Nov 6, 20; Dec 4, 18). ${Math.round(cR/J*100)}% of the joint total against ${Math.round(shareR*100)}% of take-home.</div><div class="kv"><span>Take-home</span><span class="amt">${fmt(incR)}</span><span>Personal ceiling</span><span class="amt">${fmt(pR)}</span><span>Left</span><span class="amt ${leftR<0?'neg':''}">${fmt(leftR)}</span></div></div>
+    <div class="p"><div class="who">Jael moves</div><div class="big">${fmt(cJ)}<small>a month</small></div><div class="sub">Sent the day the $3,000 from Mary and Main lands, topped up from the $2,000 business transfer on the 1st. ${Math.round(cJ/J*100)}% of the joint total against ${Math.round((1-shareR)*100)}% of take-home.</div><div class="kv"><span>Take-home</span><span class="amt">${fmt(incJ)}</span><span>Personal ceiling</span><span class="amt">${fmt(pJ)}</span><span>Left</span><span class="amt ${leftJ<0?'neg':''}">${fmt(leftJ)}</span></div></div>`;
+  const home=val("home",300),tot=incR+incJ,rate=tot?Math.round((home+Math.max(0,leftR)+Math.max(0,leftJ))/tot*100):0;
+  const temp=val("cruise",1159)+val("orl",333)+val("j_feb",229)+val("j_amex",204);
+  const v=document.getElementById("verdict");
+  if(leftR<0||leftJ<0){v.className="verdict bad";v.innerHTML=`<b>This does not balance.</b> ${leftR<0?"Russ is short "+fmt(-leftR)+" a month. ":""}${leftJ<0?"Jael is short "+fmt(-leftJ)+" a month. ":""}Lower a personal line, lower the home fund, or change the split method.`;}
+  else{v.className="verdict";v.innerHTML=`<b>It balances.</b> Joint account ${fmt(J)} a month, of which ${fmt(home)} goes to the home fund and ${fmt(val("cruise",1159)+val("j_amex",204))} clears the Amex by December. Unspent personal money (Russ ${fmt(leftR)}, Jael ${fmt(leftJ)}) should also go to savings, which puts the household savings rate near ${rate}% of take-home in Q4. From January the ${fmt(temp)} of temporary lines ends and the home fund can rise to about ${fmt(home+temp)} a month.`;}
+  const months=["October","November","December"];
+  const perR=cR/2;let travel=val("cruise",1159)*3,fund=0;
+  let t='<table><thead><tr><th>Month</th><th class="r">Russ per PBS check (x2)</th><th class="r">Jael monthly</th><th class="r">Joint funded</th><th class="r">Joint needed</th><th class="r">Amex travel left</th><th class="r">Home fund</th></tr></thead><tbody>';
+  months.forEach(m=>{travel=Math.max(0,travel-val("cruise",1159));fund+=home;t+=`<tr><td>${m}</td><td class="r n">${fmt(perR)}</td><td class="r n">${fmt(cJ)}</td><td class="r n">${fmt(cR+cJ)}</td><td class="r n">${fmt(J)}</td><td class="r n">${fmt(travel)}</td><td class="r n">${fmt(fund)}</td></tr>`;});
+  t+='</tbody></table><p class="body-sm mid" style="margin-top:var(--space-3)">Amex travel starts at the cruise plus the Orlando flights and falls by the joint payoff line each month. The home fund is deliberately small in Q4 and rises in January when the temporary lines end.</p>';
+  document.getElementById("q4table").innerHTML=t;
+}
+renderLines("jointLines",JOINT);renderLines("russLines",RUSS);renderLines("jaelLines",JAEL);
+["incR","incJ","incL"].forEach(id=>{const e=document.getElementById(id);if(state[id]!=null)e.value=state[id];e.addEventListener("input",()=>{state[id]=parseFloat(e.value)||0;save();compute();});});
+document.querySelectorAll('input[name="method"]').forEach(r=>{if(state.method===r.value)r.checked=true;r.addEventListener("change",()=>{state.method=r.value;save();compute();});});
+document.getElementById("resetBtn").addEventListener("click",()=>{state={};save();renderLines("jointLines",JOINT);renderLines("russLines",RUSS);renderLines("jaelLines",JAEL);["incR","incJ","incL"].forEach((id,i)=>document.getElementById(id).value=[6478,3000,2000][i]);document.getElementById("m-prop").checked=true;compute();});
+function drawAll(){drawSpend();drawRev();drawBal();drawFlow();}
+spendTable();drawAll();compute();
+let rt;window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(drawAll,120);});
+})();
+</script>
+</body>
+</html>
