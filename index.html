@@ -313,6 +313,30 @@ export function validateRawStaplesCooked(doc) {
 </code></pre>
         </li>
 
+        <li class="project-row" data-href="blog/inside-dealcalc.html">
+          <span class="num">12</span>
+          <span class="title">DEALCALC</span>
+          <div class="meta">
+            <span class="row strong">v0.3 / 2026</span>
+            <span class="row">ACQUISITIONS CRM + DEAL ANALYZER</span>
+            <span class="row">NEXT.JS / SUPABASE / VERCEL</span>
+            <span class="row">BALTIMORE WHOLESALE OPERATOR</span>
+            <span class="row">EXCEL PARITY, CACHED VALUES PINNED</span>
+            <span class="row">224 TESTS / 4 BROWSER SCENARIOS</span>
+            <span class="row">34 WORKBOOK ANOMALIES RECORDED</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code>// the second financing model ships behind a flag, and a test
+// holds it to the one promise that matters: the workbook
+// numbers do not move when it is switched on.
+const off = runDeal(deal);
+const on  = runDeal({ ...deal, project: macModel });
+
+expect(on.acquisitions).toEqual(off.acquisitions);
+expect(on.wholesale).toEqual(off.wholesale);
+expect(on.offers).toEqual(off.offers);
+</code></pre>
+        </li>
+
       </ol>
     </section>
 

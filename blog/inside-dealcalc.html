@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inside DealCalc: a CRM built around a spreadsheet nobody wants to retire / russh.work</title>
+  <meta name="description" content="An operator's acquisitions run on one Excel workbook and a Mac app he commissioned. The brief was a CRM his team can work in without changing a single number he already trusts. Six decisions, including why the workbook's own mistakes are reproduced on purpose." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">THESIS</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">DEALCALC / ACQUISITIONS CRM</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.10.01</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">7 MIN / 1,300 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Inside DealCalc: a CRM built around a spreadsheet nobody wants to retire</h1>
+
+      <p class="post-summary">A residential wholesale and flip operator runs his acquisitions on one Excel workbook and a Mac app he commissioned years ago. The brief was a CRM his team can work in, with the analyzer inside it, that does not change a single number he already trusts. These are the six decisions that carried it, including why the workbook's own mistakes are reproduced on purpose and how a richer financing model ships without touching the first one.</p>
+
+      <div class="post-tags">WORKBOOK PARITY / GOLDEN FIXTURES / NEXT.JS / SUPABASE / PROVIDER BOUNDARIES / ROW LEVEL SECURITY</div>
+    </header>
+
+    <div class="post-body">
+
+<p class="body">By Russ. Thesis, 2026. Live demo: <a href="https://wholesale-demo-six.vercel.app">wholesale-demo-six.vercel.app</a>, sample data, nothing connected to a real seller.</p>
+
+<hr class="rule">
+
+<h2 class="h2">The brief</h2>
+
+<p class="body">The operator buys houses in the Baltimore metro, wholesales some and flips the rest. His pipeline lives in text threads and a spreadsheet. His analysis lives in one Excel workbook he has been refining for years, and in a Mac app he commissioned to wrap that workbook's math in something clickable. Only he can run the Mac app. His partner cannot see the pipeline without being sent a screenshot.</p>
+
+<p class="body">What he asked for was a CRM his team could work in, with the analyzer inside it. What he did not ask for, and would not have accepted, was different numbers.</p>
+
+<p class="body"><mark class="callout">The thesis in one line: when a business already trusts a spreadsheet, the port's job is to be indistinguishable from it, and every better idea has to earn its way in behind a flag.</mark></p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 1. The workbook is the specification, and its cached values are the test suite</h2>
+
+<p class="body">Excel stores the last computed result of every formula cell alongside the formula. That cached layer is the real specification of a working spreadsheet, because it is what the operator has been reading and acting on. An extractor pulls every sheet, every formula and every cached value into fixtures. The calculators are then ported cell for cell, and golden tests compare each output against the cached value at one cent for currency and a millionth for ratios.</p>
+
+<p class="body">This also means porting the parts that are wrong. The extraction turned up 34 anomalies, each recorded with its cell reference. One of them carried real money. The financing block multiplies the first lien rate by the lien amount and by the hold months, which only produces a sensible answer if the rate entered is monthly. The operator had worked around it for years by typing a division by twelve into a different cell by hand. The web app could not quietly keep that trap, and it could not quietly fix it either, because a calculator that disagrees with the sheet is a calculator he stops opening.</p>
+
+<p class="body">So it shipped as a decision with his name and the date on it. The app takes one annual rate per lien, maps it onto the workbook's own shape, and reproduces the cached result to the cent. The anomaly is marked resolved in the spec with the evidence that led to it. Every other anomaly still defaults to the workbook's behavior, behind a flag that only he can authorize flipping.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 2. One engine, two runtimes</h2>
+
+<p class="body">All of the math lives in a pure TypeScript package with no file access, no database access and no framework. The browser imports it so the analyzer recalculates as he types, with no round trip. The server imports the same functions for the PDF renderer and for anything written to storage. The application layer does no arithmetic at all.</p>
+
+<p class="body">The practical payoff is that the expensive part of the system, the part that has to agree with a spreadsheet to the cent, is testable without a browser, a server or a database. The golden suite runs in about a second.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 3. Every outside service sits behind a boundary with a mock on the other side</h2>
+
+<p class="body">Property data, texting, calling, email, the judgment layer, file storage and outbound webhooks each have one interface and two implementations. When the keys are missing, the mock is selected. With an empty environment file the entire application runs end to end, which is how it was built, reviewed and click-tested before a single provider account existed.</p>
+
+<p class="body">That boundary earned itself back when the operator explained that his texts and calls have to stay inside the phone system his team already uses, so that everything a rep does is visible in both places. That is an adapter behind an existing interface. The screens, the consent rules, the timeline and the campaign scheduler did not move.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 4. The second model is opt in, and it is not allowed to move a pinned number</h2>
+
+<p class="body">The Mac app modeled financing the workbook cannot: several loans at once, draw schedules against the rehab budget, fee lines with different bases, dated expenses on a weekly cash flow. Porting that into the main calculation path would have changed numbers the golden fixtures pin to the sheet.</p>
+
+<p class="body">It ships instead as a separate model, absent by default, with its own results tab marked preview, and a test that asserts every workbook output is identical with the model switched on and switched off. The flip profit from the sheet remains the number of record until the operator approves the alternative.</p>
+
+<p class="body">The harder problem was that the Mac app's rules were not written down anywhere. The first pass inferred eighteen of them from a reconstruction of the app, and recorded each inference in the parity document as an inference. The second pass read the rules out of the compiled binary, which corrected ten: the week count rounds up rather than down, draws and each month of interest round to cents with the final draw absorbing the remainder, the low cash point is read at each date rather than at the end of each week, and holding is charged by hold months rather than by month starts. The cash flow now returns its dated lines under the same names the Mac app uses, so the two can be read side by side without interpretation.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 5. Confidentiality is a test, not a habit</h2>
+
+<p class="body">A package sent to a cash buyer must never show the contract price, the spread, the maximum allowable offer or the assignment fee. Those are the numbers that end a relationship if a buyer sees them.</p>
+
+<p class="body">The buyer facing page and the PDF render on the server from a narrowed data path, so the private figures never reach the browser at all. A browser test loads a public share link and its PDF and fails the build if any of those figures appear in the output. Share links expire, can be switched off, and record when a buyer first opened them.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Decision 6. The demo is a product surface, so it gets treated like one</h2>
+
+<p class="body">The shared demo runs on generated sample data with mock providers and an in-process database, reseeded whenever a server instance starts cold. That design has one failure mode that only appears in production. The host runs several instances, each one seeded its own copy, and the records were taking database-assigned random identifiers. A pipeline card rendered by one instance linked to an analysis another instance had never created, so the link returned not found.</p>
+
+<p class="body">The seed now assigns identifiers from a counter while it runs and hands the random default back afterward, so every instance produces an identical set of records and every link between pages holds. A test seeds two separate databases and compares them. It is sample data, but a demo that breaks when clicked is worse than no demo.</p>
+
+<hr class="rule">
+
+<h2 class="h2">Receipts</h2>
+
+<p class="body">224 unit tests: 140 on the engine including the golden suite, 14 on the database and its migrations, 70 on the provider boundaries. Four browser scenarios run in Edge against an isolated database, covering lead creation, stage movement, messaging, offer expiry, analyzer persistence, and the buyer confidentiality check.</p>
+
+<p class="body">The rehab checklist carries the workbook's 67 priced rows. The spec folder holds 34 recorded anomalies and the extraction that produced them. The database runs 8 migrations with row level security on every table and an organization filter on every query. Each saved analysis stamps the calculation rule version that produced it, and versions lock when approved, so an accepted offer cannot be quietly recalculated underneath.</p>
+
+<hr class="rule">
+
+<h2 class="h2">In progress</h2>
+
+<p class="body">Three things are built against mocks and not yet live against real accounts: sending and logging texts and calls through the operator's phone system, running campaigns against a real messaging provider, and the desktop wrapper that puts the same application in a window on Mac and Windows. The parity document also carries a short list of rules in the rental projection that are still inferred rather than read, which is the next thing to close.</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="inside-atlas.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Inside Atlas: off-market real estate</span>
+        </a>
+        <a class="next" href="./">
+          <span class="k">NEXT</span>
+          <span class="v">Back to writing index</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to writing index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / AI SOLUTIONS ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+  <script src="../scripts/menu.js"></script>
+</body>
+</html>
