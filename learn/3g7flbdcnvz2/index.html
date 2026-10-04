@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<title>FDE 401</title>
+<meta name="description" content="Private course. Content is encrypted; a passphrase is required.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/styles/tokens.css">
+<style>
+/* Built against design.md (2026-05-19b). Monochrome, no radius, no shadow, dark only. */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-font-smoothing:antialiased;background:var(--void);color-scheme:dark}
+body{font-family:var(--font-mono);font-size:15px;line-height:1.6;color:var(--paper);background:var(--void);min-height:100vh;overflow-x:clip;font-variant-numeric:tabular-nums}
+::selection{background:var(--paper);color:var(--void)}
+a{color:inherit;text-decoration:none}
+button,input,textarea{font:inherit;color:inherit;background:none;border:0}
+ul,ol{list-style:none}
+:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+[hidden]{display:none !important}
+.xs{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;line-height:1.35}
+.sm{font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;line-height:1.4}
+.mid{color:var(--mid)} .dim{color:var(--dim)}
+.disp{font-family:var(--font-display)}
+.h-poster{font-family:var(--font-display);font-weight:200;font-size:clamp(96px,22vw,360px);line-height:.78;letter-spacing:-.04em}
+.h1{font-family:var(--font-display);font-weight:800;font-size:clamp(40px,6vw,88px);line-height:.95;letter-spacing:-.03em;text-wrap:balance}
+.h2{font-family:var(--font-display);font-weight:600;font-size:clamp(28px,3.4vw,48px);line-height:1;letter-spacing:-.02em;text-wrap:balance}
+.h3{font-family:var(--font-display);font-weight:600;font-size:22px;line-height:1.2;letter-spacing:-.01em}
+
+/* chrome */
+.top{position:sticky;top:0;z-index:20;background:var(--void);border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:var(--space-5);padding:14px var(--page-margin)}
+.wm{font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
+.nav{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin-left:auto}
+.nav::-webkit-scrollbar{display:none}
+.nav a{padding:6px 10px;white-space:nowrap;color:var(--mid);transition:background var(--dur-quick),color var(--dur-quick)}
+.nav a:hover,.nav a[aria-current="page"]{background:var(--paper);color:var(--void)}
+main{padding:var(--space-7) var(--page-margin) var(--space-10)}
+.wrap{max-width:1180px}
+.read{max-width:72ch}
+section+section{margin-top:var(--space-8)}
+.rule{border-top:1px solid var(--rule);padding-top:var(--space-4);margin-bottom:var(--space-5);display:flex;gap:var(--space-4);align-items:baseline;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:10px 18px;border:1px solid var(--paper);cursor:pointer;transition:background var(--dur-quick),color var(--dur-quick)}
+.btn:hover:not([disabled]){background:var(--paper);color:var(--void)}
+.btn.fill{background:var(--paper);color:var(--void)}
+.btn.fill:hover:not([disabled]){background:var(--void);color:var(--paper)}
+.btn[disabled]{border-color:var(--dim);color:var(--dim);cursor:not-allowed}
+.link{border-bottom:1px solid var(--rule);transition:background var(--dur-quick),color var(--dur-quick)}
+.link:hover{background:var(--paper);color:var(--void)}
+
+/* lock */
+.lock{min-height:100vh;display:grid;align-content:space-between;padding:var(--page-margin)}
+.lock form{max-width:520px;display:grid;gap:var(--space-4);margin-top:var(--space-7)}
+.field{display:grid;gap:6px}
+.input{border:1px solid var(--rule);padding:12px 14px;min-height:44px;width:100%}
+.input:focus{border-color:var(--paper);outline:none}
+.check{display:flex;gap:10px;align-items:center;cursor:pointer;min-height:44px}
+.box{width:20px;height:20px;border:1px solid var(--paper);display:inline-grid;place-items:center;flex:none}
+.check input{position:absolute;opacity:0;pointer-events:none}
+.check input:checked+.box{background:var(--paper)}
+.check input:checked+.box::after{content:"";width:8px;height:8px;background:var(--void)}
+.check input:focus-visible+.box{outline:2px solid var(--paper);outline-offset:2px}
+.err{color:var(--paper);border-left:2px solid var(--paper);padding-left:12px}
+
+/* today */
+.hero{display:grid;gap:var(--space-5);margin-bottom:var(--space-8)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border-top:1px solid var(--rule)}
+.kpi{padding:var(--space-4) var(--space-4) var(--space-4) 0;border-bottom:1px solid var(--hairline)}
+.kpi b{display:block;font-family:var(--font-display);font-weight:600;font-size:40px;line-height:1;margin-top:6px}
+
+/* rows */
+.rows{border-top:1px solid var(--rule)}
+.row{display:grid;grid-template-columns:64px 1fr auto;gap:var(--space-4);align-items:baseline;padding:14px 0;border-bottom:1px solid var(--hairline);transition:background var(--dur-quick)}
+a.row:hover{background:var(--paper);color:var(--void)}
+a.row:hover .mid,a.row:hover .dim{color:var(--void)}
+.row .num{font-family:var(--font-display);font-weight:800;font-size:28px;line-height:1}
+.row .t{font-family:var(--font-display);font-weight:600;font-size:19px;line-height:1.2}
+.row.done .num,.row.done .t{color:transparent;-webkit-text-stroke:1px var(--paper)}
+a.row.done:hover .num,a.row.done:hover .t{-webkit-text-stroke:1px var(--void)}
+.tag{border:1px solid var(--rule);padding:2px 6px}
+.week{margin-top:var(--space-7)}
+.week:first-child{margin-top:0}
+
+/* module */
+.mhead{display:grid;gap:var(--space-4);margin-bottom:var(--space-7)}
+.plan{display:grid;grid-template-columns:5fr 15fr 25fr 10fr 5fr;border:1px solid var(--rule);margin-top:var(--space-4)}
+.plan div{padding:8px;border-right:1px solid var(--hairline);min-height:52px;display:grid;align-content:space-between;cursor:pointer}
+.plan div:last-child{border-right:0}
+.plan div.on{background:var(--paper);color:var(--void)}
+.plan div.past{color:var(--dim)}
+.timer{display:flex;gap:var(--space-4);align-items:center;flex-wrap:wrap;margin-top:var(--space-4)}
+.clock{font-family:var(--font-display);font-weight:600;font-size:44px;line-height:1;min-width:4ch}
+.md p+p,.md p+ul,.md ul+p,.md p+ol,.md ol+p,.md pre+p,.md p+pre{margin-top:1em}
+.md ul{list-style:none}
+.md ul li{padding-left:18px;position:relative;margin-top:.4em}
+.md ul li::before{content:"";position:absolute;left:0;top:.72em;width:8px;height:1px;background:var(--paper)}
+.md ol{counter-reset:o}
+.md ol li{counter-increment:o;padding-left:30px;position:relative;margin-top:.5em}
+.md ol li::before{content:counter(o,decimal-leading-zero);position:absolute;left:0;color:var(--mid);font-size:12px;top:.15em}
+.md strong{font-weight:500;color:var(--paper);background:linear-gradient(transparent 62%,rgba(244,244,244,.16) 62%)}
+.md code{font-size:.92em;border:1px solid var(--hairline);padding:0 4px}
+.md pre{border:1px solid var(--rule);padding:14px;overflow-x:auto;font-size:13px;line-height:1.5;white-space:pre}
+.md pre code{border:0;padding:0}
+.md a{border-bottom:1px solid var(--rule)}
+.analogy{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:var(--hairline);border:1px solid var(--hairline);margin-bottom:var(--space-5)}
+.analogy>div{background:var(--void);padding:var(--space-4)}
+.terms{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));border-top:1px solid var(--hairline);margin-top:var(--space-5)}
+.terms div{padding:12px 12px 12px 0;border-bottom:1px solid var(--hairline)}
+.callout{border-left:2px solid var(--paper);padding:4px 0 4px 16px;margin:var(--space-4) 0}
+textarea.input{min-height:220px;resize:vertical;line-height:1.55}
+.meter{font-size:12px;color:var(--mid)}
+.key{border:1px solid var(--paper);padding:var(--space-5);margin-top:var(--space-4)}
+details{border-bottom:1px solid var(--hairline)}
+details summary{cursor:pointer;padding:12px 0;list-style:none;display:flex;gap:12px}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"+";color:var(--mid);width:12px;flex:none}
+details[open] summary::before{content:"-"}
+details .a{padding:0 0 14px 24px;color:var(--mid)}
+.score{display:grid;grid-template-columns:140px repeat(4,44px);gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--hairline)}
+.score button{height:44px;border:1px solid var(--rule)}
+.score button.on{background:var(--paper);color:var(--void);border-color:var(--paper)}
+.levels{font-size:12px;color:var(--mid);grid-column:1/-1;min-height:1.4em}
+.complete{display:flex;gap:var(--space-4);align-items:center;flex-wrap:wrap;border-top:1px solid var(--rule);padding-top:var(--space-5);margin-top:var(--space-8)}
+.pager{display:flex;justify-content:space-between;gap:var(--space-4);margin-top:var(--space-7);flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:var(--space-6)}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;vertical-align:top;padding:10px 12px 10px 0;border-bottom:1px solid var(--hairline)}
+th{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid)}
+.tablewrap{overflow-x:auto}
+.strip{display:grid;grid-template-columns:repeat(40,1fr);gap:2px;margin-top:var(--space-4)}
+.strip a{aspect-ratio:1/2.4;border:1px solid var(--rule)}
+.strip a.d{background:var(--paper);border-color:var(--paper)}
+.strip a.late{border-color:var(--paper);border-style:dashed}
+.num-in{width:96px}
+.toast{position:fixed;left:var(--page-margin);bottom:var(--page-margin);background:var(--paper);color:var(--void);padding:10px 14px;z-index:40}
+@media (max-width:768px){
+  main{padding-top:var(--space-6)}
+  .row{grid-template-columns:44px 1fr;gap:var(--space-3)}
+  .row .num{font-size:22px}
+  .row .side{grid-column:2}
+  .score{grid-template-columns:1fr repeat(4,44px)}
+  .plan div{padding:6px 4px}
+  .plan .xs{letter-spacing:.04em;font-size:10px}
+  .strip{grid-template-columns:repeat(20,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<div id="lock" class="lock">
+  <div class="wm">russh.work</div>
+  <div>
+    <div class="h-poster" aria-hidden="true">401</div>
+    <h1 class="h2" style="margin-top:var(--space-5)">FDE 401, Forward Deployed Solutions</h1>
+    <p class="mid" style="margin-top:8px">Private course. The content is encrypted and opens only with the passphrase.</p>
+    <form id="unlock" autocomplete="off">
+      <label class="field"><span class="xs mid">Passphrase</span>
+        <input id="pass" class="input" type="password" autocomplete="current-password" required></label>
+      <label class="check"><input id="remember" type="checkbox"><span class="box"></span><span class="sm">Remember on this device</span></label>
+      <div><button class="btn fill" type="submit" id="go">Open the course</button></div>
+      <p id="lockmsg" class="sm mid" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+  <div class="xs dim">Fall 2026. Oct 6 to Dec 19. 40 hours.</div>
+</div>
+
+<div id="app" hidden>
+  <header class="top">
+    <a class="wm" href="#today">FDE 401</a>
+    <nav class="nav xs" aria-label="Course">
+      <a href="#today">Today</a><a href="#syllabus">Syllabus</a><a href="#posts">Posts</a><a href="#course">Course</a><a href="#progress">Progress</a><a href="#" id="lockbtn">Lock</a>
+    </nav>
+  </header>
+  <main id="view" class="wrap" tabindex="-1"></main>
+</div>
+
+<script>
+(() => {
+"use strict";
+const SLUG = "3g7flbdcnvz2";
+const KP = "fde401." + SLUG + ".progress.v1";
+const KPASS = "fde401." + SLUG + ".pass";
+let C = null;          // decrypted course { course, modules }
+let P = load();        // progress
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/* storage, guarded */
+function load() { try { return JSON.parse(localStorage.getItem(KP)) || { m: {}, exams: {} }; } catch { return { m: {}, exams: {} }; } }
+function save() { try { localStorage.setItem(KP, JSON.stringify(P)); } catch {} }
+function mp(n) { return P.m[n] || (P.m[n] = { answer: "", scores: [0,0,0,0,0], exit: false, deliv: false, field: false, cap: false, done: false, revealed: false }); }
+
+/* crypto */
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function decrypt(pass) {
+  const blob = await (await fetch("course.enc.json", { cache: "no-store" })).json();
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: b64(blob.salt), iterations: blob.iter, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+  const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64(blob.iv) }, key, b64(blob.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+async function open(pass, remember) {
+  const msg = $("#lockmsg"), go = $("#go");
+  msg.textContent = "Opening"; go.disabled = true;
+  try {
+    C = await decrypt(pass);
+    if (remember) { try { localStorage.setItem(KPASS, pass); } catch {} }
+    $("#lock").hidden = true; $("#app").hidden = false;
+    route();
+  } catch (e) {
+    msg.textContent = "That passphrase did not open the course.";
+    try { localStorage.removeItem(KPASS); } catch {}
+  } finally { go.disabled = false; }
+}
+$("#unlock").addEventListener("submit", e => { e.preventDefault(); open($("#pass").value.trim(), $("#remember").checked); });
+$("#lockbtn").addEventListener("click", e => { e.preventDefault(); try { localStorage.removeItem(KPASS); } catch {} C = null; location.hash = ""; location.reload(); });
+try { const saved = localStorage.getItem(KPASS); if (saved) open(saved, true); } catch {}
+
+/* tiny markdown */
+function inline(s) {
+  return esc(s)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+}
+function md(src) {
+  if (!src) return "";
+  const lines = String(src).replace(/\r/g, "").split("\n"); let out = "", i = 0;
+  while (i < lines.length) {
+    const l = lines[i];
+    if (/^```/.test(l)) { let buf = []; i++; while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]); i++; out += "<pre><code>" + esc(buf.join("\n")) + "</code></pre>"; continue; }
+    if (/^\s*- /.test(l)) { out += "<ul>"; while (i < lines.length && /^\s*- /.test(lines[i])) out += "<li>" + inline(lines[i++].replace(/^\s*- /, "")) + "</li>"; out += "</ul>"; continue; }
+    if (/^\s*\d+[.)] /.test(l)) { out += "<ol>"; while (i < lines.length && /^\s*\d+[.)] /.test(lines[i])) out += "<li>" + inline(lines[i++].replace(/^\s*\d+[.)] /, "")) + "</li>"; out += "</ol>"; continue; }
+    if (!l.trim()) { i++; continue; }
+    let buf = []; while (i < lines.length && lines[i].trim() && !/^```|^\s*- |^\s*\d+[.)] /.test(lines[i])) buf.push(lines[i++]);
+    out += "<p>" + inline(buf.join(" ")) + "</p>";
+  }
+  return out;
+}
+const list = (arr, ordered) => arr && arr.length ? md(arr.map((x, i) => (ordered ? (i + 1) + ". " : "- ") + x).join("\n")) : "";
+
+/* dates */
+const today = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+const fmt = iso => new Date(iso + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+const doneCount = () => C.modules.filter(m => mp(m.n).done).length;
+const dueCount = () => C.modules.filter(m => m.date <= today()).length;
+const next = () => C.modules.find(m => !mp(m.n).done) || C.modules[C.modules.length - 1];
+
+/* router */
+window.addEventListener("hashchange", route);
+function route() {
+  if (!C) return;
+  const h = location.hash.replace(/^#/, "") || "today";
+  document.querySelectorAll(".nav a").forEach(a => a.removeAttribute("aria-current"));
+  const navKey = h.startsWith("m/") ? "syllabus" : h;
+  const cur = document.querySelector('.nav a[href="#' + navKey + '"]'); if (cur) cur.setAttribute("aria-current", "page");
+  const v = $("#view");
+  if (h.startsWith("m/")) v.innerHTML = moduleView(+h.slice(2));
+  else if (h === "syllabus") v.innerHTML = syllabusView();
+  else if (h === "course") v.innerHTML = courseView();
+  else if (h === "posts") v.innerHTML = postsView();
+  else if (h === "progress") v.innerHTML = progressView();
+  else v.innerHTML = todayView();
+  bind(h); window.scrollTo(0, 0); v.focus({ preventScroll: true });
+}
+
+/* views */
+function row(m) {
+  const p = mp(m.n), late = !p.done && m.date < today();
+  return `<a class="row ${p.done ? "done" : ""}" href="#m/${m.n}">
+    <span class="num">${String(m.n).padStart(2, "0")}</span>
+    <span><span class="t">${esc(m.title)}</span><br><span class="xs mid">${fmt(m.date)} &nbsp; ${esc(m.type)}${m.field_rep ? " &nbsp; field rep" : ""}${m.capstone ? " &nbsp; capstone" : ""}${late ? " &nbsp; overdue" : ""}</span></span>
+    <span class="side xs ${p.done ? "" : "dim"}">${p.done ? "Done" : m.missing ? "Content pending" : ""}</span></a>`;
+}
+function todayView() {
+  const n = next(), d = doneCount(), due = dueCount(), gap = due - d;
+  const pace = d >= due ? (d > due ? "Ahead by " + (d - due) : "On pace") : "Behind by " + gap;
+  const wk = C.modules.filter(m => m.week === n.week);
+  const upcoming = C.modules.filter(m => (m.field_rep || m.capstone) && !mp(m.n).done).slice(0, 3);
+  return `<div class="hero">
+      <p class="xs mid">Next session, module ${n.n} of 40, ${fmt(n.date)}</p>
+      <h1 class="h1">${esc(n.title)}</h1>
+      <p class="read mid">${esc(n.focus)}</p>
+      <div><a class="btn fill" href="#m/${n.n}">Start module ${n.n}</a></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi xs mid">Completed<b>${d}<span class="mid" style="font-size:20px"> / 40</span></b></div>
+      <div class="kpi xs mid">Due by today<b>${due}</b></div>
+      <div class="kpi xs mid">Pace<b style="font-size:26px;margin-top:14px">${pace}</b></div>
+      <div class="kpi xs mid">Hours logged<b>${d}</b></div>
+    </div>
+    <section><div class="rule"><h2 class="h2">Week ${n.week}</h2><span class="xs mid">${esc(n.unit_name)}</span></div><div class="rows">${wk.map(row).join("")}</div></section>
+    <section><div class="rule"><h2 class="h2">Coming up</h2><span class="xs mid">Field reps and capstone milestones</span></div>
+      <div class="rows">${upcoming.map(m => `<a class="row" href="#m/${m.n}"><span class="num">${String(m.n).padStart(2, "0")}</span><span><span class="t">${esc(m.field_rep ? "Field rep" : "Capstone")}</span><br><span class="xs mid">${fmt(m.date)}</span><p class="mid" style="margin-top:6px">${esc(m.field_rep || m.capstone)}</p></span><span></span></a>`).join("") || '<p class="mid">All done.</p>'}</div></section>`;
+}
+function syllabusView() {
+  const weeks = [...new Set(C.modules.map(m => m.week))];
+  return `<h1 class="h1" style="margin-bottom:var(--space-7)">Syllabus</h1>` + weeks.map(w => {
+    const ms = C.modules.filter(m => m.week === w);
+    return `<div class="week"><div class="rule"><h2 class="h3">Week ${w}</h2><span class="xs mid">${fmt(ms[0].date)} to ${fmt(ms[ms.length - 1].date)} &nbsp; ${esc(ms[0].unit_name)}</span></div><div class="rows">${ms.map(row).join("")}</div></div>`;
+  }).join("");
+}
+function moduleView(n) {
+  const m = C.modules.find(x => x.n === n); if (!m) return "<p>Not found.</p>";
+  const p = mp(n), prev = C.modules.find(x => x.n === n - 1), nxt = C.modules.find(x => x.n === n + 1);
+  const hour = C.course.hour;
+  if (m.missing) return `<p class="xs mid">Module ${n}</p><h1 class="h1">${esc(m.title)}</h1><p class="read mid" style="margin-top:var(--space-5)">${esc(m.focus)}</p><p class="callout">The full lesson for this module has not been published yet.</p>${pager(prev, nxt)}`;
+  const L = m.lesson || {}, X = m.practice || {};
+  const min = X.kind === "lab" ? 120 : 280;
+  const reads = (m.read || []).map(r => `<li>${r.url ? `<a class="link" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.title)}</a>` : esc(r.title)} <span class="mid">${r.minutes ? r.minutes + " min. " : ""}${esc(r.why || "")}</span></li>`).join("");
+  const rub = C.course.rubric;
+  return `<div class="mhead">
+      <p class="xs mid">Unit ${m.unit}, ${esc(m.unit_name)} &nbsp; Module ${n} of 40 &nbsp; ${fmt(m.date)} &nbsp; ${esc(m.type)}</p>
+      <h1 class="h1">${esc(m.title)}</h1>
+      <p class="read mid">${esc(m.focus)}</p>
+      <div class="plan" id="plan">${hour.map((h, i) => `<div data-i="${i}"><span class="xs">${esc(h.name)}</span><span class="xs mid">${h.min}m</span></div>`).join("")}</div>
+      <div class="timer"><span class="clock" id="clock">60:00</span><button class="btn" id="tstart">Start the hour</button><button class="btn" id="treset">Reset</button><span class="sm mid" id="tlabel"></span></div>
+    </div>
+    <div class="read">
+    <section><div class="rule"><h2 class="h3">Objectives</h2></div><div class="md">${list(m.objectives)}</div></section>
+    <section><div class="rule"><h2 class="h3">Warmup</h2><span class="xs mid">5 min, from memory</span></div><div class="md">${list(m.warmup, true)}</div></section>
+    <section><div class="rule"><h2 class="h3">Concept</h2><span class="xs mid">15 min</span></div>
+      <div class="analogy"><div><p class="xs mid">The sports version</p><p style="margin-top:6px">${inline(L.sports)}</p></div><div><p class="xs mid">The lending version</p><p style="margin-top:6px">${inline(L.cre)}</p></div></div>
+      <div class="md">${md(L.body)}</div>
+      ${L.terms && L.terms.length ? `<div class="terms">${L.terms.map(t => `<div><p class="sm">${esc(t.term)}</p><p class="mid" style="margin-top:4px">${inline(t.def)}</p></div>`).join("")}</div>` : ""}
+      ${reads ? `<div style="margin-top:var(--space-5)"><p class="xs mid">Reading</p><ul class="md" style="margin-top:6px">${reads}</ul></div>` : ""}
+    </section>
+    <section><div class="rule"><h2 class="h3">Practice: ${esc(X.title || "")}</h2><span class="xs mid">25 min &nbsp; ${esc(X.kind || "")}</span></div>
+      <div class="md">${md(X.setup)}</div>
+      ${X.steps && X.steps.length ? `<div class="md" style="margin-top:var(--space-4)">${list(X.steps, true)}</div>` : ""}
+      ${m.field_rep ? `<div class="callout"><p class="xs mid">Field rep</p><p>${esc(m.field_rep)}</p><label class="check"><input type="checkbox" data-k="field" ${p.field ? "checked" : ""}><span class="box"></span><span class="sm">Done with a real person</span></label></div>` : ""}
+      ${m.capstone ? `<div class="callout"><p class="xs mid">Capstone</p><p>${esc(m.capstone)}</p><label class="check"><input type="checkbox" data-k="cap" ${p.cap ? "checked" : ""}><span class="box"></span><span class="sm">Milestone saved</span></label></div>` : ""}
+      <label class="field" style="margin-top:var(--space-5)"><span class="xs mid">Your answer, before you look</span>
+        <textarea class="input" id="answer" spellcheck="true">${esc(p.answer)}</textarea></label>
+      <p class="meter" id="meter"></p>
+      <div style="margin-top:var(--space-3)"><button class="btn" id="reveal" data-min="${min}">Reveal the model answer</button></div>
+      <div class="key md" id="key" ${p.revealed ? "" : "hidden"}>${md(X.key)}</div>
+    </section>
+    <section><div class="rule"><h2 class="h3">Check</h2><span class="xs mid">10 min</span></div>
+      ${(m.check || []).map(c => `<details><summary>${inline(c.q)}</summary><div class="a">${inline(c.a)}</div></details>`).join("")}
+      <div style="margin-top:var(--space-5)"><p class="xs mid">Score yourself on the rubric</p>
+      ${rub.map((r, i) => `<div class="score" data-r="${i}"><span class="sm">${esc(r.name)}</span>${[1, 2, 3, 4].map(v => `<button type="button" data-v="${v}" class="${p.scores[i] === v ? "on" : ""}" aria-pressed="${p.scores[i] === v}">${v}</button>`).join("")}<span class="levels">${p.scores[i] ? esc(r.levels[p.scores[i] - 1]) : ""}</span></div>`).join("")}
+      <p class="sm mid" style="margin-top:8px" id="total">${p.scores.reduce((a, b) => a + b, 0)} of 20</p></div>
+    </section>
+    <section><div class="rule"><h2 class="h3">Exit ticket</h2><span class="xs mid">5 min, out loud</span></div>
+      <p>${inline(m.exit_ticket)}</p>
+      <label class="check"><input type="checkbox" data-k="exit" ${p.exit ? "checked" : ""}><span class="box"></span><span class="sm">Recorded</span></label>
+      <p class="xs mid" style="margin-top:var(--space-4)">Deliverable</p><p>${inline(m.deliverable)}</p>
+      <label class="check"><input type="checkbox" data-k="deliv" ${p.deliv ? "checked" : ""}><span class="box"></span><span class="sm">Saved</span></label>
+      ${m.stretch ? `<p class="xs mid" style="margin-top:var(--space-4)">Stretch</p><p class="mid">${inline(m.stretch)}</p>` : ""}
+    </section>
+    ${postSection(m, p)}
+    <div class="complete"><button class="btn fill" id="done" ${p.exit && p.deliv ? "" : "disabled"}>${p.done ? "Completed " + esc(p.doneAt || "") : "Mark module complete"}</button><span class="sm mid">${p.exit && p.deliv ? "" : "Unlocks when the exit ticket is recorded and the deliverable is saved."}</span></div>
+    ${pager(prev, nxt)}
+    </div>`;
+}
+/* LinkedIn series */
+const HYPE = ["amazing", "powerful", "game-changing", "game changer", "revolutionary", "unlock", "supercharge", "seamless", "excited to", "thrilled", "cutting-edge", "next-level", "10x"];
+const EMPLOYER = /potomac|\bpbs\b/i;
+function pp(n) { const p = mp(n); return p.post || (p.post = { hook: "", built: "", how1: "", how2: "", how3: "", why: "", change: "", link: "", status: "", url: "" }); }
+function compose(m) {
+  const d = pp(m.n), hook = d.hook || (m.postplan && m.postplan.hook) || "";
+  const how = [d.how1, d.how2, d.how3].filter(x => x && x.trim());
+  const parts = [hook, d.built,
+    how.length ? "How it works:\n" + how.map(h => "- " + h).join("\n") : "",
+    d.why ? "Why this way: " + d.why : "",
+    d.change ? "What I would change: " + d.change : "",
+    d.link,
+    "Field Notes, day " + m.n + " of 40. #ForwardDeployed #SolutionsArchitecture #CommercialLending"];
+  return parts.filter(x => x && x.trim()).join("\n\n");
+}
+function lint(text) {
+  const out = [];
+  if (/[—–]/.test(text)) out.push("Long dash found. Use a comma, colon, or period.");
+  if (text.includes("!")) out.push("Exclamation point found.");
+  const lower = text.toLowerCase(); HYPE.forEach(w => { if (lower.includes(w)) out.push("Hype word: " + w + "."); });
+  if (EMPLOYER.test(text)) out.push("Employer name found. Posts use synthetic data and no employer names.");
+  if (text.length > 3000) out.push("Over LinkedIn's 3,000 character limit.");
+  return out;
+}
+function postSection(m, p) {
+  const plan = m.postplan; if (!plan) return "";
+  const d = pp(m.n), f = (k, label, ph, area) => `<label class="field"><span class="xs mid">${label}</span>${area ? `<textarea class="input" style="min-height:90px" data-post="${k}" placeholder="${esc(ph)}">${esc(d[k])}</textarea>` : `<input class="input" data-post="${k}" value="${esc(d[k])}" placeholder="${esc(ph)}">`}</label>`;
+  return `<section><div class="rule"><h2 class="h3">Post it</h2><span class="xs mid">${esc(C.course.posts.series)} &nbsp; ${plan.post === "roundup" ? "folds into the week " + m.week + " roundup" : "standalone post"}</span></div>
+    <div class="analogy"><div><p class="xs mid">Angle</p><p style="margin-top:6px">${esc(plan.hook)}</p></div><div><p class="xs mid">Show (${esc(plan.visual)})</p><p style="margin-top:6px">${esc(plan.show)}</p><p class="mid" style="margin-top:8px">Answer this: ${esc(plan.why)}</p></div></div>
+    <div style="display:grid;gap:var(--space-4)">
+      ${f("hook", "Hook, one line", plan.hook)}
+      ${f("built", "What I built or did, two sentences", "I built ... to ...", true)}
+      ${f("how1", "How it works, line 1", "")}${f("how2", "Line 2", "")}${f("how3", "Line 3", "")}
+      ${f("why", "Why this way, the tradeoff", plan.why, true)}
+      ${f("change", "What I would change", "One honest line")}
+      ${f("link", "Proof link (demo, video, or repo)", "https://russh.work/...")}
+    </div>
+    <p class="xs mid" style="margin-top:var(--space-5)">Preview</p>
+    <pre class="key" id="postprev" style="white-space:pre-wrap;font-family:var(--font-mono);font-size:14px"></pre>
+    <ul id="postlint" class="sm" style="margin-top:8px"></ul>
+    <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;margin-top:var(--space-4)">
+      <button class="btn" id="copypost">Copy post</button><button class="btn" id="mkcard">Download card image</button>
+    </div>
+    <div style="display:grid;gap:var(--space-3);margin-top:var(--space-5)">
+      <label class="check"><input type="checkbox" data-poststat="posted" ${d.status === "posted" ? "checked" : ""}><span class="box"></span><span class="sm">Posted on LinkedIn</span></label>
+      <label class="field"><span class="xs mid">Post URL</span><input class="input" data-post="url" value="${esc(d.url)}" placeholder="https://www.linkedin.com/posts/..."></label>
+    </div></section>`;
+}
+async function card(m) {
+  const d = pp(m.n), hook = d.hook || m.postplan.hook, how = [d.how1, d.how2, d.how3].filter(x => x && x.trim());
+  await Promise.all(['800 64px "Inter Tight"', '500 28px "JetBrains Mono"'].map(f => document.fonts.load(f).catch(() => {})));
+  const W = 1080, H = 1350, c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d");
+  g.fillStyle = "#0A0A0A"; g.fillRect(0, 0, W, H); g.fillStyle = "#F4F4F4";
+  const wrap = (text, font, x, y, max, lh) => { g.font = font; let line = "", yy = y; for (const w of text.split(/\s+/)) { const t = line ? line + " " + w : w; if (g.measureText(t).width > max && line) { g.fillText(line, x, yy); line = w; yy += lh; } else line = t; } if (line) { g.fillText(line, x, yy); yy += lh; } return yy; };
+  g.font = '500 24px "JetBrains Mono", monospace'; g.fillText(("FIELD NOTES   DAY " + String(m.n).padStart(2, "0") + " OF 40").split("").join(String.fromCharCode(8202)), 72, 104);
+  g.fillRect(72, 132, W - 144, 2);
+  let y = wrap(hook, '800 68px "Inter Tight", Arial, sans-serif', 72, 240, W - 144, 76);
+  y += 40; g.fillStyle = "#8A8A8A";
+  for (const h of how) { g.fillRect(72, y - 10, 18, 2); y = wrap(h, '400 30px "JetBrains Mono", monospace', 110, y, W - 182, 42) + 18; }
+  g.fillStyle = "#F4F4F4"; g.fillRect(72, H - 140, W - 144, 1);
+  g.font = '500 24px "JetBrains Mono", monospace'; g.fillText("RUSSH.WORK", 72, H - 92);
+  g.fillStyle = "#8A8A8A"; g.fillText(m.title.toUpperCase().slice(0, 60), 72, H - 56);
+  c.toBlob(b => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "field-notes-day-" + String(m.n).padStart(2, "0") + ".png"; a.click(); }, "image/png");
+}
+function postsView() {
+  const S = C.course.posts, weeks = [...new Set(C.modules.map(m => m.week))];
+  const posted = C.modules.filter(m => pp(m.n).status === "posted").length;
+  const drafted = C.modules.filter(m => pp(m.n).built || pp(m.n).how1).length;
+  return `<h1 class="h1">${esc(S.series)}</h1>
+    <div class="kpis" style="margin-top:var(--space-6)"><div class="kpi xs mid">Posted<b>${posted}</b></div><div class="kpi xs mid">Drafted<b>${drafted}</b></div><div class="kpi xs mid">Planned standalone<b>${C.modules.filter(m => m.postplan && m.postplan.post === "yes").length}</b></div></div>
+    <section><div class="rule"><h2 class="h2">How to post</h2></div><div class="read"><p>${esc(S.cadence)}</p><p class="callout">${esc(S.framing)}</p>
+      <p class="xs mid" style="margin-top:var(--space-5)">Structure</p><div class="md">${list(S.structure, true)}</div>
+      <p class="xs mid" style="margin-top:var(--space-5)">Guardrails</p><div class="md">${list(S.guardrails)}</div></div></section>
+    ${weeks.map(w => { const ms = C.modules.filter(m => m.week === w), rs = ms.filter(m => m.postplan && m.postplan.post === "roundup");
+      return `<section><div class="rule"><h2 class="h3">Week ${w}</h2>${rs.length ? `<button class="btn" data-roundup="${w}" style="margin-left:auto">Copy week ${w} roundup draft</button>` : ""}</div>
+      <div class="rows">${ms.map(m => { const d = pp(m.n); return `<a class="row ${d.status === "posted" ? "done" : ""}" href="#m/${m.n}"><span class="num">${String(m.n).padStart(2, "0")}</span><span><span class="t">${esc(m.postplan ? m.postplan.hook : m.title)}</span><br><span class="xs mid">${m.postplan ? esc(m.postplan.post === "roundup" ? "roundup" : m.postplan.visual) : ""}${d.url ? " &nbsp; linked" : ""}</span></span><span class="side xs ${d.status === "posted" ? "" : "dim"}">${d.status === "posted" ? "Posted" : d.built || d.how1 ? "Draft" : ""}</span></a>`; }).join("")}</div></section>`; }).join("")}`;
+}
+function roundup(w) {
+  const ms = C.modules.filter(m => m.week === w && m.postplan && m.postplan.post === "roundup");
+  const body = ms.map(m => { const d = pp(m.n); const how = [d.how1, d.how2, d.how3].filter(Boolean); return (d.hook || m.postplan.hook) + (d.built ? "\n" + d.built : "") + (how.length ? "\n" + how.map(h => "- " + h).join("\n") : ""); }).join("\n\n");
+  return "Week " + w + " of 11, the less glamorous half of forward deployed work.\n\n" + body + "\n\nField Notes, week " + w + ". #ForwardDeployed #SolutionsArchitecture";
+}
+function pager(prev, nxt) {
+  return `<div class="pager">${prev ? `<a class="btn" href="#m/${prev.n}">Module ${prev.n}</a>` : "<span></span>"}${nxt ? `<a class="btn" href="#m/${nxt.n}">Module ${nxt.n}</a>` : ""}</div>`;
+}
+function courseView() {
+  const c = C.course, f = c.fit;
+  return `<p class="xs mid">${esc(c.code)} &nbsp; ${esc(c.term)} &nbsp; ${c.hours} hours</p>
+    <h1 class="h1" style="margin-top:var(--space-4)">${esc(c.title)}</h1>
+    <p class="h3 mid" style="margin-top:var(--space-4)">${esc(c.subtitle)}</p>
+    <div class="read" style="margin-top:var(--space-6)"><p>${esc(c.description)}</p><p class="mid" style="margin-top:1em">${esc(c.schedule)}</p></div>
+    <section><div class="rule"><h2 class="h2">What you will be able to do</h2></div><div class="read md">${list(c.outcomes, true)}</div></section>
+    <section><div class="rule"><h2 class="h2">Where you start</h2></div><p class="read">${esc(f.summary)}</p>
+      <div class="grid2" style="margin-top:var(--space-5)">
+        <div><p class="xs mid">What you bring</p>${f.strengths.map(s => `<div style="padding:12px 0;border-bottom:1px solid var(--hairline)"><p class="h3" style="font-size:18px">${esc(s.name)}</p><p class="mid" style="margin-top:4px">${esc(s.use)}</p></div>`).join("")}</div>
+        <div><p class="xs mid">What gates you, and where it gets fixed</p>${f.gaps.map(s => `<div style="padding:12px 0;border-bottom:1px solid var(--hairline)"><p class="h3" style="font-size:18px">${esc(s.name)}</p><p class="mid" style="margin-top:4px">${esc(s.fix)}</p></div>`).join("")}</div>
+      </div>
+      <div class="read" style="margin-top:var(--space-6)"><p class="xs mid">Where it lands you</p><p style="margin-top:6px">${esc(f.lands)}</p><p class="callout">${esc(f.limit)}</p></div></section>
+    <section><div class="rule"><h2 class="h2">How an hour works</h2></div><div class="tablewrap"><table><tr><th>Minutes</th><th>Block</th><th>What you do</th></tr>${c.hour.map(h => `<tr><td>${h.min}</td><td>${esc(h.name)}</td><td class="mid">${esc(h.what)}</td></tr>`).join("")}</table></div></section>
+    <section><div class="rule"><h2 class="h2">Rules of the course</h2></div><div class="read md">${list(c.rules, true)}</div></section>
+    <section><div class="rule"><h2 class="h2">Grading</h2></div><div class="tablewrap read"><table><tr><th>Part</th><th>Weight</th></tr>${c.grading.map(g => `<tr><td>${esc(g.part)}</td><td>${g.weight}</td></tr>`).join("")}</table></div><p class="read mid" style="margin-top:var(--space-4)">${esc(c.pass)}</p></section>
+    <section><div class="rule"><h2 class="h2">The rubric</h2><span class="xs mid">Every case, exam, and the capstone</span></div><div class="tablewrap"><table><tr><th>Criterion</th><th>1</th><th>2</th><th>3</th><th>4</th></tr>${c.rubric.map(r => `<tr><td class="sm">${esc(r.name)}</td>${r.levels.map(l => `<td class="mid">${esc(l)}</td>`).join("")}</tr>`).join("")}</table></div></section>
+    <section><div class="rule"><h2 class="h2">Capstone</h2></div><p class="read">${esc(c.capstone.what)}</p><div class="rows" style="margin-top:var(--space-5)">${c.capstone.milestones.map(x => `<a class="row ${mp(x.module).cap || mp(x.module).done ? "done" : ""}" href="#m/${x.module}"><span class="num">${String(x.module).padStart(2, "0")}</span><span><span class="t">${esc(x.item)}</span><br><span class="xs mid">Due ${fmt(x.due)}</span></span><span></span></a>`).join("")}</div></section>
+    <section><div class="rule"><h2 class="h2">Your teaching assistant</h2></div><p class="read mid">${esc(c.ta)}</p><div style="margin-top:var(--space-4)"><button class="btn" id="copyta">Copy the TA prompt</button></div></section>
+    <section><div class="rule"><h2 class="h2">Course texts</h2></div><ul class="read">${c.texts.map(t => `<li style="padding:12px 0;border-bottom:1px solid var(--hairline)">${t.url ? `<a class="link" href="${esc(t.url)}" target="_blank" rel="noopener noreferrer">${esc(t.title)}</a>` : esc(t.title)}<p class="mid" style="margin-top:4px">${esc(t.why)}</p></li>`).join("")}</ul></section>`;
+}
+function grades() {
+  const done = doneCount();
+  const reps = C.modules.map(m => mp(m.n).scores.reduce((a, b) => a + b, 0)).filter(s => s > 0);
+  const repPct = reps.length ? reps.reduce((a, b) => a + b, 0) / (reps.length * 20) * 100 : 0;
+  const field = C.modules.filter(m => m.field_rep && mp(m.n).field).length;
+  const ex = P.exams || {};
+  const parts = [done / 40 * 100, repPct, field / 3 * 100, +ex.mid || 0, +ex.final || 0, +ex.cap || 0];
+  const total = C.course.grading.reduce((a, g, i) => a + g.weight * parts[i] / 100, 0);
+  return { parts, total, reps: reps.length, field };
+}
+function progressView() {
+  const g = grades(), names = C.course.grading.map(x => x.part), ex = P.exams || {};
+  const letter = g.total >= 90 ? "A" : g.total >= 80 ? "B" : g.total >= 70 ? "C" : "Not yet";
+  return `<h1 class="h1">Progress</h1>
+    <div class="kpis" style="margin-top:var(--space-6)">
+      <div class="kpi xs mid">Course grade<b>${g.total.toFixed(0)}</b></div>
+      <div class="kpi xs mid">Letter<b>${letter}</b></div>
+      <div class="kpi xs mid">Modules<b>${doneCount()}<span class="mid" style="font-size:20px"> / 40</span></b></div>
+      <div class="kpi xs mid">Field reps<b>${g.field}<span class="mid" style="font-size:20px"> / 3</span></b></div>
+    </div>
+    <div class="strip" aria-label="Module completion">${C.modules.map(m => `<a href="#m/${m.n}" title="Module ${m.n}" class="${mp(m.n).done ? "d" : m.date < today() ? "late" : ""}"></a>`).join("")}</div>
+    <section><div class="rule"><h2 class="h2">Grade parts</h2></div><div class="tablewrap read"><table><tr><th>Part</th><th>Weight</th><th>Score</th></tr>${names.map((nm, i) => `<tr><td>${esc(nm)}</td><td>${C.course.grading[i].weight}</td><td>${g.parts[i].toFixed(0)}</td></tr>`).join("")}</table></div>
+      <div class="grid2 read" style="margin-top:var(--space-5)">
+        ${[["mid", "Midterm, module 20"], ["final", "Final exam, module 39"], ["cap", "Capstone, module 40"]].map(([k, l]) => `<label class="field"><span class="xs mid">${l}, 0 to 100</span><input class="input num-in" type="number" min="0" max="100" data-exam="${k}" value="${esc(ex[k] ?? "")}"></label>`).join("")}
+      </div>
+      <p class="read mid" style="margin-top:var(--space-4)">${esc(C.course.pass)}</p></section>
+    <section><div class="rule"><h2 class="h2">Your data</h2><span class="xs mid">Saved in this browser only</span></div>
+      <p class="read mid">Progress lives in this browser. To move it to your phone or keep a backup, export here and import there.</p>
+      <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;margin-top:var(--space-4)"><button class="btn" id="export">Export progress</button><label class="btn" for="importf">Import progress</label><input id="importf" type="file" accept="application/json" hidden></div></section>`;
+}
+
+/* behavior */
+let timer = null;
+function bind(h) {
+  if (h.startsWith("m/")) {
+    const n = +h.slice(2), p = mp(n), m = C.modules.find(x => x.n === n); if (!m || m.missing) return;
+    const ta = $("#answer"), rv = $("#reveal"), meter = $("#meter"), minLen = +rv.dataset.min;
+    const upd = () => { const len = ta.value.trim().length; meter.textContent = p.revealed ? "" : len < minLen ? `Write at least ${minLen - len} more characters before revealing.` : "Ready."; rv.disabled = !p.revealed && len < minLen; };
+    ta.addEventListener("input", () => { p.answer = ta.value; save(); upd(); }); upd();
+    rv.addEventListener("click", () => { p.revealed = true; save(); $("#key").hidden = false; upd(); $("#key").scrollIntoView({ behavior: "smooth", block: "start" }); });
+    document.querySelectorAll("[data-k]").forEach(cb => cb.addEventListener("change", () => { p[cb.dataset.k] = cb.checked; save(); refreshDone(p); }));
+    document.querySelectorAll(".score").forEach(row => row.addEventListener("click", e => {
+      const b = e.target.closest("button"); if (!b) return; const i = +row.dataset.r, v = +b.dataset.v;
+      p.scores[i] = p.scores[i] === v ? 0 : v; save();
+      row.querySelectorAll("button").forEach(x => { const on = +x.dataset.v === p.scores[i]; x.classList.toggle("on", on); x.setAttribute("aria-pressed", on); });
+      row.querySelector(".levels").textContent = p.scores[i] ? C.course.rubric[i].levels[p.scores[i] - 1] : "";
+      $("#total").textContent = p.scores.reduce((a, b) => a + b, 0) + " of 20";
+    }));
+    $("#done").addEventListener("click", () => { p.done = true; p.doneAt = today(); save(); toast("Module " + n + " complete."); route(); });
+    setupTimer();
+    if (m.postplan) {
+      const d = pp(n), paintPost = () => { const t = compose(m); $("#postprev").textContent = t; const issues = lint(t); $("#postlint").innerHTML = (issues.length ? issues : ["Clean. " + t.length + " characters."]).map(x => `<li class="${issues.length ? "" : "mid"}">${esc(x)}</li>`).join(""); };
+      document.querySelectorAll("[data-post]").forEach(el => el.addEventListener("input", () => { d[el.dataset.post] = el.value; save(); paintPost(); }));
+      document.querySelectorAll("[data-poststat]").forEach(el => el.addEventListener("change", () => { d.status = el.checked ? "posted" : ""; save(); }));
+      $("#copypost").addEventListener("click", async () => { try { await navigator.clipboard.writeText(compose(m)); d.status = d.status || "drafted"; save(); toast("Post copied."); } catch { toast("Copy failed. Select the preview text instead."); } });
+      $("#mkcard").addEventListener("click", () => card(m));
+      paintPost();
+    }
+  }
+  if (h === "course") { const b = $("#copyta"); if (b) b.addEventListener("click", async () => { try { await navigator.clipboard.writeText(C.course.ta.replace(/^.*?Paste this to start a session: /, "").replace(/^"|"$/g, "")); toast("Copied."); } catch { toast("Copy failed. Select the text instead."); } }); }
+  if (h === "posts") document.querySelectorAll("[data-roundup]").forEach(b => b.addEventListener("click", async () => { try { await navigator.clipboard.writeText(roundup(+b.dataset.roundup)); toast("Roundup draft copied."); } catch { toast("Copy failed."); } }));
+  if (h === "progress") {
+    document.querySelectorAll("[data-exam]").forEach(i => i.addEventListener("change", () => { P.exams = P.exams || {}; P.exams[i.dataset.exam] = i.value === "" ? "" : Math.max(0, Math.min(100, +i.value)); save(); route(); }));
+    $("#export").addEventListener("click", () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(P, null, 1)], { type: "application/json" })); a.download = "fde401-progress-" + today() + ".json"; a.click(); });
+    $("#importf").addEventListener("change", async e => { try { const d = JSON.parse(await e.target.files[0].text()); if (!d || typeof d.m !== "object") throw 0; P = d; save(); toast("Progress imported."); route(); } catch { toast("That file is not an FDE 401 progress export."); } });
+  }
+}
+function refreshDone(p) { const b = $("#done"); if (!b) return; const ok = p.exit && p.deliv; b.disabled = !ok; b.nextElementSibling.textContent = ok ? "" : "Unlocks when the exit ticket is recorded and the deliverable is saved."; }
+function setupTimer() {
+  clearInterval(timer); timer = null;
+  const hour = C.course.hour, ends = []; let acc = 0; hour.forEach(h => ends.push(acc += h.min * 60));
+  let left = 3600, running = false;
+  const paint = () => {
+    const el = 3600 - left, idx = ends.findIndex(e => el < e);
+    $("#clock").textContent = String(Math.floor(left / 60)).padStart(2, "0") + ":" + String(left % 60).padStart(2, "0");
+    document.querySelectorAll("#plan div").forEach((d, i) => { d.classList.toggle("on", running && i === idx); d.classList.toggle("past", i < idx); });
+    $("#tlabel").textContent = running && idx >= 0 ? "Now: " + hour[idx].name : left === 0 ? "Hour complete." : "";
+  };
+  $("#tstart").addEventListener("click", () => {
+    if (running) { clearInterval(timer); running = false; $("#tstart").textContent = "Resume"; paint(); return; }
+    running = true; $("#tstart").textContent = "Pause";
+    timer = setInterval(() => { if (left <= 0) { clearInterval(timer); running = false; $("#tstart").textContent = "Start the hour"; paint(); return; } left--; paint(); }, 1000); paint();
+  });
+  $("#treset").addEventListener("click", () => { clearInterval(timer); running = false; left = 3600; $("#tstart").textContent = "Start the hour"; paint(); });
+  document.querySelectorAll("#plan div").forEach((d, i) => d.addEventListener("click", () => { left = 3600 - (i ? ends[i - 1] : 0); paint(); }));
+  paint();
+}
+function toast(t) { const d = document.createElement("div"); d.className = "toast sm"; d.textContent = t; d.setAttribute("role", "status"); document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }
+})();
+</script>
+</body>
+</html>
