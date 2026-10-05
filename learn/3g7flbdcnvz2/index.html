@@ -164,14 +164,14 @@ th{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;
       <p id="lockmsg" class="sm mid" role="status" aria-live="polite"></p>
     </form>
   </div>
-  <div class="xs dim">Fall 2026. Oct 6 to Dec 19. 40 hours.</div>
+  <div class="xs dim">Fall 2026. Oct 6 to Dec 19. 40 hours. Ready by Jan 31.</div>
 </div>
 
 <div id="app" hidden>
   <header class="top">
     <a class="wm" href="#today">FDE 401</a>
     <nav class="nav xs" aria-label="Course">
-      <a href="#today">Today</a><a href="#syllabus">Syllabus</a><a href="#posts">Posts</a><a href="#course">Course</a><a href="#progress">Progress</a><a href="#" id="lockbtn">Lock</a>
+      <a href="#today">Today</a><a href="#syllabus">Syllabus</a><a href="#posts">Posts</a><a href="#ready">Ready</a><a href="#course">Course</a><a href="#progress">Progress</a><a href="#" id="lockbtn">Lock</a>
     </nav>
   </header>
   <main id="view" class="wrap" tabindex="-1"></main>
@@ -262,6 +262,7 @@ function route() {
   else if (h === "syllabus") v.innerHTML = syllabusView();
   else if (h === "course") v.innerHTML = courseView();
   else if (h === "posts") v.innerHTML = postsView();
+  else if (h === "ready") v.innerHTML = readyView();
   else if (h === "progress") v.innerHTML = progressView();
   else v.innerHTML = todayView();
   bind(h); window.scrollTo(0, 0); v.focus({ preventScroll: true });
@@ -292,6 +293,7 @@ function todayView() {
       <div class="kpi xs mid">Pace<b style="font-size:26px;margin-top:14px">${pace}</b></div>
       <div class="kpi xs mid">Hours logged<b>${d}</b></div>
     </div>
+    ${C.course.ready ? readyStrip() : ""}
     <section><div class="rule"><h2 class="h2">Week ${n.week}</h2><span class="xs mid">${esc(n.unit_name)}</span></div><div class="rows">${wk.map(row).join("")}</div></section>
     <section><div class="rule"><h2 class="h2">Coming up</h2><span class="xs mid">Field reps and capstone milestones</span></div>
       <div class="rows">${upcoming.map(m => `<a class="row" href="#m/${m.n}"><span class="num">${String(m.n).padStart(2, "0")}</span><span><span class="t">${esc(m.field_rep ? "Field rep" : "Capstone")}</span><br><span class="xs mid">${fmt(m.date)}</span><p class="mid" style="margin-top:6px">${esc(m.field_rep || m.capstone)}</p></span><span></span></a>`).join("") || '<p class="mid">All done.</p>'}</div></section>`;
@@ -369,7 +371,7 @@ function compose(m) {
     d.why ? "Why this way: " + d.why : "",
     d.change ? "What I would change: " + d.change : "",
     d.link,
-    "Field Notes, day " + m.n + " of 40. #ForwardDeployed #SolutionsArchitecture #CommercialLending"];
+    "Field Notes, day " + m.n + " of 40. #FinanceAI #SolutionsEngineering #CommercialLending"];
   return parts.filter(x => x && x.trim()).join("\n\n");
 }
 function lint(text) {
@@ -437,7 +439,62 @@ function postsView() {
 function roundup(w) {
   const ms = C.modules.filter(m => m.week === w && m.postplan && m.postplan.post === "roundup");
   const body = ms.map(m => { const d = pp(m.n); const how = [d.how1, d.how2, d.how3].filter(Boolean); return (d.hook || m.postplan.hook) + (d.built ? "\n" + d.built : "") + (how.length ? "\n" + how.map(h => "- " + h).join("\n") : ""); }).join("\n\n");
-  return "Week " + w + " of 11, the less glamorous half of forward deployed work.\n\n" + body + "\n\nField Notes, week " + w + ". #ForwardDeployed #SolutionsArchitecture";
+  return "Week " + w + " of 11, the less glamorous half of solutions work.\n\n" + body + "\n\nField Notes, week " + w + ". #FinanceAI #SolutionsEngineering";
+}
+/* readiness: the definition of ready, checked from progress where it can be */
+function rp() { return P.ready || (P.ready = { manual: {}, notes: {}, fin: {}, studied: {}, skills: {} }); }
+const postedCount = () => C.modules.filter(m => pp(m.n).status === "posted").length;
+function rcheck(c) {
+  const ex = P.exams || {}, s = rp();
+  switch (c.auto) {
+    case "discovery": { const ok = [4, 30].filter(n => mp(n).field && mp(n).scores[0] >= 3 && mp(n).scores[1] >= 3).length; return [ok === 2, ok + " of 2 field reps at 3 or better"]; }
+    case "mid": return [+ex.mid >= 80, ex.mid === undefined || ex.mid === "" ? "Midterm not scored yet" : "Midterm " + ex.mid];
+    case "unit3": { const d = C.modules.filter(m => m.n >= 21 && m.n <= 30 && mp(m.n).done).length; return [d === 10, d + " of 10 modules"]; }
+    case "m37": return [mp(37).done, mp(37).done ? "Module 37 complete" : "Module 37 not done"];
+    case "final": return [+ex.final >= 80, ex.final === undefined || ex.final === "" ? "Final not scored yet" : "Final " + ex.final];
+    case "cap": return [+ex.cap >= 70 && mp(40).cap, ex.cap === undefined || ex.cap === "" ? "Capstone not scored yet" : "Capstone " + ex.cap + (mp(40).cap ? ", published" : ", not marked published")];
+    case "posts": { const n = postedCount(); return [n >= 25, n + " of 25 posted"]; }
+    default: return [!!s.manual[c.id], s.manual[c.id] ? "Checked by you" : "Check it yourself when the evidence exists"];
+  }
+}
+const readyMet = () => C.course.ready.criteria.filter(c => rcheck(c)[0]).length;
+const daysTo = iso => Math.max(0, Math.ceil((new Date(iso + "T23:59:59") - new Date()) / 864e5));
+function finWeek() { const F = C.course.ready.finishing; let i = -1; F.forEach((w, j) => { if (w.start <= today()) i = j; }); return i; }
+function finTasks(i) { const w = C.course.ready.finishing[i], s = rp(); return w.tasks.map((t, j) => `<label class="check"><input type="checkbox" data-fin="${i}-${j}" ${s.fin[i + "-" + j] ? "checked" : ""}><span class="box"></span><span>${esc(t)}</span></label>`).join(""); }
+function readyStrip() {
+  const R = C.course.ready, met = readyMet(), fw = finWeek();
+  return `<section><div class="rule"><h2 class="h2">Ready by Jan 31</h2><a class="xs mid link" href="#ready">${met} of ${R.criteria.length} met</a></div>
+    <p class="read mid">${esc(R.goal)} ${daysTo("2027-01-31")} days left. No applications before the review.</p>
+    ${fw >= 0 ? `<div class="read" style="margin-top:var(--space-4)"><p class="xs mid">This week: ${esc(R.finishing[fw].label)}</p>${finTasks(fw)}</div>` : ""}</section>`;
+}
+function readyView() {
+  const R = C.course.ready, s = rp(), met = readyMet(), fw = finWeek();
+  return `<p class="xs mid">Target role</p><h1 class="h1" style="margin-top:var(--space-4)">Ready by January 31</h1>
+    <div class="read" style="margin-top:var(--space-5)"><p>${esc(R.goal)}</p><p class="mid" style="margin-top:1em">${esc(R.role)}</p><p class="callout">${esc(R.principle)}</p></div>
+    <div class="kpis" style="margin-top:var(--space-6)">
+      <div class="kpi xs mid">Ready items met<b>${met}<span class="mid" style="font-size:20px"> / ${R.criteria.length}</span></b></div>
+      <div class="kpi xs mid">Days to Jan 31<b>${daysTo("2027-01-31")}</b></div>
+      <div class="kpi xs mid">Posted<b>${postedCount()}<span class="mid" style="font-size:20px"> / 25</span></b></div>
+      <div class="kpi xs mid">Modules<b>${doneCount()}<span class="mid" style="font-size:20px"> / 40</span></b></div>
+    </div>
+    <section><div class="rule"><h2 class="h2">The definition of ready</h2></div><p class="read mid">${esc(R.why_defined)}</p>
+      <div class="rows" style="margin-top:var(--space-5)">${R.criteria.map((c, i) => { const [ok, why] = rcheck(c); return `<div class="row ${ok ? "done" : ""}"><span class="num">${String(i + 1).padStart(2, "0")}</span>
+        <span><span class="t">${esc(c.name)}</span><p class="mid" style="margin-top:6px">${esc(c.test)}</p><p class="xs ${ok ? "" : "dim"}" style="margin-top:6px">${esc(why)}</p>
+        ${c.auto ? "" : `<label class="check"><input type="checkbox" data-rman="${c.id}" ${s.manual[c.id] ? "checked" : ""}><span class="box"></span><span class="sm">The evidence exists</span></label>`}
+        <input class="input sm" data-rnote="${c.id}" placeholder="Evidence link or file" value="${esc(s.notes[c.id] || "")}" style="margin-top:8px"></span>
+        <span class="side xs ${ok ? "" : "dim"}">${ok ? "Met" : "Not yet"}</span></div>`; }).join("")}</div>
+      <p class="read callout">${esc(R.decision)}</p></section>
+    <section><div class="rule"><h2 class="h2">After the course</h2><span class="xs mid">Dec 21 to Jan 31</span></div>
+      ${R.finishing.map((w, i) => `<div class="week"><div class="rule"><h3 class="h3">${esc(w.label)}</h3><span class="xs mid">Week of ${fmt(w.start)}${i === fw ? " &nbsp; this week" : ""}</span></div><div class="read">${finTasks(i)}</div></div>`).join("")}</section>
+    ${R.market && R.market.length ? `<section><div class="rule"><h2 class="h2">Market</h2><span class="xs mid">${Object.values(s.studied).filter(Boolean).length} of ${R.market.length} studied</span></div>
+      <p class="read mid">Companies to study, not to apply to. For each one, learn what it sells, who buys it, and the problem it solves.</p>
+      <div class="rows" style="margin-top:var(--space-5)">${R.market.map((t, i) => `<div class="row ${s.studied[t.company] ? "done" : ""}"><span class="num">${String(i + 1).padStart(2, "0")}</span>
+        <span><span class="t">${esc(t.company)}</span><br><span class="xs mid">${esc(t.segment || "")}</span>
+        <p style="margin-top:6px">${esc(t.sells || "")}</p>${t.buyer ? `<p class="mid" style="margin-top:4px">Buyer: ${esc(t.buyer)}</p>` : ""}${t.problem ? `<p class="mid" style="margin-top:4px">Problem: ${esc(t.problem)}</p>` : ""}
+        ${t.study_url ? `<p class="sm" style="margin-top:6px"><a class="link" href="${esc(t.study_url)}" target="_blank" rel="noopener noreferrer">Study the product</a></p>` : ""}
+        <label class="check"><input type="checkbox" data-study="${esc(t.company)}" ${s.studied[t.company] ? "checked" : ""}><span class="box"></span><span class="sm">Studied, and I can explain it without notes</span></label></span><span></span></div>`).join("")}</div></section>` : ""}
+    ${R.skills && R.skills.length ? `<section><div class="rule"><h2 class="h2">What the postings ask for</h2><span class="xs mid">From real solutions engineer postings</span></div>
+      ${R.skills_note ? `<p class="read mid">${esc(R.skills_note)}</p>` : ""}<div class="tablewrap read" style="margin-top:var(--space-5)"><table><tr><th>Skill</th><th>Required</th><th>Preferred</th><th>I can do it in a screen</th></tr>${R.skills.map(k => `<tr><td>${esc(k.skill)}</td><td>${k.required_count ?? ""}</td><td>${k.preferred_count ?? ""}</td><td><label class="check"><input type="checkbox" data-skill="${esc(k.skill)}" ${s.skills[k.skill] ? "checked" : ""}><span class="box"></span><span class="sm">Yes</span></label></td></tr>`).join("")}</table></div></section>` : ""}`;
 }
 function pager(prev, nxt) {
   return `<div class="pager">${prev ? `<a class="btn" href="#m/${prev.n}">Module ${prev.n}</a>` : "<span></span>"}${nxt ? `<a class="btn" href="#m/${nxt.n}">Module ${nxt.n}</a>` : ""}</div>`;
@@ -524,6 +581,14 @@ function bind(h) {
   }
   if (h === "course") { const b = $("#copyta"); if (b) b.addEventListener("click", async () => { try { await navigator.clipboard.writeText(C.course.ta.replace(/^.*?Paste this to start a session: /, "").replace(/^"|"$/g, "")); toast("Copied."); } catch { toast("Copy failed. Select the text instead."); } }); }
   if (h === "posts") document.querySelectorAll("[data-roundup]").forEach(b => b.addEventListener("click", async () => { try { await navigator.clipboard.writeText(roundup(+b.dataset.roundup)); toast("Roundup draft copied."); } catch { toast("Copy failed."); } }));
+  if (C.course.ready && (h === "ready" || h === "today" || h === "")) {
+    const s = rp(), on = (sel, fn) => document.querySelectorAll(sel).forEach(el => el.addEventListener(el.type === "checkbox" ? "change" : "input", () => { fn(el); save(); }));
+    on("[data-fin]", el => { s.fin[el.dataset.fin] = el.checked; });
+    on("[data-rman]", el => { s.manual[el.dataset.rman] = el.checked; route(); });
+    on("[data-rnote]", el => { s.notes[el.dataset.rnote] = el.value; });
+    on("[data-study]", el => { s.studied[el.dataset.study] = el.checked; });
+    on("[data-skill]", el => { s.skills[el.dataset.skill] = el.checked; });
+  }
   if (h === "progress") {
     document.querySelectorAll("[data-exam]").forEach(i => i.addEventListener("change", () => { P.exams = P.exams || {}; P.exams[i.dataset.exam] = i.value === "" ? "" : Math.max(0, Math.min(100, +i.value)); save(); route(); }));
     $("#export").addEventListener("click", () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(P, null, 1)], { type: "application/json" })); a.download = "fde401-progress-" + today() + ".json"; a.click(); });
