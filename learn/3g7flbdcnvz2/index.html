@@ -183,14 +183,15 @@ th{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;
 const SLUG = "3g7flbdcnvz2";
 const KP = "fde401." + SLUG + ".progress.v1";
 const KPASS = "fde401." + SLUG + ".pass";
+const TOUR = /[?&]tour\b/.test(location.search); // recording mode: sample progress in memory, nothing saved
 let C = null;          // decrypted course { course, modules }
 let P = load();        // progress
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 /* storage, guarded */
-function load() { try { return JSON.parse(localStorage.getItem(KP)) || { m: {}, exams: {} }; } catch { return { m: {}, exams: {} }; } }
-function save() { try { localStorage.setItem(KP, JSON.stringify(P)); } catch {} }
+function load() { if (TOUR) return tourData(); try { return JSON.parse(localStorage.getItem(KP)) || { m: {}, exams: {} }; } catch { return { m: {}, exams: {} }; } }
+function save() { if (TOUR) return; try { localStorage.setItem(KP, JSON.stringify(P)); } catch {} }
 function mp(n) { return P.m[n] || (P.m[n] = { answer: "", scores: [0,0,0,0,0], exit: false, deliv: false, field: false, cap: false, done: false, revealed: false }); }
 
 /* crypto */
@@ -210,6 +211,7 @@ async function open(pass, remember) {
     if (remember) { try { localStorage.setItem(KPASS, pass); } catch {} }
     $("#lock").hidden = true; $("#app").hidden = false;
     route();
+    if (TOUR) tourInit();
   } catch (e) {
     msg.textContent = "That passphrase did not open the course.";
     try { localStorage.removeItem(KPASS); } catch {}
@@ -407,7 +409,7 @@ function postSection(m, p) {
       <label class="field"><span class="xs mid">Post URL</span><input class="input" data-post="url" value="${esc(d.url)}" placeholder="https://www.linkedin.com/posts/..."></label>
     </div></section>`;
 }
-async function card(m) {
+async function card(m, show) {
   const d = pp(m.n), hook = d.hook || m.postplan.hook, how = [d.how1, d.how2, d.how3].filter(x => x && x.trim());
   await Promise.all(['800 64px "Inter Tight"', '500 28px "JetBrains Mono"'].map(f => document.fonts.load(f).catch(() => {})));
   const W = 1080, H = 1350, c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d");
@@ -421,7 +423,7 @@ async function card(m) {
   g.fillStyle = "#F4F4F4"; g.fillRect(72, H - 140, W - 144, 1);
   g.font = '500 24px "JetBrains Mono", monospace'; g.fillText("RUSSH.WORK", 72, H - 92);
   g.fillStyle = "#8A8A8A"; g.fillText(m.title.toUpperCase().slice(0, 60), 72, H - 56);
-  c.toBlob(b => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "field-notes-day-" + String(m.n).padStart(2, "0") + ".png"; a.click(); }, "image/png");
+  c.toBlob(b => { if (show) return show(URL.createObjectURL(b)); const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "field-notes-day-" + String(m.n).padStart(2, "0") + ".png"; a.click(); }, "image/png");
 }
 function postsView() {
   const S = C.course.posts, weeks = [...new Set(C.modules.map(m => m.week))];
@@ -477,7 +479,7 @@ function readyView() {
       <div class="kpi xs mid">Posted<b>${postedCount()}<span class="mid" style="font-size:20px"> / 25</span></b></div>
       <div class="kpi xs mid">Modules<b>${doneCount()}<span class="mid" style="font-size:20px"> / 40</span></b></div>
     </div>
-    <section><div class="rule"><h2 class="h2">The definition of ready</h2></div><p class="read mid">${esc(R.why_defined)}</p>
+    <section id="r-def"><div class="rule"><h2 class="h2">The definition of ready</h2></div><p class="read mid">${esc(R.why_defined)}</p>
       <div class="rows" style="margin-top:var(--space-5)">${R.criteria.map((c, i) => { const [ok, why] = rcheck(c); return `<div class="row ${ok ? "done" : ""}"><span class="num">${String(i + 1).padStart(2, "0")}</span>
         <span><span class="t">${esc(c.name)}</span><p class="mid" style="margin-top:6px">${esc(c.test)}</p><p class="xs ${ok ? "" : "dim"}" style="margin-top:6px">${esc(why)}</p>
         ${c.auto ? "" : `<label class="check"><input type="checkbox" data-rman="${c.id}" ${s.manual[c.id] ? "checked" : ""}><span class="box"></span><span class="sm">The evidence exists</span></label>`}
@@ -486,7 +488,7 @@ function readyView() {
       <p class="read callout">${esc(R.decision)}</p></section>
     <section><div class="rule"><h2 class="h2">After the course</h2><span class="xs mid">Dec 21 to Jan 31</span></div>
       ${R.finishing.map((w, i) => `<div class="week"><div class="rule"><h3 class="h3">${esc(w.label)}</h3><span class="xs mid">Week of ${fmt(w.start)}${i === fw ? " &nbsp; this week" : ""}</span></div><div class="read">${finTasks(i)}</div></div>`).join("")}</section>
-    ${R.market && R.market.length ? `<section><div class="rule"><h2 class="h2">Market</h2><span class="xs mid">${Object.values(s.studied).filter(Boolean).length} of ${R.market.length} studied</span></div>
+    ${R.market && R.market.length ? `<section id="r-market"><div class="rule"><h2 class="h2">Market</h2><span class="xs mid">${Object.values(s.studied).filter(Boolean).length} of ${R.market.length} studied</span></div>
       <p class="read mid">Companies to study, not to apply to. For each one, learn what it sells, who buys it, and the problem it solves.</p>
       <div class="rows" style="margin-top:var(--space-5)">${R.market.map((t, i) => `<div class="row ${s.studied[t.company] ? "done" : ""}"><span class="num">${String(i + 1).padStart(2, "0")}</span>
         <span><span class="t">${esc(t.company)}</span><br><span class="xs mid">${esc(t.segment || "")}</span>
@@ -549,6 +551,64 @@ function progressView() {
     <section><div class="rule"><h2 class="h2">Your data</h2><span class="xs mid">Saved in this browser only</span></div>
       <p class="read mid">Progress lives in this browser. To move it to your phone or keep a backup, export here and import there.</p>
       <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;margin-top:var(--space-4)"><button class="btn" id="export">Export progress</button><label class="btn" for="importf">Import progress</label><input id="importf" type="file" accept="application/json" hidden></div></section>`;
+}
+
+/* tour: a self-playing walkthrough for screen recording. Open the page with ?tour. Steps sum to 150 seconds. */
+function tourData() {
+  const ex = { hook: "", built: "I called the U.S. Treasury Fiscal Data API from the terminal, with no wrapper library, and read every line of the response.",
+    how1: "GET request to the average interest rates endpoint, filtered to one month", how2: "Read the status code, the headers, and the JSON fields by hand",
+    how3: "Checked one rate against the Treasury's own published table", why: "A wrapper hides the status code and the error body. When an integration breaks at a client, those are the first two things I need to read.",
+    change: "Next time I would save the raw response to a file first, so I can compare runs.", link: "", status: "", url: "" };
+  return { m: { 9: { answer: "", scores: [0, 0, 0, 0, 0], exit: false, deliv: false, field: false, cap: false, done: false, revealed: false, post: ex } }, exams: {}, ready: { manual: {}, notes: {}, fin: {}, studied: {}, skills: {} } };
+}
+const TSTEPS = [
+  { h: "today", to: 0, s: 10, cap: "I gave myself 40 hours to go from credit analyst to finance AI solutions engineer. I designed the course for it and built it with Claude. Today is day 0." },
+  { h: "today", to: ".kpis", s: 9, cap: "Four one-hour sessions a week, October 6 to December 19. The home screen shows the next session and whether I am on pace." },
+  { h: "syllabus", to: 0, s: 5, cap: "40 modules in four units." },
+  { h: "syllabus", to: "end", s: 12, glide: 10000, cap: "Hear the problem. Build the technical floor. Design the solution. Deploy and land. A midterm, a final, and a capstone." },
+  { h: "m/9", to: 0, s: 9, cap: "Every module is a timed hour: warmup, concept, hands-on practice, self-check, and a 90-second spoken exit ticket." },
+  { h: "m/9", to: ".analogy", s: 9, cap: "Concepts come with a sports version and a lending version, because that is how I learn." },
+  { h: "m/9", to: "#answer", s: 10, cap: "Practice is hands-on. I write my own answer before the model answer unlocks. AI can explain and quiz me. It does not type for me." },
+  { h: "m/9", to: ".score", s: 9, act: "score", cap: "Then I score myself on five criteria: listening, questions, framing, solution fit, and honesty." },
+  { h: "m/9", to: "#postprev", s: 10, cap: "When a module is done, the app drafts the LinkedIn post from what I built and flags hype words. This one is an example draft." },
+  { h: "m/9", to: "#postprev", s: 8, act: "card", cap: "It also makes the image for the post." },
+  { h: "posts", to: 0, s: 9, cap: "Every module has a planned post. That is this series: Field Notes, 40 hours of work in public." },
+  { h: "ready", to: 0, s: 10, cap: "The goal: ready for a finance AI solutions engineer seat by January 31. No applications until then." },
+  { h: "ready", to: "#r-def", s: 10, cap: "Ready means ten items with evidence, not a feeling. Seven check themselves from my progress. Today I am at zero." },
+  { h: "ready", to: "#r-market", s: 10, cap: "I mapped 30 finance AI companies to study, and counted what 14 real solutions engineer postings ask for." },
+  { h: "course", to: ".grid2", s: 10, cap: "It is built on an honest audit of what I do well and what holds me back, with the fix for each gap." },
+  { h: "today", to: 0, s: 10, cap: "Follow along on LinkedIn. Field Notes, day 1 of 40, is Tuesday." }
+];
+let tPaused = false, tStop = false, tSkip = false;
+const tSleep = ms => new Promise(res => { let left = ms; const iv = setInterval(() => { if (tStop || tSkip) { clearInterval(iv); return res(); } if (!tPaused) left -= 100; if (left <= 0) { clearInterval(iv); res(); } }, 100); });
+function tGlide(y, ms) { const s0 = scrollY, d = y - s0, t0 = performance.now(); return new Promise(res => { const f = now => { const k = Math.min(1, (now - t0) / ms), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; scrollTo(0, s0 + d * e); k < 1 && !tStop ? requestAnimationFrame(f) : res(); }; requestAnimationFrame(f); }); }
+function tY(to) { if (to === 0) return 0; if (to === "end") return document.documentElement.scrollHeight - innerHeight; const el = $(to); return el ? el.getBoundingClientRect().top + scrollY - 96 : 0; }
+function tourInit() {
+  if ($("#tourbar")) return;
+  document.body.style.paddingBottom = "200px";
+  const bar = document.createElement("div"); bar.id = "tourbar";
+  bar.style.cssText = "position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--paper);color:var(--void);padding:20px clamp(16px,4vw,48px);display:grid;gap:8px";
+  bar.innerHTML = `<p class="xs" id="tourstep" style="opacity:.6">Recording mode. Sample progress, nothing is saved. Space pauses, right arrow skips, Esc ends.</p><p id="tourcap" style="font-family:var(--font-display);font-weight:600;font-size:clamp(18px,2.4vw,28px);line-height:1.25;max-width:60ch">Start your recorder, then press Start tour. It runs 150 seconds.</p><div><button class="btn" id="tourgo" style="border-color:var(--void)">Start tour</button></div>`;
+  document.body.appendChild(bar);
+  $("#tourgo").addEventListener("click", tourRun);
+  addEventListener("keydown", e => { if (!$("#tourbar")) return; if (e.key === " ") { e.preventDefault(); tPaused = !tPaused; } else if (e.key === "ArrowRight") tSkip = true; else if (e.key === "Escape") { tStop = true; $("#tourbar").remove(); document.body.style.paddingBottom = ""; } });
+}
+async function tourRun() {
+  $("#tourgo").parentElement.remove(); tStop = false;
+  const t0 = performance.now();
+  for (let i = 0; i < TSTEPS.length && !tStop; i++) {
+    const st = TSTEPS[i], start = performance.now(); tSkip = false;
+    $("#tourstep").textContent = "Field Notes   " + (i + 1) + " of " + TSTEPS.length;
+    $("#tourcap").textContent = st.cap;
+    if ((location.hash.replace(/^#/, "") || "today") !== st.h) { location.hash = "#" + st.h; await tSleep(450); }
+    await tGlide(tY(st.to), st.glide || 1400);
+    if (st.act === "score") { for (const [r, v] of [[0, 3], [1, 3], [2, 2], [3, 3], [4, 3]]) { const b = document.querySelector(`.score[data-r="${r}"] button[data-v="${v}"]`); if (b) b.click(); await tSleep(350); } }
+    if (st.act === "card") await new Promise(res => card(C.modules.find(m => m.n === 9), u => { const im = document.createElement("img"); im.id = "tourcard"; im.src = u; im.style.cssText = "position:fixed;z-index:49;top:72px;right:clamp(16px,4vw,48px);height:calc(100vh - 300px);max-height:620px;border:1px solid var(--rule)"; document.body.appendChild(im); res(); }));
+    await tSleep(Math.max(0, st.s * 1000 - (performance.now() - start)));
+    const im = $("#tourcard"); if (im) im.remove();
+  }
+  window.__tourSeconds = Math.round((performance.now() - t0) / 1000);
+  if (!tStop) { $("#tourstep").textContent = "Field Notes"; $("#tourcap").textContent = "russh.work"; }
 }
 
 /* behavior */
