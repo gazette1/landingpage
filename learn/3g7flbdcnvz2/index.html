@@ -456,6 +456,7 @@ function rcheck(c) {
     case "final": return [+ex.final >= 80, ex.final === undefined || ex.final === "" ? "Final not scored yet" : "Final " + ex.final];
     case "cap": return [+ex.cap >= 70 && mp(40).cap, ex.cap === undefined || ex.cap === "" ? "Capstone not scored yet" : "Capstone " + ex.cap + (mp(40).cap ? ", published" : ", not marked published")];
     case "posts": { const n = postedCount(); return [n >= 25, n + " of 25 posted"]; }
+    case "elective": { const d = C.modules.filter(m => m.n >= 41 && m.n <= 44 && mp(m.n).done).length; return [d === 4, d + " of 4 elective modules"]; }
     default: return [!!s.manual[c.id], s.manual[c.id] ? "Checked by you" : "Check it yourself when the evidence exists"];
   }
 }
