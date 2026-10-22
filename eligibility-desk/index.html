@@ -1,0 +1,585 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>Prove Once, Match Many</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: the DealCalc app shell. Sidebar of sections, page header with actions, status cards, then cards with header strips. Tokens copied from DealCalc globals.css, plus a matching dark palette. */
+:root{
+  --bg:#f7f7f5; --surface:#ffffff; --surface-2:#fafaf9; --border:#e6e4df; --border-strong:#d4d1ca;
+  --fg:#1a1a18; --fg-2:#55534d; --fg-3:#8a877f; --accent:#0f172a; --accent-fg:#ffffff;
+  --brand:#2563eb; --brand-soft:#e8efff; --good:#15803d; --good-soft:#e7f6ec; --warn:#b45309; --warn-soft:#fdf1e2;
+  --bad:#b91c1c; --bad-soft:#fde8e8; --info:#1d4f8a; --info-soft:#e9f2fb; --hover:rgba(0,0,0,.04); --active:rgba(0,0,0,.06);
+  --shadow-card:0 1px 2px rgba(20,20,18,.04),0 1px 1px rgba(20,20,18,.03); --on-brand:#ffffff;
+  --sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121211; --surface:#1a1a18; --surface-2:#201f1d; --border:#2e2d2a; --border-strong:#3d3b37;
+  --fg:#eceae5; --fg-2:#b5b2aa; --fg-3:#8a877f; --accent:#e8e6e1; --accent-fg:#121211;
+  --brand:#6b9bff; --brand-soft:#1b2640; --good:#5fca83; --good-soft:#15291d; --warn:#f0a35c; --warn-soft:#33230f;
+  --bad:#f08080; --bad-soft:#371818; --info:#8fbcf0; --info-soft:#16253a; --hover:rgba(255,255,255,.05); --active:rgba(255,255,255,.08);
+  --shadow-card:0 1px 2px rgba(0,0,0,.3); --on-brand:#121211; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121211; --surface:#1a1a18; --surface-2:#201f1d; --border:#2e2d2a; --border-strong:#3d3b37;
+  --fg:#eceae5; --fg-2:#b5b2aa; --fg-3:#8a877f; --accent:#e8e6e1; --accent-fg:#121211;
+  --brand:#6b9bff; --brand-soft:#1b2640; --good:#5fca83; --good-soft:#15291d; --warn:#f0a35c; --warn-soft:#33230f;
+  --bad:#f08080; --bad-soft:#371818; --info:#8fbcf0; --info-soft:#16253a; --hover:rgba(255,255,255,.05); --active:rgba(255,255,255,.08);
+  --shadow-card:0 1px 2px rgba(0,0,0,.3); --on-brand:#121211; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased;font-feature-settings:"cv02","cv03","cv04","cv11","tnum"}
+::selection{background:var(--brand-soft)}
+a{color:var(--brand);text-decoration:none} a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid color-mix(in srgb,var(--brand) 45%,transparent);outline-offset:1px}
+.num{font-variant-numeric:tabular-nums}
+.app{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+/* Sidebar */
+.sidebar{position:sticky;top:0;height:100vh;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column}
+.brandblk{display:flex;gap:8px;align-items:center;padding:16px;border-bottom:1px solid var(--border)}
+.logo{height:28px;width:28px;border-radius:6px;background:var(--accent);color:var(--accent-fg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+.brandblk .t{font-size:13px;font-weight:600} .brandblk .s{font-size:11px;color:var(--fg-3)}
+.nav{display:flex;flex-direction:column;gap:2px;padding:12px 8px;flex:1}
+.nav a{display:flex;align-items:center;gap:10px;border-radius:6px;padding:6px 10px;font-size:13px;color:var(--fg-2)}
+.nav a:hover{background:var(--hover);color:var(--fg);text-decoration:none}
+.nav a.on{background:var(--active);color:var(--fg);font-weight:500}
+.nav svg{width:16px;height:16px;flex:none;stroke:var(--fg-3)}
+.nav a.on svg{stroke:var(--fg)}
+.navcount{margin-left:auto}
+.side-foot{border-top:1px solid var(--border);padding:12px;display:flex;gap:8px;align-items:center}
+.avatar{height:32px;width:32px;border-radius:999px;background:var(--accent);color:var(--accent-fg);display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;flex:none}
+.side-foot .n{font-size:13px;font-weight:500} .side-foot .r{font-size:11px;color:var(--fg-3)}
+/* Main */
+.main{min-width:0;padding-inline:clamp(16px,3vw,32px);padding-block:24px 64px;display:grid;gap:16px;align-content:start;max-width:1320px}
+.pagehead{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:4px}
+.crumbs{font-size:12px;color:var(--fg-3);margin-bottom:4px}
+h1{font-size:20px;font-weight:600;letter-spacing:-.01em;margin:0}
+.desc{font-size:13px;color:var(--fg-2);margin:4px 0 0;max-width:72ch}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+/* Cards */
+.card{border:1px solid var(--border);background:var(--surface);border-radius:8px;box-shadow:var(--shadow-card);min-width:0}
+.card[id]{scroll-margin-top:16px}
+.card-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.card-h h3{font-size:13px;font-weight:600;margin:0;line-height:20px}
+.card-h p{font-size:12px;color:var(--fg-3);margin:2px 0 0}
+.card-b{padding:12px 16px;display:grid;gap:12px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{padding:12px 16px;display:grid;gap:6px}
+.kpi .l{font-size:12px;color:var(--fg-3);font-weight:500}
+.kpi .v{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.kpi .sub{font-size:11px;color:var(--fg-3)}
+.g2{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:16px;align-items:start}
+.g2e{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+@media (max-width:1024px){.g2,.g2e{grid-template-columns:minmax(0,1fr)}}
+/* Badges and buttons */
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:500;line-height:16px;white-space:nowrap}
+.badge::before{content:"";height:6px;width:6px;border-radius:999px;background:currentColor}
+.badge.nodot::before{display:none}
+.t-neutral{background:var(--active);color:var(--fg-2)} .t-brand{background:var(--brand-soft);color:var(--brand)} .t-good{background:var(--good-soft);color:var(--good)}
+.t-warn{background:var(--warn-soft);color:var(--warn)} .t-bad{background:var(--bad-soft);color:var(--bad)} .t-info{background:var(--info-soft);color:var(--info)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;border-radius:6px;font:inherit;font-size:13px;font-weight:500;height:32px;padding:0 12px;cursor:pointer;border:1px solid transparent;transition:background .12s,color .12s}
+.btn-default{background:var(--accent);color:var(--accent-fg);box-shadow:0 1px 2px rgba(0,0,0,.08)} .btn-default:hover{opacity:.9}
+.btn-primary{background:var(--brand);color:var(--on-brand)} .btn-primary:hover{opacity:.9}
+.btn-outline{border-color:var(--border);background:var(--surface);color:var(--fg)} .btn-outline:hover{background:var(--surface-2)}
+.btn-sm{height:28px;padding:0 10px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:default}
+/* Forms */
+.field{display:grid;gap:4px;min-width:0}
+.field label,.lbl{font-size:12px;font-weight:500;color:var(--fg-2)}
+.hint{font-size:11px;color:var(--fg-3)}
+.inp{display:flex;height:32px;width:100%;border-radius:6px;border:1px solid var(--border);background:var(--surface);padding:0 10px;font:inherit;font-size:13px;color:var(--fg);transition:border-color .12s}
+.inp:focus-visible{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 22%,transparent)}
+input[type=number].inp{text-align:right;font-variant-numeric:tabular-nums}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+select.inp{appearance:none;padding-right:28px;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%238a877f" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>');background-repeat:no-repeat;background-position:right 8px center}
+textarea.inp{height:auto;min-height:120px;padding:8px 10px;line-height:1.55;resize:vertical}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
+.ck{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--fg)}
+.ck input{accent-color:var(--brand);width:15px;height:15px;margin:0}
+.sep{border:0;border-top:1px solid var(--border);margin:2px 0}
+/* Tables */
+.tw{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl thead th{background:var(--surface-2);font-size:12px;color:var(--fg-3);font-weight:500;text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{padding:8px 12px;border-bottom:1px solid color-mix(in srgb,var(--border) 70%,transparent);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr:hover{background:var(--surface-2)}
+.tbl td.r{text-align:right;font-family:var(--mono);font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--fg-2)}
+.tbl td.m{width:22px;padding-right:0}
+.dot{display:inline-block;height:8px;width:8px;border-radius:999px;margin-top:5px}
+.d-pass{background:var(--good)} .d-fail{background:var(--bad)} .d-warn{background:var(--warn)} .d-info{background:var(--border-strong)}
+.src{font-size:11px;margin-left:6px}
+/* Program rows */
+.prog{border-top:1px solid var(--border)}
+.prog:first-child{border-top:0}
+.prog summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;padding:12px 16px}
+.prog summary::-webkit-details-marker{display:none}
+.prog summary:hover{background:var(--surface-2)}
+.prog .nm{font-size:13px;font-weight:600} .prog .adm{font-size:12px;color:var(--fg-3);margin-left:6px}
+.prog .gives{font-size:12px;color:var(--fg-2);padding:0 16px 8px}
+.chev{width:14px;height:14px;stroke:var(--fg-3);transition:transform .12s;flex:none}
+.prog[open] .chev{transform:rotate(90deg)}
+.banner{display:flex;gap:10px;align-items:flex-start;background:var(--warn-soft);color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 25%,transparent);border-radius:8px;padding:10px 14px;font-size:13px}
+.banner b{font-weight:600;white-space:nowrap}
+ol.order{margin:0;padding-left:18px;display:grid;gap:10px;font-size:13px;color:var(--fg-2)}
+ol.order b{color:var(--fg);font-weight:600}
+pre.log{font-family:var(--mono);font-size:11.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:10px;max-height:240px;overflow:auto;margin:0;white-space:pre-wrap;word-break:break-word;color:var(--fg-2)}
+.empty{font-size:13px;color:var(--fg-3)}
+.foot{font-size:12px;color:var(--fg-3);max-width:90ch;margin-top:8px}
+@media (max-width:1024px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .sidebar{position:sticky;top:0;height:auto;z-index:5;flex-direction:row;align-items:center;border-right:0;border-bottom:1px solid var(--border)}
+  .brandblk{border-bottom:0;padding:10px 12px}
+  .brandblk .s{display:none}
+  .nav{flex-direction:row;overflow-x:auto;padding:8px;flex:1}
+  .nav a{white-space:nowrap}
+  .side-foot{display:none}
+  .card[id]{scroll-margin-top:64px}
+}
+@media (max-width:520px){.r2,.checks,.kpis{grid-template-columns:1fr}}
+@keyframes fade-in{from{opacity:0;transform:translateY(2px)}to{opacity:1;transform:none}}
+.fade-in{animation:fade-in .12s ease-out}
+@media (prefers-reduced-motion:reduce){.fade-in{animation:none}.chev{transition:none}}
+</style>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brandblk"><div class="logo">E</div><div><div class="t">Eligibility Desk</div><div class="s">Independent demo</div></div></div>
+    <nav class="nav" aria-label="Sections">
+      <a href="#record" class="on"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 10.5 12 3l9 7.5V21H3z"/><path d="M9 21v-6h6v6"/></svg>Household</a>
+      <a href="#decisions"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Decisions</a>
+      <a href="#intake"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4z"/></svg>Note intake</a>
+      <a href="#documents"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>Documents</a>
+      <a href="#rules"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Rules</a>
+      <a href="#tests"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 3h6M10 3v6L4.5 19A1.5 1.5 0 0 0 5.8 21h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/></svg>Golden tests <span class="navcount" id="navTests"></span></a>
+      <a href="#audit"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>Audit log <span class="navcount" id="navLog"></span></a>
+    </nav>
+    <div class="side-foot"><span class="avatar">RH</span><div><div class="n">Russell Harris</div><div class="r">Built with Claude Code</div></div></div>
+  </aside>
+
+  <main class="main">
+    <div class="pagehead">
+      <div style="min-width:0">
+        <div class="crumbs">Demo / DC energy assistance</div>
+        <h1>Prove once, match many</h1>
+        <p class="desc">One household record checked against four DC programs. Each decision shows the rule, the threshold, the rule version, and the source. AI may read an intake note; code makes every decision and does every calculation.</p>
+      </div>
+      <div class="actions">
+        <label class="lbl" for="exampleSel" style="margin:0">Example</label>
+        <select id="exampleSel" class="inp" style="width:auto;min-width:220px"></select>
+        <button class="btn btn-default" id="recordBtn">Record decision</button>
+      </div>
+    </div>
+
+    <div id="banner" class="banner" hidden></div>
+    <div class="kpis" id="summary"></div>
+
+    <div class="g2">
+      <section class="card" id="record">
+        <div class="card-h"><div><h3>Household record</h3><p>Verified once, reused for every program. Example households, not real people.</p></div><span class="hint" id="recordNote" role="status"></span></div>
+        <div class="card-b">
+          <div class="r2">
+            <div class="field"><label for="size">Household size</label><select id="size" class="inp"></select></div>
+            <div class="field"><label for="decisionDate">Decision date</label><input type="date" id="decisionDate" class="inp"></div>
+          </div>
+          <div class="r2">
+            <div class="field"><label for="incAmt">Gross income ($)</label><input type="number" id="incAmt" class="inp" min="0" step="1"></div>
+            <div class="field"><label for="incFreq">Per</label><select id="incFreq" class="inp"><option value="annual">Year</option><option value="monthly">Month</option><option value="semimonthly">Half month</option><option value="biweekly">Two weeks</option><option value="weekly">Week</option></select></div>
+          </div>
+          <div class="hint" id="annualNote"></div>
+          <div class="field"><label for="evDate">Date on newest proof of income</label><input type="date" id="evDate" class="inp"></div>
+          <div class="field"><span class="lbl">Benefits anyone in the household receives</span>
+            <div class="checks"><label class="ck"><input type="checkbox" id="tanf"> TANF</label><label class="ck"><input type="checkbox" id="ssi"> SSI</label><label class="ck"><input type="checkbox" id="snap"> SNAP</label></div></div>
+          <hr class="sep">
+          <div class="r2">
+            <div class="field"><label for="tenure">Home</label><select id="tenure" class="inp"><option value="renter">Renter</option><option value="owner">Owner</option></select></div>
+            <div class="field"><label for="units">Units in building</label><input type="number" id="units" class="inp" min="1" step="1"></div>
+          </div>
+          <div class="field"><label for="share">Income-eligible households in building (%)</label><input type="number" id="share" class="inp" min="0" max="100" step="1"></div>
+          <div class="field"><span class="lbl">Account and property</span>
+            <div class="checks"><label class="ck"><input type="checkbox" id="billName"> Bill in applicant's name</label><label class="ck"><input type="checkbox" id="foreclosure"> In foreclosure</label><label class="ck"><input type="checkbox" id="redev"> Pending redevelopment</label><label class="ck"><input type="checkbox" id="forSale"> Intended for sale</label></div></div>
+        </div>
+      </section>
+
+      <div style="display:grid;gap:16px;min-width:0">
+        <section class="card" id="decisions">
+          <div class="card-h"><div><h3>Decisions</h3><p>Open a program to see every check behind its decision.</p></div></div>
+          <div id="programs"></div>
+        </section>
+        <div class="g2e">
+          <section class="card"><div class="card-h"><div><h3>Application order</h3><p>Sequenced so one intake feeds the next program.</p></div></div><div class="card-b"><ol class="order" id="order"></ol></div></section>
+          <section class="card" id="documents"><div class="card-h"><div><h3>Documents, asked once</h3><p>Each is collected one time and reused.</p></div></div><div id="docs"></div></section>
+        </div>
+      </div>
+    </div>
+
+    <section class="card" id="intake">
+      <div class="card-h"><div><h3>Intake from a caseworker note</h3><p>Claude returns only facts the note states. Code annualizes income and computes the building share. You review before anything changes.</p></div><div class="actions"><button class="btn btn-primary btn-sm" id="aiBtn">Read note with Claude</button><button class="btn btn-outline btn-sm" id="aiStop" hidden>Stop</button></div></div>
+      <div class="card-b"><div class="g2e" style="gap:16px">
+        <div class="field"><label for="noteText">Caseworker note (example)</label>
+          <textarea id="noteText" class="inp">Met Ms. R at the Ward 8 resilience hub on 10/20. Household of 3: her and two kids. Works part time; she showed pay stubs from September and early October, about $2,400 every two weeks. Gets SNAP, no TANF, nobody on SSI. Rents in a 4-unit building; she says 2 of the other units are also low income. The Pepco bill is still in her ex's name.</textarea></div>
+        <div id="aiOut" aria-live="polite" style="display:grid;gap:10px;align-content:start"><p class="empty">Facts read from the note appear here for review.</p></div>
+      </div></div>
+    </section>
+
+    <div class="g2e">
+      <section class="card" id="rules"><div class="card-h"><div><h3>Rules as data</h3><p>Versioned limit tables with effective periods and sources. The engine uses the version in force on the decision date.</p></div></div><div class="card-b" id="rulesBody"></div></section>
+      <div style="display:grid;gap:16px;min-width:0">
+        <section class="card" id="tests"><div class="card-h"><div><h3>Golden households</h3><p>Fixed cases decided as of 2026-10-22, run on every load.</p></div><span id="testSum" class="badge"></span></div><div id="testsBody"></div></section>
+        <section class="card" id="audit"><div class="card-h"><div><h3>Audit log</h3><p>One line per recorded decision, with the rule versions used.</p></div><button class="btn btn-outline btn-sm" id="copyLog">Copy log</button></div><div class="card-b"><pre class="log" id="log">No decisions recorded yet. Use Record decision.</pre></div></section>
+      </div>
+    </div>
+
+    <p class="foot">Built by Russell Harris with Claude Code as an independent demo for a forward deployed engineering conversation. Not affiliated with Groundswell or Gratava, and not eligibility advice. Thresholds were read from the linked public sources on October 21, 2026; where a current table could not be confirmed, the page says so. Portfolio: russh.work</p>
+  </main>
+</div>
+
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = n => { const c = Math.round(n*100)/100; return (c < 0 ? "-$" : "$") + Math.abs(c).toLocaleString("en-US", {minimumFractionDigits:Number.isInteger(c)?0:2, maximumFractionDigits:2}); };
+const today = () => { const d = new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const daysBetween = (a,b) => Math.round((new Date(b+"T12:00:00") - new Date(a+"T12:00:00")) / 864e5);
+
+/* ---------- Sources ---------- */
+const SRC = {
+  liheap: {label:"DOEE LIHEAP FY2026 benefit table (LIHEAP Clearinghouse)", url:"https://liheapch.ncat.org/docs/2026/benefits-matricies/DC_BenefitMatrix_Heat-Cool_2026.docx"},
+  wap: {label:"DOEE Weatherization Assistance Program page", url:"https://doee.dc.gov/node/9432"},
+  wapPlan: {label:"DOEE FY26 WAP proposed state plan", url:"https://doee.dc.gov/sites/default/files/dc/sites/doee/service_content/attachments/FY26%20WAP%20Proposed%20State%20Plan.pdf"},
+  udp: {label:"DC Public Service Commission, discount programs", url:"https://dcpsc.org/Consumers-Corner/Programs/Low-Income-Discount-Program.aspx"},
+  udpDoee: {label:"DOEE Utility Discount Program page", url:"https://doee.dc.gov/udp"},
+  sfa: {label:"DCSEU income qualification page", url:"https://www.dcseu.com/homeowners-renters/qualify"},
+  sfaGuide: {label:"DOEE Solar for All income verification guidance", url:"https://doee.dc.gov/sites/default/files/dc/sites/ddoe/service_content/attachments/Solar%20for%20All%20-%20Income%20Verification%20Guidance_3.1_update%20FINAL.pdf"}
+};
+
+/* ---------- Rules as data ---------- */
+const RULES = {
+  liheap: {
+    name: "LIHEAP", full: "Low Income Home Energy Assistance Program", admin: "DOEE",
+    gives: "A payment toward heating or cooling bills, sized by household, income, fuel, and dwelling type.",
+    test: "Income at or below 60% of state median income", op: "lte",
+    versions: [{v:"FY2026", start:"2025-10-01", end:"2026-09-30", src:SRC.liheap,
+      table:{1:61841,2:80869,3:99897,4:118926,5:137954,6:156982},
+      over6:"Above six people: add 3 percentage points to 132% for each extra person, times the four-person limit."}]
+  },
+  wap: {
+    name: "Weatherization", full: "Weatherization Assistance Program", admin: "DOEE",
+    gives: "No-cost weatherization and energy upgrades to the home. DOEE notes openings are delayed this fiscal year.",
+    test: "Income below 60% of state median income, or a household member on TANF or SSI", op: "lt",
+    versions: [{v:"FY2026", start:"2025-10-01", end:"2026-09-30", src:SRC.wap,
+      table:{1:61841,2:80869,3:99897,4:118926,5:137954,6:156982,7:160550,8:164117,9:167685,10:171253}}]
+  },
+  udp: {
+    name: "Utility Discount", full: "Utility Discount Program", admin: "DOEE",
+    gives: "Discounts on electric, gas, and water bills.",
+    test: "Income at or below the DC discount-program limit, with the utility bill in the applicant's name", op: "lte",
+    versions: [
+      {v:"FY2026", start:"2025-10-01", end:"2026-09-30", src:SRC.udp, table:{1:91800,2:104900,3:118000,4:131100,5:141600,6:152600,7:162500,8:173100}},
+      {v:"FY2027", start:"2026-10-01", end:"2027-09-30", src:SRC.udp, table:{1:93050,2:106350,3:119650,4:132900,5:143550,6:154200,7:164800,8:175450}}]
+  },
+  sfa: {
+    name: "Solar for All", full: "Solar for All", admin: "DOEE and DCSEU",
+    gives: "Solar savings for income-qualified homeowners and renters.",
+    test: "Income at or below 80% of area median income", op: "lte",
+    versions: [{v:"DCSEU table, effective June 2025", start:"2025-06-01", end:null, provisional:true, src:SRC.sfa,
+      table:{1:91800,2:104900,3:118000,4:131100}, note:"The table read for this demo covers one to four people. Larger households need the current DCSEU table."}]
+  }
+};
+const ORDER = ["liheap","wap","udp","sfa"];
+
+function pickVersion(prog, date){
+  const vs = RULES[prog].versions;
+  const cur = vs.find(x => x.start <= date && (!x.end || date <= x.end));
+  if (cur) return {ver:cur, stale:false};
+  const past = vs.filter(x => x.start <= date).sort((a,b) => a.start < b.start ? -1 : 1).pop();
+  return past ? {ver:past, stale:true} : null;
+}
+function limitFor(prog, ver, size){
+  if (ver.table[size] != null) return {limit:ver.table[size], how:"table"};
+  if (prog === "liheap" && size > 6){
+    const pct = 1.32 + 0.03*(size-6);
+    return {limit:Math.floor(ver.table[4]*pct), how:"formula: "+(pct*100).toFixed(0)+"% of the four-person limit"};
+  }
+  return null;
+}
+const MULT = {annual:1, monthly:12, semimonthly:24, biweekly:26, weekly:52};
+const annualIncome = h => Math.round((Number(h.incAmt)||0) * (MULT[h.incFreq]||1) * 100) / 100;
+const hasIncome = h => String(h.incAmt ?? "").trim() !== "" && isFinite(Number(h.incAmt)) && Number(h.incAmt) >= 0;
+
+/* ---------- Engine ---------- */
+function evaluate(h){
+  const date = h.decisionDate, income = annualIncome(h), out = {};
+  for (const p of ORDER){
+    const R = RULES[p], checks = []; let hardFail=false, review=false, needs=false, soft=false;
+    const pick = pickVersion(p, date);
+    if (!pick){ out[p] = {status:"review", checks:[{m:"!",cls:"warn",t:"No rule version covers this date",r:date}], ver:null}; continue; }
+    const {ver, stale} = pick;
+    if (stale){ soft=true; checks.push({m:"!",cls:"warn",t:"Newest table on record ("+ver.v+") ended "+ver.end+". A current table was not found, so this result is provisional.",r:ver.v, src:ver.src}); }
+    else if (ver.provisional){ soft=true; checks.push({m:"!",cls:"warn",t:"Table has no published end date; confirm it is current before relying on it.",r:ver.v, src:ver.src}); }
+    else checks.push({m:"ok",cls:"pass",t:"Rule version in force on "+date,r:ver.v, src:ver.src});
+
+    const lim = limitFor(p, ver, Number(h.size));
+    let incomePass = null;
+    if (!hasIncome(h)){ review=true; checks.push({m:"?",cls:"warn",t:"No usable gross income on record. Enter an amount of zero or more.",r:"needs review", src:null}); }
+    else if (!lim){ review=true; checks.push({m:"?",cls:"warn",t:"No income limit on record for a household of "+h.size+". "+(ver.note||""),r:"needs review", src:ver.src}); }
+    else {
+      incomePass = R.op === "lt" ? income < lim.limit : income <= lim.limit;
+      checks.push({m:incomePass?"ok":"no",cls:incomePass?"pass":"fail",
+        t:"Income "+money(income)+(incomePass ? (R.op==="lt"?" below ":" at or below ") : (R.op==="lt"?" at or above ":" above "))+money(lim.limit)+" for "+h.size+(h.size==1?" person":" people")+(lim.how!=="table"?" ("+lim.how+")":""),
+        r:(R.op==="lt"?"< ":"<= ")+money(lim.limit), src:ver.src});
+    }
+
+    if (p === "wap"){
+      const cat = h.tanf || h.ssi;
+      checks.push({m:cat?"ok":"-",cls:cat?"pass":"info",t:"Household member on TANF or SSI qualifies regardless of income",r:cat?(h.tanf?"TANF":"SSI"):"none", src:SRC.wap});
+      if (incomePass === false && !cat) hardFail = true;
+      if (incomePass === null && cat) review = false;
+      const flags = [h.foreclosure&&"foreclosure", h.redev&&"pending redevelopment", h.forSale&&"intended for sale"].filter(Boolean);
+      checks.push({m:flags.length?"no":"ok",cls:flags.length?"fail":"pass",t:"Property not in foreclosure, pending redevelopment, or intended for sale",r:flags.length?flags.join(", "):"clear", src:SRC.wap});
+      if (flags.length) hardFail = true;
+      const u = Number(h.units), sh = String(h.share ?? "").trim() === "" ? NaN : Number(h.share);
+      if (!(Number.isInteger(u) && u >= 1)){ review=true; checks.push({m:"?",cls:"warn",t:"Units in building not on record. Enter a whole number of 1 or more.",r:"needs review", src:SRC.wap}); }
+      else if (u >= 2){
+        const need = u >= 5 ? 66 : 50, rule = (u>=5?"5 or more units":"2 to 4 units")+": at least "+need+"% of households must be income-eligible";
+        if (!(sh >= 0 && sh <= 100)){ review=true; checks.push({m:"?",cls:"warn",t:rule+". Share not on record or outside 0 to 100.",r:"needs review", src:SRC.wap}); }
+        else {
+          const okB = sh >= need;
+          checks.push({m:okB?"ok":"no",cls:okB?"pass":"fail",t:rule,r:sh+"% vs "+need+"%", src:SRC.wap});
+          if (!okB) hardFail = true;
+        }
+      }
+      if (!h.evDate){ needs=true; checks.push({m:"doc",cls:"warn",t:"No dated proof of income on file",r:"needed", src:SRC.wapPlan}); }
+      else {
+        const age = daysBetween(h.evDate, date), okE = age >= 0 && age <= 90;
+        checks.push({m:okE?"ok":"doc",cls:okE?"pass":"warn",t:"Proof of income dated within 90 days (proposed FY26 state plan)",r:age < 0 ? "dated after decision" : age+" days old", src:SRC.wapPlan});
+        if (!okE) needs = true;
+      }
+      checks.push({m:"-",cls:"info",t:"Requires a signed LIHEAP application in the packet",r:"see order", src:SRC.wap});
+    } else if (incomePass === false) hardFail = true;
+
+    if (p === "udp"){
+      checks.push({m:h.billName?"ok":"doc",cls:h.billName?"pass":"warn",t:"Utility bill in the applicant's name",r:h.billName?"yes":"no", src:SRC.udpDoee});
+      if (!h.billName) needs = true;
+    }
+    if (h.snap) checks.push({m:"-",cls:"info",t:"SNAP is on the record. None of these four rules use it; it stays on file for programs that do.",r:"kept", src:null});
+
+    const status = hardFail ? "ineligible" : review ? "review" : needs ? "needs" : soft ? "likely" : "eligible";
+    out[p] = {status, checks, ver, income};
+  }
+  return out;
+}
+const STATUS = {eligible:"Eligible", likely:"Eligible, rules provisional", needs:"Needs a document", review:"Needs review", ineligible:"Not eligible"};
+const TONE = {eligible:"t-good", likely:"t-info", needs:"t-warn", review:"t-brand", ineligible:"t-bad"};
+const badge = st => `<span class="badge ${TONE[st]}">${STATUS[st]}</span>`;
+const CHEV = `<svg class="chev" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg>`;
+
+/* ---------- Documents and order ---------- */
+const DOCS = [
+  {d:"Government-issued photo ID", p:["udp","wap"]},
+  {d:"Social Security card for each household member", p:["udp","wap"]},
+  {d:"Proof of income for each member with income (WAP: dated within 90 days)", p:["udp","wap"]},
+  {d:"Most recent utility bills", p:["udp","wap"]},
+  {d:"Signed LIHEAP application", p:["liheap","wap"]},
+  {d:"Signed EMS-LRP-WAP application", p:["wap"]},
+  {d:"Most recent bank statement", p:["wap"]},
+  {d:"Mortgage statement or deed", p:["wap"], owner:true},
+  {d:"Homeowner's or renter's insurance", p:["wap"]},
+  {d:"Disconnection notice, if any", p:["udp"]},
+  {d:"Income documents per DOEE Solar for All guidance", p:["sfa"]}
+];
+function renderDocs(res, h){
+  const live = new Set(ORDER.filter(p => res[p].status !== "ineligible"));
+  const rows = DOCS.filter(x => x.p.some(p => live.has(p)) && (!x.owner || h.tenure === "owner"));
+  $("docs").innerHTML = rows.length ? `<div class="tw"><table class="tbl"><thead><tr><th>Document</th><th>Used by</th></tr></thead><tbody>${rows.map(x => `<tr><td>${esc(x.d)}</td><td><span style="display:flex;gap:4px;flex-wrap:wrap">${x.p.filter(p=>live.has(p)).map(p=>`<span class="badge nodot t-neutral">${esc(RULES[p].name)}</span>`).join("")}</span></td></tr>`).join("")}</tbody></table></div>`
+    : `<div class="card-b"><p class="empty">No program is open to this household, so no documents are needed.</p></div>`;
+}
+function renderOrder(res){
+  const live = p => res[p].status !== "ineligible";
+  const steps = [];
+  if (live("liheap") && live("wap")) steps.push(`<li><b>LIHEAP first.</b> The weatherization packet requires a signed LIHEAP application, so one intake serves both. <a href="${SRC.wap.url}" target="_blank" rel="noopener">DOEE</a></li>`);
+  else if (live("liheap")) steps.push(`<li><b>LIHEAP first.</b> One DOEE application for help with heating or cooling bills.</li>`);
+  else if (live("wap")) steps.push(`<li><b>Signed LIHEAP application first.</b> The weatherization packet requires one, even though LIHEAP itself is not open to this household. <a href="${SRC.wap.url}" target="_blank" rel="noopener">DOEE</a></li>`);
+  if (live("wap")) steps.push(`<li><b>Weatherization next.</b> Reuses the LIHEAP documents plus bank, insurance, and housing papers.</li>`);
+  if (live("sfa")) steps.push(live("wap") ? `<li><b>Solar for All after weatherization.</b> Example sequencing policy: upgrade the home before sizing solar to its lower load. This is a configurable policy, not a DC rule.</li>`
+    : `<li><b>Solar for All.</b> Weatherization is not open to this household, so there is no upgrade to sequence before solar.</li>`);
+  if (live("udp")) steps.push(`<li><b>Utility Discount, any time.</b> Separate application through DOEE; the bill must be in the applicant's name.</li>`);
+  $("order").innerHTML = steps.join("") || `<li>No program is open to this household.</li>`;
+}
+
+/* ---------- Rendering ---------- */
+function renderResults(res){
+  $("summary").innerHTML = ORDER.map(p => {
+    const r = res[p];
+    return `<div class="card kpi"><div class="l">${esc(RULES[p].full)}</div><div>${badge(r.status)}</div><div class="sub">${r.ver ? "Rules " + esc(r.ver.v) : "No rule version"}, ${esc(RULES[p].admin)}</div></div>`;
+  }).join("");
+  $("programs").innerHTML = ORDER.map(p => {
+    const R = RULES[p], r = res[p];
+    return `<details class="prog" ${r.status!=="eligible"?"open":""}><summary><span style="display:flex;align-items:center;gap:8px;min-width:0">${CHEV}<span><span class="nm">${esc(R.full)}</span><span class="adm">${esc(R.admin)}</span></span></span>${badge(r.status)}</summary>
+      <div class="gives">${esc(R.gives)} Test: ${esc(R.test)}.</div>
+      <div class="tw"><table class="tbl"><thead><tr><th></th><th>Check</th><th style="text-align:right">Value</th></tr></thead><tbody>${r.checks.map(c => `<tr><td class="m"><span class="dot d-${c.cls==="pass"?"pass":c.cls==="fail"?"fail":c.cls==="warn"?"warn":"info"}"></span></td><td>${esc(c.t)}${c.src?`<a class="src" href="${c.src.url}" target="_blank" rel="noopener">Source</a>`:""}</td><td class="r">${esc(c.r)}</td></tr>`).join("")}</tbody></table></div></details>`;
+  }).join("");
+}
+function renderRules(){
+  $("rulesBody").innerHTML = ORDER.map(p => {
+    const R = RULES[p];
+    return R.versions.map(v => {
+      const sizes = Object.keys(v.table);
+      return `<div style="display:grid;gap:6px"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><span style="font-size:13px;font-weight:600">${esc(R.full)} <span class="badge nodot t-neutral">${esc(v.v)}</span></span><span class="hint">${esc(v.start)} to ${esc(v.end||"no end date published")}</span></div>
+      <div class="tw" style="border:1px solid var(--border);border-radius:6px"><table class="tbl"><thead><tr><th>People</th>${sizes.map(n=>`<th style="text-align:right">${n}</th>`).join("")}</tr></thead><tbody><tr><td>Limit</td>${sizes.map(n=>`<td class="r">${money(v.table[n])}</td>`).join("")}</tr></tbody></table></div>
+      <div class="hint">${v.over6?esc(v.over6)+" ":""}${v.note?esc(v.note)+" ":""}<a href="${v.src.url}" target="_blank" rel="noopener">${esc(v.src.label)}</a></div></div>`;
+    }).join("");
+  }).join("");
+}
+
+/* ---------- Form ---------- */
+const FIELDS = ["size","decisionDate","incAmt","incFreq","evDate","tanf","ssi","snap","tenure","units","share","billName","foreclosure","redev","forSale"];
+const BOOL = new Set(["tanf","ssi","snap","billName","foreclosure","redev","forSale"]);
+function readForm(){ const h={}; for (const f of FIELDS) h[f] = BOOL.has(f) ? $(f).checked : $(f).value; h.size = Number(h.size); return h; }
+function writeForm(h){ for (const f of FIELDS){ if (h[f] === undefined) continue; if (BOOL.has(f)) $(f).checked = !!h[f]; else $(f).value = h[f]; } }
+
+const EXAMPLES = [
+  {id:"A", name:"Family of 4, $95,000", h:{size:4,incAmt:95000,incFreq:"annual",evDate:"2026-10-10",tanf:false,ssi:false,snap:false,tenure:"renter",units:1,share:100,billName:true,foreclosure:false,redev:false,forSale:false},
+    expect:{liheap:"likely",wap:"likely",udp:"eligible",sfa:"likely"}},
+  {id:"B", name:"Couple, $90,000", h:{size:2,incAmt:90000,incFreq:"annual",evDate:"2026-10-01",tanf:false,ssi:false,snap:false,tenure:"owner",units:1,share:100,billName:true,foreclosure:false,redev:false,forSale:false},
+    expect:{liheap:"ineligible",wap:"ineligible",udp:"eligible",sfa:"likely"}},
+  {id:"C", name:"Single adult on SSI, $70,000 household income", h:{size:1,incAmt:70000,incFreq:"annual",evDate:"2026-09-30",tanf:false,ssi:true,snap:false,tenure:"owner",units:1,share:100,billName:true,foreclosure:false,redev:false,forSale:false},
+    expect:{liheap:"ineligible",wap:"likely",udp:"eligible",sfa:"likely"}},
+  {id:"D", name:"Household of 7, $160,000", h:{size:7,incAmt:160000,incFreq:"annual",evDate:"2026-10-15",tanf:false,ssi:false,snap:false,tenure:"owner",units:1,share:100,billName:true,foreclosure:false,redev:false,forSale:false},
+    expect:{liheap:"likely",wap:"likely",udp:"eligible",sfa:"review"}},
+  {id:"E", name:"Family of 3, stale pay stub, bill not in name", h:{size:3,incAmt:60000,incFreq:"annual",evDate:"2026-06-01",tanf:false,ssi:false,snap:true,tenure:"renter",units:1,share:100,billName:false,foreclosure:false,redev:false,forSale:false},
+    expect:{liheap:"likely",wap:"needs",udp:"needs",sfa:"likely"}},
+  {id:"F", name:"Couple in a 12-unit building, $50,000", h:{size:2,incAmt:50000,incFreq:"annual",evDate:"2026-10-05",tanf:false,ssi:false,snap:false,tenure:"renter",units:12,share:55,billName:true,foreclosure:false,redev:false,forSale:false},
+    expect:{liheap:"likely",wap:"ineligible",udp:"eligible",sfa:"likely"}}
+];
+
+function runTests(){
+  const DATE = "2026-10-22"; let pass = 0, total = 0;
+  const rows = EXAMPLES.map(ex => {
+    const res = evaluate({...ex.h, decisionDate:DATE});
+    const misses = ORDER.filter(p => res[p].status !== ex.expect[p]);
+    total += ORDER.length; pass += ORDER.length - misses.length;
+    return `<tr><td><b>${ex.id}.</b> ${esc(ex.name)}${misses.length?`<div class="hint" style="color:var(--bad)">${misses.map(p=>esc(RULES[p].name)+": expected "+STATUS[ex.expect[p]]+", got "+STATUS[res[p].status]).join("; ")}</div>`:`<div class="hint">${ORDER.map(p=>esc(RULES[p].name)+": "+STATUS[res[p].status]).join(", ")}</div>`}</td><td style="text-align:right"><span class="badge ${misses.length?"t-bad":"t-good"}">${misses.length?"Fail":"Pass"}</span></td></tr>`;
+  });
+  $("testsBody").innerHTML = `<div class="tw"><table class="tbl"><thead><tr><th>Household</th><th style="text-align:right">Result</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>`;
+  const ok = pass === total;
+  $("testSum").className = "badge " + (ok ? "t-good" : "t-bad");
+  $("testSum").textContent = pass + " of " + total + " match";
+  $("navTests").innerHTML = `<span class="badge nodot ${ok ? "t-good" : "t-bad"}">${pass}/${total}</span>`;
+}
+
+function update(){
+  const h = readForm(), inc = annualIncome(h);
+  $("annualNote").textContent = h.incFreq !== "annual" && hasIncome(h) ? "Annualized in code: " + money(Number(h.incAmt)||0) + " x " + MULT[h.incFreq] + " = " + money(inc) : "";
+  const res = evaluate(h);
+  renderResults(res); renderDocs(res, h); renderOrder(res);
+  const staleNames = ORDER.filter(p => res[p].checks.some(c => c.cls === "warn" && /provisional|confirm/.test(c.t))).map(p => RULES[p].name);
+  const b = $("banner");
+  const udpNote = res.udp.ver && !staleNames.includes(RULES.udp.name) ? " " + RULES.udp.name + " uses " + res.udp.ver.v + " limits published by the DC Public Service Commission." : "";
+  if (staleNames.length){ b.hidden = false; b.innerHTML = `<b>Rule currency.</b> <span>On ${esc(h.decisionDate)}, ${esc(staleNames.join(", "))} ${staleNames.length>1?"have":"has"} no confirmed current table, so ${staleNames.length>1?"those results are":"that result is"} provisional.${esc(udpNote)}</span>`; }
+  else b.hidden = true;
+  return {h, res};
+}
+
+/* ---------- Audit log ---------- */
+const log = [];
+async function hashRecord(h){
+  try {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(JSON.stringify(h)));
+    return [...new Uint8Array(buf)].slice(0,6).map(b=>b.toString(16).padStart(2,"0")).join("");
+  } catch { return "n/a"; }
+}
+$("recordBtn").addEventListener("click", async () => {
+  const {h, res} = update();
+  const entry = {recorded_at:new Date().toISOString(), record_hash:await hashRecord(h), decision_date:h.decisionDate, annual_income:annualIncome(h), household_size:h.size,
+    decisions:Object.fromEntries(ORDER.map(p => [p, {status:res[p].status, rule_version:res[p].ver ? res[p].ver.v : null}]))};
+  log.unshift(entry); if (log.length > 25) log.pop();
+  $("log").textContent = log.map(e => JSON.stringify(e)).join("\n");
+  $("navLog").innerHTML = `<span class="badge nodot t-brand">${log.length}</span>`;
+  $("recordNote").textContent = "Recorded " + new Date().toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+});
+$("copyLog").addEventListener("click", async () => {
+  const text = $("log").textContent;
+  try { await navigator.clipboard.writeText(text); $("copyLog").textContent = "Copied"; }
+  catch { const r = document.createRange(); r.selectNodeContents($("log")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); $("copyLog").textContent = "Selected"; }
+  setTimeout(() => $("copyLog").textContent = "Copy log", 1500);
+});
+
+/* ---------- AI intake ---------- */
+const PROMPT = note => `You read caseworker intake notes for DC energy-assistance programs. Extract only facts the note states. Do not total or annualize income, do not calculate percentages, and do not decide eligibility.
+Reply with only one JSON object in this shape:
+{"householdSize": integer or null, "incomeItems": [{"amount": number, "frequency": "weekly"|"biweekly"|"semimonthly"|"monthly"|"annual", "source": short string}], "incomeEvidenceDate": "YYYY-MM-DD" or null (only when an exact date is stated), "tanf": true|false|null, "ssi": true|false|null, "snap": true|false|null, "tenure": "owner"|"renter"|null, "buildingUnits": integer or null, "otherLowIncomeUnits": integer or null, "billInApplicantName": true|false|null, "foreclosure": true|false|null, "redevelopment": true|false|null, "forSale": true|false|null, "uncertain": [short strings naming anything unclear or missing]}
+Use null when the note does not say.
+
+Note:
+"""
+${note}
+"""`;
+let sampleFn = null, ctl = null, lastFacts = null;
+function showAiUnavailable(msg){ sampleFn = null; $("aiBtn").disabled = true; $("aiOut").innerHTML = `<p class="empty">${esc(msg)}</p>`; }
+(async () => {
+  try { sampleFn = window.claude && typeof window.claude.use === "function" ? await window.claude.use("sample") : null; } catch { sampleFn = null; }
+  if (!sampleFn) showAiUnavailable("Claude intake runs when this page is opened in Claude. The rules engine above works without it.");
+})();
+function factsToRecord(f){
+  const h = {}, from = [];
+  const num = x => typeof x === "number" && isFinite(x);
+  if (Number.isInteger(f.householdSize) && f.householdSize > 0){ h.size = Math.min(f.householdSize, 10); from.push("household size"); }
+  const items = Array.isArray(f.incomeItems) ? f.incomeItems.filter(i => i && num(i.amount) && MULT[i.frequency]) : [];
+  if (items.length){ h.incAmt = Math.round(items.reduce((s,i) => s + i.amount*MULT[i.frequency], 0)); h.incFreq = "annual"; from.push("income, annualized in code from " + items.length + " item" + (items.length>1?"s":"")); }
+  if (typeof f.incomeEvidenceDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(f.incomeEvidenceDate)){ h.evDate = f.incomeEvidenceDate; from.push("evidence date"); }
+  else { h.evDate = ""; }
+  for (const [k,fld] of [["tanf","tanf"],["ssi","ssi"],["snap","snap"],["billInApplicantName","billName"],["foreclosure","foreclosure"],["redevelopment","redev"],["forSale","forSale"]]) if (typeof f[k] === "boolean"){ h[fld] = f[k]; from.push(fld); }
+  if (f.tenure === "owner" || f.tenure === "renter"){ h.tenure = f.tenure; from.push("tenure"); }
+  if (Number.isInteger(f.buildingUnits) && f.buildingUnits > 0){
+    h.units = f.buildingUnits; from.push("units");
+    if (Number.isInteger(f.otherLowIncomeUnits) && f.buildingUnits > 1){ h.share = Math.round(Math.min(100, (f.otherLowIncomeUnits + 1) / f.buildingUnits * 100)); from.push("building share, computed in code"); }
+  }
+  return {h, from, items};
+}
+$("aiBtn").addEventListener("click", async () => {
+  if (!sampleFn) return;
+  ctl = new AbortController(); $("aiBtn").disabled = true; $("aiStop").hidden = false;
+  $("aiOut").innerHTML = `<p class="empty">Reading the note...</p>`;
+  try {
+    const f = await sampleFn.json(PROMPT($("noteText").value.slice(0, 4000)), {signal: ctl.signal, modelTier: "quick"});
+    if (!f || typeof f !== "object") throw {code:"invalid_json"};
+    lastFacts = factsToRecord(f);
+    const unc = Array.isArray(f.uncertain) ? f.uncertain.filter(x => typeof x === "string").slice(0, 6) : [];
+    const LABEL = {size:"Household size", incAmt:"Annual income (computed in code)", incFreq:"Income period", evDate:"Proof of income date", tanf:"TANF", ssi:"SSI", snap:"SNAP", billName:"Bill in applicant's name", foreclosure:"Foreclosure", redev:"Redevelopment", forSale:"For sale", tenure:"Home", units:"Units in building", share:"Eligible share % (computed in code)"};
+    const show = (k,v) => v === "" ? "not stated" : v === true ? "yes" : v === false ? "no" : k === "incAmt" ? money(v) : v;
+    const facts = Object.entries(lastFacts.h).map(([k,v]) => `<tr><td>${esc(LABEL[k]||k)}</td><td class="r">${esc(show(k,v))}</td></tr>`).join("");
+    $("aiOut").innerHTML = `<div class="tw" style="border:1px solid var(--border);border-radius:6px"><table class="tbl"><thead><tr><th>Fact read from the note</th><th style="text-align:right">Value</th></tr></thead><tbody>${facts || '<tr><td colspan="2" class="empty">No usable facts found.</td></tr>'}</tbody></table></div>
+      ${lastFacts.items.length ? `<div class="hint">Income items as stated: ${lastFacts.items.map(i => esc(money(i.amount)+" "+i.frequency+(i.source?" ("+i.source+")":""))).join(", ")}. Annualized in code.</div>` : ""}
+      ${unc.length ? `<div><div class="lbl">Flagged as unclear</div><ul style="margin:4px 0 0;padding-left:18px;font-size:13px;color:var(--fg-2)">${unc.map(u=>`<li>${esc(u)}</li>`).join("")}</ul></div>` : ""}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn btn-default btn-sm" id="aiApply">Apply to record</button><span class="hint">Fields the note does not state stay as they are.</span></div>`;
+    $("aiApply").addEventListener("click", () => { writeForm(lastFacts.h); update(); $("aiOut").insertAdjacentHTML("beforeend", `<p class="hint">Applied: ${esc(lastFacts.from.join(", "))}. The rules engine made the decisions.</p>`); $("aiApply").disabled = true; });
+  } catch (e){
+    const code = e && e.code;
+    if (code === "not_granted" || code === "sampling_disabled" || code === "not_declared" || code === "capability_disabled" || code === "capability_removed") showAiUnavailable("Claude is not available for this page in this view. The rules engine still works.");
+    else if (code === "cancelled") $("aiOut").innerHTML = `<p class="empty">Stopped.</p>`;
+    else if (code === "rate_limited") $("aiOut").innerHTML = `<p class="empty">Too many requests right now. Try again in a minute.</p>`;
+    else if (code === "invalid_json") $("aiOut").innerHTML = `<p class="empty">The reply was not usable data. Try again, or shorten the note.</p>`;
+    else $("aiOut").innerHTML = `<p class="empty">Claude could not read the note this time. Try again.</p>`;
+  } finally {
+    if (sampleFn) $("aiBtn").disabled = false; $("aiStop").hidden = true;
+  }
+});
+$("aiStop").addEventListener("click", () => ctl && ctl.abort());
+
+/* ---------- Init ---------- */
+$("size").innerHTML = Array.from({length:10}, (_,i) => `<option value="${i+1}">${i+1}</option>`).join("");
+$("exampleSel").innerHTML = EXAMPLES.map(ex => `<option value="${ex.id}">${ex.id}. ${esc(ex.name)}</option>`).join("");
+$("exampleSel").addEventListener("change", e => { const ex = EXAMPLES.find(x => x.id === e.target.value); if (ex) { writeForm(ex.h); update(); } });
+document.querySelectorAll(".nav a").forEach(a => a.addEventListener("click", () => { document.querySelectorAll(".nav a").forEach(x => x.classList.remove("on")); a.classList.add("on"); }));
+for (const f of FIELDS) $(f).addEventListener(BOOL.has(f) ? "change" : "input", update);
+writeForm({...EXAMPLES[0].h, decisionDate: today()});
+renderRules(); runTests(); update();
+})();
+</script>
+
+</body></html>
