@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Feasibility Desk</title>
+<meta name="description" content="Five real estate AI initiatives run through Josh Panknin's published four-area decision framework, with the three feasibility gates applied in order and the data inventory shown next to each verdict.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200..800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Tokens follow russh.work design.md: monochrome, display plus mono, flat. The only color is on gate status, which encodes data. */
+:root{
+  --void:#0A0A0A; --paper:#F4F4F4; --mid:#8A8A8A; --dim:#404040;
+  --hairline:rgba(244,244,244,.12); --rule:rgba(244,244,244,.32); --panel:#111111; --panel-2:#161616;
+  --pass:#7BC67E; --cond:#E0B55A; --fail:#E57373; --na:#5a5a5a;
+  --font-display:'Inter Tight','Inter','Helvetica Neue',Arial,sans-serif;
+  --font-mono:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;--s9:96px;
+  --ease:cubic-bezier(.4,0,.2,1);
+  color-scheme:dark;
+}
+:root[data-theme="light"]{ --void:#F4F4F4; --paper:#0A0A0A; --mid:#5c5c5c; --dim:#b8b8b8; --hairline:rgba(10,10,10,.12); --rule:rgba(10,10,10,.32); --panel:#ececec; --panel-2:#e4e4e4; --pass:#2e7d32; --cond:#9a6b00; --fail:#b3261e; --na:#9a9a9a; color-scheme:light }
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--void);color:var(--paper);font-family:var(--font-mono);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:clip;font-variant-numeric:tabular-nums}
+a{color:var(--paper);text-decoration:none;border-bottom:1px solid var(--rule)}
+a:hover{background:var(--paper);color:var(--void);border-color:transparent;transition:all .1s}
+h1,h2,h3,h4{font-family:var(--font-display);margin:0;font-weight:600;letter-spacing:-.02em}
+h1{font-size:clamp(48px,7vw,112px);line-height:.92;font-weight:800;letter-spacing:-.035em}
+h2{font-size:clamp(28px,3.6vw,48px);line-height:1}
+h3{font-size:22px;line-height:1.2}
+h4{font-size:16px;line-height:1.3;font-weight:600}
+p{margin:0 0 var(--s4)}
+.k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);font-weight:500}
+.k2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+.mid{color:var(--mid)}
+.wrap{padding:0 var(--s5)}
+@media (max-width:720px){.wrap{padding:0 var(--s4)}}
+/* top bar */
+.top{display:flex;justify-content:space-between;align-items:center;padding:var(--s4) var(--s5);border-bottom:1px solid var(--hairline);position:sticky;top:0;background:var(--void);z-index:20;gap:var(--s4)}
+.top .wm{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;font-size:18px}
+.top .right{display:flex;gap:var(--s4);align-items:center;flex-wrap:wrap;justify-content:flex-end}
+button{font:inherit;cursor:pointer}
+.btn{background:transparent;color:var(--paper);border:1px solid var(--rule);padding:6px 12px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-weight:500;border-radius:2px;transition:background .1s,color .1s}
+.btn:hover,.btn[aria-pressed="true"]{background:var(--paper);color:var(--void)}
+.btn:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+/* hero */
+.hero{padding:var(--s8) 0 var(--s7);border-bottom:1px solid var(--hairline);display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:var(--s7);align-items:end}
+@media (max-width:900px){.hero{grid-template-columns:1fr;gap:var(--s5)}}
+.hero .lede{max-width:620px}
+.hero .meta{justify-self:end;text-align:right;max-width:420px}
+@media (max-width:900px){.hero .meta{justify-self:start;text-align:left}}
+.legend{display:inline-flex;gap:var(--s4);flex-wrap:wrap;margin-top:var(--s3)}
+.tag{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:1px 6px;border:1px solid var(--rule);border-radius:2px;vertical-align:middle;margin-left:4px;font-weight:500}
+.tag.jp{border-style:solid}
+.tag.rh{border-style:dashed;color:var(--mid)}
+/* layout */
+.layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:var(--s7);padding-top:var(--s6)}
+@media (max-width:900px){.layout{grid-template-columns:1fr;gap:var(--s5)}}
+.rail{position:sticky;top:72px;align-self:start;max-height:calc(100vh - 88px);overflow:auto}
+@media (max-width:900px){.rail{position:static;max-height:none}}
+.cases{list-style:none;margin:0 0 var(--s6);padding:0;border-top:1px solid var(--hairline)}
+.cases li{border-bottom:1px solid var(--hairline)}
+.cases button{all:unset;display:grid;grid-template-columns:28px 1fr auto;gap:var(--s3);width:100%;padding:var(--s3) 0;cursor:pointer;align-items:start}
+.cases button:hover .t,.cases button[aria-current="true"] .t{font-weight:600}
+.cases button:focus-visible{outline:2px solid var(--paper)}
+.cases .n{font-size:11px;color:var(--mid);padding-top:4px;letter-spacing:.1em}
+.cases .t{font-family:var(--font-display);font-size:17px;line-height:1.2;letter-spacing:-.01em;transition:font-weight .1s}
+.cases .d{font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding-top:3px;font-weight:500}
+.areas{list-style:none;margin:0;padding:0}
+.areas a{display:block;border:0;padding:4px 0;font-size:12px;color:var(--mid);letter-spacing:.06em;text-transform:uppercase}
+.areas a:hover{background:transparent;color:var(--paper)}
+/* main */
+.main{min-width:0;padding-bottom:var(--s9)}
+.case-head{padding-bottom:var(--s5);border-bottom:1px solid var(--hairline);margin-bottom:var(--s6)}
+.case-head .ctx{max-width:720px;color:var(--mid);margin-top:var(--s3)}
+.verdict{display:grid;grid-template-columns:auto 1fr;gap:var(--s5);align-items:center;margin:var(--s5) 0 0;padding:var(--s4) 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.verdict .big{font-family:var(--font-display);font-weight:800;font-size:clamp(28px,4vw,56px);letter-spacing:-.03em;line-height:1}
+.verdict .why{font-size:13px;color:var(--mid)}
+.verdict .big.GO{color:var(--pass)} .verdict .big.MODIFY{color:var(--cond)} .verdict .big.DONT{color:var(--fail)}
+section.area{padding:var(--s6) 0;border-bottom:1px solid var(--hairline)}
+section.area:nth-of-type(even) .ahead{text-align:right}
+.ahead{margin-bottom:var(--s5)}
+.ahead .k{display:block;margin-bottom:var(--s2)}
+.ahead h2 .tag{font-family:var(--font-mono);letter-spacing:.12em;font-size:11px;position:relative;top:-14px}
+.prose{max-width:720px}
+.prose p{color:var(--paper)}
+/* continuum */
+.cont{margin:var(--s5) 0;max-width:720px}
+.cont .bar{position:relative;height:2px;background:var(--rule);margin:var(--s5) 0 var(--s3)}
+.cont .pin{position:absolute;top:-7px;width:16px;height:16px;border-radius:50%;background:var(--paper);transform:translateX(-50%)}
+.cont .ends{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mid)}
+/* gates */
+.gates{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--hairline);border:1px solid var(--hairline);margin:var(--s5) 0}
+@media (max-width:900px){.gates{grid-template-columns:1fr}}
+.gate{background:var(--void);padding:var(--s4)}
+.gate .q{font-family:var(--font-display);font-size:20px;font-weight:600;letter-spacing:-.01em;margin:var(--s1) 0 var(--s2)}
+.st{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:500}
+.st::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--na);display:inline-block}
+.st.PASS::before{background:var(--pass)} .st.CONDITIONAL::before{background:var(--cond)} .st.FAIL::before{background:var(--fail)}
+.st.PASS{color:var(--pass)} .st.CONDITIONAL{color:var(--cond)} .st.FAIL{color:var(--fail)} .st.NA{color:var(--na)}
+.gate.locked{color:var(--mid)}
+.gate .ev{font-size:13px;margin-top:var(--s3)}
+.gate .ev li{margin-bottom:6px}
+ul.ev,ul.plain{padding-left:18px;margin:0}
+.gatebody{margin-top:var(--s6)}
+.gatebody h3{margin-bottom:var(--s3)}
+.gatebody h3 .st{margin-left:var(--s3);vertical-align:middle}
+.sub{margin:var(--s5) 0}
+.sub h4{margin-bottom:var(--s2)}
+.sub h4 .tag{font-family:var(--font-mono)}
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;margin:var(--s3) 0}
+.tbl th{text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);font-weight:500;padding:8px 10px 8px 0;border-bottom:1px solid var(--rule);vertical-align:bottom}
+.tbl td{padding:10px 10px 10px 0;border-bottom:1px solid var(--hairline);vertical-align:top}
+.tbl td.mono{font-size:12px}
+.tbl .s{white-space:nowrap;font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+.s.Available{color:var(--pass)} .s.Partial{color:var(--cond)} .s.Missing{color:var(--fail)} .s.Engineering{color:var(--paper)}
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* diagram */
+.diagram{margin:var(--s4) 0;border:1px solid var(--hairline);padding:var(--s4);overflow-x:auto}
+.diagram svg{display:block;min-width:620px;width:100%;height:auto;font-family:var(--font-mono);font-size:11px}
+.diagram text{fill:var(--paper)}
+.diagram .lbl{fill:var(--mid);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.diagram rect{fill:var(--panel);stroke:var(--rule)}
+.diagram rect.out{fill:var(--panel-2)}
+.diagram line,.diagram path{stroke:var(--rule);fill:none}
+.diagram .in.Missing rect{stroke-dasharray:4 3;stroke:var(--fail)}
+.diagram .in.Partial rect{stroke:var(--cond)}
+.diagram .in.Engineering rect{stroke:var(--paper)}
+/* two-col blocks */
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--s5)}
+.block{border-top:1px solid var(--rule);padding-top:var(--s3)}
+.block .k{display:block;margin-bottom:var(--s2)}
+/* decision */
+.record{border:1px solid var(--rule);padding:var(--s5);margin:var(--s5) 0;max-width:820px}
+.record dl{display:grid;grid-template-columns:160px 1fr;gap:var(--s3) var(--s5);margin:0}
+@media (max-width:600px){.record dl{grid-template-columns:1fr}}
+.record dt{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);font-weight:500;padding-top:3px}
+.record dd{margin:0;font-size:14px}
+.actions{display:flex;gap:var(--s3);flex-wrap:wrap;margin-top:var(--s4)}
+.toast{position:fixed;bottom:24px;left:24px;background:var(--paper);color:var(--void);padding:8px 12px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;border-radius:2px;opacity:0;transform:translateY(8px);transition:all .24s var(--ease);pointer-events:none;z-index:30}
+.toast.show{opacity:1;transform:none}
+/* custom form */
+.form{max-width:820px}
+.field{margin-bottom:var(--s4)}
+.field label{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:6px;font-weight:500}
+input[type=text],textarea,select{width:100%;background:var(--panel);color:var(--paper);border:1px solid var(--hairline);padding:8px 10px;font:inherit;font-size:14px;border-radius:2px}
+textarea{min-height:72px;resize:vertical}
+input[type=range]{width:100%;accent-color:var(--paper)}
+.row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s3)}
+@media (max-width:720px){.row3{grid-template-columns:1fr}}
+.invrow{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) 150px 36px;gap:var(--s2);margin-bottom:var(--s2);align-items:center}
+@media (max-width:720px){.invrow{grid-template-columns:1fr 1fr}}
+.x{all:unset;cursor:pointer;color:var(--mid);text-align:center;font-size:16px;line-height:1}
+.x:hover{color:var(--paper)}
+.x:focus-visible{outline:2px solid var(--paper)}
+.rulebox{border:1px dashed var(--rule);padding:var(--s4);font-size:13px;color:var(--mid);margin:var(--s4) 0}
+.rulebox code{color:var(--paper)}
+/* sources */
+.sources{padding:var(--s7) 0 var(--s9);border-top:1px solid var(--rule);margin-top:var(--s7)}
+.sources ol{padding-left:22px;max-width:820px;font-size:13px}
+.sources li{margin-bottom:var(--s3)}
+.attrib{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--s5);max-width:980px;margin:var(--s5) 0}
+footer{border-top:1px solid var(--hairline);padding:var(--s5) var(--s5) var(--s8);font-size:12px;color:var(--mid);display:flex;justify-content:space-between;gap:var(--s4);flex-wrap:wrap}
+@media print{.top,.rail,.actions,.toast{display:none}.layout{grid-template-columns:1fr}body{background:#fff;color:#000}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="wm">Feasibility Desk</div>
+  <div class="right">
+    <span class="k" id="topstate">Case 01 of 05</span>
+    <button class="btn" id="themeBtn" type="button" aria-pressed="false">Light</button>
+    <a class="btn" href="https://russh.work" style="border-bottom:1px solid var(--rule)">russh.work</a>
+  </div>
+</div>
+
+<main class="wrap">
+  <header class="hero">
+    <div>
+      <h1>Should we<br>build it.</h1>
+      <p class="lede" style="margin-top:var(--s5)">Five real estate AI initiatives, each run through Josh Panknin's published four-area decision framework: the nature of the outcome, the three feasibility gates in order, where the technology comes from, and how to evaluate the return. Every verdict shows the data inventory and the gate that decided it. One of the five fails on purpose.</p>
+      <div class="legend">
+        <span class="k">Attribution</span>
+        <span class="k2"><span class="tag jp" style="margin-left:0">JP</span> his published term</span>
+        <span class="k2"><span class="tag rh" style="margin-left:0">RH</span> my addition</span>
+      </div>
+    </div>
+    <div class="meta">
+      <p class="k">What this is</p>
+      <p style="font-size:13px;color:var(--mid)">An implementation of the framework from the Parallax Advisors Insights series (August 2026), built by Russell Harris to show how real estate judgment becomes a project that can be evaluated before money is spent. Not affiliated with Parallax Advisors or Columbia. The framework is his; the cases, the data inventories, the decision rule and the verdicts are mine.</p>
+      <p class="k" style="margin-top:var(--s4)">Built</p>
+      <p style="font-size:13px;color:var(--mid)">2026-10-21. Public data only. Vanilla HTML, no build step. Your own initiative is stored in this browser only.</p>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="rail" aria-label="Initiatives">
+      <p class="k" style="margin-bottom:var(--s3)">Initiatives</p>
+      <ul class="cases" id="caseList"></ul>
+      <p class="k" style="margin-bottom:var(--s3)">Four decision areas <span class="tag jp">JP</span></p>
+      <ul class="areas">
+        <li><a href="#a1">01 Operational or strategic</a></li>
+        <li><a href="#a2">02 Feasibility, three gates</a></li>
+        <li><a href="#a3">03 Technology sourcing</a></li>
+        <li><a href="#a4">04 Evaluation of returns</a></li>
+        <li><a href="#a5">05 Decision record <span class="tag rh">RH</span></a></li>
+        <li><a href="#sources">Sources and attribution</a></li>
+      </ul>
+    </aside>
+
+    <div class="main" id="main"></div>
+  </div>
+
+  <section class="sources" id="sources">
+    <p class="k">Sources and attribution</p>
+    <h2 style="margin:var(--s3) 0 var(--s5)">What is his, what is mine</h2>
+    <div class="attrib">
+      <div class="block"><span class="k">His published framework <span class="tag jp">JP</span></span>
+        <ul class="plain" style="font-size:13px">
+          <li>Four decision areas: operational or strategic; value, technical and execution feasibility; technology sourcing; approach to ROI.</li>
+          <li>The three gates in order: "should we do it", "can it be done", "can we do it".</li>
+          <li>Start from the ideal inputs, then build a feature inventory (sources, formats, history, geography, interval) and identify what is unavailable or needs engineering.</li>
+          <li>Computational suitability and the accuracy threshold set by the actual use; prototype to production as a separate test.</li>
+          <li>Two sensible resource paths: fit the project to fixed resources, or fund the requirements of a desired outcome.</li>
+          <li>Three sources of capability: industry-agnostic applications, internal development, third-party integration components.</li>
+          <li>Conventional ROI for predictable automation; decompose and evaluate holistically for strategic work; evaluate uncertainty rather than hide it.</li>
+        </ul></div>
+      <div class="block"><span class="k">My additions <span class="tag rh">RH</span></span>
+        <ul class="plain" style="font-size:13px">
+          <li>The five cases, the data inventories and every verdict. Four cases come from work I do as a CRE credit analyst and LIHTC advisor.</li>
+          <li>A written decision rule that turns gate results into Go, Modify or Don't go, with later gates locked when an earlier one fails. He publishes no scoring system, so this is mine and it is deliberately not a weighted score.</li>
+          <li>The decision record: the smallest next step, a kill rule, and what would change the decision.</li>
+          <li>The uncertainty register inside the returns area.</li>
+          <li>The verification gate pattern (every number in an AI draft must match a computed fact) used in cases 02 and 05.</li>
+        </ul></div>
+    </div>
+    <ol>
+      <li>Panknin, J. "A Decision-Making Framework for Real Estate AI." Parallax Advisors Insights, August 8, 2026.</li>
+      <li>Panknin, J. "Operational vs. Strategic AI Initiatives." Parallax Advisors Insights, August 11, 2026.</li>
+      <li>Panknin, J. "How can you tell if an AI project will work? Three types of feasibility questions can do a lot of that work for you." Parallax Advisors Insights, August 13, 2026.</li>
+      <li>Panknin, J. "Three Sources of AI Capability. Only One Creates Advantage." Parallax Advisors Insights, August 17, 2026.</li>
+      <li>Panknin, J. "Don't get caught in the ROI trap." Parallax Advisors Insights, August 24, 2026.</li>
+      <li>Panknin, J. interviewed by H. Richards. "Stop believing the hype." GRI Club, February 19, 2024. Source of "broad, but not deep".</li>
+      <li>Panknin, J. "Real Estate's AI Challenge Isn't Technology, It's Communication." Urban Land, March 19, 2026.</li>
+      <li>Citigroup Commercial Mortgage Trust 2022-GC48, CIK 0001924870. Form ABS-EE filed 2026-09-28, accession 0001888524-26-017330, exhibit 102; prospectus 424B2 filed 2022-06-21, accession 0001539497-22-001195. SEC EDGAR. Values read on 2026-10-21.</li>
+      <li>SEC Regulation AB II, asset-level disclosure compliance date November 23, 2016 (17 CFR 229.1125).</li>
+    </ol>
+  </section>
+</main>
+<footer>
+  <span>Feasibility Desk, built by Russell Harris, russellharrisrei@gmail.com. Not affiliated with Parallax Advisors, Columbia University, or any employer. Public data only.</span>
+  <span><a href="https://russh.work">russh.work</a></span>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script id="desk-data">
+/* Cases. Status vocabulary for inputs: Available, Partial, Missing, Engineering. Gate vocabulary: PASS, CONDITIONAL, FAIL. */
+window.DESK_CASES = [
+{
+  id:"cmbs", n:"01",
+  title:"Early-warning watchlist for conduit CMBS loans from public monthly filings",
+  short:"CMBS early warning",
+  ctx:"A credit desk or B-piece buyer wants to see deteriorating loans before the servicer watchlist does, using data it already has a right to. Every US public conduit deal issued after November 2016 files loan-level data to EDGAR every month. Almost nobody reads it as a time series.",
+  continuum:{pos:0.7, why:"The output is a ranked decision input (which loans to re-underwrite, which bonds to re-price), not a faster version of an existing task, so it sits on the strategic side. The first tier, normalizing the monthly filings into tables, is operational work. It is also the structured data the strategic layer needs, which is the point he makes about operational work feeding strategic analysis."},
+  value:{status:"PASS", decision:"Which loans get analyst attention this month and which bonds get re-priced.", user:"Surveillance analyst; the B-piece or special servicing desk.", benefit:"Decision quality first, speed second.", evidence:[
+    "In the September 2026 filing for CGCMT 2022-GC48, 79 Fifth Avenue (office, $50MM) shows DSCR on NOI falling from 1.68x at issuance to 0.93x while physical occupancy stayed near 100 percent. An occupancy screen alone would not flag it.",
+    "Cliffs Hotel and Spa (lodging, $50MM): DSCR on NCF from 3.15x at issuance to 0.91x.",
+    "Yorkshire and Lexington Towers (multifamily, $60MM): the Yorkshire appraisal moved from $821MM (January 2022) to $580MM (April 2026); transferred to special servicing 2024-11-22.",
+    "Each of these is visible in a public file with the two values and their dates. The value question is whether seeing them a month or two earlier changes a decision. On a desk that re-underwrites by exception, it does."]},
+  tech:{status:"PASS", ideal:["Loan terms and current status","Financials at issuance vs most recent, with dates","Tenant roster and lease expirations","Servicer distress markers","Property rent roll and trailing twelve months","Submarket rent and vacancy","Loan narrative at issuance"],
+    output:"Ranked watchlist, one row per loan per month, every flag with field, both values, both dates, and the filing accession number",
+    inventory:[
+      {input:"Loan terms", fields:"originalLoanAmount, originalInterestRatePercentage, maturityDate, originalAmortizationTermNumber, interestOnlyIndicator", source:"Form ABS-EE exhibit 102 XML, EDGAR", fmt:"XML", hist:"Monthly since Nov 2016", geo:"All US public conduit deals", intv:"Monthly", status:"Available", gap:"None."},
+      {input:"Current balance and payment status", fields:"reportPeriodEndActualBalanceAmount, paidThroughDate, paymentStatusLoanCode", source:"Same filing", fmt:"XML", hist:"Monthly since Nov 2016", geo:"Same", intv:"Monthly", status:"Partial", gap:"Code meanings must be taken from the SEC ABS XML technical specification before use. Not yet confirmed."},
+      {input:"Financials, issuance vs most recent", fields:"netOperatingIncomeSecuritizationAmount vs mostRecentNetOperatingIncomeAmount; the NCF pair; DSCR on NOI and on NCF; occupancy pair; valuationSecuritizationAmount vs mostRecentValuationAmount, each with dates", source:"Same filing", fmt:"XML", hist:"Monthly, values update when the servicer receives statements", geo:"Same", intv:"Quarterly to annual underneath a monthly file", status:"Partial", gap:"Most-recent financials lag the report month by one to two quarters and mix annual and year-to-date periods. The watchlist must carry the financial-statement date next to every ratio."},
+      {input:"Top three tenants and lease expirations", fields:"largestTenant, squareFeetLargestTenant, leaseExpirationLargestTenantDate, and the second and third", source:"Same filing", fmt:"XML", hist:"Monthly", geo:"Same", intv:"Monthly", status:"Partial", gap:"Populated for office, retail and industrial. Blank by nature for multifamily and lodging, so rollover risk is a property-type-specific signal."},
+      {input:"Distress markers", fields:"mostRecentSpecialServicerTransferDate, modifiedIndicator, modificationCode, workoutStrategyCode, nonRecoverabilityIndicator, advance amounts", source:"Same filing", fmt:"XML", hist:"Monthly", geo:"Same", intv:"Monthly", status:"Available", gap:"Code meanings to confirm against the SEC specification, same as payment status."},
+      {input:"Property rent roll and T-12", fields:"Tenant-level rents, operating statements", source:"Servicer reports behind Trepp, Intex, or CREFC IRP subscriptions", fmt:"PDF, xlsx", hist:"Varies", geo:"Varies", intv:"Quarterly", status:"Missing", gap:"Not public. The watchlist is designed to work without it. A subscription would move the backtest tier forward."},
+      {input:"Submarket rent and vacancy", fields:"Asking rent, vacancy by submarket", source:"CoStar or similar", fmt:"Export", hist:"Long", geo:"Metro and submarket", intv:"Quarterly", status:"Missing", gap:"Subscription. Enrichment, not a dependency."},
+      {input:"Loan narrative at issuance", fields:"Underwritten NCF, DSCR, sponsor, tenancy text", source:"Prospectus 424B2 (for this deal, accession 0001539497-22-001195)", fmt:"HTML", hist:"One per deal at issuance", geo:"Per deal", intv:"Once", status:"Engineering", gap:"Text extraction from long HTML. One-time per deal; used as input to the extraction test in a later tier."}],
+    comp:"Every tier-one signal is a ratio of two reported numbers or a comparison of two dates: DSCR drift, valuation haircut, occupancy drop, a top tenant lease ending before maturity, maturity inside 18 months with DSCR under 1.25x, and the distress flags. No subjective attribute is required. Sponsor quality and submarket narrative are subjective, matter, and are excluded on purpose; that is a stated limit, not an oversight.",
+    acc:"This is triage. A flag sends a loan to a person. A false positive costs analyst minutes; a false negative costs a missed loan. So thresholds favor recall, and every flag shows both values and both dates so a reviewer can dismiss it in seconds. No predictive accuracy is claimed and none is needed for tier one.",
+    prod:"The monthly pull has to survive restated filings, loan payoffs, and asset numbers that change between filings. One SQLite row per loan per month with the accession number on every row, and a reconciliation check that loan count and total balance match the filing."},
+  exec:{status:"PASS", expertise:{need:"CMBS credit knowledge to set thresholds and read the output; moderate data engineering (XML parsing, rate-limited EDGAR access, SQLite).", have:"Credit knowledge in house. Engineering done with AI-assisted coding, which is enough at this scale."}, funding:{need:"$0 data cost. LLM API spend under $20 for thirty notes.", have:"Available."}, time:{need:"About 20 hours for tiers one and two.", have:"Two hours a week over ten weeks, hard stop December 5, 2026."}, path:"Fit the project to fixed resources. Tiers one and two ship (rules watchlist, then an AI note that cannot invent a number). The vendor extraction test ships if time allows. The backtest and 50-deal coverage are parked until there is a second person or a data subscription."},
+  sourcing:[
+    {comp:"EDGAR access and XML parsing", cat:"Internal", why:"Thin and specific. No vendor needed; a vendor would add a dependency without adding judgment."},
+    {comp:"Signal definitions and thresholds", cat:"Internal", why:"This is the credit judgment. It is the part that would differ between two desks and the part a desk should own."},
+    {comp:"Storage and query (SQLite, later DuckDB)", cat:"Third-party component", why:"Commodity. Use it, do not build it."},
+    {comp:"LLM API for surveillance notes", cat:"Third-party component", why:"Commodity model behind an internal prompt and an internal number-match gate."},
+    {comp:"Loan-level data subscription (Trepp or similar)", cat:"Third-party component", why:"Later. It deepens the data but does not replace the internal signal logic."},
+    {comp:"Generic AI surveillance product", cat:"Industry-agnostic application, not chosen", why:"There is no generic product for this. The closest offerings bundle data and screens; the screen logic should stay in house."}],
+  returns:{mode:"Holistic, with the measurable parts stated", rows:[
+    {comp:"Analyst hours per monthly surveillance cycle", meas:"Yes", est:"Measure before and after on one desk", basis:"Time log over two cycles", unc:"Low"},
+    {comp:"Months of earlier detection vs the servicer watchlist", meas:"Only in a backtest", est:"Unknown until tier four runs", basis:"Compare flag month to special-servicing transfer month across deals", unc:"High; small sample"},
+    {comp:"Bond re-pricing impact", meas:"No, in this scope", est:"Not estimated", basis:"Would need position data and a longer history", unc:"Not knowable here"},
+    {comp:"Build cost", meas:"Yes", est:"About 20 hours plus under $20 in API spend", basis:"Plan", unc:"Low"}],
+    register:["Whether the lag in most-recent financials erases the detection advantage for some property types.","How many loans per deal reconcile cleanly month to month; one truncated read of this file showed loan-level detail but the count was not confirmed.","Whether code meanings in the SEC specification match the plan's assumptions."]},
+  record:{decision:"GO", gate:"Execution set the scope; no gate failed.", next:"Phase 0, two hours: pull three monthly exhibit 102 files for CGCMT 2022-GC48 with a declared SEC User-Agent, count the loans, confirm the three loans above against the file, and write down the code meanings from the SEC specification.", kill:"If fewer than five of the eight inventory rows reconcile to the filing, or code meanings cannot be confirmed, stop before tier one.", change:"A data subscription moves the backtest forward. A mandate to cover 50 deals needs a second person. Either changes the execution gate, not the value gate."}
+},
+{
+  id:"template", n:"02",
+  title:"Populate the standard underwriting template from offering memoranda, rent rolls and T-12 statements",
+  short:"Underwriting template fill",
+  ctx:"On a lending desk the first pass of an underwriting template is mostly transcription: pull rents from a rent roll, operating lines from a trailing twelve, and the deal facts from an offering memorandum into the desk's own structure. The desk wants that first pass done by a machine, with the analyst reviewing instead of typing.",
+  continuum:{pos:0.15, why:"Same task, faster and more consistent. Operational. It earns a second look because a populated template is structured deal data, and a few hundred of them is the dataset a desk needs before any strategic analysis of its own pipeline is possible."},
+  value:{status:"PASS", decision:"None directly. The decision stays with the analyst; the benefit is where their hours go.", user:"Credit analysts and underwriters.", benefit:"Time and consistency.", evidence:["In my own work a first-pass template takes two to four hours per deal, most of it transcription. That is personal experience, not an industry statistic.","Consistency matters as much as time: two analysts fill the same template differently, which makes portfolio comparison harder later."]},
+  tech:{status:"CONDITIONAL", ideal:["Offering memorandum","Rent roll","Trailing twelve months operating statement","Broker pro forma, kept separate from actuals","The desk's own field taxonomy"],
+    output:"A populated template where every number carries a page reference and an arithmetic check",
+    inventory:[
+      {input:"Offering memorandum", fields:"Deal facts, unit mix, pro forma", source:"Broker PDFs", fmt:"PDF, often image-based", hist:"Per deal", geo:"Per deal", intv:"Once", status:"Engineering", gap:"Layouts vary by brokerage. OCR needed for scanned pages. Pro forma figures sit next to in-place figures and must not be confused."},
+      {input:"Rent roll", fields:"Unit, tenant, rent, lease dates", source:"Sponsor or property manager", fmt:"xlsx or PDF, every format different", hist:"Point in time", geo:"Per deal", intv:"Once per request", status:"Partial", gap:"No standard layout. Column mapping is per sponsor. Sum of rents must reconcile to gross potential rent or the extraction is wrong."},
+      {input:"T-12 operating statement", fields:"Revenue and expense lines by month", source:"Sponsor accounting export", fmt:"PDF or xlsx", hist:"Twelve months", geo:"Per deal", intv:"Once per request", status:"Partial", gap:"Chart-of-accounts names differ. Needs a mapping to the desk's expense categories, which is desk judgment, not extraction."},
+      {input:"Desk field taxonomy", fields:"Which NOI, which occupancy, in-place vs underwritten", source:"Internal", fmt:"Definitions", hist:"n/a", geo:"n/a", intv:"n/a", status:"Available", gap:"Exists in people's heads and the template. Writing it down is the first deliverable."}],
+    comp:"The fields are numbers, but the labels around them are judgment: in-place vs pro forma, trailing vs annualized, which occupancy. These can be represented with an explicit taxonomy and a rule for each. Without the taxonomy the machine will pick the broker's number, because it is the one printed in bold.",
+    acc:"A wrong NOI in a credit memo is not acceptable at any rate, so the threshold on money fields is 100 percent after verification, not 95 percent on extraction. Verification: every number traces to a page; rent roll lines sum to gross potential rent; T-12 lines sum to the stated NOI. Anything that fails goes to the analyst. Extraction accuracy before the gate is not known for this desk's document mix. It has to be measured, which is why the gate is conditional.",
+    prod:"The prototype will be tested on clean deals. Production sees scanned rent rolls, merged cells, and a T-12 with a mid-year chart-of-accounts change. Keep a failure log from day one and treat the pass-through rate as the metric."},
+  exec:{status:"PASS", expertise:{need:"Domain knowledge for the taxonomy and the reconciliation rules; light engineering.", have:"In house."}, funding:{need:"API cost in cents per deal; OCR cost similar.", have:"Available."}, time:{need:"Three weeks for the measurement, then two to three for the build.", have:"Available at that scale."}, path:"Fit the project to fixed resources. Start with the thirty-deal measurement, not the tool."},
+  sourcing:[
+    {comp:"OCR and PDF text extraction", cat:"Third-party component", why:"Commodity."},
+    {comp:"LLM extraction", cat:"Third-party component", why:"Commodity model behind an internal schema."},
+    {comp:"Field taxonomy and reconciliation rules", cat:"Internal", why:"This is where the desk's judgment lives and where two desks would differ."},
+    {comp:"Template and review screen", cat:"Internal", why:"Small, and it has to match the desk's workflow exactly."},
+    {comp:"Generic document-AI product", cat:"Industry-agnostic application, conditional", why:"Acceptable only if it exposes page-level citations and lets the desk keep its own taxonomy. Otherwise it hides the step that matters."}],
+  returns:{mode:"Conventional ROI, appropriate here", rows:[
+    {comp:"Hours saved per deal", meas:"Yes", est:"Analyst time on first pass, before vs after, on thirty deals", basis:"Time log", unc:"Low once measured"},
+    {comp:"Deals per month", meas:"Yes", est:"Desk volume", basis:"Pipeline log", unc:"Low"},
+    {comp:"Correction time per deal after the gate", meas:"Yes", est:"Unknown until the thirty-deal test", basis:"Failure log", unc:"High before measurement"},
+    {comp:"API and OCR cost per deal", meas:"Yes", est:"Cents to low dollars", basis:"Provider pricing", unc:"Low"}],
+    register:["Post-gate pass rate by field type on this desk's documents.","How often the broker pro forma is mistaken for in-place figures before the taxonomy is written down.","Whether scanned rent rolls are a large enough share to justify OCR work."]},
+  record:{decision:"MODIFY", gate:"Technical, conditional on the accuracy threshold.", next:"Write the field taxonomy. Run extraction with the reconciliation gate on thirty closed deals and record the pass-through rate by field.", kill:"If fewer than 70 percent of money fields pass the gate, the analyst's correction time eats the saving. Stop and fix the taxonomy or the inputs, not the model.", change:"A standard rent roll format from sponsors would move several rows from Partial to Available. That is a process change, which he notes is the change firms resist."}
+},
+{
+  id:"nbhd", n:"03",
+  title:"Rank DC and Baltimore neighborhoods by expected three-year appreciation from permits, 311 requests, business openings and transit",
+  short:"Neighborhood appreciation",
+  ctx:"An acquisitions team wants to concentrate effort where values are about to move, using leading indicators instead of the last twelve months of sales. This is the shape of the Columbia and RXR research question, scaled to one person and two cities.",
+  continuum:{pos:0.9, why:"Strategic. The output changes where capital and effort go. Nothing in the existing workflow gets faster; a new input appears."},
+  value:{status:"PASS", decision:"Where to concentrate acquisition sourcing for the next year.", user:"Acquisitions lead.", benefit:"Decision quality.", evidence:["The premise is that appreciation differs widely between neighborhoods inside the same metro. The analysis measures that dispersion first; if it turns out small, the value gate reopens.","Sourcing effort is the scarce resource in a small shop, so a ranking that is right about the top quintile is worth having even if it is wrong about the middle."]},
+  tech:{status:"CONDITIONAL", ideal:["Building permits by address and date","311 service requests by location and date","Business openings, closures and ratings over time","Transit access and ridership","Bank deposits by branch","Repeat-sales price index by neighborhood, as the label"],
+    output:"A ranked list of neighborhoods with the features that drove each rank, backtested on past three-year windows",
+    inventory:[
+      {input:"Building permits", fields:"Type, value, address, issue date", source:"DC Open Data (DOB permits); Open Baltimore permits", fmt:"CSV, API", hist:"Multi-year, back into the 2010s", geo:"Both cities", intv:"Daily to monthly", status:"Available", gap:"Geocoding and permit-type normalization between the two cities."},
+      {input:"311 service requests", fields:"Type, location, date", source:"DC 311 on opendata.dc.gov; Open Baltimore 311", fmt:"CSV, API", hist:"Multi-year", geo:"Both cities", intv:"Daily", status:"Available", gap:"Request categories differ between cities. Reporting rates vary by neighborhood, which is itself a confound."},
+      {input:"Business openings and ratings over time", fields:"Open date, category, rating history", source:"Yelp Fusion API; business license datasets", fmt:"API, CSV", hist:"Current state only from Yelp; licenses have history", geo:"Both", intv:"Live", status:"Partial", gap:"Yelp returns the present, not the past, and its terms limit storing responses. A three-year backtest needs features as they were three years ago, which Yelp cannot supply. Business license data can; it carries less signal."},
+      {input:"Transit", fields:"Stop locations, service frequency, ridership", source:"GTFS feeds; WMATA and MTA ridership releases", fmt:"GTFS, CSV", hist:"Multi-year", geo:"Both", intv:"Schedule changes; monthly ridership", status:"Available", gap:"Station-level ridership history needs assembly from separate releases."},
+      {input:"Bank deposits by branch", fields:"Deposits per branch, annual", source:"FDIC Summary of Deposits", fmt:"CSV", hist:"Annual since 1994", geo:"National, by branch address", intv:"Annual", status:"Available", gap:"Branch closures create gaps; annual cadence is coarse."},
+      {input:"Sales prices (the label)", fields:"Price, date, parcel", source:"DC recorder and OTR sales data; Maryland SDAT", fmt:"CSV", hist:"Multi-year", geo:"Both", intv:"Continuous", status:"Engineering", gap:"Repeat-sales index construction by neighborhood, with arm's-length filtering. This is the largest engineering task and it defines the target."}],
+    comp:"Neighborhood change has subjective parts: perceived safety, retail quality, the feel of a block. The public proxies are weak for these, and I would say so in the output rather than let a permit count stand in for them silently. The binding constraint is historical reconstruction: a backtest needs each feature as it was at the start of each window. Permits, 311, deposits and sales support that. Live-only sources do not.",
+    acc:"Directional ranking is enough: is the top quintile right more often than a naive baseline (last three years' appreciation). Point forecasts are not needed and would not be credible from this data.",
+    prod:"If it works, the production version re-scores quarterly. Source schemas change without notice on open-data portals, so every loader needs a schema check and a failure alert."},
+  exec:{status:"FAIL", expertise:{need:"Data engineering across six sources, spatial joins, index construction, and enough statistics to run an honest backtest.", have:"One person, part time."}, funding:{need:"No data cost for the public sources; a CoStar seat would help and is not available.", have:"$0."}, time:{need:"The RXR project at Columbia ran with three to five graduate students over semesters, per Commercial Observer's January 2023 account. The full version is that size.", have:"A few hours a week."}, path:"Fit the project to fixed resources. Reduce to DC only, archivable sources only (permits, 311, deposits, sales), one backtest window. The full two-city, six-source version is parked, not killed."},
+  sourcing:[
+    {comp:"Loaders for public sources", cat:"Internal", why:"Small, specific, and the schema checks are the work."},
+    {comp:"Repeat-sales index", cat:"Internal", why:"It is the label. Owning it means owning the definition of success."},
+    {comp:"Yelp and similar live data", cat:"Third-party component", why:"Live scoring enrichment only, never training data, because it cannot be reconstructed historically."},
+    {comp:"Mapping and geocoding", cat:"Third-party component", why:"Commodity."},
+    {comp:"Neighborhood scoring product", cat:"Industry-agnostic application, not chosen", why:"Several exist. None show their features or let you backtest them on your own definition of a neighborhood, so you cannot evaluate them, which fails his vendor test."}],
+  returns:{mode:"Holistic; a conventional ROI would be invented", rows:[
+    {comp:"Top-quintile hit rate vs naive baseline", meas:"Yes, in the backtest", est:"Unknown", basis:"Backtest on past windows", unc:"High"},
+    {comp:"Sourcing hours redirected", meas:"Yes", est:"Depends on whether the team acts on the ranking", basis:"Team log", unc:"Medium"},
+    {comp:"Value of a better acquisition", meas:"No", est:"Not estimated", basis:"Would need a portfolio and years", unc:"Not knowable here"}],
+    register:["Whether 311 reporting rates confound the signal more than they inform it.","Whether a repeat-sales index at neighborhood grain has enough transactions in Baltimore's thinner areas.","Whether the signal, if found, persists after the window it was found in."]},
+  record:{decision:"MODIFY", gate:"Execution. Value and technical pass with conditions; the full scope exceeds one person.", next:"Build the DC-only repeat-sales index from recorder data. Nothing else until the label exists.", kill:"If the index cannot be built at neighborhood grain with at least a few hundred repeat pairs per neighborhood per window, stop; there is no label to learn.", change:"A second person or a semester of graduate students reopens the full scope. A CoStar seat adds submarket rent as a feature."}
+},
+{
+  id:"lihtc", n:"04",
+  title:"Predict which 9 percent LIHTC applications a state agency will award",
+  short:"LIHTC award prediction",
+  ctx:"Developers spend six figures preparing a competitive 9 percent Low-Income Housing Tax Credit application and lose most rounds. A developer asked whether machine learning on past awards could tell them which deals to pursue.",
+  continuum:{pos:0.8, why:"Strategic. It would change which sites a developer controls and which rounds they enter."},
+  value:{status:"PASS", decision:"Which sites to pursue and which rounds to enter.", user:"Developer principals.", benefit:"Decision quality and avoided application cost.", evidence:["Application cost is real and sunk. Knowing the odds before spending it is worth a lot to the person spending it."]},
+  tech:{status:"FAIL", ideal:["Each state's scoring rules by year","Every past application's self-score and agency score","Awards by round","Site and market data for each application","Tie-breaker and discretionary decisions as applied"],
+    output:"A probability of award for a proposed application",
+    inventory:[
+      {input:"Scoring rules (the QAP)", fields:"Point categories, thresholds, set-asides, tie-breakers", source:"State housing finance agency", fmt:"PDF, one per state per year", hist:"Annual, and it changes every year", geo:"Per state", intv:"Annual", status:"Available", gap:"The rulebook moves yearly. Last year's winning score can be this year's loser under a different table."},
+      {input:"Past application scores", fields:"Self-score, agency score by category", source:"Agency scoring summaries", fmt:"PDF", hist:"Some agencies publish; many publish only awards", geo:"Per state", intv:"Per round", status:"Partial", gap:"Category-level scores are the feature set, and for many states they are not public."},
+      {input:"Awards by round", fields:"Awardee, credits, set-aside", source:"Agency award lists", fmt:"PDF, press release", hist:"Available", geo:"Per state", intv:"One or two rounds a year", status:"Available", gap:"Tens of applications per round per state. The label exists; there are very few of it under any single rulebook."},
+      {input:"Site and market data", fields:"Census tract designations, amenities, rents", source:"HUD, Census, agency maps", fmt:"Mixed", hist:"Available", geo:"National", intv:"Annual", status:"Available", gap:"Fine. Not the constraint."},
+      {input:"Discretionary decisions as applied", fields:"Tie-breaks, waivers, cure letters", source:"Not published", fmt:"n/a", hist:"n/a", geo:"n/a", intv:"n/a", status:"Missing", gap:"Documented in the QAP, applied with judgment, outcomes not disclosed."}],
+    comp:"This is his 'broad, but not deep' data in its purest form. Many states, each with a different rulebook that changes yearly, and a few dozen labeled outcomes per rulebook. A model trained across states mixes rulebooks; a model trained within one state has a sample in the tens. The discretionary layer is representable as rules but not observable as outcomes.",
+    acc:"A developer needs to know their own score within a point or two of the winning line. That is arithmetic against the current QAP, not prediction. Any statistical answer would carry an interval wider than the question.",
+    prod:"Not evaluated. The project does not pass the data sufficiency test as framed."},
+  exec:{status:"NA", expertise:{need:"Not evaluated.", have:"Value feasibility cannot compensate for data that does not exist, so this gate is locked."}, funding:{need:"Not evaluated.", have:""}, time:{need:"Not evaluated.", have:""}, path:"Not evaluated. The reframed project below is operational and would pass easily."},
+  sourcing:[
+    {comp:"Deterministic QAP scorer (rules as code)", cat:"Internal", why:"The reframed project. Encode the current year's QAP, score a proposed deal, show the point gap to last round's winning line. I have built this for Maryland's QAP and it is the useful version of the question."},
+    {comp:"Competitive-set table per round", cat:"Internal", why:"Who applied, who won, by set-aside. Small and valuable."},
+    {comp:"Site data", cat:"Third-party component", why:"HUD and Census, free."}],
+  returns:{mode:"Not evaluated for the ML version. Conventional ROI for the rules-as-code version", rows:[
+    {comp:"Application cost avoided on deals that would not have scored", meas:"Yes", est:"Per avoided application", basis:"Developer's own cost history", unc:"Low"},
+    {comp:"Hours to encode one state's QAP", meas:"Yes", est:"Days, not weeks", basis:"Prior build", unc:"Low"}],
+    register:["Whether the developer wants the honest answer (arithmetic and a competitive set) or the one they asked for (a probability). The project only works if it is the first."]},
+  record:{decision:"DONT", gate:"Technical, data sufficiency. Later gates not evaluated on purpose.", next:"Reframe as a deterministic QAP scorer plus a per-round competitive-set table. That is operational, passes all three gates, and answers the real question.", kill:"n/a for the ML version; it stops here.", change:"A state agency publishing category-level scores for ten years would make a within-state model worth testing. None I know of does."}
+},
+{
+  id:"memo", n:"05",
+  title:"Draft the narrative sections of a CRE credit memo from the underwriting file",
+  short:"AI credit memo narrative",
+  ctx:"The numbers in a credit memo come from the underwriting model. The narrative around them (property, market, sponsor, risks and mitigants) takes hours to write and reads the same deal to deal. The desk wants a first draft from the file, with the analyst editing rather than starting from blank.",
+  continuum:{pos:0.25, why:"Operational. The memo exists, the structure exists, the facts exist. The machine writes the first draft of prose. It becomes strategic only if the desk later mines the structured facts across memos, which this project makes possible but does not do."},
+  value:{status:"PASS", decision:"None. The credit decision and the opinion stay with the analyst and committee.", user:"Credit analysts; committee readers who want consistent memos.", benefit:"Time and consistency of structure.", evidence:["Narrative drafting is a large share of memo time and the least analytical part of it.","Consistency has a second-order value: committee members read faster when every memo puts the same facts in the same place."]},
+  tech:{status:"CONDITIONAL", ideal:["The computed facts table from the underwriting model","The desk's memo structure","Sponsor and market notes from the analyst","Prior memos as style examples, with numbers stripped"],
+    output:"A draft narrative in which every number matches a fact in the table, with the opinion sections left for the analyst",
+    inventory:[
+      {input:"Computed facts table", fields:"Loan terms, NOI, DSCR, LTV, debt yield, rent roll summary, sources and uses", source:"Underwriting model export", fmt:"xlsx, JSON", hist:"Per deal", geo:"Per deal", intv:"Once", status:"Available", gap:"Needs a named-field export. Most models have the numbers in cells without names."},
+      {input:"Memo structure", fields:"Section order and required content", source:"Desk template", fmt:"docx", hist:"n/a", geo:"n/a", intv:"n/a", status:"Available", gap:"None."},
+      {input:"Analyst notes on sponsor and market", fields:"Free text", source:"Analyst", fmt:"Text", hist:"Per deal", geo:"Per deal", intv:"Once", status:"Partial", gap:"The model must not originate these. If the analyst has not written them, the sections stay blank rather than being filled with plausible prose."},
+      {input:"Prior memos for style", fields:"Approved memos", source:"Desk archive", fmt:"docx, PDF", hist:"Years", geo:"n/a", intv:"n/a", status:"Engineering", gap:"Strip numbers and names before use as examples so the model learns structure, not stale facts."}],
+    comp:"The numbers are computed in code and handed to the model as facts. The judgment (is this sponsor strong, is this market soft) is subjective and stays human; the model formats it, it does not form it. That split is the whole design.",
+    acc:"A memo with one invented number is worse than no draft, because it is believed. The threshold is 100 percent number match: a gate pulls every number out of the draft and matches it to the facts table; any number without a match fails the draft and it is rewritten. Measured on thirty memos before anyone uses it. Prose quality is scored on a five-point rubric (accurate, complete, cautious, useful, concise) by a reviewer who does not know which drafts were edited.",
+    prod:"Facts tables will have missing fields on unusual deals. The draft has to say 'not provided' rather than fill the gap. Log every gate failure; the failure types are the roadmap."},
+  exec:{status:"PASS", expertise:{need:"Desk knowledge for the structure and the rubric; light engineering for the export, prompt, and gate.", have:"In house."}, funding:{need:"API cost of a few cents per memo.", have:"Available."}, time:{need:"Two weeks to the thirty-memo test.", have:"Available."}, path:"Fit to fixed resources. The gate and the eval are the project; the prompt is the small part."},
+  sourcing:[
+    {comp:"Named-field export from the underwriting model", cat:"Internal", why:"The desk's model, the desk's names."},
+    {comp:"Prompt, number-match gate, rubric", cat:"Internal", why:"This is the control. It should never be inside a vendor's black box."},
+    {comp:"LLM", cat:"Third-party component", why:"Commodity, swappable."},
+    {comp:"Generic memo-writing product", cat:"Industry-agnostic application, not chosen", why:"Unless it exposes a fact table and a verifiable gate, it cannot be evaluated on the thing that matters."}],
+  returns:{mode:"Conventional ROI, appropriate here", rows:[
+    {comp:"Hours per memo narrative", meas:"Yes", est:"Before vs after on thirty memos", basis:"Time log", unc:"Low once measured"},
+    {comp:"Gate pass rate on first draft", meas:"Yes", est:"Unknown until measured", basis:"Eval log", unc:"Medium"},
+    {comp:"Committee read time", meas:"Weakly", est:"Not estimated", basis:"Would need a survey", unc:"High"}],
+    register:["Whether analysts actually edit the draft or sign it. The second is the failure mode and it has to be checked, not assumed.","Whether the facts export covers unusual structures (ground leases, mezzanine) without manual steps."]},
+  record:{decision:"MODIFY", gate:"Technical, conditional on the number-match threshold being demonstrated.", next:"Build the named-field export and the gate. Run thirty memos. Report the number-match rate and the rubric scores before anyone writes a memo with it.", kill:"If number match is under 100 percent after the rewrite loop on thirty memos, the gate is not working and the tool does not ship.", change:"Nothing about value. If the eval passes, this is the first project to ship of the five."}
+}];
+</script>
+
+<script id="desk-logic">
+/*LOGIC-START*/
+/* Decision rule (RH). Gates are evaluated in order. A failed gate locks the gates after it.
+   value FAIL      -> DONT, later gates NA
+   technical FAIL  -> DONT, execution NA
+   execution FAIL  -> MODIFY (fit to resources or fund the outcome)
+   any CONDITIONAL -> MODIFY (measure first)
+   all PASS        -> GO */
+function decide(g){
+  var v=g.value, t=g.tech, e=g.exec;
+  if(v==="FAIL") return {decision:"DONT", gates:{value:"FAIL", tech:"NA", exec:"NA"}, gate:"value"};
+  if(t==="FAIL") return {decision:"DONT", gates:{value:v, tech:"FAIL", exec:"NA"}, gate:"tech"};
+  if(e==="FAIL") return {decision:"MODIFY", gates:{value:v, tech:t, exec:"FAIL"}, gate:"exec"};
+  if(v==="CONDITIONAL"||t==="CONDITIONAL"||e==="CONDITIONAL"){
+    return {decision:"MODIFY", gates:{value:v, tech:t, exec:e}, gate: v==="CONDITIONAL"?"value":(t==="CONDITIONAL"?"tech":"exec")};
+  }
+  return {decision:"GO", gates:{value:v, tech:t, exec:e}, gate:null};
+}
+/* Inventory roll-up (RH): Missing on a dependency fails data sufficiency; Partial or Engineering makes it conditional. */
+function inventoryStatus(rows){
+  var s="PASS";
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    if(r.status==="Missing" && r.dep!==false) return "FAIL";
+    if(r.status==="Partial"||r.status==="Engineering") s="CONDITIONAL";
+  }
+  return s;
+}
+/*LOGIC-END*/
+</script>
+
+<script>
+(function(){
+  var CASES=window.DESK_CASES;
+  var LABEL={GO:"Go",MODIFY:"Modify",DONT:"Don't go"};
+  var $=function(s,el){return (el||document).querySelector(s)};
+  var esc=function(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
+  var main=$("#main"), list=$("#caseList"), toast=$("#toast");
+  var current=null;
+
+  /* theme */
+  var themeBtn=$("#themeBtn");
+  function setTheme(t){document.documentElement.setAttribute("data-theme",t);themeBtn.textContent=t==="light"?"Dark":"Light";themeBtn.setAttribute("aria-pressed",String(t==="light"));try{localStorage.setItem("fd-theme",t)}catch(e){}}
+  try{var st=localStorage.getItem("fd-theme");if(st)setTheme(st)}catch(e){}
+  themeBtn.addEventListener("click",function(){setTheme(document.documentElement.getAttribute("data-theme")==="light"?"dark":"light")});
+
+  function say(m){toast.textContent=m;toast.classList.add("show");clearTimeout(say.t);say.t=setTimeout(function(){toast.classList.remove("show")},1800)}
+
+  /* custom initiative, stored locally */
+  var CUSTOM_KEY="fd-custom-v1";
+  function blankCustom(){return {title:"",ctx:"",pos:50,value:"PASS",valueNote:"",inv:[{input:"",source:"",status:"Available"}],acc:"",comp:"",expertise:"PASS",funding:"PASS",time:"PASS",path:"fit",execNote:"",sourcing:"",ret:"",unc:"",next:"",kill:""}}
+  function loadCustom(){try{var s=localStorage.getItem(CUSTOM_KEY);if(s){var o=JSON.parse(s);if(o&&o.inv)return o}}catch(e){}return blankCustom()}
+  function saveCustom(c){try{localStorage.setItem(CUSTOM_KEY,JSON.stringify(c))}catch(e){}}
+  var custom=loadCustom();
+
+  function customGates(c){
+    var tech=inventoryStatus(c.inv.filter(function(r){return r.input.trim()||r.source.trim()}));
+    var ex=[c.expertise,c.funding,c.time];
+    var exec= ex.indexOf("FAIL")>=0?"FAIL":(ex.indexOf("CONDITIONAL")>=0?"CONDITIONAL":"PASS");
+    return {value:c.value, tech:tech, exec:exec};
+  }
+
+  /* rail */
+  function renderList(){
+    var html="";
+    CASES.forEach(function(c){
+      var d=decide({value:c.value.status,tech:c.tech.status,exec:c.exec.status});
+      html+='<li><button type="button" data-id="'+c.id+'" aria-current="'+(current===c.id)+'"><span class="n">'+c.n+'</span><span class="t">'+esc(c.short)+'</span><span class="d" style="color:var(--'+(d.decision==="GO"?"pass":d.decision==="MODIFY"?"cond":"fail")+')">'+LABEL[d.decision]+'</span></button></li>';
+    });
+    var cg=customGates(custom), cd=decide(cg);
+    html+='<li><button type="button" data-id="custom" aria-current="'+(current==="custom")+'"><span class="n">06</span><span class="t">'+esc(custom.title.trim()||"Your own initiative")+'</span><span class="d" style="color:var(--'+(cd.decision==="GO"?"pass":cd.decision==="MODIFY"?"cond":"fail")+')">'+(custom.title.trim()?LABEL[cd.decision]:"Blank")+'</span></button></li>';
+    list.innerHTML=html;
+  }
+  list.addEventListener("click",function(e){var b=e.target.closest("button[data-id]");if(!b)return;show(b.getAttribute("data-id"));});
+
+  function stTag(s){return '<span class="st '+s+'">'+(s==="NA"?"Not evaluated":s==="CONDITIONAL"?"Conditional":s==="PASS"?"Pass":"Fail")+'</span>'}
+
+  function diagram(c){
+    var ins=c.tech.inventory, n=ins.length, rowH=34, h=Math.max(n*rowH+20, 140);
+    var s='<svg viewBox="0 0 760 '+h+'" role="img" aria-label="Ideal inputs, the system, and the output">';
+    s+='<text class="lbl" x="0" y="10">Ideal inputs, with actual status</text><text class="lbl" x="330" y="10">System</text><text class="lbl" x="520" y="10">Output</text>';
+    ins.forEach(function(r,i){
+      var y=22+i*rowH;
+      s+='<g class="in '+r.status+'"><rect x="0" y="'+y+'" width="280" height="24" rx="2"/><text x="8" y="'+(y+16)+'">'+esc(r.input.length>34?r.input.slice(0,33)+"…":r.input)+'</text><text class="lbl" x="272" y="'+(y+16)+'" text-anchor="end">'+esc(r.status)+'</text></g>';
+      s+='<path d="M280 '+(y+12)+' C 305 '+(y+12)+', 305 '+(h/2)+', 330 '+(h/2)+'"/>';
+    });
+    s+='<rect x="330" y="'+(h/2-30)+'" width="160" height="60" rx="2"/><text x="410" y="'+(h/2-4)+'" text-anchor="middle">signals and rules</text><text class="lbl" x="410" y="'+(h/2+14)+'" text-anchor="middle">in code, inspectable</text>';
+    s+='<line x1="490" y1="'+(h/2)+'" x2="520" y2="'+(h/2)+'"/>';
+    s+='<rect class="out" x="520" y="'+(h/2-30)+'" width="240" height="60" rx="2"/>';
+    var out=c.tech.output, words=out.split(" "), lines=[],cur="";
+    words.forEach(function(w){if((cur+" "+w).length>36){lines.push(cur);cur=w}else cur=cur?cur+" "+w:w});lines.push(cur);
+    lines.slice(0,3).forEach(function(l,i){s+='<text x="530" y="'+(h/2-12+i*14)+'" font-size="10">'+esc(l)+'</text>'});
+    s+='</svg>';
+    return '<div class="diagram">'+s+'</div>';
+  }
+
+  function renderCase(c){
+    var d=decide({value:c.value.status,tech:c.tech.status,exec:c.exec.status});
+    var g=d.gates;
+    var h='';
+    h+='<div class="case-head"><p class="k">Initiative '+c.n+' of 05</p><h2 style="margin-top:var(--s2)">'+esc(c.title)+'</h2><p class="ctx">'+esc(c.ctx)+'</p>';
+    h+='<div class="verdict"><div class="big '+d.decision+'">'+LABEL[d.decision]+'</div><div class="why"><span class="k">Deciding gate</span><br>'+esc(c.record.gate)+'</div></div></div>';
+
+    /* Area 1 */
+    h+='<section class="area" id="a1"><div class="ahead"><span class="k">Area 01</span><h2>Operational or strategic <span class="tag jp">JP</span></h2></div>';
+    h+='<div class="cont"><div class="bar"><div class="pin" style="left:'+(c.continuum.pos*100)+'%"></div></div><div class="ends"><span>Operational: improve existing work</span><span>Strategic: improve decisions</span></div></div>';
+    h+='<div class="prose"><p>'+esc(c.continuum.why)+'</p><p class="mid" style="font-size:13px">Why it matters downstream: the position sets how returns are evaluated in area 04. Operational work gets conventional ROI. Strategic work gets decomposed.</p></div></section>';
+
+    /* Area 2 */
+    h+='<section class="area" id="a2"><div class="ahead"><span class="k">Area 02</span><h2>Feasibility, three gates in order <span class="tag jp">JP</span></h2></div>';
+    h+='<div class="gates">';
+    h+='<div class="gate"><span class="k">Gate 1</span><div class="q">Should we do it</div>'+stTag(g.value)+'<ul class="ev">'+c.value.evidence.map(function(e){return '<li>'+esc(e)+'</li>'}).join("")+'</ul></div>';
+    h+='<div class="gate'+(g.tech==="NA"?" locked":"")+'"><span class="k">Gate 2</span><div class="q">Can it be done</div>'+stTag(g.tech)+'<ul class="ev"><li>'+esc(c.tech.acc)+'</li></ul></div>';
+    h+='<div class="gate'+(g.exec==="NA"?" locked":"")+'"><span class="k">Gate 3</span><div class="q">Can we do it</div>'+stTag(g.exec)+'<ul class="ev"><li>'+esc(c.exec.path)+'</li></ul></div>';
+    h+='</div>';
+    h+='<p class="mid" style="font-size:13px;max-width:720px">Sequential by design. Business value does not compensate for missing data, and a feasible project is still infeasible for an organization that cannot staff it. A failed gate locks the gates after it.</p>';
+
+    /* gate 1 body */
+    h+='<div class="gatebody"><h3>Gate 1, value '+stTag(g.value)+'</h3><div class="cols">';
+    h+='<div class="block"><span class="k">Decision it improves</span>'+esc(c.value.decision)+'</div><div class="block"><span class="k">Who uses it</span>'+esc(c.value.user)+'</div><div class="block"><span class="k">Benefit type</span>'+esc(c.value.benefit)+'</div></div></div>';
+
+    /* gate 2 body */
+    h+='<div class="gatebody"><h3>Gate 2, technical '+stTag(g.tech)+'</h3>';
+    h+='<div class="sub"><h4>Data sufficiency: start from the ideal, then inventory what exists <span class="tag jp">JP</span></h4><p class="mid" style="font-size:13px">Ideal inputs: '+esc(c.tech.ideal.join("; "))+'.</p>'+diagram(c);
+    h+='<div class="tblwrap"><table class="tbl"><thead><tr><th>Input</th><th>Fields</th><th>Source</th><th>Format</th><th>History</th><th>Geography</th><th>Interval</th><th>Status</th><th>Gap or engineering</th></tr></thead><tbody>';
+    c.tech.inventory.forEach(function(r){h+='<tr><td><strong>'+esc(r.input)+'</strong></td><td class="mono">'+esc(r.fields)+'</td><td>'+esc(r.source)+'</td><td>'+esc(r.fmt)+'</td><td>'+esc(r.hist)+'</td><td>'+esc(r.geo)+'</td><td>'+esc(r.intv)+'</td><td><span class="s '+r.status+'">'+esc(r.status)+'</span></td><td>'+esc(r.gap)+'</td></tr>'});
+    h+='</tbody></table></div></div>';
+    h+='<div class="cols"><div class="block"><span class="k">Computational suitability <span class="tag jp">JP</span></span><p style="font-size:14px">'+esc(c.tech.comp)+'</p></div><div class="block"><span class="k">Accuracy threshold, set by the use <span class="tag jp">JP</span></span><p style="font-size:14px">'+esc(c.tech.acc)+'</p></div><div class="block"><span class="k">Prototype to production <span class="tag jp">JP</span></span><p style="font-size:14px">'+esc(c.tech.prod)+'</p></div></div></div>';
+
+    /* gate 3 body */
+    h+='<div class="gatebody'+(g.exec==="NA"?" mid":"")+'"><h3>Gate 3, execution '+stTag(g.exec)+'</h3>';
+    h+='<div class="tblwrap"><table class="tbl"><thead><tr><th>Resource</th><th>Required</th><th>Available</th></tr></thead><tbody>';
+    [["Expertise",c.exec.expertise],["Funding",c.exec.funding],["Time",c.exec.time]].forEach(function(p){h+='<tr><td><strong>'+p[0]+'</strong></td><td>'+esc(p[1].need)+'</td><td>'+esc(p[1].have)+'</td></tr>'});
+    h+='</tbody></table></div><div class="block" style="max-width:720px"><span class="k">Resource path <span class="tag jp">JP</span></span>'+esc(c.exec.path)+'</div></div>';
+    h+='</section>';
+
+    /* Area 3 */
+    h+='<section class="area" id="a3"><div class="ahead"><span class="k">Area 03</span><h2>Where the technology comes from <span class="tag jp">JP</span></h2></div>';
+    h+='<div class="tblwrap"><table class="tbl"><thead><tr><th>Component</th><th>Category</th><th>Why</th></tr></thead><tbody>';
+    c.sourcing.forEach(function(r){h+='<tr><td><strong>'+esc(r.comp)+'</strong></td><td class="mono">'+esc(r.cat)+'</td><td>'+esc(r.why)+'</td></tr>'});
+    h+='</tbody></table></div><p class="mid" style="font-size:13px;max-width:720px">His rule: capabilities core to how a firm competes are developed internally; agnostic functions are bought; external components support the internal system. In every case above the judgment layer is internal and the commodity layer is not.</p></section>';
+
+    /* Area 4 */
+    h+='<section class="area" id="a4"><div class="ahead"><span class="k">Area 04</span><h2>Evaluation of returns <span class="tag jp">JP</span></h2></div>';
+    h+='<p class="k">Approach: '+esc(c.returns.mode)+'</p>';
+    h+='<div class="tblwrap"><table class="tbl"><thead><tr><th>Component</th><th>Measurable</th><th>Estimate</th><th>Basis</th><th>Uncertainty</th></tr></thead><tbody>';
+    c.returns.rows.forEach(function(r){h+='<tr><td><strong>'+esc(r.comp)+'</strong></td><td>'+esc(r.meas)+'</td><td>'+esc(r.est)+'</td><td>'+esc(r.basis)+'</td><td>'+esc(r.unc)+'</td></tr>'});
+    h+='</tbody></table></div>';
+    h+='<div class="block" style="max-width:720px"><span class="k">Uncertainty register <span class="tag rh">RH</span></span><ul class="plain" style="font-size:14px">'+c.returns.register.map(function(u){return '<li>'+esc(u)+'</li>'}).join("")+'</ul><p class="mid" style="font-size:13px;margin-top:var(--s3)">No point estimate is given where none can be defended. His point: a precise number that hides uncertainty becomes a budget and a deadline.</p></div></section>';
+
+    /* Area 5 */
+    h+='<section class="area" id="a5" style="border-bottom:0"><div class="ahead"><span class="k">Area 05</span><h2>Decision record <span class="tag rh">RH</span></h2></div>';
+    h+='<div class="record"><dl><dt>Decision</dt><dd><strong style="color:var(--'+(d.decision==="GO"?"pass":d.decision==="MODIFY"?"cond":"fail")+')">'+LABEL[d.decision]+'</strong></dd><dt>Deciding gate</dt><dd>'+esc(c.record.gate)+'</dd><dt>Smallest next step</dt><dd>'+esc(c.record.next)+'</dd><dt>Kill rule</dt><dd>'+esc(c.record.kill)+'</dd><dt>What would change it</dt><dd>'+esc(c.record.change)+'</dd></dl>';
+    h+='<div class="actions"><button class="btn" type="button" data-act="copy">Copy record as markdown</button><button class="btn" type="button" data-act="print">Print</button></div></div></section>';
+    return h;
+  }
+
+  function recordMarkdown(c){
+    var d=decide({value:c.value.status,tech:c.tech.status,exec:c.exec.status});
+    var L=[];
+    L.push("# Feasibility Desk: "+c.title);
+    L.push("");
+    L.push("Decision: "+LABEL[d.decision]+"  ");
+    L.push("Deciding gate: "+c.record.gate);
+    L.push("");
+    L.push("## 1. Operational or strategic");
+    L.push("Position: "+Math.round(c.continuum.pos*100)+"/100 toward strategic. "+c.continuum.why);
+    L.push("");
+    L.push("## 2. Feasibility");
+    L.push("- Value: "+d.gates.value+". "+c.value.decision);
+    L.push("- Technical: "+d.gates.tech+". "+c.tech.acc);
+    L.push("- Execution: "+d.gates.exec+". "+c.exec.path);
+    L.push("");
+    L.push("### Feature inventory");
+    L.push("| Input | Source | Status | Gap |");
+    L.push("|---|---|---|---|");
+    c.tech.inventory.forEach(function(r){L.push("| "+r.input+" | "+r.source+" | "+r.status+" | "+r.gap+" |")});
+    L.push("");
+    L.push("## 3. Sourcing");
+    c.sourcing.forEach(function(r){L.push("- "+r.comp+": "+r.cat+". "+r.why)});
+    L.push("");
+    L.push("## 4. Returns ("+c.returns.mode+")");
+    c.returns.rows.forEach(function(r){L.push("- "+r.comp+": measurable "+r.meas+"; "+r.est+"; uncertainty "+r.unc)});
+    L.push("Uncertainty register:");
+    c.returns.register.forEach(function(u){L.push("- "+u)});
+    L.push("");
+    L.push("## 5. Decision record");
+    L.push("- Next step: "+c.record.next);
+    L.push("- Kill rule: "+c.record.kill);
+    L.push("- What would change it: "+c.record.change);
+    L.push("");
+    L.push("Framework: Josh Panknin, Parallax Advisors Insights, August 2026. Cases, inventories, decision rule and verdicts: Russell Harris. Generated at russh.work/feasibility-desk, "+new Date().toISOString().slice(0,10)+".");
+    return L.join("\n");
+  }
+
+  /* custom initiative */
+  function sel(name,val,opts){return '<select name="'+name+'">'+opts.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===val?" selected":"")+'>'+o[1]+'</option>'}).join("")+'</select>'}
+  var G3=[["PASS","Pass"],["CONDITIONAL","Conditional"],["FAIL","Fail"]];
+  var S4=[["Available","Available"],["Partial","Partial"],["Missing","Missing"],["Engineering","Engineering"]];
+  function renderCustom(){
+    var c=custom, gates=customGates(c), d=decide(gates);
+    var h='';
+    h+='<div class="case-head"><p class="k">Initiative 06, yours</p><h2 style="margin-top:var(--s2)">'+esc(c.title.trim()||"Your own initiative")+'</h2><p class="ctx">Run an initiative of your own through the same four areas. The gate statuses roll up from what you enter and the decision follows the written rule below. Nothing leaves this browser.</p>';
+    h+='<div class="verdict"><div class="big '+d.decision+'">'+(c.title.trim()?LABEL[d.decision]:"Blank")+'</div><div class="why"><span class="k">Gates</span><br>Value '+gates.value+' / Technical '+gates.tech+' / Execution '+gates.exec+(d.gate?'<br>Deciding gate: '+({value:"value",tech:"technical",exec:"execution"})[d.gate]:'')+'</div></div></div>';
+    h+='<form class="form" id="customForm" autocomplete="off">';
+    h+='<div class="rulebox">Decision rule <span class="tag rh">RH</span>: <code>value FAIL</code> stops everything. <code>technical FAIL</code> stops before execution. <code>execution FAIL</code> means Modify (rescope or fund). Any <code>Conditional</code> means Modify (measure first). All <code>Pass</code> means Go. Technical rolls up from the inventory: any Missing input fails it; Partial or Engineering makes it conditional. Execution rolls up from the three resource lines.</div>';
+    h+='<section class="area" id="a1"><div class="ahead"><span class="k">Area 01</span><h2>Operational or strategic</h2></div><div class="field"><label>Initiative, one line</label><input type="text" name="title" value="'+esc(c.title)+'" placeholder="What gets built and for whom"></div><div class="field"><label>Context</label><textarea name="ctx" placeholder="The decision or task it touches, and why now">'+esc(c.ctx)+'</textarea></div><div class="field"><label>Position: '+c.pos+' of 100 toward strategic</label><input type="range" name="pos" min="0" max="100" value="'+c.pos+'"></div></section>';
+    h+='<section class="area" id="a2"><div class="ahead"><span class="k">Area 02</span><h2>Feasibility</h2></div>';
+    h+='<div class="row3"><div class="field"><label>Gate 1, value</label>'+sel("value",c.value,G3)+'</div><div class="field" style="grid-column:span 2"><label>Decision it improves, who uses it, benefit type</label><input type="text" name="valueNote" value="'+esc(c.valueNote)+'"></div></div>';
+    h+='<div class="field"><label>Gate 2, feature inventory (ideal inputs first, then what exists)</label><div id="invRows">';
+    c.inv.forEach(function(r,i){h+='<div class="invrow"><input type="text" data-inv="'+i+'" data-f="input" value="'+esc(r.input)+'" placeholder="Ideal input"><input type="text" data-inv="'+i+'" data-f="source" value="'+esc(r.source)+'" placeholder="Source, format, interval"><select data-inv="'+i+'" data-f="status">'+S4.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===r.status?" selected":"")+'>'+o[1]+'</option>'}).join("")+'</select><button class="x" type="button" data-rm="'+i+'" aria-label="Remove row">×</button></div>'});
+    h+='</div><button class="btn" type="button" id="addRow">Add input</button></div>';
+    h+='<div class="cols"><div class="field"><label>Computational suitability (what is subjective, how represented)</label><textarea name="comp">'+esc(c.comp)+'</textarea></div><div class="field"><label>Accuracy threshold, set by the use</label><textarea name="acc">'+esc(c.acc)+'</textarea></div></div>';
+    h+='<div class="row3"><div class="field"><label>Gate 3, expertise</label>'+sel("expertise",c.expertise,G3)+'</div><div class="field"><label>Funding</label>'+sel("funding",c.funding,G3)+'</div><div class="field"><label>Time</label>'+sel("time",c.time,G3)+'</div></div>';
+    h+='<div class="row3"><div class="field"><label>Resource path</label>'+sel("path",c.path,[["fit","Fit the project to fixed resources"],["fund","Fund the requirements of the outcome"]])+'</div><div class="field" style="grid-column:span 2"><label>Execution note</label><input type="text" name="execNote" value="'+esc(c.execNote)+'"></div></div></section>';
+    h+='<section class="area" id="a3"><div class="ahead"><span class="k">Area 03</span><h2>Sourcing</h2></div><div class="field"><label>Components: internal, third-party component, or industry-agnostic buy, and why</label><textarea name="sourcing">'+esc(c.sourcing)+'</textarea></div></section>';
+    h+='<section class="area" id="a4"><div class="ahead"><span class="k">Area 04</span><h2>Returns</h2></div><div class="cols"><div class="field"><label>Measurable components and basis</label><textarea name="ret">'+esc(c.ret)+'</textarea></div><div class="field"><label>Uncertainty register</label><textarea name="unc">'+esc(c.unc)+'</textarea></div></div></section>';
+    h+='<section class="area" id="a5" style="border-bottom:0"><div class="ahead"><span class="k">Area 05</span><h2>Decision record</h2></div><div class="cols"><div class="field"><label>Smallest next step</label><textarea name="next">'+esc(c.next)+'</textarea></div><div class="field"><label>Kill rule</label><textarea name="kill">'+esc(c.kill)+'</textarea></div></div>';
+    h+='<div class="actions"><button class="btn" type="button" data-act="copycustom">Copy as markdown</button><button class="btn" type="button" data-act="reset">Clear</button></div></section></form>';
+    return h;
+  }
+  function customMarkdown(){
+    var c=custom, g=customGates(c), d=decide(g);
+    var L=["# Feasibility Desk: "+(c.title||"Untitled initiative"),"",c.ctx,"","Decision: "+LABEL[d.decision]+" (value "+g.value+", technical "+g.tech+", execution "+g.exec+")","","## 1. Operational or strategic: "+c.pos+"/100 toward strategic","","## 2. Feasibility","- Value: "+c.value+". "+c.valueNote,"- Inventory:"];
+    c.inv.forEach(function(r){if(r.input||r.source)L.push("  - "+r.input+" | "+r.source+" | "+r.status)});
+    L.push("- Computational suitability: "+c.comp,"- Accuracy threshold: "+c.acc,"- Execution: expertise "+c.expertise+", funding "+c.funding+", time "+c.time+"; path: "+(c.path==="fit"?"fit to fixed resources":"fund the outcome")+". "+c.execNote,"","## 3. Sourcing",c.sourcing,"","## 4. Returns",c.ret,"Uncertainty register: "+c.unc,"","## 5. Decision record","- Next step: "+c.next,"- Kill rule: "+c.kill,"","Framework: Josh Panknin, Parallax Advisors Insights, August 2026. Decision rule and tool: Russell Harris, russh.work/feasibility-desk.");
+    return L.join("\n");
+  }
+  function bindCustom(){
+    var f=$("#customForm"); if(!f) return;
+    f.addEventListener("input",function(e){
+      var t=e.target;
+      if(t.hasAttribute("data-inv")){var i=+t.getAttribute("data-inv");custom.inv[i][t.getAttribute("data-f")]=t.value;}
+      else if(t.name){custom[t.name]= t.name==="pos"?+t.value:t.value;}
+      saveCustom(custom);
+      if(t.tagName==="SELECT"||t.name==="pos"||t.name==="title"){var y=window.scrollY;show("custom",true);window.scrollTo(0,y);}
+      else {renderList();}
+    });
+    f.addEventListener("click",function(e){
+      var b=e.target.closest("button"); if(!b) return;
+      if(b.id==="addRow"){custom.inv.push({input:"",source:"",status:"Available"});saveCustom(custom);var y=window.scrollY;show("custom",true);window.scrollTo(0,y);var rows=document.querySelectorAll("#invRows input[data-f=input]");if(rows.length)rows[rows.length-1].focus();}
+      else if(b.hasAttribute("data-rm")){custom.inv.splice(+b.getAttribute("data-rm"),1);if(!custom.inv.length)custom.inv.push({input:"",source:"",status:"Available"});saveCustom(custom);var y2=window.scrollY;show("custom",true);window.scrollTo(0,y2);}
+      else if(b.getAttribute("data-act")==="reset"){custom=blankCustom();saveCustom(custom);show("custom",true);say("Cleared");}
+      else if(b.getAttribute("data-act")==="copycustom"){copy(customMarkdown());}
+    });
+  }
+  function copy(text){
+    var done=function(){say("Copied")}, fail=function(){
+      var ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();
+      try{document.execCommand("copy");done()}catch(e){say("Copy failed")}document.body.removeChild(ta)};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,fail)}else fail();
+  }
+
+  function show(id,keepScroll){
+    current=id;
+    var c=CASES.filter(function(x){return x.id===id})[0];
+    main.innerHTML= c?renderCase(c):renderCustom();
+    if(!c) bindCustom();
+    renderList();
+    $("#topstate").textContent= c?("Case "+c.n+" of 05"):"Your initiative";
+    try{location.hash==="#"+id||history.replaceState(null,"","#"+id)}catch(e){}
+    if(!keepScroll && window.scrollY>200){var top=$(".layout").getBoundingClientRect().top+window.scrollY-72;window.scrollTo({top:top,behavior:"smooth"})}
+  }
+  main.addEventListener("click",function(e){
+    var b=e.target.closest("button[data-act]"); if(!b) return;
+    var act=b.getAttribute("data-act");
+    if(act==="print") window.print();
+    else if(act==="copy"){var c=CASES.filter(function(x){return x.id===current})[0]; if(c) copy(recordMarkdown(c));}
+  });
+
+  var start=(location.hash||"").slice(1);
+  var ids=CASES.map(function(c){return c.id}).concat(["custom"]);
+  show(ids.indexOf(start)>=0?start:CASES[0].id,true);
+  window.addEventListener("hashchange",function(){var h=location.hash.slice(1);if(ids.indexOf(h)>=0&&h!==current)show(h)});
+})();
+</script>
+</body>
+</html>
