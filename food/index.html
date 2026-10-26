@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<title>Getting Food Benefits Used</title>
+<meta name="description" content="A local nonprofit for Maryland and Delaware that gets Medicare and Medicaid members using the food benefits they already have. Draft for advice.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/styles/tokens.css">
+<style>
+/* Built against design.md (2026-05-19b). Tokens from /styles/tokens.css. Monochrome, no radius, no shadow, dark only. Unlisted. */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;background:var(--void);color-scheme:dark;scroll-behavior:smooth}
+body{font-family:var(--font-mono);font-weight:400;font-size:15px;line-height:1.6;color:var(--paper);background:var(--void);min-height:100vh;overflow-x:clip;font-variant-numeric:tabular-nums}
+::selection{background:var(--paper);color:var(--void)}
+a{color:inherit;text-decoration:none}
+ol,ul{list-style:none}
+:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+.mid{color:var(--mid)}
+.mono-xs{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;line-height:1.35}
+
+.wordmark{position:fixed;top:var(--page-margin);left:var(--page-margin);z-index:10;font-size:14px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;mix-blend-mode:difference}
+.wordmark .dot{color:var(--mid)}
+.index{position:fixed;top:var(--page-margin);right:var(--page-margin);z-index:10;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.index a{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);padding:4px 8px;transition:background var(--dur-quick) var(--ease-precision),color var(--dur-quick) var(--ease-precision)}
+.index a:hover,.index a:focus-visible{background:var(--paper);color:var(--void);outline:none}
+@media (max-width:1100px){.index{display:none}}
+
+.hero{min-height:100vh;position:relative;padding:var(--page-margin)}
+.hero .poster{position:absolute;left:var(--page-margin);top:16vh;font-family:var(--font-display);font-weight:200;font-size:clamp(60px,12.5vw,224px);line-height:.85;letter-spacing:-.04em;max-width:100%}
+.hero .poster b{font-weight:800}
+.hero .brief{position:absolute;right:var(--page-margin);bottom:calc(var(--page-margin) + 104px);max-width:540px;text-align:right}
+.hero .brief p{font-size:15px;line-height:1.6}
+.hero .brief .meta{margin-top:var(--space-5);display:grid;gap:4px;color:var(--mid)}
+.hero .status{position:absolute;left:var(--page-margin);bottom:var(--page-margin);font-size:12px;line-height:1.7;color:var(--mid)}
+.hero .status .k{color:var(--paper)}
+.hero .status .cursor{display:inline-block;width:8px;height:14px;background:var(--paper);vertical-align:-2px;animation:blink 600ms steps(2,end) infinite}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.hero .status .cursor{animation:none}}
+@media (max-width:760px){
+  .hero{min-height:auto;padding-top:calc(var(--page-margin) + 64px);padding-bottom:var(--space-8)}
+  .hero .poster{position:static;font-size:clamp(52px,16vw,120px);margin-bottom:var(--space-7)}
+  .hero .brief{position:static;text-align:left;max-width:100%;margin-bottom:var(--space-7)}
+  .hero .status{position:static}
+}
+
+.section{position:relative;padding:0 var(--page-margin);border-top:1px solid var(--hairline);scroll-margin-top:16px}
+.opener{padding:var(--space-10) 0 var(--space-7);max-width:900px}
+.opener.right{margin-left:auto;text-align:right}
+.opener .label{display:block;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);margin-bottom:var(--space-4)}
+.opener .h{font-family:var(--font-display);font-weight:800;font-size:clamp(40px,5.2vw,84px);line-height:.95;letter-spacing:-.03em;text-wrap:balance}
+.opener .lede{margin-top:var(--space-5);font-size:15px;line-height:1.6;max-width:62ch;color:var(--paper)}
+.opener.right .lede{margin-left:auto}
+@media (max-width:760px){.opener{padding:var(--space-8) 0 var(--space-6)}.opener.right{text-align:left;margin-left:0}.opener.right .lede{margin-left:0}}
+.col{max-width:680px}
+.col.offset{margin-left:25%}
+@media (max-width:1000px){.col.offset{margin-left:0}}
+.pad-b{padding-bottom:var(--space-10)}
+@media (max-width:760px){.pad-b{padding-bottom:var(--space-8)}}
+
+.strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.strip>div{padding:var(--space-5) var(--space-4) var(--space-5) 0;border-left:1px solid var(--hairline);padding-left:var(--space-4)}
+.strip>div:first-child{border-left:0;padding-left:0}
+.strip .v{font-family:var(--font-display);font-weight:800;font-size:clamp(40px,5vw,80px);line-height:.95;letter-spacing:-.03em}
+.strip .l{margin-top:var(--space-3);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid)}
+.strip .d{margin-top:var(--space-3);font-size:13px;line-height:1.5}
+@media (max-width:700px){.strip{grid-template-columns:1fr}.strip>div{border-left:0;padding-left:0}.strip>div+div{border-top:1px solid var(--hairline)}}
+
+.block{border-top:1px solid var(--hairline);padding:var(--space-6) 0}
+.block .k{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);margin-bottom:var(--space-3)}
+.block p+p{margin-top:var(--space-3)}
+.block.flag{background:var(--paper);color:var(--void);padding:var(--space-6) var(--space-5);margin-top:var(--space-6)}
+.block.flag .k{color:var(--void)}
+.flag .big{font-family:var(--font-display);font-weight:800;font-size:clamp(28px,3.6vw,52px);line-height:1;letter-spacing:-.03em;text-wrap:balance}
+.flag p{margin-top:var(--space-4);font-size:15px;line-height:1.6}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8)}
+@media (max-width:900px){.two{grid-template-columns:1fr;gap:0}}
+.plain li{padding:var(--space-3) 0;border-top:1px solid var(--hairline);font-size:14px;line-height:1.6}
+.plain li:last-child{border-bottom:1px solid var(--hairline)}
+.plain b{font-weight:500}
+ol.steps li{display:grid;grid-template-columns:40px 1fr;gap:var(--space-4);padding:var(--space-4) 0;border-top:1px solid var(--hairline);font-size:14px;line-height:1.6}
+ol.steps li:last-child{border-bottom:1px solid var(--hairline)}
+ol.steps .n{font-size:11px;font-weight:500;letter-spacing:.12em;color:var(--mid);padding-top:5px}
+ol.steps b{display:block;font-family:var(--font-display);font-weight:600;font-size:18px;letter-spacing:-.01em;margin-bottom:4px}
+
+.rows{border-top:1px solid var(--rule)}
+.row{display:grid;grid-template-columns:200px 1fr 1fr;gap:var(--space-6);padding:var(--space-6) 0;border-bottom:1px solid var(--hairline)}
+.row .who{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid)}
+.row .who b{display:block;color:var(--paper);font-family:var(--font-display);font-weight:800;font-size:clamp(22px,2.4vw,34px);letter-spacing:-.03em;line-height:1;margin-top:var(--space-2);text-transform:none}
+.row .k{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);margin-bottom:var(--space-2)}
+.row p{font-size:14px;line-height:1.6}
+@media (max-width:900px){.row{grid-template-columns:1fr;gap:var(--space-4)}}
+
+table{width:100%;border-collapse:collapse;font-size:13px;line-height:1.5}
+th,td{text-align:left;vertical-align:top;padding:var(--space-3) var(--space-4) var(--space-3) 0;border-top:1px solid var(--hairline)}
+th{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);border-top:1px solid var(--rule)}
+tr:last-child td{border-bottom:1px solid var(--hairline)}
+td:first-child{font-weight:500}
+.scroll{overflow-x:auto}
+.scroll table{min-width:640px}
+
+footer{padding:var(--space-10) var(--page-margin) var(--space-9);border-top:1px solid var(--hairline);min-height:40vh}
+footer .ask{font-family:var(--font-display);font-weight:200;font-size:clamp(40px,7vw,120px);line-height:.9;letter-spacing:-.04em;max-width:14ch}
+footer .ask b{font-weight:800}
+footer ol{margin-top:var(--space-8);max-width:720px}
+footer .end{margin-top:var(--space-9);font-size:12px;line-height:1.7;color:var(--mid)}
+</style>
+</head>
+<body>
+<a class="wordmark" href="/">RUSSH<span class="dot">.</span>WORK</a>
+<nav class="index" aria-label="Sections">
+  <a href="#gap">Gap</a><a href="#insight">Insight</a><a href="#lesson">Lesson</a><a href="#what">What</a><a href="#where">Where</a><a href="#pays">Who pays</a><a href="#money">The money</a><a href="#door">Front door</a><a href="#team">Team</a><a href="#numbers">Numbers</a><a href="#ninety">90 days</a><a href="#unknowns">Unknowns</a><a href="#ask">Ask</a>
+</nav>
+
+<section class="hero">
+  <h1 class="poster">Getting food<br><b>benefits used</b></h1>
+  <div class="brief">
+    <p>A local nonprofit for Maryland and Delaware that gets Medicare and Medicaid members using the food benefits they already have. We coordinate and arrange. We never deliver food.</p>
+    <div class="meta mono-xs"><span>Draft for advice, October 2026</span><span>Russ Harris, Lanham, Maryland</span><span>Every number here is an assumption until a call confirms it</span></div>
+  </div>
+  <div class="status" aria-hidden="true"><span class="cursor"></span> <span class="k">STATUS:</span> validation, weeks 1 to 13<br>&nbsp;&nbsp;<span class="k">AREA:</span> maryland / delaware, local on purpose<br>&nbsp;&nbsp;<span class="k">SHELL:</span> fiscal sponsor first, nonprofit later</div>
+</section>
+
+<section class="section" id="gap">
+  <div class="opener"><span class="label">01 / The gap</span><h2 class="h">Food benefits are funded and go unused</h2></div>
+  <div class="strip">
+    <div><div class="v">85%</div><div class="l">Fact, KFF 2026</div><div class="d">of Medicare special-needs plans offer a food or produce benefit in 2026.</div></div>
+    <div><div class="v">13.5%</div><div class="l">Fact, USDA via CBPP</div><div class="d">of US households were food insecure in 2023.</div></div>
+    <div><div class="v">$77.5B</div><div class="l">Fact, Feeding America</div><div class="d">a year in excess health care spending linked to food insecurity.</div></div>
+  </div>
+  <div class="col offset pad-b"><div class="block"><p>Nobody publishes how much of the funded benefit goes unused. The two research briefings behind this page (October 4 and October 23, 2026) found the public data thin: MedPAC could not treat reported meal encounters as reliable, and a Commonwealth Fund survey found fewer than one in ten Medicare Advantage respondents reporting use of food or meal benefits. That number is the first thing the plan calls will ask for.</p></div></div>
+</section>
+
+<section class="section" id="insight">
+  <div class="opener right"><span class="label">02 / The insight, and Richard had it first</span><h2 class="h">The bottleneck is utilization, not supply.</h2><p class="lede">Plans and programs fund food benefits that eligible people never claim. Trusted local people get those benefits used better than a plan call center does. The research found the thesis sound. What failed was the business model around it.</p></div>
+</section>
+
+<section class="section" id="lesson">
+  <div class="opener"><span class="label">03 / What the first version taught</span><h2 class="h">Good idea, venture-shaped business</h2></div>
+  <div class="two pad-b">
+    <div class="block"><div class="k">SecureFOOD, 2023 to 2026</div>
+      <ul class="plain"><li>Raised venture-style money and sold software to large national insurers.</li><li>Insurers take 9 to 18 months to buy and already had food vendors.</li><li>Federal support for food benefits narrowed in 2025 and 2026.</li><li>Changed direction three times. No public record of a paying customer.</li></ul></div>
+    <div class="block"><div class="k">This version</div>
+      <ul class="plain"><li><b>A nonprofit.</b> Grants and community-benefit money a company cannot take.</li><li><b>Local.</b> Maryland and Delaware, a few dozen partners. Never national.</li><li><b>A service with people in it.</b> Not a platform.</li><li><b>Funded by whoever loses money</b> when a benefit goes unused.</li></ul></div>
+  </div>
+</section>
+
+<section class="section" id="what">
+  <div class="opener right"><span class="label">04 / What we do</span><h2 class="h">We coordinate and arrange. We never deliver food.</h2></div>
+  <div class="col offset pad-b">
+    <ol class="steps">
+      <li><span class="n">01</span><div><b>Referral</b>A hospital, plan, or food bank refers a patient.</div></li>
+      <li><span class="n">02</span><div><b>Enroll</b>A navigator calls, confirms eligibility, and finds the benefits they already have.</div></li>
+      <li><span class="n">03</span><div><b>Arrange</b>We order meals or groceries from a provider that already delivers.</div></li>
+      <li><span class="n">04</span><div><b>Check in</b>Text and phone check-ins. Problems go to the care team.</div></li>
+      <li><span class="n">05</span><div><b>Report</b>Every quarter, each funder sees who used what and what changed.</div></li>
+    </ol>
+    <div class="block flag"><div class="k">The product</div><div class="big">The report is the product.</div><p>Each funder sees what it paid for inside one budget year, which the first version never gave anyone. Two navigators, AI for reminders and reports, off-the-shelf HIPAA tools. No platform.</p></div>
+    <div class="block"><div class="k">Five things we will not build</div>
+      <ul class="plain"><li><b>No kitchen, truck, or inventory.</b> MANNA, Moveable Feast, and the food banks deliver. We are their partner, not their rival.</li><li><b>No app or platform.</b> Off-the-shelf tools and secure file exchange. People do the work.</li><li><b>No national expansion.</b> Two states. More only after the first two work.</li><li><b>No venture money.</b> Contracts and grants. A board, not investors.</li><li><b>No bet on new reimbursement.</b> Nothing here waits on a waiver or a new billing code.</li></ul></div>
+  </div>
+</section>
+
+<section class="section" id="where">
+  <div class="opener"><span class="label">05 / Where</span><h2 class="h">Maryland and Delaware first, on purpose</h2></div>
+  <div class="rows pad-b">
+    <div class="row"><div class="who">First<b>Maryland</b></div><div><div class="k">Why</div><p>Richard did the groundwork: Baltimore, CareFirst, the Techstars and UpSurge network.</p></div><div><div class="k">The money logic</div><p>Hospitals run on fixed state-set budgets under the AHEAD model, so an avoided readmission saves them the avoidable cost this year. In April 2026 the state launched a medically tailored meals program with Moveable Feast and Food &amp; Friends that covers Prince George's County. The enrollment gap in that program is the first thing to ask about.</p></div></div>
+    <div class="row"><div class="who">First<b>Delaware</b></div><div><div class="k">Why</div><p>My own network: hospital, state agency, plan, and nonprofit contacts I already know.</p></div><div><div class="k">The money logic</div><p>No fixed budget, so the buyer is a plan, a community-benefit office, or the state. ChristianaCare, Beebe, and Bayhealth already fund food access; the state issued a food-is-medicine RFP in 2026. Each is a separate call.</p></div></div>
+    <div class="row"><div class="who">Later<b>The corridor</b></div><div><div class="k">Only if the first two work</div><p>Prince George's County beyond the first cohort, DC, Philadelphia, Northern Virginia.</p></div><div><div class="k">Why it can wait</div><p>Medicare Advantage plans are federal, so a plan contract can reach across the corridor before we do.</p></div></div>
+  </div>
+</section>
+
+<section class="section" id="pays">
+  <div class="opener right"><span class="label">06 / Who pays</span><h2 class="h">Four funders, each losing money when a benefit goes unused</h2></div>
+  <div class="scroll pad-b"><table>
+    <thead><tr><th>Funder</th><th>Why they would</th><th>How we are paid</th><th>Proven when</th></tr></thead>
+    <tbody>
+      <tr><td>Hospitals</td><td>Patients come back when they cannot get the right food</td><td>A six-month program, then an annual contract or a community-benefit grant</td><td>A director names the route and a price</td></tr>
+      <tr><td>Medicare Advantage, D-SNP, and Medicaid plans</td><td>They already buy outreach and social-needs navigation, and fund a food benefit members rarely use</td><td>A funded navigation assignment with completion measures. Not a fee per member activated; the research found no such contract anywhere</td><td>A plan shares a scope and payment schedule</td></tr>
+      <tr><td>Food banks and meal providers</td><td>They have food and grants, not enrollment staff</td><td>An enrollment subcontract from their grants</td><td>A partner has money it cannot staff</td></tr>
+      <tr><td>Foundations and public funders</td><td>Food access and family stability are in their mission</td><td>Grants that fund staff and the director</td><td>A funder invites an application</td></tr>
+    </tbody></table></div>
+</section>
+
+<section class="section" id="money">
+  <div class="opener"><span class="label">07 / Follow the money for one person</span><h2 class="h">We are paid for the work, never for the food</h2><p class="lede">A 74-year-old on a Medicare Advantage plan goes home after a heart failure stay. Her plan already pays for a food benefit she has never used. Every return visit costs the hospital.</p></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Who pays us</th><th>What they are paying for</th><th>What we get</th></tr></thead>
+    <tbody>
+      <tr><td>The hospital</td><td>Fewer readmissions. It refers 75 patients and funds a six-month program.</td><td>$40,000 per program, about $530 a patient</td></tr>
+      <tr><td>The health plan</td><td>Navigation work for members it assigns to us, with agreed completion measures.</td><td>A funded assignment. No price yet.</td></tr>
+      <tr><td>The meal provider or food bank</td><td>A grant that says enroll 500 people, and no staff to find them.</td><td>An enrollment subcontract, about $40,000 a year</td></tr>
+      <tr><td>Funders</td><td>The program itself: navigators, tools, the director.</td><td>Grants. $300,000 a year is the target.</td></tr>
+    </tbody></table></div>
+  <div class="col offset pad-b"><div class="block"><p>The meals are paid for by the plan's benefit, the hospital, or the provider's grant. We are paid for finding people, enrolling them, keeping them on it, and proving it worked. The quarterly report is why each funder renews.</p><p class="mid">Every amount is an assumption. None of the four has agreed to pay yet; the first 50 calls find out whether they will, and at what price.</p></div></div>
+</section>
+
+<section class="section" id="door">
+  <div class="opener right"><span class="label">08 / The front door</span><h2 class="h">The members already gather on Sunday</h2></div>
+  <div class="two pad-b">
+    <div class="block"><div class="k">Large congregations in Prince George's County</div><p>Thousands of members on Medicare and Medicaid, a health ministry, a room, and volunteers who are already trusted.</p><p>Maryland has done this before: the Faith Community Health Network (LifeBridge Health, 2016) linked hospital navigators to trained volunteers in 70 congregations, with a signed consent, and reported lower inpatient use.</p>
+      <ul class="plain" style="margin-top:var(--space-5)"><li>A referral source: members with a food benefit they never use.</li><li>A site: an enrollment Sunday with a navigator at a table.</li><li>A volunteer pipeline: two members trained as navigators.</li><li>Proof of reach when we sell a plan contract.</li></ul></div>
+    <div class="block flag" style="margin-top:0"><div class="k">What it cannot be</div><div class="big">A payer.</div><p>A church does not buy programs. A plan or hospital still funds each member we enroll. So the congregation makes the plan contract easier to sell. It does not replace it.</p></div>
+  </div>
+</section>
+
+<section class="section" id="team">
+  <div class="opener"><span class="label">09 / Who runs it</span><h2 class="h">Four or five people and a board of three to five</h2></div>
+  <div class="two pad-b">
+    <div class="block"><div class="k">The team, hired by trigger, not by date</div>
+      <div class="scroll"><table><thead><tr><th>Role</th><th>Starts when</th></tr></thead><tbody>
+        <tr><td>Executive director (me)</td><td>Unpaid until the budget carries a salary the board sets</td></tr>
+        <tr><td>Navigator, CHW-certified, contract</td><td>The first program is signed</td></tr>
+        <tr><td>Fractional dietitian</td><td>The first program is signed</td></tr>
+        <tr><td>Program director</td><td>Four active programs</td></tr>
+        <tr><td>Second navigator, bilingual</td><td>Six programs</td></tr>
+        <tr><td>Data and reporting lead</td><td>Nine programs</td></tr>
+      </tbody></table></div></div>
+    <div class="block"><div class="k">The board</div>
+      <ul class="plain"><li>A founder voice who knows what the first version learned.</li><li>A funder voice with standing in Delaware.</li><li>A plan or hospital voice from Maryland.</li><li>A finance or governance voice.</li></ul>
+      <p class="mid" style="margin-top:var(--space-4);font-size:13px">Nobody on the board is paid. The board sets the director's pay, approves the budget, and signs the sponsor agreement.</p></div>
+  </div>
+</section>
+
+<section class="section" id="numbers">
+  <div class="opener right"><span class="label">10 / The numbers, all of them assumptions</span><h2 class="h">Small, local, and funded by contracts and grants</h2></div>
+  <div class="strip">
+    <div><div class="v">$40,000</div><div class="l">Six-month program</div><div class="d">Up to 75 patients. The first ask of every hospital.</div></div>
+    <div><div class="v">$85,000</div><div class="l">Annual program</div><div class="d">Up to 200 patients a year. Twelve to fourteen of these is the whole organization.</div></div>
+    <div><div class="v">$300,000</div><div class="l">Grants, year two target</div><div class="d">A year, funding program staff and the director. The biggest unknown.</div></div>
+  </div>
+  <div class="col offset pad-b"><div class="scroll" style="margin-top:var(--space-6)"><table>
+    <thead><tr><th>Budget on the plan schedule</th><th>Year 1</th><th>Year 2</th><th>Year 3</th></tr></thead>
+    <tbody><tr><td>Total funding, contracts and grants</td><td>$234,000</td><td>$929,000</td><td>$1,443,000</td></tr><tr><td>Programs at year end</td><td>4</td><td>13</td><td>14</td></tr><tr><td>Staff, including the director</td><td>2</td><td>5</td><td>6</td></tr></tbody></table></div>
+    <div class="block"><p class="mid">Prices from the research design. Budget from the planning model at placeholder inputs. No contract or grant exists yet. Staff pay is set by independent board members against comparable organizations.</p></div></div>
+</section>
+
+<section class="section" id="ninety">
+  <div class="opener"><span class="label">11 / The next 90 days</span><h2 class="h">October 26 to January 24: validate, then decide</h2></div>
+  <div class="col offset pad-b">
+    <ol class="steps">
+      <li><span class="n">W 1-2</span><div><b>Shell and board</b>Richard's role. Two board candidates. A fiscal sponsor so the program can take grants within weeks.</div></li>
+      <li><span class="n">W 3-8</span><div><b>Fifty calls</b>Hospitals, plans, food providers, and funders in both states. Grant or contract, at what price, who signs.</div></li>
+      <li><span class="n">W 9-12</span><div><b>Commitments</b>Letters of intent, concept notes to funders, a board slate, the plan updated with real numbers.</div></li>
+      <li><span class="n">W 13</span><div><b>Go or no-go</b>Ten conversations, three commitments, a legal shell, a board, food partner terms in both states.</div></li>
+    </ol>
+    <div class="block"><p>Cost to find out: about $6,000 and nights and weekends. If fewer than two commitments come from ten conversations, it stops.</p></div>
+  </div>
+</section>
+
+<section class="section" id="unknowns">
+  <div class="opener right"><span class="label">12 / What I do not know yet</span><h2 class="h">Five questions the calls have to answer</h2></div>
+  <div class="col offset pad-b">
+    <ol class="steps">
+      <li><span class="n">01</span><div><b>Does an avoided readmission reach a Maryland hospital's margin this year?</b>If yes, hospitals buy by contract. If no, they fund by grant, if at all.</div></li>
+      <li><span class="n">02</span><div><b>Will a plan pay a nonprofit for navigation it assigns?</b>Plans buy this elsewhere. Nobody has priced it here. The plan calls get a number or a no.</div></li>
+      <li><span class="n">03</span><div><b>Do funders pay for enrollment work, or only for food?</b>The grant lane carries the staff. If funders only buy meals, the budget changes shape.</div></li>
+      <li><span class="n">04</span><div><b>Who will sponsor a program with no track record?</b>Without a sponsor or a filed nonprofit, nobody can pay us.</div></li>
+      <li><span class="n">05</span><div><b>What share of the funded benefit actually goes unused?</b>The number the whole idea rests on. Plans know it and have not had to say it.</div></li>
+    </ol>
+    <div class="block flag"><div class="k">And one from the first version</div><div class="big">Did any buyer ever pull the original product, even locally?</div><p>If not, this stops.</p></div>
+  </div>
+</section>
+
+<footer id="ask">
+  <p class="ask">Tell me what is <b>wrong</b> with this.</p>
+  <ol class="steps">
+    <li><span class="n">01</span><div><b>Thirty minutes of candor.</b>Which of the five unknowns would you answer differently, and why.</div></li>
+    <li><span class="n">02</span><div><b>Three introductions.</b>The people who own readmissions, food benefits, or community funding where you are.</div></li>
+    <li><span class="n">03</span><div><b>Whether you would sit on the board,</b> or who should.</div></li>
+  </ol>
+  <p class="end">No money is being asked for before the January review.<br>Russ Harris, Lanham, Maryland. This page is unlisted; share the address only with people you mean to.</p>
+</footer>
+</body>
+</html>
