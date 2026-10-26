@@ -1,7 +1,29 @@
 {
-  "generated": "2026-08-02T18:00:00Z",
-  "count": 22,
+  "generated": "2026-10-26T19:08:55Z",
+  "count": 23,
   "posts": [
+    {
+      "title": "Field Note: a season of strikeout picks, graded against the market",
+      "slug": "field-strikeout-season-2026",
+      "url": "blog/field-strikeout-season-2026.html",
+      "archetype": "field-note",
+      "date": "2026-10-26",
+      "project": "strikeout",
+      "version": "season / 2026",
+      "tags": [
+        "baseball",
+        "statcast",
+        "lightgbm",
+        "market-lines",
+        "calibration",
+        "evaluation",
+        "github-actions",
+        "clv"
+      ],
+      "summary": "492 picks over 109 game days, every one regraded against Statcast after the season. The posted record is 80 percent. The honest record is 55 percent, and the sportsbook's line forecast strikeouts better than the model did. What the cushion hid, what the operations got right, and the one thing that was never logged.",
+      "word_count": 1394,
+      "read_time_min": 7
+    },
     {
       "title": "Field Note: what 1,000 inputs found in an extraction pipeline",
       "slug": "field-cookspec-eval",
@@ -10,7 +32,14 @@
       "date": "2026-08-02",
       "project": "cookspec",
       "version": "v1 / 2026",
-      "tags": ["evaluation", "llm-as-judge", "validation-gates", "extraction", "measurement", "fdaa"],
+      "tags": [
+        "evaluation",
+        "llm-as-judge",
+        "validation-gates",
+        "extraction",
+        "measurement",
+        "fdaa"
+      ],
       "summary": "One user report became a 2,000-compile evaluation across five channels. It surfaced two bugs in my own metrics before it surfaced any in the product, the worst defect never threw an error, and the fix that mattered was moving a rule out of the prompt into code that can fail.",
       "word_count": 2100,
       "read_time_min": 10
@@ -23,7 +52,16 @@
       "date": "2026-08-02",
       "project": "cookspec",
       "version": "v1 / 2026",
-      "tags": ["extraction", "multimodal", "gemini", "deepseek", "validation-loops", "cloudflare-workers", "supabase", "schema-org"],
+      "tags": [
+        "extraction",
+        "multimodal",
+        "gemini",
+        "deepseek",
+        "validation-loops",
+        "cloudflare-workers",
+        "supabase",
+        "schema-org"
+      ],
       "summary": "A recipe notation from 2004 that solved the format problem and was ignored for twenty years, rebuilt as an extraction pipeline. Any TikTok, Reel, article or photo compiles into one merge table with every unit normalized and checked against a density table.",
       "word_count": 1900,
       "read_time_min": 9
@@ -36,7 +74,16 @@
       "date": "2026-07-02",
       "project": "adoption-chain",
       "version": "v6 / 2026",
-      "tags": ["buy-side", "sec-edgar", "retrieval", "auditability", "deepseek", "provider-agnostic", "cost-economics", "research-tooling"],
+      "tags": [
+        "buy-side",
+        "sec-edgar",
+        "retrieval",
+        "auditability",
+        "deepseek",
+        "provider-agnostic",
+        "cost-economics",
+        "research-tooling"
+      ],
       "summary": "Turns a PM's scenario into a consequence map, finds the under-covered small-cap companies on each consequence, and drafts a one-page thesis per name where every claim links to the exact SEC filing sentence. Leverage underneath judgment, never a recommendation.",
       "word_count": 2300,
       "read_time_min": 12
@@ -49,7 +96,16 @@
       "date": "2026-06-24",
       "project": "strikeout",
       "version": "v1 / 2026",
-      "tags": ["lightgbm", "quantile-regression", "stacking", "calibration", "walk-forward-cv", "baseball", "statcast", "eval"],
+      "tags": [
+        "lightgbm",
+        "quantile-regression",
+        "stacking",
+        "calibration",
+        "walk-forward-cv",
+        "baseball",
+        "statcast",
+        "eval"
+      ],
       "summary": "Three LightGBM quantile regressors produce a median and a 90 percent interval, a Ridge stacker blends them against a dumb baseline, and a stratified blind test on unseen post-All-Star-Break data is the only gate that lets a model ship.",
       "word_count": 2600,
       "read_time_min": 13
@@ -62,7 +118,16 @@
       "date": "2026-06-21",
       "project": "study-quest",
       "version": "v1 / 2026",
-      "tags": ["pwa", "supabase", "rls", "deepseek", "provider-selection", "human-in-the-loop", "integrity", "decision-analysis"],
+      "tags": [
+        "pwa",
+        "supabase",
+        "rls",
+        "deepseek",
+        "provider-selection",
+        "human-in-the-loop",
+        "integrity",
+        "decision-analysis"
+      ],
       "summary": "A gamified, mastery-gated catch-up learning PWA built for my son. Ship for the platform you can deploy from, pick the model on cost, put the integrity boundary in the database, grade only what the model is good at, and make the reward economy a config.",
       "word_count": 2100,
       "read_time_min": 10
@@ -75,7 +140,16 @@
       "date": "2026-06-08",
       "project": "gardencam",
       "version": "v1 / 2026",
-      "tags": ["vibe-coding", "public-data", "traffic-cameras", "nyc-dot", "knicks", "build-in-public", "static-site", "civic-tech"],
+      "tags": [
+        "vibe-coding",
+        "public-data",
+        "traffic-cameras",
+        "nyc-dot",
+        "knicks",
+        "build-in-public",
+        "static-site",
+        "civic-tech"
+      ],
       "summary": "The Knicks are up 2-0 in the Finals and the Game 3 watch party got scattered across three parks. So in one evening I built a way to watch the watch party, using New York's public traffic cameras as a stand-in live feed.",
       "word_count": 430,
       "read_time_min": 3
@@ -88,7 +162,16 @@
       "date": "2026-06-08",
       "project": null,
       "version": null,
-      "tags": ["traffic-cameras", "nyc-dot", "public-data", "haversine", "cors", "javascript", "static-site", "civic-tech"],
+      "tags": [
+        "traffic-cameras",
+        "nyc-dot",
+        "public-data",
+        "haversine",
+        "cors",
+        "javascript",
+        "static-site",
+        "civic-tech"
+      ],
       "summary": "New York DOT puts roughly 957 traffic cameras online as still images with no key and no login. Refresh one on a timer and a still becomes a feed. How I found the right cameras for each location, faked live without the page jumping, and handled the cameras that quietly die.",
       "word_count": 1180,
       "read_time_min": 6
@@ -101,7 +184,17 @@
       "date": "2026-05-19",
       "project": "atlas",
       "version": "POC / 2026",
-      "tags": ["signal-composition", "half-life-decay", "vision-llm", "gemma-3-27b", "street-view", "attom", "real-estate", "public-records", "cost-economics"],
+      "tags": [
+        "signal-composition",
+        "half-life-decay",
+        "vision-llm",
+        "gemma-3-27b",
+        "street-view",
+        "attom",
+        "real-estate",
+        "public-records",
+        "cost-economics"
+      ],
       "summary": "Atlas surfaces off-market real estate leads by composing 19 distinct signal types across 568,135 parcels in Wake and Durham counties, with vision signals scored by Gemma 3 27B and a total POC spend of $54.",
       "word_count": 3250,
       "read_time_min": 15
@@ -114,7 +207,14 @@
       "date": "2026-05-19",
       "project": "odi",
       "version": "v2.0",
-      "tags": ["multi-provider", "orchestration", "decision-analysis", "citation-enforcement", "fdaa", "judgment"],
+      "tags": [
+        "multi-provider",
+        "orchestration",
+        "decision-analysis",
+        "citation-enforcement",
+        "fdaa",
+        "judgment"
+      ],
       "summary": "Five architectural decisions in a multi-pass orchestration system, the alternatives rejected, and what each teaches about FDAA judgment in high-quality-bar long-context generation. The implementation is mine. The reasoning is portable.",
       "word_count": 2400,
       "read_time_min": 11
@@ -127,7 +227,14 @@
       "date": "2026-05-19",
       "project": "mes",
       "version": "Phase 3 / 2026",
-      "tags": ["algorithmic-trading", "decision-analysis", "regime-detection", "anti-lookahead", "fdaa", "judgment"],
+      "tags": [
+        "algorithmic-trading",
+        "decision-analysis",
+        "regime-detection",
+        "anti-lookahead",
+        "fdaa",
+        "judgment"
+      ],
       "summary": "Five architectural decisions in an algorithmic trading system targeting the New York open on Micro E-mini S&P 500 futures. The alternatives rejected, and what each teaches about FDAA judgment in a high-noise low-sample domain.",
       "word_count": 2700,
       "read_time_min": 12
@@ -140,7 +247,16 @@
       "date": "2026-05-19",
       "project": "mosaic",
       "version": "v1 / 2026",
-      "tags": ["python", "lihtc", "corridor-analysis", "public-data", "automation", "mosaic", "fdaa", "cost-economics"],
+      "tags": [
+        "python",
+        "lihtc",
+        "corridor-analysis",
+        "public-data",
+        "automation",
+        "mosaic",
+        "fdaa",
+        "cost-economics"
+      ],
       "summary": "A 15-script Python pipeline that fuses Census ACS, HUD QCT, IRS OZ, USDA Food Atlas, state DDD, and land bank inventory data on a parcel key, scores against the state QAP, and produces an LP-memo-ready output.",
       "word_count": 2500,
       "read_time_min": 12
@@ -153,7 +269,15 @@
       "date": "2026-05-19",
       "project": "trialedge",
       "version": "v1.6",
-      "tags": ["calibration", "lightgbm", "biotech", "cloudflare", "ml-architecture", "eval", "cost-economics"],
+      "tags": [
+        "calibration",
+        "lightgbm",
+        "biotech",
+        "cloudflare",
+        "ml-architecture",
+        "eval",
+        "cost-economics"
+      ],
       "summary": "TrialEdge predicts FDA PDUFA catalyst outcomes. 4,032 tracked entities, 208 labeled outcomes, AUC 0.686 on the held-out set. The architecture is intentionally small, intentionally calibrated, and intentionally cheap.",
       "word_count": 3250,
       "read_time_min": 15
@@ -166,7 +290,14 @@
       "date": "2026-05-19",
       "project": "cre",
       "version": "Prompt Suite",
-      "tags": ["cre", "underwriting", "prompt-engineering", "claude", "mosaic", "eat-your-own-dog-food"],
+      "tags": [
+        "cre",
+        "underwriting",
+        "prompt-engineering",
+        "claude",
+        "mosaic",
+        "eat-your-own-dog-food"
+      ],
       "summary": "The Mosaic feasibility workflow is a Claude prompt suite that produces bank-quality CRE feasibility studies in 90 minutes instead of 30 hours.",
       "word_count": 2500,
       "read_time_min": 11
@@ -179,7 +310,14 @@
       "date": "2026-05-19",
       "project": "decktrainer",
       "version": "Phase 1 / 2026",
-      "tags": ["hardware", "midi", "python", "drill-engine", "coaching-tool", "scope-discipline"],
+      "tags": [
+        "hardware",
+        "midi",
+        "python",
+        "drill-engine",
+        "coaching-tool",
+        "scope-discipline"
+      ],
       "summary": "DeckTrainer is a learn-to-DJ coaching tool for the Hercules DJControl Starlight and Mix. Scope discipline, hardware-constraint surfacing, phased build plan.",
       "word_count": 2400,
       "read_time_min": 11
@@ -192,7 +330,15 @@
       "date": "2026-05-19",
       "project": null,
       "version": null,
-      "tags": ["lihtc", "cre", "affordable-housing", "mosaic", "public-data", "ai-architecture", "fdaa"],
+      "tags": [
+        "lihtc",
+        "cre",
+        "affordable-housing",
+        "mosaic",
+        "public-data",
+        "ai-architecture",
+        "fdaa"
+      ],
       "summary": "Five public-records distress designations on a single parcel. The Mosaic framework to stack them, and the AI architecture that compresses three weeks of research to three hours.",
       "word_count": 1600,
       "read_time_min": 7
@@ -205,7 +351,15 @@
       "date": "2026-05-19",
       "project": null,
       "version": null,
-      "tags": ["hospitality", "debt-sizing", "lender-matching", "cre", "constraint-satisfaction", "ai-architecture", "fdaa"],
+      "tags": [
+        "hospitality",
+        "debt-sizing",
+        "lender-matching",
+        "cre",
+        "constraint-satisfaction",
+        "ai-architecture",
+        "fdaa"
+      ],
       "summary": "Hospitality debt sourcing as constraint satisfaction followed by ranking. The architecture that compresses a week of broker research into thirty minutes.",
       "word_count": 1500,
       "read_time_min": 7
@@ -218,7 +372,15 @@
       "date": "2026-05-19",
       "project": null,
       "version": null,
-      "tags": ["hospitality", "noi-projection", "appraisal", "sponsor-bias", "underwriting", "ai-architecture", "fdaa"],
+      "tags": [
+        "hospitality",
+        "noi-projection",
+        "appraisal",
+        "sponsor-bias",
+        "underwriting",
+        "ai-architecture",
+        "fdaa"
+      ],
       "summary": "A coastal hospitality asset has an appraisal-stabilized NOI and a sponsor pro forma that differ by 17 percent. The gap decomposes into four components.",
       "word_count": 1500,
       "read_time_min": 7
@@ -231,7 +393,14 @@
       "date": "2026-05-19",
       "project": null,
       "version": null,
-      "tags": ["brokerage", "cre", "offering-memo", "signal-vs-spin", "ai-underwriting", "fdaa"],
+      "tags": [
+        "brokerage",
+        "cre",
+        "offering-memo",
+        "signal-vs-spin",
+        "ai-underwriting",
+        "fdaa"
+      ],
       "summary": "A brokerage marketing flyer is the highest-volume unstructured document in CRE. Four lines actually matter. The AI-architected workflow that closes the gap.",
       "word_count": 1500,
       "read_time_min": 7
@@ -244,7 +413,15 @@
       "date": "2026-05-19",
       "project": null,
       "version": null,
-      "tags": ["emerging-sponsor", "capital-stack", "institutional-capital", "cre", "sponsor-narrative", "ai-architecture", "fdaa"],
+      "tags": [
+        "emerging-sponsor",
+        "capital-stack",
+        "institutional-capital",
+        "cre",
+        "sponsor-narrative",
+        "ai-architecture",
+        "fdaa"
+      ],
       "summary": "An emerging sponsor faces a structural problem in the capital stack: senior debt is reachable, LP equity is the wall. The four packaging patterns institutional LPs evaluate against.",
       "word_count": 1500,
       "read_time_min": 7
@@ -257,7 +434,14 @@
       "date": "2026-05-20",
       "project": null,
       "version": null,
-      "tags": ["obsidian", "claude-code", "workflow", "project-tracking", "ai-architecture", "fdaa"],
+      "tags": [
+        "obsidian",
+        "claude-code",
+        "workflow",
+        "project-tracking",
+        "ai-architecture",
+        "fdaa"
+      ],
       "summary": "Obsidian as the human-facing planning layer, Claude Code as the execution layer, both reading the same file system. Conventions, failure modes, what changes at team scale.",
       "word_count": 1700,
       "read_time_min": 8
@@ -270,7 +454,15 @@
       "date": "2026-05-20",
       "project": null,
       "version": null,
-      "tags": ["discord", "claude-code", "webhooks", "alerts", "ambient-notification", "ai-architecture", "fdaa"],
+      "tags": [
+        "discord",
+        "claude-code",
+        "webhooks",
+        "alerts",
+        "ambient-notification",
+        "ai-architecture",
+        "fdaa"
+      ],
       "summary": "Discord webhooks for AI alerts: ship notifications, build failures, long-task completions, daily summaries. Hook architecture and channel layout.",
       "word_count": 1500,
       "read_time_min": 7
@@ -283,7 +475,14 @@
       "date": "2026-05-20",
       "project": null,
       "version": null,
-      "tags": ["perplexity", "deep-research", "decision-trees", "synthesis", "ai-architecture", "fdaa"],
+      "tags": [
+        "perplexity",
+        "deep-research",
+        "decision-trees",
+        "synthesis",
+        "ai-architecture",
+        "fdaa"
+      ],
       "summary": "Map the decision as a tree of binary or trinary branches, write a per-node Perplexity prompt, let the model synthesize, then come back to the node and decide.",
       "word_count": 1800,
       "read_time_min": 8
