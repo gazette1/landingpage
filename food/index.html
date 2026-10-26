@@ -100,8 +100,9 @@ th,td{text-align:left;vertical-align:top;padding:var(--space-3) var(--space-4) v
 th{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);border-top:1px solid var(--rule)}
 tr:last-child td{border-bottom:1px solid var(--hairline)}
 td:first-child{font-weight:500}
-.scroll{overflow-x:auto}
-.scroll table{min-width:640px}
+.scroll{overflow-x:auto;max-width:100%;min-width:0}
+.scroll table.wide{min-width:640px}
+.two>*,.row>*,.col,.block{min-width:0}
 
 footer{padding:var(--space-10) var(--page-margin) var(--space-9);border-top:1px solid var(--hairline);min-height:40vh}
 footer .ask{font-family:var(--font-display);font-weight:200;font-size:clamp(40px,7vw,120px);line-height:.9;letter-spacing:-.04em;max-width:14ch}
@@ -176,7 +177,7 @@ footer .end{margin-top:var(--space-9);font-size:12px;line-height:1.7;color:var(-
 
 <section class="section" id="pays">
   <div class="opener right"><span class="label">06 / Who pays</span><h2 class="h">Four funders, each losing money when a benefit goes unused</h2></div>
-  <div class="scroll pad-b"><table>
+  <div class="scroll pad-b"><table class="wide">
     <thead><tr><th>Funder</th><th>Why they would</th><th>How we are paid</th><th>Proven when</th></tr></thead>
     <tbody>
       <tr><td>Hospitals</td><td>Patients come back when they cannot get the right food</td><td>A six-month program, then an annual contract or a community-benefit grant</td><td>A director names the route and a price</td></tr>
@@ -188,7 +189,7 @@ footer .end{margin-top:var(--space-9);font-size:12px;line-height:1.7;color:var(-
 
 <section class="section" id="money">
   <div class="opener"><span class="label">07 / Follow the money for one person</span><h2 class="h">We are paid for the work, never for the food</h2><p class="lede">A 74-year-old on a Medicare Advantage plan goes home after a heart failure stay. Her plan already pays for a food benefit she has never used. Every return visit costs the hospital.</p></div>
-  <div class="scroll"><table>
+  <div class="scroll"><table class="wide">
     <thead><tr><th>Who pays us</th><th>What they are paying for</th><th>What we get</th></tr></thead>
     <tbody>
       <tr><td>The hospital</td><td>Fewer readmissions. It refers 75 patients and funds a six-month program.</td><td>$40,000 per program, about $530 a patient</td></tr>
