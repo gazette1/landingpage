@@ -1,0 +1,2496 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Leakage Desk</title>
+<meta name="description" content="A revenue reconciliation agent with evals and a release gate: signed contracts, CRM, usage, and billing for 30 synthetic accounts. Demo on synthetic data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f5f6f7; --surface:#ffffff; --surface-2:#f9fafb; --border:#e3e5e8; --border-strong:#cfd3d8;
+  --fg:#16181b; --fg-2:#4d535b; --fg-3:#80868f; --accent:#16181b; --accent-fg:#ffffff;
+  --brand:#c2410c; --brand-soft:#fdeee6; --good:#15803d; --good-soft:#e7f6ec; --warn:#a16207; --warn-soft:#fbf3dc;
+  --bad:#b91c1c; --bad-soft:#fde8e8; --info:#1d4f8a; --info-soft:#e9f2fb; --hover:rgba(0,0,0,.04); --active:rgba(0,0,0,.06);
+  --shadow-card:0 1px 2px rgba(20,20,18,.04); --on-brand:#ffffff;
+  --sans:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r-sm:4px; --r-md:6px; --r-lg:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111315; --surface:#181b1e; --surface-2:#1e2125; --border:#2b2f34; --border-strong:#3a3f45;
+  --fg:#e9ebee; --fg-2:#b3b8bf; --fg-3:#858b93; --accent:#e9ebee; --accent-fg:#111315;
+  --brand:#fb8a4f; --brand-soft:#3a2214; --good:#5fca83; --good-soft:#15291d; --warn:#e8b94e; --warn-soft:#33290f;
+  --bad:#f08080; --bad-soft:#371818; --info:#8fbcf0; --info-soft:#16253a; --hover:rgba(255,255,255,.05); --active:rgba(255,255,255,.08);
+  --shadow-card:0 1px 2px rgba(0,0,0,.3); --on-brand:#111315; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111315; --surface:#181b1e; --surface-2:#1e2125; --border:#2b2f34; --border-strong:#3a3f45;
+  --fg:#e9ebee; --fg-2:#b3b8bf; --fg-3:#858b93; --accent:#e9ebee; --accent-fg:#111315;
+  --brand:#fb8a4f; --brand-soft:#3a2214; --good:#5fca83; --good-soft:#15291d; --warn:#e8b94e; --warn-soft:#33290f;
+  --bad:#f08080; --bad-soft:#371818; --info:#8fbcf0; --info-soft:#16253a; --hover:rgba(255,255,255,.05); --active:rgba(255,255,255,.08);
+  --shadow-card:0 1px 2px rgba(0,0,0,.3); --on-brand:#111315; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:clip}
+a{color:var(--brand);text-decoration:none} a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid color-mix(in srgb,var(--brand) 50%,transparent);outline-offset:1px}
+.app{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column}
+.brandblk{display:flex;gap:10px;align-items:center;padding:16px;border-bottom:1px solid var(--border)}
+.logo{height:28px;width:28px;border-radius:var(--r-sm);background:var(--brand);color:var(--on-brand);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;font-family:var(--mono)}
+.brandblk .t{font-size:14px;font-weight:600} .brandblk .s{font-size:12px;color:var(--fg-3)}
+.nav{display:flex;flex-direction:column;gap:2px;padding:12px 8px;flex:1}
+.nav a{display:flex;align-items:center;gap:10px;border-radius:var(--r-md);padding:6px 10px;font-size:14px;color:var(--fg-2)}
+.nav a:hover{background:var(--hover);color:var(--fg);text-decoration:none}
+.nav .cnt{margin-left:auto}
+.side-foot{border-top:1px solid var(--border);padding:12px;font-size:12px;color:var(--fg-3)}
+.main{min-width:0;padding-inline:clamp(16px,3vw,32px);padding-block:24px 64px;display:grid;gap:16px;align-content:start;max-width:1280px}
+.pagehead{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between}
+.crumbs{font-size:13px;color:var(--fg-3);margin-bottom:4px}
+h1{font-size:24px;font-weight:600;letter-spacing:-.01em;margin:0;line-height:1.25}
+.desc{font-size:15px;color:var(--fg-2);margin:6px 0 0;max-width:76ch}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.card{border:1px solid var(--border);background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--shadow-card);min-width:0}
+.card[id]{scroll-margin-top:16px}
+.card-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.card-h h2{font-size:16px;font-weight:600;margin:0;line-height:22px}
+.card-h p{font-size:14px;color:var(--fg-3);margin:2px 0 0;max-width:80ch}
+.card-b{padding:14px 16px;display:grid;gap:12px;min-width:0}
+.card-b>*,.fnd>*{min-width:0}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{padding:12px 16px;display:grid;gap:4px}
+.kpi .l{font-size:13px;color:var(--fg-3);font-weight:500}
+.kpi .v{font-size:20px;font-weight:600;font-family:var(--mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.kpi .sub{font-size:12px;color:var(--fg-3)}
+.kpi.hl{border-color:color-mix(in srgb,var(--brand) 45%,var(--border))} .kpi.hl .v{color:var(--brand)}
+.srcs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+@media (max-width:900px){.srcs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.srcs>div{padding:12px 16px;border-right:1px solid var(--border);display:grid;gap:2px}
+.srcs>div:last-child{border-right:0}
+.srcs .n{font-size:13px;font-weight:600} .srcs .d{font-size:13px;color:var(--fg-2)}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:500;line-height:16px;white-space:nowrap}
+.t-neutral{background:var(--active);color:var(--fg-2)} .t-brand{background:var(--brand-soft);color:var(--brand)} .t-good{background:var(--good-soft);color:var(--good)}
+.t-warn{background:var(--warn-soft);color:var(--warn)} .t-bad{background:var(--bad-soft);color:var(--bad)} .t-info{background:var(--info-soft);color:var(--info)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;border-radius:var(--r-md);font:inherit;font-size:14px;font-weight:500;height:34px;padding:0 12px;cursor:pointer;border:1px solid transparent}
+.btn-primary{background:var(--brand);color:var(--on-brand)} .btn-primary:hover{opacity:.9}
+.btn-outline{border-color:var(--border);background:var(--surface);color:var(--fg)} .btn-outline:hover{background:var(--surface-2)}
+.btn-sm{height:30px;padding:0 10px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.field{display:grid;gap:4px;min-width:0}
+.lbl{font-size:13px;font-weight:500;color:var(--fg-2)}
+.hint{font-size:13px;color:var(--fg-3)}
+.inp{display:flex;height:34px;width:100%;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface);padding:0 10px;font:inherit;font-size:14px;color:var(--fg)}
+.inp:focus-visible{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 22%,transparent)}
+select.inp{appearance:none;padding-right:28px;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%2380868f" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>');background-repeat:no-repeat;background-position:right 8px center}
+textarea.inp{height:auto;min-height:96px;padding:8px 10px;line-height:1.55;resize:vertical}
+.tw{overflow-x:auto;min-width:0}
+table.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl thead th{background:var(--surface-2);font-size:12px;color:var(--fg-3);font-weight:500;text-align:right;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl thead th.l{text-align:left}
+.tbl td{padding:7px 10px;border-bottom:1px solid color-mix(in srgb,var(--border) 70%,transparent);vertical-align:top}
+.tbl td.r{text-align:right;font-family:var(--mono);font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--fg-2)}
+.tbl td .sm{display:block;font-size:12px;color:var(--fg-3)}
+.tbl tr.hit td:first-child{box-shadow:inset 3px 0 0 var(--brand)}
+.tbl tfoot td{font-weight:600;background:var(--surface-2)}
+.pos{color:var(--brand)!important} .neg{color:var(--info)!important}
+.fnd{border-top:1px solid var(--border);padding:16px;display:grid;gap:10px;min-width:0}
+.fnd:first-child{border-top:0}
+.fnd .top{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.fnd .nm{font-size:15px;font-weight:600}
+.fnd .amt{margin-left:auto;font-family:var(--mono);font-weight:600;font-size:15px}
+.src{font-size:12px;color:var(--fg-3)}
+.ids{display:flex;flex-wrap:wrap;gap:4px}
+.ids code,.gate code{font-family:var(--mono);font-size:12px;border-radius:var(--r-sm);padding:1px 5px;background:var(--active);color:var(--fg-2)}
+.gate{font-size:13px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.gate code.x{background:var(--bad-soft);color:var(--bad)}
+.disp{display:grid;grid-template-columns:260px minmax(0,1fr);gap:8px;align-items:center}
+@media (max-width:700px){.disp{grid-template-columns:minmax(0,1fr)}}
+.banner{display:flex;gap:10px;align-items:flex-start;border-radius:var(--r-md);padding:10px 14px;font-size:14px;border:1px solid}
+.banner.warn{background:var(--warn-soft);color:var(--warn);border-color:color-mix(in srgb,var(--warn) 25%,transparent)}
+.banner.bad{background:var(--bad-soft);color:var(--bad);border-color:color-mix(in srgb,var(--bad) 25%,transparent)}
+.banner.good{background:var(--good-soft);color:var(--good);border-color:color-mix(in srgb,var(--good) 25%,transparent)}
+.banner.info{background:var(--info-soft);color:var(--info);border-color:color-mix(in srgb,var(--info) 25%,transparent)}
+.banner b{font-weight:600}
+pre.log{font-family:var(--mono);font-size:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:10px;max-height:220px;overflow:auto;margin:0;white-space:pre-wrap;word-break:break-word;color:var(--fg-2)}
+.checks{display:grid;gap:8px}
+.chk{display:grid;grid-template-columns:52px minmax(0,1fr);gap:8px;font-size:14px}
+.chk .tag{font-family:var(--mono);font-size:12px;font-weight:600;padding-top:2px}
+.chk .dt{grid-column:2;font-family:var(--mono);font-size:12px;color:var(--fg-3);display:grid;gap:2px;overflow-wrap:anywhere}
+.ok{color:var(--good)} .no{color:var(--bad)}
+.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:700px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.summary div{border:1px solid var(--border);border-radius:var(--r-md);padding:8px 10px;display:grid;gap:2px}
+.summary .l{font-size:12px;color:var(--fg-3)} .summary .v{font-family:var(--mono);font-weight:600;font-size:15px}
+.prose{font-size:15px;color:var(--fg-2);display:grid;gap:10px;max-width:78ch}
+.prose p{margin:0} .prose b{color:var(--fg)}
+.foot{font-size:13px;color:var(--fg-3);max-width:90ch}
+@media (max-width:1024px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .sidebar{position:sticky;top:0;height:auto;z-index:5;flex-direction:row;align-items:center;border-right:0;border-bottom:1px solid var(--border);min-width:0}
+  .brandblk{border-bottom:0;padding:10px 12px} .brandblk .s{display:none}
+  .nav{flex-direction:row;overflow-x:auto;padding:8px;flex:1;min-width:0} .nav a{white-space:nowrap}
+  .side-foot{display:none} .card[id]{scroll-margin-top:64px}
+}
+@media (max-width:480px){.brandblk .t{display:none} .kpi .v{font-size:17px} h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brandblk"><div class="logo">LD</div><div><div class="t">Leakage Desk</div><div class="s">Q3 2026 reconciliation</div></div></div>
+    <nav class="nav" aria-label="Sections">
+      <a href="#overview">Overview</a>
+      <a href="#accounts">Accounts</a>
+      <a href="#findings">Findings <span class="cnt badge t-brand" id="navF">0</span></a>
+      <a href="#review">Review</a>
+      <a href="#evals">Evals <span class="cnt badge" id="navE"></span></a>
+      <a href="#about">How it works</a>
+    </nav>
+    <div class="side-foot">Demo on synthetic data. Built by Russell Harris.</div>
+  </aside>
+
+  <main class="main">
+    <div class="pagehead" id="overview">
+      <div>
+        <div class="crumbs">Finance operations / Revenue reconciliation</div>
+        <h1>Q3 2026: what signed contracts say vs. what billing sent</h1>
+        <p class="desc">Thirty accounts, four sources: the CRM export, the contracts folder (master agreements and order forms), the usage export, and the billing export. Code reconciles every invoice line against signed terms and explains each gap. An AI model drafts the note; a gate checks it; a person decides. The evals at the bottom decide whether a code change can ship.</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-outline btn-sm" id="resetBtn" type="button">Reset decisions</button>
+        <button class="btn btn-outline btn-sm" id="themeBtn" type="button" aria-label="Toggle dark mode">Theme</button>
+      </div>
+    </div>
+
+    <div class="banner info"><span><b>Synthetic data.</b> Sample Co, its 30 customers, contracts, order forms, usage, and invoices are invented for this demo. Nine billing errors and six decoys were planted on purpose; the answer key is in the Evals section.</span></div>
+
+    <section class="kpis" aria-label="Quarter totals">
+      <div class="card kpi"><span class="l">Billed in Q3</span><span class="v" id="kBilled"></span><span class="sub">90 invoices</span></div>
+      <div class="card kpi"><span class="l">Signed terms say</span><span class="v" id="kExp"></span><span class="sub" id="kExpS"></span></div>
+      <div class="card kpi hl"><span class="l">Under-billed</span><span class="v" id="kUnder"></span><span class="sub" id="kUnderS"></span></div>
+      <div class="card kpi"><span class="l">Over-billed (owed to customers)</span><span class="v" id="kOver"></span><span class="sub" id="kOverS"></span></div>
+    </section>
+
+    <section class="card" aria-label="Sources">
+      <div class="srcs" id="srcs"></div>
+    </section>
+
+    <section class="card" id="accounts">
+      <div class="card-h"><div><h2>Accounts</h2><p>Expected is computed in code from signed terms only: seats and price from the master agreement, the uplift from its anniversary month, signed order forms, and monthly usage over the allowance. Highlighted rows have a finding.</p></div></div>
+      <div class="tw"><table class="tbl" id="acctTbl"><thead><tr>
+        <th class="l">Account</th><th>Billed</th><th>Signed terms</th><th>Difference</th><th class="l">Finding</th>
+      </tr></thead><tbody></tbody><tfoot></tfoot></table></div>
+    </section>
+
+    <section class="card" id="findings">
+      <div class="card-h">
+        <div><h2>Findings and notes</h2><p>Code finds and explains each gap. The notes were drafted by an AI model; every dollar amount, percentage, count, and document ID in a note must be a fact of that finding, and the note must state the amount and cite a document. Edit a note and the gate checks it again.</p></div>
+        <button class="btn btn-outline btn-sm" id="tryGate" type="button">Try the gate</button>
+      </div>
+      <div id="fList"></div>
+    </section>
+
+    <section class="card" id="review">
+      <div class="card-h"><div><h2>Review</h2><p>Every finding needs a decision and every note must pass the gate before the batch goes to billing. Nothing is invoiced or credited from this page.</p></div></div>
+      <div class="card-b">
+        <div class="summary" id="sumBox"></div>
+        <div class="banner warn" id="revReq" hidden></div>
+        <div class="disp">
+          <div class="field"><label class="lbl" for="reviewer">Reviewer</label><input class="inp" id="reviewer" placeholder="Name"></div>
+          <div class="actions" style="align-self:end"><button class="btn btn-primary" id="sendBtn" type="button">Send batch to billing</button></div>
+        </div>
+        <div><div class="lbl" style="margin-bottom:6px">Audit log</div><pre class="log" id="log"></pre></div>
+      </div>
+    </section>
+
+    <section class="card" id="evals">
+      <div class="card-h"><div><h2>Evals and release gate</h2><p>The same checks run here on every load and in Node before every publish. Pick a simulated code change to see whether the evals would let it ship.</p></div></div>
+      <div class="card-b">
+        <div class="disp">
+          <div class="field"><label class="lbl" for="regSel">Code version</label><select class="inp" id="regSel"></select></div>
+          <div class="hint" id="regDetail"></div>
+        </div>
+        <div class="banner" id="relBanner"></div>
+        <div class="checks" id="checkList"></div>
+        <div>
+          <div class="lbl" style="margin-bottom:6px">Answer key: planted errors and decoys</div>
+          <div class="tw"><table class="tbl" id="keyTbl"><thead><tr><th class="l">Account</th><th class="l">Planted</th><th>Key amount</th><th>Engine</th><th class="l">Result</th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="about">
+      <div class="card-h"><div><h2>How it works</h2></div></div>
+      <div class="card-b prose">
+        <p><b>The workflow.</b> A billing analyst runs the quarter. Code computes what each invoice line should have been from signed terms only, compares it with what billing sent, and tests each gap against known causes: an uplift that never reached billing, overage not charged at the contract rate, a change billed without a signed order form, a signed change billing never applied. Anything it cannot explain goes to a person as unexplained. An AI model drafts a note for each finding, a gate checks the note, and a reviewer decides each one before the batch goes to billing.</p>
+        <p><b>What the model is allowed to do.</b> Write. It never computes a number and never decides. The notes were drafted once by <span id="modelName"></span> and are re-checked by the gate on every load. A note may not promise a refund or credit, claim the customer agreed, accuse anyone, or tell billing to contact the customer.</p>
+        <p><b>Why the evals look like this.</b> A reconciler fails in two directions: it misses money, or it raises alarms on accounts billed correctly, which costs reviewer trust. So the answer key has nine planted errors and six decoys (accounts that look unusual but are right), every figure is recomputed by a separate Python implementation, the gate has its own tests with known answers, and three simulated regressions prove the checks catch plausible bugs: an off-by-one on the uplift month, overage netted across the quarter, and trusting the CRM over the contracts folder.</p>
+        <p><b>How it was built.</b> With Claude Code, in one session: the engine, the Python cross-check, the note generator, and <code>check.mjs</code>, which runs these checks in Node and exits non-zero on any failure. The build script will not write the published copy unless that gate passes, so the page you are reading passed it.</p>
+        <p><b>Not real data.</b> The company, customers, contracts, usage, and invoices are synthetic. Not affiliated with any software vendor, consultancy, or customer.</p>
+      </div>
+    </section>
+
+    <p class="foot">Leakage Desk, a demo by Russell Harris (<a href="https://russh.work">russh.work</a>). October 2026.</p>
+  </main>
+</div>
+
+<script>/* Leakage Desk engine. Pure functions, no DOM. Runs in the browser and in Node
+   (the note generator and check.mjs import this same file), so the page, the
+   AI drafts, the gate, and the evals all see identical numbers.
+
+   Spec (golden.py implements it separately from this text, not from this code):
+     What a month should bill comes only from signed terms:
+       seats  = contract seats + seat changes on SIGNED order forms in effect
+       price  = base price per seat; times (1 + uplift) from the anniversary
+                month on, if the contract has an uplift; then times (1 - d) for
+                each SIGNED discount order form in effect. Each step rounds to
+                the cent, half up.
+       subscription = seats x price
+       overage      = max(0, usage - allowance) x overage rate, per month
+     A month's variance = expected - billed, per line (positive: under-billed).
+     A subscription variance is explained by the first hypothesis that
+     reproduces the billed amount exactly:
+       uplift_not_billed    billed = expected without the uplift
+       unsigned_amendment   billed = expected with an unsigned order form applied
+       overbilled           billed = expected without a signed order form
+                            (a signed change billing never applied)
+       otherwise            unexplained (goes to a person)
+     An overage variance above zero is overage_not_billed; below zero, overbilled.
+   Findings are grouped by account and type. All money is integer cents. */
+(function (root) {
+  "use strict";
+
+  const TYPES = {
+    uplift_not_billed: { label: "Contract uplift not billed", side: "under", action: "bill" },
+    overage_not_billed: { label: "Usage overage not billed", side: "under", action: "bill" },
+    unsigned_amendment: { label: "Billing change without a signed order form", side: "under", action: "hold" },
+    overbilled: { label: "Customer over-billed", side: "over", action: "credit" },
+    amendment_not_billed: { label: "Signed change not billed", side: "under", action: "bill" },
+    unexplained: { label: "Unexplained variance", side: "either", action: "review" },
+  };
+
+  // Simulated code changes for the release gate. Each is a plausible bug a
+  // reviewer could miss in a diff; the evals have to catch them.
+  const REGRESSIONS = {
+    none: { label: "Current code", detail: "The engine as published." },
+    upliftLag: { label: "Uplift starts a month late", detail: "An off-by-one: the uplift applies from the month after the anniversary." },
+    poolOverage: { label: "Overage pooled over the quarter", detail: "Usage is netted across the quarter instead of billed month by month, as the contract says." },
+    trustCrm: { label: "CRM amendments treated as signed", detail: "The reconciler trusts the CRM instead of checking the contracts folder for a signed order form." },
+  };
+
+  const halfUp = (num, den) => Math.floor((2 * num + den) / (2 * den));
+
+  function signedAmends(acct, opts) {
+    return acct.crm.amendments.filter((a) => opts.trustCrm || acct.orderForms[a.id].signed);
+  }
+
+  function upliftOn(c, month, opts) {
+    const m = Number(month.slice(-2));
+    return c.upliftBp > 0 && (opts.upliftLag ? m > c.anniversaryMonth : m >= c.anniversaryMonth);
+  }
+
+  function priceAt(c, amends, month, opts, withUplift = true) {
+    let p = c.basePriceCents;
+    if (withUplift && upliftOn(c, month, opts)) p = halfUp(p * (10000 + c.upliftBp), 10000);
+    for (const a of amends) if (a.effective <= month && a.discountBp) p = halfUp(p * (10000 - a.discountBp), 10000);
+    return p;
+  }
+  function seatsAt(c, amends, month) {
+    let s = c.seats;
+    for (const a of amends) if (a.effective <= month && a.seatChange) s += a.seatChange;
+    return s;
+  }
+  function subAt(c, amends, month, opts, withUplift = true) {
+    return seatsAt(c, amends, month) * priceAt(c, amends, month, opts, withUplift);
+  }
+
+  function reconcileAccount(acct, months, opts = {}) {
+    const c = acct.contract, signed = signedAmends(acct, opts);
+    const unsigned = acct.crm.amendments.filter((a) => !signed.includes(a));
+    const rows = [];
+    for (const m of months) {
+      const inv = acct.invoices.find((i) => i.month === m);
+      const expSub = subAt(c, signed, m, opts);
+      const overUnits = Math.max(0, acct.usage[m] - c.allowanceUnits);
+      const expOver = overUnits * c.overageRateCents;
+      rows.push({ month: m, invoice: inv.id, seats: seatsAt(c, signed, m), price: priceAt(c, signed, m, opts),
+                  expSub, billedSub: inv.subscriptionCents, overUnits, expOver, billedOver: inv.overageCents });
+    }
+    if (opts.poolOverage) {
+      // The regression: net usage across the quarter, then spread the charge
+      // over the months that billed overage (or the last month if none did).
+      const units = Math.max(0, months.reduce((s, m) => s + acct.usage[m], 0) - c.allowanceUnits * months.length);
+      const total = units * c.overageRateCents;
+      for (const r of rows) { r.expOver = 0; r.overUnits = 0; }
+      const target = rows.filter((r) => r.billedOver > 0);
+      const t = target.length ? target : [rows[rows.length - 1]];
+      let left = total;
+      t.forEach((r, i) => { const share = i === t.length - 1 ? left : Math.round(total / t.length); r.expOver = share; left -= share; });
+    }
+
+    const parts = [];
+    for (const r of rows) {
+      const dSub = r.expSub - r.billedSub;
+      if (dSub !== 0) {
+        let type = "unexplained", evidence = [];
+        if (upliftOn(c, r.month, opts) && r.billedSub === subAt(c, signed, r.month, opts, false)) {
+          type = "uplift_not_billed"; evidence = [c.id];
+        } else {
+          const u = unsigned.find((a) => a.effective <= r.month && r.billedSub === subAt(c, signed.concat([a]), r.month, opts));
+          if (u) { type = "unsigned_amendment"; evidence = [u.id]; }
+          else {
+            const s = signed.find((a) => a.effective <= r.month && r.billedSub === subAt(c, signed.filter((x) => x !== a), r.month, opts));
+            if (s) { type = dSub < 0 ? "overbilled" : "amendment_not_billed"; evidence = [s.id]; }
+          }
+        }
+        parts.push({ type, month: r.month, line: "subscription", expected: r.expSub, billed: r.billedSub, diff: dSub, evidence, invoice: r.invoice, row: r });
+      }
+      const dOver = r.expOver - r.billedOver;
+      if (dOver !== 0) parts.push({ type: dOver > 0 ? "overage_not_billed" : "overbilled", month: r.month, line: "overage",
+                                     expected: r.expOver, billed: r.billedOver, diff: dOver, evidence: [c.id], invoice: r.invoice, row: r });
+    }
+
+    const groups = {};
+    for (const p of parts) {
+      const k = acct.id + ":" + p.type;
+      const g = groups[k] || (groups[k] = { id: k, account: acct.id, name: acct.name, owner: acct.crm.owner, type: p.type,
+                                            months: [], amountCents: 0, evidence: [], parts: [] });
+      g.months.push(p.month); g.amountCents += p.diff; g.parts.push(p);
+      for (const e of p.evidence.concat([p.invoice])) if (!g.evidence.includes(e)) g.evidence.push(e);
+    }
+    const findings = Object.values(groups);
+    for (const f of findings) f.facts = factsFor(f, acct);
+    const expected = rows.reduce((s, r) => s + r.expSub + r.expOver, 0);
+    const billed = rows.reduce((s, r) => s + r.billedSub + r.billedOver, 0);
+    return { account: acct, rows, findings, expected, billed };
+  }
+
+  // The figures a note about this finding may use. The gate allows these and
+  // nothing else.
+  function factsFor(f, acct) {
+    const c = acct.contract;
+    const F = { amountCents: Math.abs(f.amountCents), monthCount: f.months.length,
+                monthly: f.parts.map((p) => ({ month: p.month, expected: p.expected, billed: p.billed, diff: p.diff })) };
+    if (f.type === "uplift_not_billed") {
+      F.upliftPct = c.upliftBp / 100; F.seats = c.seats; F.basePriceCents = c.basePriceCents;
+      F.upliftedPriceCents = halfUp(c.basePriceCents * (10000 + c.upliftBp), 10000); F.anniversaryMonth = c.anniversaryMonth;
+    }
+    if (f.type === "overage_not_billed" || (f.type === "overbilled" && f.parts[0].line === "overage")) {
+      F.allowanceUnits = c.allowanceUnits; F.rateCents = c.overageRateCents;
+      F.usage = f.parts.map((p) => acct.usage[p.month]); F.overUnits = f.parts.map((p) => p.row.overUnits);
+    }
+    if (f.type === "unsigned_amendment" || f.type === "overbilled" || f.type === "amendment_not_billed") {
+      const of = acct.crm.amendments.find((a) => f.evidence.includes(a.id));
+      if (of) {
+        F.orderForm = of.id; F.effective = of.effective; F.signed = acct.orderForms[of.id].signed;
+        if (of.discountBp) F.discountPct = of.discountBp / 100;
+        if (of.seatChange) F.seatChange = Math.abs(of.seatChange);
+        F.seats = c.seats; F.basePriceCents = c.basePriceCents;
+      }
+    }
+    return F;
+  }
+
+  function reconcile(data, opts = {}) {
+    const accounts = data.accounts.map((a) => reconcileAccount(a, data.months, opts));
+    const findings = accounts.flatMap((a) => a.findings);
+    const sum = (fn) => accounts.reduce((s, a) => s + fn(a), 0);
+    const under = findings.filter((f) => f.amountCents > 0).reduce((s, f) => s + f.amountCents, 0);
+    const over = findings.filter((f) => f.amountCents < 0).reduce((s, f) => s - f.amountCents, 0);
+    return { accounts, findings, totals: { billed: sum((a) => a.billed), expected: sum((a) => a.expected), under, over } };
+  }
+
+  // ---- evals: findings against the planted answer key ----
+  function evaluate(res, key) {
+    const byId = Object.fromEntries(res.findings.map((f) => [f.account + ":" + f.type, f]));
+    const issues = key.issues.map((k) => {
+      const f = byId[k.account + ":" + k.type];
+      return { ...k, found: !!f, amountMatch: !!f && f.amountCents === k.amountCents, gotCents: f ? f.amountCents : null };
+    });
+    const planted = new Set(key.issues.map((k) => k.account + ":" + k.type));
+    const falsePos = res.findings.filter((f) => !planted.has(f.account + ":" + f.type));
+    const decoys = key.decoys.map((d) => ({ ...d, clean: !res.findings.some((f) => f.account === d.account) }));
+    return { issues, falsePos, decoys,
+             recall: issues.filter((i) => i.found).length, amounts: issues.filter((i) => i.amountMatch).length,
+             total: issues.length, decoysClean: decoys.filter((d) => d.clean).length };
+  }
+
+  // ---- formatting: the only forms the page and the drafts use ----
+  const money = (c) => (c < 0 ? "-" : "") + "$" + (Math.abs(c) / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const num = (n) => n.toLocaleString("en-US");
+  const pct = (p) => (Number.isInteger(p) ? String(p) : p.toFixed(1)) + "%";
+  const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const monthName = (m) => MONTH_NAMES[Number(m.slice(-2)) - 1];
+
+  // Deterministic note for one finding; used when no AI draft matches.
+  const poss = (n) => n + (n.endsWith("s") ? "'" : "'s");
+  function ruleDraft(f) {
+    const F = f.facts, ms = f.months.map(monthName).join(", "), ev = f.evidence.join(", ");
+    switch (f.type) {
+      case "uplift_not_billed":
+        return `${poss(f.name)} contract ${f.evidence[0]} carries a ${pct(F.upliftPct)} uplift from ${monthName("2026-" + String(F.anniversaryMonth).padStart(2, "0"))}, which takes the seat price from ${money(F.basePriceCents)} to ${money(F.upliftedPriceCents)}. Billing kept the old price for ${ms}, under-billing ${money(F.amountCents)}. Evidence: ${ev}. Confirm with ${f.owner} before a catch-up invoice.`;
+      case "overage_not_billed":
+        return `${f.name} used more than its ${num(F.allowanceUnits)} monthly allowance in ${ms}, and billing charged less overage than the contract rate of ${money(F.rateCents)} per unit requires. Under-billed: ${money(F.amountCents)}. Evidence: ${ev}.`;
+      case "unsigned_amendment":
+        return `Billing applied order form ${F.orderForm} for ${f.name} from ${monthName(F.effective)}, but the contracts folder has no signed copy. Against signed terms the account is under-billed ${money(F.amountCents)} for ${ms}. Hold: get the order form signed, or bill at the signed terms. Evidence: ${ev}.`;
+      case "overbilled":
+        return `Signed order form ${F.orderForm} changed ${poss(f.name)} terms from ${monthName(F.effective)}, but billing never applied it. The customer was over-billed ${money(F.amountCents)} for ${ms} and is owed a credit. Evidence: ${ev}.`;
+      case "amendment_not_billed":
+        return `Signed order form ${F.orderForm} for ${f.name} was never applied in billing. Under-billed ${money(F.amountCents)} for ${ms}. Evidence: ${ev}.`;
+      default:
+        return `${poss(f.name)} ${ms} invoice differs from signed terms by ${money(F.amountCents)}, and no contract term, order form, or usage figure explains it. Route to ${f.owner} and billing to find the source before any adjustment. Evidence: ${ev}.`;
+    }
+  }
+
+  // ---- the gate: every dollar amount, percentage, count, and document ID in
+  // a note must be a fact of this finding; policy phrases are blocked; the
+  // note must state the amount and cite evidence ----
+  function allowed(f) {
+    const F = f.facts, money = new Set(), pcts = new Set(), counts = new Set();
+    const addM = (c) => { if (typeof c === "number") money.add(Math.abs(c)); };
+    addM(F.amountCents); addM(F.basePriceCents); addM(F.upliftedPriceCents); addM(F.rateCents);
+    for (const m of F.monthly) { addM(m.expected); addM(m.billed); addM(m.diff); }
+    for (const v of [F.upliftPct, F.discountPct]) if (typeof v === "number") pcts.add(v);
+    for (const v of [F.seats, F.seatChange, F.allowanceUnits, F.monthCount]) if (typeof v === "number") counts.add(v);
+    for (const v of (F.usage || []).concat(F.overUnits || [])) counts.add(v);
+    if (typeof F.seats === "number" && typeof F.seatChange === "number") counts.add(F.seats - F.seatChange);
+    return { money, pcts, counts };
+  }
+  const MONEY_RX = /\$\s?(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d{1,2}))?\s?(K|thousand)?\b/gi;
+  const PCT_RX = /(\d+(?:\.\d+)?)\s?(?:%|percent\b)/gi;
+  const COUNT_RX = /(?<![\d.,$])\b(\d{1,3}(?:,\d{3})+|\d+)\s+(seats?|units?|documents?|months?)\b/gi;
+  const ID_RX = /\b(?:MSA|OF|INV)-\d{4}(?:-\d{2})?\b/g;
+  const POLICY = [
+    [/\bfraud\w*/i, "accuses fraud"], [/\bintentional\w*/i, "assigns intent"], [/\bguarantee\w*/i, "guarantees an outcome"],
+    [/\bwill (?:be )?(?:refund|credit)\w*/i, "promises a refund or credit before approval"],
+    [/\b(?:customer|client) (?:agreed|has agreed|accepted)\b/i, "claims a customer agreement not in the record"],
+    [/\bcontact (?:the )?customer\b/i, "tells billing ops to contact the customer directly"],
+  ];
+
+  function gate(text, f) {
+    const A = allowed(f), unsupported = [], policy = [], missing = [];
+    for (const m of text.matchAll(MONEY_RX)) {
+      const whole = Number(m[1].replace(/,/g, "")), cents = m[2] ? Number(m[2].padEnd(2, "0")) : null;
+      const unit = (m[3] || "").toLowerCase(), k = unit === "k" || unit === "thousand";
+      const v = k ? Math.round((whole + (cents || 0) / 100) * 100000) : whole * 100 + (cents || 0);
+      // Tolerance is half of the last digit the writer showed.
+      const tol = k ? 50000 / Math.pow(10, m[2] ? m[2].length : 0) : cents === null ? 50 : 0;
+      if (![...A.money].some((a) => Math.abs(a - v) <= tol)) unsupported.push(m[0].trim());
+    }
+    for (const m of text.matchAll(PCT_RX)) if (![...A.pcts].some((a) => Math.abs(a - Number(m[1])) < 1e-9)) unsupported.push(m[0].trim());
+    for (const m of text.matchAll(COUNT_RX)) if (!A.counts.has(Number(m[1].replace(/,/g, "")))) unsupported.push(m[0].trim());
+    for (const m of text.matchAll(ID_RX)) if (!f.evidence.includes(m[0])) unsupported.push(m[0]);
+    for (const [rx, why] of POLICY) { const m = text.match(rx); if (m) policy.push(`"${m[0]}" ${why}`); }
+    const amt = money(Math.abs(f.amountCents));
+    if (!text.includes(amt)) missing.push(`the amount (${amt})`);
+    if (!f.evidence.some((e) => text.includes(e))) missing.push("an evidence ID");
+    return { passed: !unsupported.length && !policy.length && !missing.length, unsupported, policy, missing };
+  }
+
+  function hashData(d) {
+    const s = JSON.stringify(d);
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return (h >>> 0).toString(16).padStart(8, "0");
+  }
+
+  // ---- the release gate: one list of checks, run by the page on every load
+  // and by check.mjs before every publish ----
+  const GATE_TESTS = [
+    // [sentence, should pass] against ACC-04's uplift finding
+    ["Billing kept the $85.00 seat price after the 5% uplift; under-billed $2,805.00 (MSA-1004).", true],
+    ["Under-billed $2,805.00 across 3 months for 220 seats at $89.25. Evidence: INV-2607-04.", true],
+    ["Under-billed $2,850.00. Evidence: MSA-1004.", false],
+    ["A 6% uplift was missed; under-billed $2,805.00 (MSA-1004).", false],
+    ["Under-billed $2,805.00 for 240 seats (MSA-1004).", false],
+    ["Under-billed $2,805.00. Evidence: INV-2607-05.", false],
+    ["Under-billed $2,805.00 (MSA-1004). This looks like fraud by the rep.", false],
+    ["Under-billed $2,805.00 (MSA-1004). We will credit the difference next cycle.", false],
+    ["The uplift was not billed. Evidence: MSA-1004.", false],
+    ["Under-billed about $2.8K; see MSA-1004 for the $2,805.00 figure.", true],
+  ];
+
+  function runChecks(data, key, golden, notes, opts = {}) {
+    const res = reconcile(data, opts), ev = evaluate(res, key), out = [];
+    const add = (ok, text, detail) => out.push({ ok, text, detail: detail || [] });
+    add(ev.recall === ev.total, `${ev.recall} of ${ev.total} planted billing errors found`,
+        ev.issues.filter((i) => !i.found).map((i) => `missed ${i.account} ${i.type}`));
+    add(ev.amounts === ev.total, `${ev.amounts} of ${ev.total} found with the exact dollar amount`,
+        ev.issues.filter((i) => i.found && !i.amountMatch).map((i) => `${i.account} ${i.type}: got ${money(i.gotCents)}, key ${money(i.amountCents)}`));
+    add(ev.falsePos.length === 0, `${ev.falsePos.length} false alarms on correctly billed accounts`,
+        ev.falsePos.map((f) => `${f.account} ${f.type} ${money(f.amountCents)}`));
+    add(ev.decoysClean === ev.decoys.length, `${ev.decoysClean} of ${ev.decoys.length} decoys left alone (unusual but correct)`,
+        ev.decoys.filter((d) => !d.clean).map((d) => `${d.account} flagged: ${d.why}`));
+    let n = 0, ok = 0; const mism = [];
+    for (const a of res.accounts) for (const k of ["expected", "billed"]) {
+      n++; if (golden.accounts[a.account.id][k] === a[k]) ok++; else mism.push(`${a.account.id} ${k}: engine ${money(a[k])}, Python ${money(golden.accounts[a.account.id][k])}`);
+    }
+    for (const k of ["billed", "expected", "under", "over"]) { n++; if (golden.totals[k] === res.totals[k]) ok++; else mism.push(`total ${k}: engine ${money(res.totals[k])}, Python ${money(golden.totals[k])}`); }
+    const gf = golden.findings, ef = Object.fromEntries(res.findings.map((f) => [f.id, f.amountCents]));
+    for (const id of new Set(Object.keys(gf).concat(Object.keys(ef)))) { n++; if (gf[id] === ef[id]) ok++; else mism.push(`${id}: engine ${ef[id] === undefined ? "none" : money(ef[id])}, Python ${gf[id] === undefined ? "none" : money(gf[id])}`); }
+    add(ok === n, `${ok} of ${n} figures match the independent Python implementation`, mism);
+    const base = reconcile(data).findings.find((f) => f.id === "ACC-04:uplift_not_billed");
+    let gp = 0; const gfail = [];
+    for (const [t, exp] of GATE_TESTS) { if (base && gate(t, base).passed === exp) gp++; else gfail.push(`expected ${exp ? "pass" : "block"}: ${t}`); }
+    add(gp === GATE_TESTS.length, `${gp} of ${GATE_TESTS.length} gate tests return the expected answer`, gfail);
+    let drafted = 0, passed = 0; const nfail = [];
+    for (const f of res.findings) {
+      const nn = notes && notes.notes[f.id];
+      if (!nn) continue;
+      drafted++;
+      const g = gate(nn.text, f);
+      if (g.passed) passed++; else nfail.push(`${f.id}: ${g.unsupported.concat(g.policy, g.missing.map((m) => "missing " + m)).join("; ")}`);
+    }
+    add(drafted > 0 && passed === drafted, `${passed} of ${drafted} AI-drafted notes pass the gate against today's numbers`, nfail);
+    return { res, ev, checks: out, release: out.every((c) => c.ok) };
+  }
+
+  const api = { TYPES, REGRESSIONS, GATE_TESTS, runChecks, reconcile, reconcileAccount, evaluate, ruleDraft, gate, allowed, hashData,
+                fmt: { money, num, pct, monthName } };
+  if (typeof module !== "undefined" && module.exports) module.exports = api;
+  else root.LeakageEngine = api;
+})(typeof window !== "undefined" ? window : globalThis);
+</script>
+<script>
+const DATA = {
+ "company": "Sample Co (synthetic)",
+ "quarter": "Q3 2026",
+ "months": [
+  "2026-07",
+  "2026-08",
+  "2026-09"
+ ],
+ "usageUnit": "documents processed",
+ "accounts": [
+  {
+   "id": "ACC-01",
+   "name": "Alder Freight",
+   "crm": {
+    "owner": "J. Ortiz",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1001",
+    "seats": 60,
+    "basePriceCents": 4500,
+    "upliftBp": 300,
+    "anniversaryMonth": 4,
+    "allowanceUnits": 3000,
+    "overageRateCents": 15
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 1780,
+    "2026-08": 1683,
+    "2026-09": 2285
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-01",
+     "month": "2026-07",
+     "subscriptionCents": 278100,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-01",
+     "month": "2026-08",
+     "subscriptionCents": 278100,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-01",
+     "month": "2026-09",
+     "subscriptionCents": 278100,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-02",
+   "name": "Birchway Health",
+   "crm": {
+    "owner": "K. Patel",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1002",
+    "seats": 60,
+    "basePriceCents": 7500,
+    "upliftBp": 0,
+    "anniversaryMonth": 4,
+    "allowanceUnits": 6000,
+    "overageRateCents": 10
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 4260,
+    "2026-08": 4560,
+    "2026-09": 4980
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-02",
+     "month": "2026-07",
+     "subscriptionCents": 325000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-02",
+     "month": "2026-08",
+     "subscriptionCents": 450000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-02",
+     "month": "2026-09",
+     "subscriptionCents": 450000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-03",
+   "name": "Cobalt Title",
+   "crm": {
+    "owner": "M. Chen",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1003",
+    "seats": 200,
+    "basePriceCents": 6000,
+    "upliftBp": 500,
+    "anniversaryMonth": 6,
+    "allowanceUnits": 20000,
+    "overageRateCents": 8
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 11099,
+    "2026-08": 17913,
+    "2026-09": 16658
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-03",
+     "month": "2026-07",
+     "subscriptionCents": 1260000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-03",
+     "month": "2026-08",
+     "subscriptionCents": 1260000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-03",
+     "month": "2026-09",
+     "subscriptionCents": 1260000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-04",
+   "name": "Dunmore Logistics",
+   "crm": {
+    "owner": "S. Brooks",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1004",
+    "seats": 220,
+    "basePriceCents": 8500,
+    "upliftBp": 500,
+    "anniversaryMonth": 7,
+    "allowanceUnits": 22000,
+    "overageRateCents": 12
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 15620,
+    "2026-08": 16720,
+    "2026-09": 18260
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-04",
+     "month": "2026-07",
+     "subscriptionCents": 1870000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-04",
+     "month": "2026-08",
+     "subscriptionCents": 1870000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-04",
+     "month": "2026-09",
+     "subscriptionCents": 1870000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-05",
+   "name": "Eastgate Credit Union",
+   "crm": {
+    "owner": "T. Nguyen",
+    "amendments": [
+     {
+      "id": "OF-2205",
+      "effective": "2026-07",
+      "discountBp": 1500
+     }
+    ]
+   },
+   "contract": {
+    "id": "MSA-1005",
+    "seats": 90,
+    "basePriceCents": 9000,
+    "upliftBp": 0,
+    "anniversaryMonth": 2,
+    "allowanceUnits": 9000,
+    "overageRateCents": 15
+   },
+   "orderForms": {
+    "OF-2205": {
+     "signed": true
+    }
+   },
+   "usage": {
+    "2026-07": 6390,
+    "2026-08": 6840,
+    "2026-09": 7470
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-05",
+     "month": "2026-07",
+     "subscriptionCents": 688500,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-05",
+     "month": "2026-08",
+     "subscriptionCents": 688500,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-05",
+     "month": "2026-09",
+     "subscriptionCents": 688500,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-06",
+   "name": "Fairlane Dental Group",
+   "crm": {
+    "owner": "J. Ortiz",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1006",
+    "seats": 120,
+    "basePriceCents": 11000,
+    "upliftBp": 300,
+    "anniversaryMonth": 1,
+    "allowanceUnits": 6000,
+    "overageRateCents": 15
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 5558,
+    "2026-08": 4630,
+    "2026-09": 4169
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-06",
+     "month": "2026-07",
+     "subscriptionCents": 1359600,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-06",
+     "month": "2026-08",
+     "subscriptionCents": 1359600,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-06",
+     "month": "2026-09",
+     "subscriptionCents": 1359600,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-07",
+   "name": "Granite Insurance Services",
+   "crm": {
+    "owner": "K. Patel",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1007",
+    "seats": 80,
+    "basePriceCents": 11000,
+    "upliftBp": 700,
+    "anniversaryMonth": 10,
+    "allowanceUnits": 8000,
+    "overageRateCents": 12
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 7400,
+    "2026-08": 11200,
+    "2026-09": 6900
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-07",
+     "month": "2026-07",
+     "subscriptionCents": 880000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-07",
+     "month": "2026-08",
+     "subscriptionCents": 880000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-07",
+     "month": "2026-09",
+     "subscriptionCents": 880000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-08",
+   "name": "Harbor Point Hotels",
+   "crm": {
+    "owner": "M. Chen",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1008",
+    "seats": 80,
+    "basePriceCents": 7500,
+    "upliftBp": 700,
+    "anniversaryMonth": 4,
+    "allowanceUnits": 8000,
+    "overageRateCents": 10
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 6011,
+    "2026-08": 7046,
+    "2026-09": 7669
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-08",
+     "month": "2026-07",
+     "subscriptionCents": 642000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-08",
+     "month": "2026-08",
+     "subscriptionCents": 642000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-08",
+     "month": "2026-09",
+     "subscriptionCents": 642000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-09",
+   "name": "Ironwood Manufacturing",
+   "crm": {
+    "owner": "S. Brooks",
+    "amendments": [
+     {
+      "id": "OF-2209",
+      "effective": "2026-08",
+      "discountBp": 2000
+     }
+    ]
+   },
+   "contract": {
+    "id": "MSA-1009",
+    "seats": 120,
+    "basePriceCents": 9000,
+    "upliftBp": 0,
+    "anniversaryMonth": 6,
+    "allowanceUnits": 12000,
+    "overageRateCents": 15
+   },
+   "orderForms": {
+    "OF-2209": {
+     "signed": false
+    }
+   },
+   "usage": {
+    "2026-07": 8520,
+    "2026-08": 9120,
+    "2026-09": 9960
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-09",
+     "month": "2026-07",
+     "subscriptionCents": 1080000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-09",
+     "month": "2026-08",
+     "subscriptionCents": 864000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-09",
+     "month": "2026-09",
+     "subscriptionCents": 864000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-10",
+   "name": "Juniper Legal",
+   "crm": {
+    "owner": "T. Nguyen",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1010",
+    "seats": 300,
+    "basePriceCents": 11000,
+    "upliftBp": 700,
+    "anniversaryMonth": 1,
+    "allowanceUnits": 15000,
+    "overageRateCents": 8
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 16372,
+    "2026-08": 11576,
+    "2026-09": 10557
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-10",
+     "month": "2026-07",
+     "subscriptionCents": 3531000,
+     "overageCents": 10976
+    },
+    {
+     "id": "INV-2608-10",
+     "month": "2026-08",
+     "subscriptionCents": 3531000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-10",
+     "month": "2026-09",
+     "subscriptionCents": 3531000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-11",
+   "name": "Kestrel Energy",
+   "crm": {
+    "owner": "J. Ortiz",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1011",
+    "seats": 140,
+    "basePriceCents": 11000,
+    "upliftBp": 700,
+    "anniversaryMonth": 8,
+    "allowanceUnits": 14000,
+    "overageRateCents": 10
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 9940,
+    "2026-08": 10640,
+    "2026-09": 11620
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-11",
+     "month": "2026-07",
+     "subscriptionCents": 1540000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-11",
+     "month": "2026-08",
+     "subscriptionCents": 1540000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-11",
+     "month": "2026-09",
+     "subscriptionCents": 1540000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-12",
+   "name": "Lakeshore Schools",
+   "crm": {
+    "owner": "K. Patel",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1012",
+    "seats": 250,
+    "basePriceCents": 6000,
+    "upliftBp": 500,
+    "anniversaryMonth": 9,
+    "allowanceUnits": 25000,
+    "overageRateCents": 12
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 17750,
+    "2026-08": 19000,
+    "2026-09": 20750
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-12",
+     "month": "2026-07",
+     "subscriptionCents": 1500000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-12",
+     "month": "2026-08",
+     "subscriptionCents": 1500000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-12",
+     "month": "2026-09",
+     "subscriptionCents": 1575000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-13",
+   "name": "Meridian Property Co",
+   "crm": {
+    "owner": "M. Chen",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1013",
+    "seats": 300,
+    "basePriceCents": 7500,
+    "upliftBp": 300,
+    "anniversaryMonth": 11,
+    "allowanceUnits": 30000,
+    "overageRateCents": 15
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 18585,
+    "2026-08": 23116,
+    "2026-09": 16630
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-13",
+     "month": "2026-07",
+     "subscriptionCents": 2250000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-13",
+     "month": "2026-08",
+     "subscriptionCents": 2250000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-13",
+     "month": "2026-09",
+     "subscriptionCents": 2250000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-14",
+   "name": "Northfield Clinics",
+   "crm": {
+    "owner": "S. Brooks",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1014",
+    "seats": 150,
+    "basePriceCents": 4500,
+    "upliftBp": 300,
+    "anniversaryMonth": 7,
+    "allowanceUnits": 15000,
+    "overageRateCents": 8
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 9227,
+    "2026-08": 8961,
+    "2026-09": 12422
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-14",
+     "month": "2026-07",
+     "subscriptionCents": 695250,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-14",
+     "month": "2026-08",
+     "subscriptionCents": 695250,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-14",
+     "month": "2026-09",
+     "subscriptionCents": 695250,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-15",
+   "name": "Oakmont Wealth",
+   "crm": {
+    "owner": "T. Nguyen",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1015",
+    "seats": 150,
+    "basePriceCents": 4500,
+    "upliftBp": 0,
+    "anniversaryMonth": 6,
+    "allowanceUnits": 15000,
+    "overageRateCents": 15
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 13100,
+    "2026-08": 18400,
+    "2026-09": 19900
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-15",
+     "month": "2026-07",
+     "subscriptionCents": 675000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-15",
+     "month": "2026-08",
+     "subscriptionCents": 675000,
+     "overageCents": 40800
+    },
+    {
+     "id": "INV-2609-15",
+     "month": "2026-09",
+     "subscriptionCents": 675000,
+     "overageCents": 58800
+    }
+   ]
+  },
+  {
+   "id": "ACC-16",
+   "name": "Pinecrest Foods",
+   "crm": {
+    "owner": "J. Ortiz",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1016",
+    "seats": 120,
+    "basePriceCents": 7500,
+    "upliftBp": 500,
+    "anniversaryMonth": 9,
+    "allowanceUnits": 12000,
+    "overageRateCents": 8
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 12900,
+    "2026-08": 14100,
+    "2026-09": 11500
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-16",
+     "month": "2026-07",
+     "subscriptionCents": 900000,
+     "overageCents": 7200
+    },
+    {
+     "id": "INV-2608-16",
+     "month": "2026-08",
+     "subscriptionCents": 900000,
+     "overageCents": 16800
+    },
+    {
+     "id": "INV-2609-16",
+     "month": "2026-09",
+     "subscriptionCents": 945000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-17",
+   "name": "Quarry Lane Builders",
+   "crm": {
+    "owner": "K. Patel",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1017",
+    "seats": 200,
+    "basePriceCents": 12500,
+    "upliftBp": 500,
+    "anniversaryMonth": 12,
+    "allowanceUnits": 20000,
+    "overageRateCents": 8
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 19127,
+    "2026-08": 12024,
+    "2026-09": 13726
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-17",
+     "month": "2026-07",
+     "subscriptionCents": 2500000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-17",
+     "month": "2026-08",
+     "subscriptionCents": 2500000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-17",
+     "month": "2026-09",
+     "subscriptionCents": 2500000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-18",
+   "name": "Riverbend Bank",
+   "crm": {
+    "owner": "M. Chen",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1018",
+    "seats": 120,
+    "basePriceCents": 4500,
+    "upliftBp": 0,
+    "anniversaryMonth": 6,
+    "allowanceUnits": 12000,
+    "overageRateCents": 10
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 9258,
+    "2026-08": 10670,
+    "2026-09": 8256
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-18",
+     "month": "2026-07",
+     "subscriptionCents": 540000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-18",
+     "month": "2026-08",
+     "subscriptionCents": 540000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-18",
+     "month": "2026-09",
+     "subscriptionCents": 540000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-19",
+   "name": "Sable Analytics",
+   "crm": {
+    "owner": "S. Brooks",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1019",
+    "seats": 200,
+    "basePriceCents": 9000,
+    "upliftBp": 500,
+    "anniversaryMonth": 11,
+    "allowanceUnits": 20000,
+    "overageRateCents": 10
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 24600,
+    "2026-08": 27100,
+    "2026-09": 25800
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-19",
+     "month": "2026-07",
+     "subscriptionCents": 1800000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-19",
+     "month": "2026-08",
+     "subscriptionCents": 1800000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-19",
+     "month": "2026-09",
+     "subscriptionCents": 1800000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-20",
+   "name": "Tidewater Marine",
+   "crm": {
+    "owner": "T. Nguyen",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1020",
+    "seats": 60,
+    "basePriceCents": 4500,
+    "upliftBp": 700,
+    "anniversaryMonth": 11,
+    "allowanceUnits": 3000,
+    "overageRateCents": 15
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 2680,
+    "2026-08": 2262,
+    "2026-09": 1874
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-20",
+     "month": "2026-07",
+     "subscriptionCents": 270000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-20",
+     "month": "2026-08",
+     "subscriptionCents": 270000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-20",
+     "month": "2026-09",
+     "subscriptionCents": 270000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-21",
+   "name": "Upland Telecom",
+   "crm": {
+    "owner": "J. Ortiz",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1021",
+    "seats": 60,
+    "basePriceCents": 11000,
+    "upliftBp": 0,
+    "anniversaryMonth": 8,
+    "allowanceUnits": 6000,
+    "overageRateCents": 8
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 4260,
+    "2026-08": 4560,
+    "2026-09": 4980
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-21",
+     "month": "2026-07",
+     "subscriptionCents": 660000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-21",
+     "month": "2026-08",
+     "subscriptionCents": 660000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-21",
+     "month": "2026-09",
+     "subscriptionCents": 660000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-22",
+   "name": "Valley Air",
+   "crm": {
+    "owner": "K. Patel",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1022",
+    "seats": 25,
+    "basePriceCents": 9000,
+    "upliftBp": 300,
+    "anniversaryMonth": 8,
+    "allowanceUnits": 2500,
+    "overageRateCents": 12
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 1931,
+    "2026-08": 2423,
+    "2026-09": 2320
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-22",
+     "month": "2026-07",
+     "subscriptionCents": 225000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-22",
+     "month": "2026-08",
+     "subscriptionCents": 231750,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-22",
+     "month": "2026-09",
+     "subscriptionCents": 231750,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-23",
+   "name": "Westbrook Retail",
+   "crm": {
+    "owner": "M. Chen",
+    "amendments": [
+     {
+      "id": "OF-2223",
+      "effective": "2026-09",
+      "seatChange": -15
+     }
+    ]
+   },
+   "contract": {
+    "id": "MSA-1023",
+    "seats": 180,
+    "basePriceCents": 7500,
+    "upliftBp": 0,
+    "anniversaryMonth": 3,
+    "allowanceUnits": 18000,
+    "overageRateCents": 15
+   },
+   "orderForms": {
+    "OF-2223": {
+     "signed": false
+    }
+   },
+   "usage": {
+    "2026-07": 12780,
+    "2026-08": 13680,
+    "2026-09": 14940
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-23",
+     "month": "2026-07",
+     "subscriptionCents": 1350000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-23",
+     "month": "2026-08",
+     "subscriptionCents": 1350000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-23",
+     "month": "2026-09",
+     "subscriptionCents": 1237500,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-24",
+   "name": "Yarrow Biotech",
+   "crm": {
+    "owner": "S. Brooks",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1024",
+    "seats": 25,
+    "basePriceCents": 6000,
+    "upliftBp": 0,
+    "anniversaryMonth": 4,
+    "allowanceUnits": 2500,
+    "overageRateCents": 15
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 1541,
+    "2026-08": 2378,
+    "2026-09": 1534
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-24",
+     "month": "2026-07",
+     "subscriptionCents": 150000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-24",
+     "month": "2026-08",
+     "subscriptionCents": 150000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-24",
+     "month": "2026-09",
+     "subscriptionCents": 150000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-25",
+   "name": "Zephyr Media",
+   "crm": {
+    "owner": "T. Nguyen",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1025",
+    "seats": 300,
+    "basePriceCents": 4500,
+    "upliftBp": 500,
+    "anniversaryMonth": 11,
+    "allowanceUnits": 30000,
+    "overageRateCents": 15
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 21300,
+    "2026-08": 22800,
+    "2026-09": 24900
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-25",
+     "month": "2026-07",
+     "subscriptionCents": 1350000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-25",
+     "month": "2026-08",
+     "subscriptionCents": 1350000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-25",
+     "month": "2026-09",
+     "subscriptionCents": 1350000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-26",
+   "name": "Ashford Utilities",
+   "crm": {
+    "owner": "J. Ortiz",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1026",
+    "seats": 40,
+    "basePriceCents": 9000,
+    "upliftBp": 500,
+    "anniversaryMonth": 1,
+    "allowanceUnits": 4000,
+    "overageRateCents": 8
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 3421,
+    "2026-08": 3145,
+    "2026-09": 2518
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-26",
+     "month": "2026-07",
+     "subscriptionCents": 378000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-26",
+     "month": "2026-08",
+     "subscriptionCents": 378000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-26",
+     "month": "2026-09",
+     "subscriptionCents": 378000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-27",
+   "name": "Brookstone Senior Living",
+   "crm": {
+    "owner": "K. Patel",
+    "amendments": [
+     {
+      "id": "OF-2227",
+      "effective": "2026-08",
+      "seatChange": -10
+     }
+    ]
+   },
+   "contract": {
+    "id": "MSA-1027",
+    "seats": 100,
+    "basePriceCents": 6000,
+    "upliftBp": 0,
+    "anniversaryMonth": 11,
+    "allowanceUnits": 10000,
+    "overageRateCents": 15
+   },
+   "orderForms": {
+    "OF-2227": {
+     "signed": true
+    }
+   },
+   "usage": {
+    "2026-07": 7100,
+    "2026-08": 7600,
+    "2026-09": 8300
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-27",
+     "month": "2026-07",
+     "subscriptionCents": 600000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-27",
+     "month": "2026-08",
+     "subscriptionCents": 600000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-27",
+     "month": "2026-09",
+     "subscriptionCents": 600000,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-28",
+   "name": "Cedar Ridge Pharmacy",
+   "crm": {
+    "owner": "M. Chen",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1028",
+    "seats": 25,
+    "basePriceCents": 11000,
+    "upliftBp": 500,
+    "anniversaryMonth": 9,
+    "allowanceUnits": 2500,
+    "overageRateCents": 12
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 2221,
+    "2026-08": 2412,
+    "2026-09": 1516
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-28",
+     "month": "2026-07",
+     "subscriptionCents": 275000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-28",
+     "month": "2026-08",
+     "subscriptionCents": 275000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-28",
+     "month": "2026-09",
+     "subscriptionCents": 288750,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-29",
+   "name": "Delmar Staffing",
+   "crm": {
+    "owner": "S. Brooks",
+    "amendments": []
+   },
+   "contract": {
+    "id": "MSA-1029",
+    "seats": 150,
+    "basePriceCents": 7500,
+    "upliftBp": 500,
+    "anniversaryMonth": 7,
+    "allowanceUnits": 7500,
+    "overageRateCents": 10
+   },
+   "orderForms": {},
+   "usage": {
+    "2026-07": 7175,
+    "2026-08": 8848,
+    "2026-09": 7060
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-29",
+     "month": "2026-07",
+     "subscriptionCents": 1181250,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-29",
+     "month": "2026-08",
+     "subscriptionCents": 1181250,
+     "overageCents": 13480
+    },
+    {
+     "id": "INV-2609-29",
+     "month": "2026-09",
+     "subscriptionCents": 1181250,
+     "overageCents": 0
+    }
+   ]
+  },
+  {
+   "id": "ACC-30",
+   "name": "Elmhurst Transit",
+   "crm": {
+    "owner": "T. Nguyen",
+    "amendments": [
+     {
+      "id": "OF-2230",
+      "effective": "2026-08",
+      "discountBp": 1000
+     }
+    ]
+   },
+   "contract": {
+    "id": "MSA-1030",
+    "seats": 40,
+    "basePriceCents": 12500,
+    "upliftBp": 0,
+    "anniversaryMonth": 8,
+    "allowanceUnits": 4000,
+    "overageRateCents": 8
+   },
+   "orderForms": {
+    "OF-2230": {
+     "signed": false
+    }
+   },
+   "usage": {
+    "2026-07": 2840,
+    "2026-08": 3040,
+    "2026-09": 3320
+   },
+   "invoices": [
+    {
+     "id": "INV-2607-30",
+     "month": "2026-07",
+     "subscriptionCents": 500000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2608-30",
+     "month": "2026-08",
+     "subscriptionCents": 500000,
+     "overageCents": 0
+    },
+    {
+     "id": "INV-2609-30",
+     "month": "2026-09",
+     "subscriptionCents": 500000,
+     "overageCents": 0
+    }
+   ]
+  }
+ ]
+};
+const KEY = {
+ "generated": "2026-10-27",
+ "issues": [
+  {
+   "account": "ACC-04",
+   "type": "uplift_not_billed",
+   "months": [
+    "2026-07",
+    "2026-08",
+    "2026-09"
+   ],
+   "amountCents": 280500,
+   "evidence": [
+    "MSA-1004",
+    "INV-2607-04",
+    "INV-2608-04",
+    "INV-2609-04"
+   ],
+   "note": "5% uplift from July anniversary never reached billing"
+  },
+  {
+   "account": "ACC-11",
+   "type": "uplift_not_billed",
+   "months": [
+    "2026-08",
+    "2026-09"
+   ],
+   "amountCents": 215600,
+   "evidence": [
+    "MSA-1011",
+    "INV-2608-11",
+    "INV-2609-11"
+   ],
+   "note": "7% uplift from August anniversary never reached billing"
+  },
+  {
+   "account": "ACC-07",
+   "type": "overage_not_billed",
+   "months": [
+    "2026-08"
+   ],
+   "amountCents": 38400,
+   "evidence": [
+    "MSA-1007",
+    "INV-2608-07"
+   ],
+   "note": "August usage over allowance, no overage line"
+  },
+  {
+   "account": "ACC-19",
+   "type": "overage_not_billed",
+   "months": [
+    "2026-07",
+    "2026-08",
+    "2026-09"
+   ],
+   "amountCents": 175000,
+   "evidence": [
+    "MSA-1019",
+    "INV-2607-19",
+    "INV-2608-19",
+    "INV-2609-19"
+   ],
+   "note": "overage SKU missing for the whole quarter"
+  },
+  {
+   "account": "ACC-15",
+   "type": "overage_not_billed",
+   "months": [
+    "2026-08",
+    "2026-09"
+   ],
+   "amountCents": 24900,
+   "evidence": [
+    "MSA-1015",
+    "INV-2608-15",
+    "INV-2609-15"
+   ],
+   "note": "overage billed at an old $0.12 rate instead of the contract's $0.15"
+  },
+  {
+   "account": "ACC-09",
+   "type": "unsigned_amendment",
+   "months": [
+    "2026-08",
+    "2026-09"
+   ],
+   "amountCents": 432000,
+   "evidence": [
+    "OF-2209",
+    "INV-2608-09",
+    "INV-2609-09"
+   ],
+   "note": "20% discount applied in billing; order form not signed"
+  },
+  {
+   "account": "ACC-23",
+   "type": "unsigned_amendment",
+   "months": [
+    "2026-09"
+   ],
+   "amountCents": 112500,
+   "evidence": [
+    "OF-2223",
+    "INV-2609-23"
+   ],
+   "note": "15-seat reduction applied in billing; order form not signed"
+  },
+  {
+   "account": "ACC-27",
+   "type": "overbilled",
+   "months": [
+    "2026-08",
+    "2026-09"
+   ],
+   "amountCents": -120000,
+   "evidence": [
+    "OF-2227",
+    "INV-2608-27",
+    "INV-2609-27"
+   ],
+   "note": "signed 10-seat reduction never applied; customer billed for 100 seats"
+  },
+  {
+   "account": "ACC-02",
+   "type": "unexplained",
+   "months": [
+    "2026-07"
+   ],
+   "amountCents": 125000,
+   "evidence": [
+    "INV-2607-02"
+   ],
+   "note": "a $1,250 reduction with no amendment, credit memo, or note behind it"
+  }
+ ],
+ "decoys": [
+  {
+   "account": "ACC-05",
+   "why": "signed 15% discount (OF-2205) applied correctly"
+  },
+  {
+   "account": "ACC-12",
+   "why": "5% uplift from the September anniversary billed correctly"
+  },
+  {
+   "account": "ACC-16",
+   "why": "over allowance in July and August, overage billed correctly"
+  },
+  {
+   "account": "ACC-21",
+   "why": "uplift waived in the contract (0%), so no increase is due"
+  },
+  {
+   "account": "ACC-25",
+   "why": "anniversary is in November, after this quarter"
+  },
+  {
+   "account": "ACC-30",
+   "why": "unsigned discount in the CRM that billing correctly ignored"
+  }
+ ]
+};
+const GOLDEN = {
+ "totals": {
+  "billed": 93761906,
+  "expected": 95045806,
+  "under": 1403900,
+  "over": 120000
+ },
+ "accounts": {
+  "ACC-01": {
+   "expected": 834300,
+   "billed": 834300
+  },
+  "ACC-02": {
+   "expected": 1350000,
+   "billed": 1225000
+  },
+  "ACC-03": {
+   "expected": 3780000,
+   "billed": 3780000
+  },
+  "ACC-04": {
+   "expected": 5890500,
+   "billed": 5610000
+  },
+  "ACC-05": {
+   "expected": 2065500,
+   "billed": 2065500
+  },
+  "ACC-06": {
+   "expected": 4078800,
+   "billed": 4078800
+  },
+  "ACC-07": {
+   "expected": 2678400,
+   "billed": 2640000
+  },
+  "ACC-08": {
+   "expected": 1926000,
+   "billed": 1926000
+  },
+  "ACC-09": {
+   "expected": 3240000,
+   "billed": 2808000
+  },
+  "ACC-10": {
+   "expected": 10603976,
+   "billed": 10603976
+  },
+  "ACC-11": {
+   "expected": 4835600,
+   "billed": 4620000
+  },
+  "ACC-12": {
+   "expected": 4575000,
+   "billed": 4575000
+  },
+  "ACC-13": {
+   "expected": 6750000,
+   "billed": 6750000
+  },
+  "ACC-14": {
+   "expected": 2085750,
+   "billed": 2085750
+  },
+  "ACC-15": {
+   "expected": 2149500,
+   "billed": 2124600
+  },
+  "ACC-16": {
+   "expected": 2769000,
+   "billed": 2769000
+  },
+  "ACC-17": {
+   "expected": 7500000,
+   "billed": 7500000
+  },
+  "ACC-18": {
+   "expected": 1620000,
+   "billed": 1620000
+  },
+  "ACC-19": {
+   "expected": 5575000,
+   "billed": 5400000
+  },
+  "ACC-20": {
+   "expected": 810000,
+   "billed": 810000
+  },
+  "ACC-21": {
+   "expected": 1980000,
+   "billed": 1980000
+  },
+  "ACC-22": {
+   "expected": 688500,
+   "billed": 688500
+  },
+  "ACC-23": {
+   "expected": 4050000,
+   "billed": 3937500
+  },
+  "ACC-24": {
+   "expected": 450000,
+   "billed": 450000
+  },
+  "ACC-25": {
+   "expected": 4050000,
+   "billed": 4050000
+  },
+  "ACC-26": {
+   "expected": 1134000,
+   "billed": 1134000
+  },
+  "ACC-27": {
+   "expected": 1680000,
+   "billed": 1800000
+  },
+  "ACC-28": {
+   "expected": 838750,
+   "billed": 838750
+  },
+  "ACC-29": {
+   "expected": 3557230,
+   "billed": 3557230
+  },
+  "ACC-30": {
+   "expected": 1500000,
+   "billed": 1500000
+  }
+ },
+ "findings": {
+  "ACC-02:unexplained": 125000,
+  "ACC-04:uplift_not_billed": 280500,
+  "ACC-07:overage_not_billed": 38400,
+  "ACC-09:unsigned_amendment": 432000,
+  "ACC-11:uplift_not_billed": 215600,
+  "ACC-15:overage_not_billed": 24900,
+  "ACC-19:overage_not_billed": 175000,
+  "ACC-23:unsigned_amendment": 112500,
+  "ACC-27:overbilled": -120000
+ }
+};
+const NOTES = {
+  "generated": "2026-10-27",
+  "model": "gpt-5.4-mini-2026-03-17",
+  "dataHash": "c297c911",
+  "tokens": {
+    "input": 2002,
+    "output": 866
+  },
+  "notes": {
+    "ACC-02:unexplained": {
+      "text": "INV-2607-02 shows July signed terms of $4,500.00 and billing of $3,250.00, leaving a $1,250.00 under-billed variance for Birchway Health. The cause is not stated in the facts, so it needs to be found before any adjustment.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      }
+    },
+    "ACC-04:uplift_not_billed": {
+      "text": "MSA-1004 and INV-2607-04, INV-2608-04, INV-2609-04 show the July, August, and September uplift was billed at $18,700.00 instead of signed terms of $19,635.00. The total under-billed amount is $2,805.00, and the billing gap should be reviewed against the signed 5% uplift.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      }
+    },
+    "ACC-07:overage_not_billed": {
+      "text": "MSA-1007 and INV-2608-07 show August signed terms of $384.00 and billing of $0.00 for Granite Insurance Services. The total under-billed amount is $384.00, and the usage overage should be checked against the monthly allowance in the documents.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      }
+    },
+    "ACC-09:unsigned_amendment": {
+      "text": "OF-2209 and INV-2608-09, INV-2609-09 show August and September billed at $8,640.00 against signed terms of $10,800.00 for Ironwood Manufacturing. The total under-billed amount is $4,320.00, and the billing change needs a signed order form before any adjustment.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      }
+    },
+    "ACC-11:uplift_not_billed": {
+      "text": "MSA-1011 and INV-2608-11, INV-2609-11 show August and September billed at $15,400.00 against signed terms of $16,478.00 for Kestrel Energy. The total under-billed amount is $2,156.00, and the billing gap should be reviewed against the signed 7% uplift.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      }
+    },
+    "ACC-15:overage_not_billed": {
+      "text": "MSA-1015 and INV-2608-15, INV-2609-15 show August and September signed terms of $510.00 and $735.00, with billing of $408.00 and $588.00 for Oakmont Wealth. The total under-billed amount is $249.00, and the usage overage should be checked against the monthly allowance in the documents.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      }
+    },
+    "ACC-19:overage_not_billed": {
+      "text": "MSA-1019 and INV-2607-19, INV-2608-19, INV-2609-19 show July, August, and September signed terms of $460.00, $710.00, and $580.00 with billing of $0.00. The total under-billed amount is $1,750.00, and the usage overage should be checked against the monthly allowance in the documents.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      }
+    },
+    "ACC-23:unsigned_amendment": {
+      "text": "OF-2223 and INV-2609-23 show September billed at $12,375.00 against signed terms of $13,500.00 for Westbrook Retail. The total under-billed amount is $1,125.00, and the billing change needs a signed order form before any adjustment.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      }
+    },
+    "ACC-27:overbilled": {
+      "text": "OF-2227 and INV-2608-27, INV-2609-27 show August and September billed at $6,000.00 against signed terms of $5,400.00 for Brookstone Senior Living. The total over-billed amount is $1,200.00, and the signed order form should be reviewed in the billing record.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      }
+    }
+  }
+};
+</script>
+<script>
+(function () {
+  "use strict";
+  const E = window.LeakageEngine, F = E.fmt;
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, attrs = {}, kids = []) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === "text") n.textContent = v; else if (k === "cls") n.className = v; else n.setAttribute(k, v);
+    }
+    for (const c of [].concat(kids)) if (c !== null && c !== undefined && c !== false) n.append(c);
+    return n;
+  };
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem("ld:" + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem("ld:" + k, JSON.stringify(v)); } catch {} },
+  };
+  const S = store.get("state", null) || { notes: {}, disp: {}, log: [], sent: false };
+  const save = () => store.set("state", S);
+  const now = () => new Date().toISOString().replace("T", " ").slice(0, 19);
+  function log(action, detail) { S.log.push(`${now()}  ${action.padEnd(16)} ${detail || ""}`); if (S.log.length > 200) S.log.shift(); }
+
+  const res = E.reconcile(DATA);
+  const T = res.totals;
+  const signedClass = (c) => (c > 0 ? "pos" : c < 0 ? "neg" : "");
+  const diffStr = (c) => (c === 0 ? "$0.00" : (c > 0 ? "+" : "-") + F.money(Math.abs(c)));
+  const TYPE_BADGE = { uplift_not_billed: "t-brand", overage_not_billed: "t-brand", amendment_not_billed: "t-brand", unsigned_amendment: "t-warn", overbilled: "t-info", unexplained: "t-bad" };
+  const SUGGEST = { bill: "Suggested: bill the difference", hold: "Suggested: hold for a signed order form", credit: "Suggested: issue a credit", review: "Suggested: investigate the source" };
+  const DECISIONS = [["", "Decision..."], ["bill", "Bill the difference"], ["credit", "Issue a credit"], ["hold", "Hold for a signed order form"], ["investigate", "Investigate the source"], ["dismiss", "Dismiss: no action"]];
+
+  // ---------- header ----------
+  function renderTop() {
+    $("kBilled").textContent = F.money(T.billed);
+    $("kExp").textContent = F.money(T.expected);
+    $("kExpS").textContent = `net gap ${F.money(T.expected - T.billed)}`;
+    const under = res.findings.filter((f) => f.amountCents > 0), over = res.findings.filter((f) => f.amountCents < 0);
+    $("kUnder").textContent = F.money(T.under);
+    $("kUnderS").textContent = `${under.length} findings on ${new Set(under.map((f) => f.account)).size} accounts`;
+    $("kOver").textContent = F.money(T.over);
+    $("kOverS").textContent = `${over.length} finding${over.length === 1 ? "" : "s"}`;
+    const amends = DATA.accounts.flatMap((a) => a.crm.amendments);
+    const signed = DATA.accounts.reduce((s, a) => s + Object.values(a.orderForms).filter((o) => o.signed).length, 0);
+    const box = $("srcs"); box.textContent = "";
+    for (const [n, d] of [["CRM export", `${DATA.accounts.length} accounts, ${amends.length} amendments entered by sales`],
+                          ["Contracts folder", `${DATA.accounts.length} master agreements, ${amends.length} order forms, ${signed} signed`],
+                          ["Usage export", `${DATA.accounts.length * DATA.months.length} monthly readings (${DATA.usageUnit})`],
+                          ["Billing export", `${DATA.accounts.reduce((s, a) => s + a.invoices.length, 0)} invoices, July to September`]])
+      box.append(el("div", {}, [el("span", { cls: "n", text: n }), el("span", { cls: "d", text: d })]));
+  }
+
+  function renderAccounts() {
+    const tb = $("acctTbl").querySelector("tbody"); tb.textContent = "";
+    const rows = res.accounts.slice().sort((a, b) => Math.abs(b.expected - b.billed) - Math.abs(a.expected - a.billed) || a.account.id.localeCompare(b.account.id));
+    for (const a of rows) {
+      const d = a.expected - a.billed;
+      const tr = el("tr", { cls: a.findings.length ? "hit" : "" });
+      tr.append(el("td", {}, [document.createTextNode(a.account.name), el("span", { cls: "sm", text: `${a.account.id} · ${a.account.crm.owner}` })]),
+        el("td", { cls: "r", text: F.money(a.billed) }), el("td", { cls: "r", text: F.money(a.expected) }),
+        el("td", { cls: "r " + signedClass(d), text: diffStr(d) }),
+        el("td", {}, a.findings.length ? a.findings.map((f) => el("a", { href: "#f-" + f.id.replace(/[^a-z0-9]/gi, "-"), cls: "badge " + TYPE_BADGE[f.type], text: E.TYPES[f.type].label })) : [el("span", { cls: "hint", text: "Billed as signed" })]));
+      tb.append(tr);
+    }
+    const tf = $("acctTbl").querySelector("tfoot"); tf.textContent = "";
+    tf.append(el("tr", {}, [el("td", { text: "Total" }), el("td", { cls: "r", text: F.money(T.billed) }), el("td", { cls: "r", text: F.money(T.expected) }),
+      el("td", { cls: "r " + signedClass(T.expected - T.billed), text: diffStr(T.expected - T.billed) }), el("td")]));
+  }
+
+  // ---------- findings ----------
+  function noteFor(f) {
+    if (S.notes[f.id] !== undefined) return { text: S.notes[f.id], src: "Edited by reviewer" };
+    const n = NOTES.notes[f.id];
+    if (n && NOTES.dataHash === E.hashData(DATA)) return { text: n.text, src: `AI draft · ${NOTES.model} · ${NOTES.generated}` };
+    return { text: E.ruleDraft(f), src: "Rule-based draft" };
+  }
+  function gateView(box, g) {
+    box.textContent = "";
+    if (g.passed) { box.append(el("span", { cls: "badge t-good", text: "Gate: passed" }), el("span", { cls: "src", text: "every figure and document ID is a fact of this finding" })); return; }
+    box.append(el("span", { cls: "badge t-bad", text: "Gate: blocked" }));
+    if (g.unsupported.length) { box.append(el("span", { cls: "src", text: "not in the record:" })); g.unsupported.forEach((u) => box.append(el("code", { cls: "x", text: u }))); }
+    for (const p of g.policy) box.append(el("span", { cls: "src", text: "policy: " + p }));
+    for (const m of g.missing) box.append(el("span", { cls: "src", text: "missing " + m }));
+  }
+  function renderFindings() {
+    const box = $("fList"); box.textContent = "";
+    for (const f of res.findings.slice().sort((a, b) => Math.abs(b.amountCents) - Math.abs(a.amountCents))) {
+      const n = noteFor(f), t = E.TYPES[f.type];
+      const ta = el("textarea", { cls: "inp", "aria-label": `Note for ${f.name}` }); ta.value = n.text;
+      const gbox = el("div", { cls: "gate" }), srcEl = el("div", { cls: "src", text: n.src });
+      ta.addEventListener("input", () => { S.notes[f.id] = ta.value; save(); gateView(gbox, E.gate(ta.value, f)); srcEl.textContent = "Edited by reviewer"; renderReview(); });
+      ta.addEventListener("change", () => { log("note edited", f.id + (E.gate(ta.value, f).passed ? "" : " (blocked by gate)")); save(); renderLog(); });
+      const mt = el("table", { cls: "tbl" }, [el("thead", {}, [el("tr", {}, [el("th", { cls: "l", text: "Month" }), el("th", { cls: "l", text: "Line" }), el("th", { text: "Signed terms" }), el("th", { text: "Billed" }), el("th", { text: "Difference" })])])]);
+      const mb = el("tbody");
+      for (const p of f.parts) mb.append(el("tr", {}, [el("td", { text: F.monthName(p.month) }), el("td", { text: p.line }), el("td", { cls: "r", text: F.money(p.expected) }), el("td", { cls: "r", text: F.money(p.billed) }), el("td", { cls: "r " + signedClass(p.diff), text: diffStr(p.diff) })]));
+      mt.append(mb);
+      const sel = el("select", { cls: "inp", "aria-label": `Decision for ${f.name}` });
+      for (const [v, txt] of DECISIONS) sel.append(el("option", { value: v, text: txt }));
+      sel.value = S.disp[f.id] || "";
+      sel.disabled = S.sent;
+      sel.addEventListener("change", () => { S.disp[f.id] = sel.value; log("decided", `${f.id} -> ${sel.value || "none"}`); save(); renderReview(); });
+      box.append(el("div", { cls: "fnd", id: "f-" + f.id.replace(/[^a-z0-9]/gi, "-") }, [
+        el("div", { cls: "top" }, [el("span", { cls: "badge " + TYPE_BADGE[f.type], text: t.label }), el("span", { cls: "nm", text: `${f.name}` }), el("span", { cls: "src", text: `${f.account} · owner ${f.owner}` }),
+          el("span", { cls: "amt " + signedClass(f.amountCents), text: (f.amountCents > 0 ? "under-billed " : "over-billed ") + F.money(Math.abs(f.amountCents)) })]),
+        el("div", { cls: "ids" }, [el("span", { cls: "src", text: "Evidence:" })].concat(f.evidence.map((e) => el("code", { text: e })))),
+        el("div", { cls: "tw" }, [mt]),
+        ta, gbox, srcEl,
+        el("div", { cls: "disp" }, [sel, el("span", { cls: "hint", text: SUGGEST[t.action] })]),
+      ]));
+      gateView(gbox, E.gate(n.text, f));
+    }
+    $("navF").textContent = res.findings.length;
+  }
+
+  // ---------- review ----------
+  function blockers() {
+    const out = [];
+    for (const f of res.findings) {
+      if (!S.disp[f.id]) out.push(`decide ${f.account}`);
+      if (!E.gate(noteFor(f).text, f).passed) out.push(`fix the ${f.account} note`);
+    }
+    return out;
+  }
+  function renderReview() {
+    const tot = { bill: 0, credit: 0, hold: 0, investigate: 0, dismiss: 0 };
+    for (const f of res.findings) { const d = S.disp[f.id]; if (d) tot[d] += Math.abs(f.amountCents); }
+    const sb = $("sumBox"); sb.textContent = "";
+    for (const [k, l] of [["bill", "To bill"], ["credit", "To credit"], ["hold", "Held for signature"], ["investigate", "To investigate"]])
+      sb.append(el("div", {}, [el("span", { cls: "l", text: l }), el("span", { cls: "v", text: F.money(tot[k]) })]));
+    const b = blockers(), req = $("revReq");
+    req.hidden = S.sent || !b.length;
+    req.textContent = b.length ? `Before sending: ${b.slice(0, 6).join("; ")}${b.length > 6 ? `; and ${b.length - 6} more` : ""}.` : "";
+    $("sendBtn").disabled = S.sent || b.length > 0;
+    $("sendBtn").textContent = S.sent ? "Sent to billing" : "Send batch to billing";
+    renderLog();
+  }
+  function renderLog() { $("log").textContent = S.log.length ? S.log.slice().reverse().join("\n") : "No actions yet."; }
+
+  // ---------- evals ----------
+  function renderEvals() {
+    const reg = $("regSel").value, opts = reg === "none" ? {} : { [reg]: true };
+    $("regDetail").textContent = E.REGRESSIONS[reg].detail;
+    const r = E.runChecks(DATA, KEY, GOLDEN, NOTES, opts);
+    const bn = $("relBanner"); bn.className = "banner " + (r.release ? "good" : "bad"); bn.textContent = "";
+    const failed = r.checks.filter((c) => !c.ok).length;
+    bn.append(el("span", {}, [el("b", { text: r.release ? "Release allowed." : "Release blocked." }),
+      document.createTextNode(r.release ? ` All ${r.checks.length} checks pass.` : ` ${failed} of ${r.checks.length} checks fail. This change would not be published.`)]));
+    const cl = $("checkList"); cl.textContent = "";
+    for (const c of r.checks) {
+      cl.append(el("div", { cls: "chk" }, [el("span", { cls: "tag " + (c.ok ? "ok" : "no"), text: c.ok ? "PASS" : "FAIL" }), el("span", { text: c.text }),
+        c.detail.length ? el("div", { cls: "dt" }, c.detail.slice(0, 5).map((d) => el("span", { text: d })).concat(c.detail.length > 5 ? [el("span", { text: `and ${c.detail.length - 5} more` })] : [])) : null]));
+    }
+    const tb = $("keyTbl").querySelector("tbody"); tb.textContent = "";
+    for (const i of r.ev.issues) tb.append(el("tr", {}, [el("td", { text: i.account }), el("td", {}, [document.createTextNode(E.TYPES[i.type].label), el("span", { cls: "sm", text: i.note })]),
+      el("td", { cls: "r", text: diffStr(i.amountCents) }), el("td", { cls: "r", text: i.gotCents === null ? "not found" : diffStr(i.gotCents) }),
+      el("td", {}, [el("span", { cls: "badge " + (i.amountMatch ? "t-good" : "t-bad"), text: i.amountMatch ? "exact" : i.found ? "wrong amount" : "missed" })])]));
+    for (const d of r.ev.decoys) tb.append(el("tr", {}, [el("td", { text: d.account }), el("td", {}, [document.createTextNode("Decoy"), el("span", { cls: "sm", text: d.why })]),
+      el("td", { cls: "r", text: "no finding" }), el("td", { cls: "r", text: d.clean ? "no finding" : "flagged" }),
+      el("td", {}, [el("span", { cls: "badge " + (d.clean ? "t-good" : "t-bad"), text: d.clean ? "left alone" : "false alarm" })])]));
+    const nav = $("navE"); nav.textContent = r.release ? "pass" : "fail"; nav.className = "cnt badge " + (r.release ? "t-good" : "t-bad");
+  }
+
+  // ---------- wiring ----------
+  const rs = $("regSel");
+  for (const [k, v] of Object.entries(E.REGRESSIONS)) rs.append(el("option", { value: k, text: v.label }));
+  rs.value = "none";
+  rs.addEventListener("change", renderEvals);
+  $("sendBtn").addEventListener("click", () => {
+    const who = $("reviewer").value.trim() || "anonymous";
+    S.sent = true; log("sent to billing", `by ${who}; ${res.findings.length} decisions`); save(); renderFindings(); renderReview();
+  });
+  $("resetBtn").addEventListener("click", () => { S.notes = {}; S.disp = {}; S.sent = false; log("reset", "decisions and edits cleared"); save(); renderFindings(); renderReview(); });
+  $("tryGate").addEventListener("click", () => {
+    const first = document.querySelector("#fList textarea");
+    if (!first) return;
+    first.value = first.value + " The customer agreed to a $3,100.00 catch-up, and we will credit any difference.";
+    first.dispatchEvent(new Event("input")); first.dispatchEvent(new Event("change"));
+    first.scrollIntoView({ behavior: "smooth", block: "center" }); first.focus();
+  });
+  const root = document.documentElement;
+  const theme = store.get("theme", null); if (theme) root.setAttribute("data-theme", theme);
+  $("themeBtn").addEventListener("click", () => {
+    const dark = root.getAttribute("data-theme") ? root.getAttribute("data-theme") === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    const next = dark ? "light" : "dark"; root.setAttribute("data-theme", next); store.set("theme", next);
+  });
+  $("modelName").textContent = NOTES.model;
+  renderTop(); renderAccounts(); renderFindings(); renderReview(); renderEvals();
+})();
+</script>
+</body>
+</html>
