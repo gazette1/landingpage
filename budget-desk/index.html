@@ -1,0 +1,995 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Budget Desk</title>
+<meta name="description" content="A property budget draft with outlier flags, gated AI variance notes, and an approval step. Demo on synthetic data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#f7f7f5; --surface:#ffffff; --surface-2:#fafaf9; --border:#e6e4df; --border-strong:#d4d1ca;
+  --fg:#1a1a18; --fg-2:#55534d; --fg-3:#8a877f; --accent:#0f172a; --accent-fg:#ffffff;
+  --brand:#2563eb; --brand-soft:#e8efff; --good:#15803d; --good-soft:#e7f6ec; --warn:#b45309; --warn-soft:#fdf1e2;
+  --bad:#b91c1c; --bad-soft:#fde8e8; --info:#1d4f8a; --info-soft:#e9f2fb; --hover:rgba(0,0,0,.04); --active:rgba(0,0,0,.06);
+  --shadow-card:0 1px 2px rgba(20,20,18,.04),0 1px 1px rgba(20,20,18,.03); --on-brand:#ffffff;
+  --sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121211; --surface:#1a1a18; --surface-2:#201f1d; --border:#2e2d2a; --border-strong:#3d3b37;
+  --fg:#eceae5; --fg-2:#b5b2aa; --fg-3:#8a877f; --accent:#e8e6e1; --accent-fg:#121211;
+  --brand:#6b9bff; --brand-soft:#1b2640; --good:#5fca83; --good-soft:#15291d; --warn:#f0a35c; --warn-soft:#33230f;
+  --bad:#f08080; --bad-soft:#371818; --info:#8fbcf0; --info-soft:#16253a; --hover:rgba(255,255,255,.05); --active:rgba(255,255,255,.08);
+  --shadow-card:0 1px 2px rgba(0,0,0,.3); --on-brand:#121211; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121211; --surface:#1a1a18; --surface-2:#201f1d; --border:#2e2d2a; --border-strong:#3d3b37;
+  --fg:#eceae5; --fg-2:#b5b2aa; --fg-3:#8a877f; --accent:#e8e6e1; --accent-fg:#121211;
+  --brand:#6b9bff; --brand-soft:#1b2640; --good:#5fca83; --good-soft:#15291d; --warn:#f0a35c; --warn-soft:#33230f;
+  --bad:#f08080; --bad-soft:#371818; --info:#8fbcf0; --info-soft:#16253a; --hover:rgba(255,255,255,.05); --active:rgba(255,255,255,.08);
+  --shadow-card:0 1px 2px rgba(0,0,0,.3); --on-brand:#121211; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased;font-feature-settings:"cv02","cv03","cv04","cv11","tnum"}
+a{color:var(--brand);text-decoration:none} a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid color-mix(in srgb,var(--brand) 45%,transparent);outline-offset:1px}
+.app{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column}
+.brandblk{display:flex;gap:8px;align-items:center;padding:16px;border-bottom:1px solid var(--border)}
+.logo{height:28px;width:28px;border-radius:6px;background:var(--accent);color:var(--accent-fg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+.brandblk .t{font-size:13px;font-weight:600} .brandblk .s{font-size:11px;color:var(--fg-3)}
+.nav{display:flex;flex-direction:column;gap:2px;padding:12px 8px;flex:1}
+.nav a{display:flex;align-items:center;gap:10px;border-radius:6px;padding:6px 10px;font-size:13px;color:var(--fg-2)}
+.nav a:hover{background:var(--hover);color:var(--fg);text-decoration:none}
+.nav .cnt{margin-left:auto}
+.side-foot{border-top:1px solid var(--border);padding:12px;font-size:11px;color:var(--fg-3)}
+.main{min-width:0;padding-inline:clamp(16px,3vw,32px);padding-block:24px 64px;display:grid;gap:16px;align-content:start;max-width:1320px}
+.pagehead{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between}
+.crumbs{font-size:12px;color:var(--fg-3);margin-bottom:4px}
+h1{font-size:20px;font-weight:600;letter-spacing:-.01em;margin:0}
+.desc{font-size:13px;color:var(--fg-2);margin:4px 0 0;max-width:78ch}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.card{border:1px solid var(--border);background:var(--surface);border-radius:8px;box-shadow:var(--shadow-card);min-width:0}
+.card[id]{scroll-margin-top:16px}
+.card-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.card-h h3{font-size:13px;font-weight:600;margin:0;line-height:20px}
+.card-h p{font-size:12px;color:var(--fg-3);margin:2px 0 0;max-width:80ch}
+.card-b{padding:12px 16px;display:grid;gap:12px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{padding:12px 16px;display:grid;gap:6px}
+.kpi .l{font-size:12px;color:var(--fg-3);font-weight:500}
+.kpi .v{font-size:17px;font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.kpi .sub{font-size:11px;color:var(--fg-3)}
+.g2{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:1100px){.g2{grid-template-columns:minmax(0,1fr)}}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:500;line-height:16px;white-space:nowrap}
+.badge::before{content:"";height:6px;width:6px;border-radius:999px;background:currentColor}
+.t-neutral{background:var(--active);color:var(--fg-2)} .t-brand{background:var(--brand-soft);color:var(--brand)} .t-good{background:var(--good-soft);color:var(--good)}
+.t-warn{background:var(--warn-soft);color:var(--warn)} .t-bad{background:var(--bad-soft);color:var(--bad)} .t-info{background:var(--info-soft);color:var(--info)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;border-radius:6px;font:inherit;font-size:13px;font-weight:500;height:32px;padding:0 12px;cursor:pointer;border:1px solid transparent}
+.btn-default{background:var(--accent);color:var(--accent-fg)} .btn-default:hover{opacity:.9}
+.btn-primary{background:var(--brand);color:var(--on-brand)} .btn-primary:hover{opacity:.9}
+.btn-outline{border-color:var(--border);background:var(--surface);color:var(--fg)} .btn-outline:hover{background:var(--surface-2)}
+.btn-sm{height:28px;padding:0 10px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.field{display:grid;gap:4px;min-width:0}
+.field label,.lbl{font-size:12px;font-weight:500;color:var(--fg-2)}
+.hint{font-size:11px;color:var(--fg-3)}
+.inp{display:flex;height:32px;width:100%;border-radius:6px;border:1px solid var(--border);background:var(--surface);padding:0 10px;font:inherit;font-size:13px;color:var(--fg)}
+.inp:focus-visible{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 22%,transparent)}
+input[type=number].inp{text-align:right;font-variant-numeric:tabular-nums}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+select.inp{appearance:none;padding-right:28px;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%238a877f" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>');background-repeat:no-repeat;background-position:right 8px center}
+textarea.inp{height:auto;min-height:84px;padding:8px 10px;line-height:1.55;resize:vertical}
+.arow{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:8px;align-items:center}
+.arow .lbl{font-weight:400;color:var(--fg)}
+.arow .hint{grid-column:1/-1;margin-top:-4px}
+.unit{position:relative} .unit input{padding-right:22px} .unit span{position:absolute;right:8px;top:7px;font-size:12px;color:var(--fg-3);pointer-events:none}
+.unit.pre input{padding-left:18px;padding-right:10px} .unit.pre span{left:8px;right:auto}
+.sep{border:0;border-top:1px solid var(--border);margin:2px 0}
+.tw{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl thead th{background:var(--surface-2);font-size:12px;color:var(--fg-3);font-weight:500;text-align:right;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl thead th:first-child{text-align:left}
+.tbl td{padding:7px 10px;border-bottom:1px solid color-mix(in srgb,var(--border) 70%,transparent)}
+.tbl td.r{text-align:right;font-family:var(--mono);font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--fg-2)}
+.tbl tr.sub td{font-weight:600;background:var(--surface-2);color:var(--fg)} .tbl tr.sub td.r{color:var(--fg)}
+.tbl tr.flagged td:first-child{box-shadow:inset 3px 0 0 var(--warn)}
+.tbl tr.flagged-high td:first-child{box-shadow:inset 3px 0 0 var(--bad)}
+.up{color:var(--bad)} .down{color:var(--good)}
+.flag{border-top:1px solid var(--border);padding:14px 16px;display:grid;gap:10px}
+.flag:first-child{border-top:0}
+.flag .top{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.flag .nm{font-size:13px;font-weight:600}
+.flag .rule{font-size:12px;color:var(--fg-3)}
+.src{font-size:11px;color:var(--fg-3)}
+.gate{font-size:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.gate code{font-family:var(--mono);font-size:11.5px;background:var(--bad-soft);color:var(--bad);border-radius:4px;padding:1px 5px}
+.disp{display:grid;grid-template-columns:220px minmax(0,1fr);gap:8px}
+@media (max-width:700px){.disp{grid-template-columns:minmax(0,1fr)}}
+.steps{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12px}
+.steps .s{padding:4px 10px;border-radius:999px;border:1px solid var(--border);color:var(--fg-3)}
+.steps .s.on{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.steps .s.done{background:var(--good-soft);color:var(--good);border-color:transparent}
+.steps .s.ret{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.banner{display:flex;gap:10px;align-items:flex-start;border-radius:8px;padding:10px 14px;font-size:13px;border:1px solid}
+.banner.warn{background:var(--warn-soft);color:var(--warn);border-color:color-mix(in srgb,var(--warn) 25%,transparent)}
+.banner.bad{background:var(--bad-soft);color:var(--bad);border-color:color-mix(in srgb,var(--bad) 25%,transparent)}
+.banner.info{background:var(--info-soft);color:var(--info);border-color:color-mix(in srgb,var(--info) 25%,transparent)}
+.banner b{font-weight:600}
+pre.log{font-family:var(--mono);font-size:11.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:10px;max-height:220px;overflow:auto;margin:0;white-space:pre-wrap;word-break:break-word;color:var(--fg-2)}
+.checklist{display:grid;gap:4px;font-size:12px;font-family:var(--mono);color:var(--fg-2)}
+.ok{color:var(--good)} .no{color:var(--bad)}
+.prose{font-size:13px;color:var(--fg-2);display:grid;gap:8px;max-width:86ch}
+.prose p{margin:0}
+.foot{font-size:12px;color:var(--fg-3);max-width:90ch}
+@media (max-width:1024px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .sidebar{position:sticky;top:0;height:auto;z-index:5;flex-direction:row;align-items:center;border-right:0;border-bottom:1px solid var(--border)}
+  .brandblk{border-bottom:0;padding:10px 12px} .brandblk .s{display:none}
+  .nav{flex-direction:row;overflow-x:auto;padding:8px;flex:1} .nav a{white-space:nowrap}
+  .side-foot{display:none} .card[id]{scroll-margin-top:64px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brandblk"><div class="logo">BD</div><div><div class="t">Budget Desk</div><div class="s">FY2027 property budgets</div></div></div>
+    <nav class="nav" aria-label="Sections">
+      <a href="#overview">Overview</a>
+      <a href="#assumptions">Assumptions</a>
+      <a href="#budget">Budget</a>
+      <a href="#flags">Flags <span class="cnt badge t-warn" id="navFlags">0</span></a>
+      <a href="#approval">Approval</a>
+      <a href="#checks">Checks</a>
+      <a href="#about">How it works</a>
+    </nav>
+    <div class="side-foot">Demo on synthetic data. Built by Russell Harris.</div>
+  </aside>
+
+  <main class="main">
+    <div class="pagehead" id="overview">
+      <div>
+        <div class="crumbs">Portfolio / <span id="crumbProp"></span></div>
+        <h1 id="title">FY2027 budget draft</h1>
+        <p class="desc" id="story"></p>
+      </div>
+      <div class="actions">
+        <label class="lbl" for="propSel" style="margin-right:2px">Property</label>
+        <select class="inp" id="propSel" style="width:auto;min-width:220px"></select>
+        <button class="btn btn-outline btn-sm" id="resetBtn" type="button">Reset assumptions</button>
+        <button class="btn btn-outline btn-sm" id="themeBtn" type="button" aria-label="Toggle dark mode">Theme</button>
+      </div>
+    </div>
+
+    <div id="banners" style="display:grid;gap:8px"></div>
+
+    <section class="kpis" aria-label="Key figures">
+      <div class="card kpi"><span class="l">Effective gross income</span><span class="v" id="kEgi"></span><span class="sub" id="kEgiS"></span></div>
+      <div class="card kpi"><span class="l">Operating expenses</span><span class="v" id="kOpex"></span><span class="sub" id="kOpexS"></span></div>
+      <div class="card kpi"><span class="l">Net operating income</span><span class="v" id="kNoi"></span><span class="sub" id="kNoiS"></span></div>
+      <div class="card kpi"><span class="l">Debt service coverage</span><span class="v" id="kDscr"></span><span class="sub" id="kDscrS"></span></div>
+    </section>
+
+    <div class="g2">
+      <section class="card" id="assumptions">
+        <div class="card-h"><div><h3>Assumptions</h3><p>Change any input; the budget, the flags, and the coverage test update as you type.</p></div></div>
+        <div class="card-b" id="assumpBody"></div>
+      </section>
+
+      <section class="card" id="budget">
+        <div class="card-h"><div><h3>Budget draft</h3><p>Every line is computed in code from the trailing twelve months (T-12) and the assumptions. Peer medians are per unit and illustrative.</p></div></div>
+        <div class="tw"><table class="tbl" id="budgetTbl"><thead><tr>
+          <th>Line</th><th>T-12</th><th>Budget</th><th>Change</th><th>Per unit</th><th>Peer median</th><th>vs peer</th>
+        </tr></thead><tbody></tbody></table></div>
+      </section>
+    </div>
+
+    <section class="card" id="flags">
+      <div class="card-h">
+        <div><h3>Flags and variance notes</h3><p>Code finds the outliers. The notes were drafted by an AI model and every figure in them is checked against this budget before anyone sees them. Edit a note and the gate checks it again.</p></div>
+        <button class="btn btn-outline btn-sm" id="tryGate" type="button">Try the gate</button>
+      </div>
+      <div id="flagList"></div>
+    </section>
+
+    <section class="card" id="approval">
+      <div class="card-h"><div><h3>Approval</h3><p>Every high or critical flag needs a decision, and every note must pass the gate, before the budget can go to the asset manager. A budget below its loan covenant cannot be approved as drafted.</p></div></div>
+      <div class="card-b">
+        <div class="steps" id="steps"></div>
+        <div class="banner info" id="approvalReq" hidden></div>
+        <div class="disp">
+          <div class="field"><label for="reviewer">Reviewer</label><input class="inp" id="reviewer" placeholder="Name"></div>
+          <div class="field"><label for="apNote">Note</label><input class="inp" id="apNote" placeholder="Optional for submit and approve, required to return"></div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="submitBtn" type="button">Submit for approval</button>
+          <button class="btn btn-default" id="approveBtn" type="button">Approve</button>
+          <button class="btn btn-outline" id="returnBtn" type="button">Return with note</button>
+        </div>
+        <div><div class="lbl" style="margin-bottom:6px">Audit log</div><pre class="log" id="log"></pre></div>
+      </div>
+    </section>
+
+    <section class="card" id="checks">
+      <div class="card-h"><div><h3>Checks</h3><p>Run on every page load. The budget figures are recomputed by a second, independent implementation in Python; the gate is tested against sentences with known answers.</p></div></div>
+      <div class="card-b"><div class="checklist" id="checkList"></div></div>
+    </section>
+
+    <section class="card" id="about">
+      <div class="card-h"><div><h3>How it works</h3></div></div>
+      <div class="card-b prose">
+        <p><b>The workflow.</b> An analyst sets assumptions for one property. Code drafts every budget line from the trailing twelve months, finds the outliers, and tests debt service coverage the way the lender will. An AI model drafts a variance note for each flag. A gate rejects any note with a dollar amount, percentage, or coverage ratio that is not on the budget. A person decides each flag, and the budget moves to approval with an audit trail tied to the exact assumptions.</p>
+        <p><b>What the model is allowed to do.</b> Write. It never computes a number. The notes were drafted once for each property's starting assumptions by <span id="modelName"></span> and checked by the gate; when you change an assumption, the page switches to rule-based notes because the AI draft no longer matches the numbers.</p>
+        <p><b>What the flags look for.</b> An expense line that moves more than 10 percent from the trailing year (high above 20), a line more than 25 percent off the peer median per unit, vacancy, concessions, or bad debt budgeted more than 1 point better than last year's actual, coverage below or near the covenant, and coverage that only clears the covenant because of those optimistic assumptions.</p>
+        <p><b>Not real data.</b> The three properties, their histories, the peer medians, and the loans are synthetic, built to look like typical DC-area assets. Not affiliated with any operator, lender, or software company.</p>
+      </div>
+    </section>
+
+    <p class="foot">Budget Desk, a demo by Russell Harris (<a href="https://russh.work">russh.work</a>). Built with Claude Code. October 2026.</p>
+  </main>
+</div>
+
+<script>/* Budget Desk engine. Pure functions, no DOM. Runs in the browser and in Node
+   (the commentary generator and the checks import the same file), so the page,
+   the AI drafts, and the gate all see identical numbers.
+
+   Model of a property budget:
+     revenue  GPR grows with rent growth; loss to lease, vacancy, concessions,
+              and bad debt are percentages of GPR; other income grows on its own.
+     expenses controllable lines grow by their own rate; management fee is a
+              percent of EGI; taxes and insurance move by reassessment and
+              renewal; reserves are dollars per unit.
+   Every line is rounded to whole dollars before anything is summed, so a total
+   always equals the sum of the lines a reader sees. */
+(function (root) {
+  "use strict";
+
+  const REVENUE = [
+    { key: "gpr", label: "Gross potential rent", sign: 1 },
+    { key: "lossToLease", label: "Loss to lease", sign: -1, pct: "lossToLeasePct" },
+    { key: "vacancy", label: "Vacancy", sign: -1, pct: "vacancyPct" },
+    { key: "concessions", label: "Concessions", sign: -1, pct: "concessionsPct" },
+    { key: "badDebt", label: "Bad debt", sign: -1, pct: "badDebtPct" },
+    { key: "otherIncome", label: "Other income", sign: 1, growth: "otherIncomeGrowth" },
+  ];
+  const EXPENSES = [
+    { key: "payroll", label: "Payroll", growth: "payrollGrowth" },
+    { key: "repairs", label: "Repairs and maintenance", growth: "repairsGrowth" },
+    { key: "turnover", label: "Turnover", growth: "turnoverGrowth" },
+    { key: "contract", label: "Contract services", growth: "contractGrowth" },
+    { key: "utilities", label: "Utilities", growth: "utilitiesGrowth" },
+    { key: "marketing", label: "Marketing", growth: "marketingGrowth" },
+    { key: "admin", label: "Administrative", growth: "adminGrowth" },
+    { key: "mgmtFee", label: "Management fee", fee: true },
+    { key: "taxes", label: "Real estate taxes", growth: "taxChange" },
+    { key: "insurance", label: "Insurance", growth: "insuranceChange" },
+    { key: "reserves", label: "Replacement reserves", perUnit: "reservesPerUnit" },
+  ];
+
+  // Thresholds the flags use. Data, not code, so a reviewer can see and change them.
+  const RULES = {
+    historyWarn: 10,       // percent change vs T-12 that earns a flag
+    historyHigh: 20,       // percent change that earns a high flag
+    peerBand: 25,          // percent above or below the peer median, per unit
+    optimisticVacancy: 1.0,   // points below the T-12 actual
+    optimisticConcessions: 1.0,
+    optimisticBadDebt: 1.0,
+    dscrCushion: 0.10,     // within this much of the covenant is a warning
+  };
+
+  // Three sample properties. Synthetic: invented to look like typical DC-area
+  // assets, not drawn from any operator. Peer medians are illustrative.
+  const PROPERTIES = [
+    {
+      id: "A", name: "Sample A", type: "Garden", market: "Suburban Maryland", units: 240,
+      debtService: 2255000, covenant: 1.25,
+      t12: { gpr: 5328000, lossToLease: 106560, vacancy: 277056, concessions: 53280, badDebt: 85248, otherIncome: 244800,
+             payroll: 456000, repairs: 151200, turnover: 108000, contract: 117600, utilities: 266400, marketing: 57600,
+             admin: 103200, mgmtFeePct: 3.0, taxes: 556800, insurance: 168000, reserves: 72000 },
+      defaults: { rentGrowth: 3.0, lossToLeasePct: 2.0, vacancyPct: 5.0, concessionsPct: 1.0, badDebtPct: 1.5,
+                  otherIncomeGrowth: 3.0, payrollGrowth: 4.0, repairsGrowth: 3.0, turnoverGrowth: 3.0, contractGrowth: 4.0,
+                  utilitiesGrowth: 5.0, marketingGrowth: 0.0, adminGrowth: 3.0, mgmtFeePct: 3.0, taxChange: 9.0,
+                  insuranceChange: 28.0, reservesPerUnit: 300 },
+      peer: { payroll: 1850, repairs: 620, turnover: 460, contract: 480, utilities: 1050, marketing: 230, admin: 420,
+              taxes: 2250, insurance: 680, reserves: 300 },
+      story: "Insurance renewal and a tax reassessment squeeze a loan that already sits near its covenant.",
+    },
+    {
+      id: "B", name: "Sample B", type: "Mid-rise", market: "Washington, DC", units: 120,
+      debtService: 1650000, covenant: 1.20,
+      t12: { gpr: 3816000, lossToLease: 114480, vacancy: 248040, concessions: 152640, badDebt: 76320, otherIncome: 201600,
+             payroll: 312000, repairs: 84000, turnover: 60000, contract: 108000, utilities: 156000, marketing: 54000,
+             admin: 72000, mgmtFeePct: 2.75, taxes: 516000, insurance: 102000, reserves: 30000 },
+      defaults: { rentGrowth: 2.5, lossToLeasePct: 3.0, vacancyPct: 5.0, concessionsPct: 2.0, badDebtPct: 2.0,
+                  otherIncomeGrowth: 2.0, payrollGrowth: 4.0, repairsGrowth: 3.0, turnoverGrowth: 3.0, contractGrowth: 6.0,
+                  utilitiesGrowth: 4.0, marketingGrowth: -20.0, adminGrowth: 3.0, mgmtFeePct: 2.75, taxChange: 4.0,
+                  insuranceChange: 12.0, reservesPerUnit: 250 },
+      peer: { payroll: 2500, repairs: 680, turnover: 520, contract: 850, utilities: 1250, marketing: 420, admin: 560,
+              taxes: 4100, insurance: 820, reserves: 250 },
+      story: "The draft assumes occupancy and concessions improve while the marketing budget is cut 20 percent.",
+    },
+    {
+      id: "C", name: "Sample C", type: "Workforce", market: "Prince George's County, MD", units: 64,
+      debtService: 375000, covenant: 1.20,
+      t12: { gpr: 1132800, lossToLease: 11328, vacancy: 67968, concessions: 5664, badDebt: 50976, otherIncome: 42240,
+             payroll: 147200, repairs: 57600, turnover: 32000, contract: 25600, utilities: 96000, marketing: 6400,
+             admin: 25600, mgmtFeePct: 4.0, taxes: 96000, insurance: 56320, reserves: 25600 },
+      defaults: { rentGrowth: 3.5, lossToLeasePct: 1.0, vacancyPct: 5.5, concessionsPct: 0.5, badDebtPct: 2.5,
+                  otherIncomeGrowth: 2.0, payrollGrowth: 3.0, repairsGrowth: -10.0, turnoverGrowth: 3.0, contractGrowth: 3.0,
+                  utilitiesGrowth: 6.0, marketingGrowth: 0.0, adminGrowth: 3.0, mgmtFeePct: 4.0, taxChange: 5.0,
+                  insuranceChange: 22.0, reservesPerUnit: 400 },
+      peer: { payroll: 1900, repairs: 820, turnover: 480, contract: 390, utilities: 1350, marketing: 90, admin: 380,
+              taxes: 1450, insurance: 760, reserves: 350 },
+      story: "Bad debt is budgeted at 2.5% of rent against last year's 4.5%, and that one assumption is what keeps the loan above its covenant.",
+    },
+  ];
+
+  const r0 = (x) => Math.round(x);
+  const pct = (x) => Math.round(x * 10) / 10;          // one decimal
+  const ratio = (x) => Math.round(x * 100) / 100;      // two decimals
+
+  function t12Totals(p) {
+    const t = p.t12;
+    const egi = t.gpr - t.lossToLease - t.vacancy - t.concessions - t.badDebt + t.otherIncome;
+    const fee = r0(egi * t.mgmtFeePct / 100);
+    const opex = EXPENSES.reduce((s, e) => s + (e.fee ? fee : t[e.key]), 0);
+    return { egi, mgmtFee: fee, opex, noi: egi - opex, dscr: ratio((egi - opex) / p.debtService) };
+  }
+
+  function compute(p, a) {
+    const t = p.t12;
+    const tt = t12Totals(p);
+    const lines = [];
+    const gpr = r0(t.gpr * (1 + a.rentGrowth / 100));
+    let egi = 0;
+    for (const L of REVENUE) {
+      let budget, t12v = L.key === "gpr" || L.key === "otherIncome" ? t[L.key] : -t[L.key];
+      if (L.key === "gpr") budget = gpr;
+      else if (L.pct) budget = -r0(gpr * a[L.pct] / 100);
+      else budget = r0(t[L.key] * (1 + a[L.growth] / 100));
+      egi += budget;
+      lines.push({ key: L.key, label: L.label, section: "revenue", t12: t12v, budget });
+    }
+    let opex = 0;
+    for (const E of EXPENSES) {
+      let budget, t12v = E.fee ? tt.mgmtFee : t[E.key];
+      if (E.fee) budget = r0(egi * a.mgmtFeePct / 100);
+      else if (E.perUnit) budget = r0(p.units * a[E.perUnit]);
+      else budget = r0(t[E.key] * (1 + a[E.growth] / 100));
+      opex += budget;
+      lines.push({ key: E.key, label: E.label, section: "expense", t12: t12v, budget });
+    }
+    for (const l of lines) {
+      // Change in the line's size, so a growing deduction reads as an increase.
+      l.change = l.t12 ? pct((Math.abs(l.budget) - Math.abs(l.t12)) / Math.abs(l.t12) * 100) : null;
+      l.perUnit = r0(Math.abs(l.budget) / p.units);
+      l.peer = p.peer[l.key] ?? null;
+      l.vsPeer = l.peer ? pct((l.perUnit - l.peer) / l.peer * 100) : null;
+    }
+    const noi = egi - opex;
+    const totals = {
+      egi, opex, noi, dscr: ratio(noi / p.debtService),
+      egiChange: pct((egi - tt.egi) / tt.egi * 100), opexChange: pct((opex - tt.opex) / tt.opex * 100),
+      noiChange: pct((noi - tt.noi) / tt.noi * 100), noiMargin: pct(noi / egi * 100),
+      t12: tt,
+    };
+    const stress = stressDSCR(p, a);
+    const flags = findFlags(p, a, lines, totals, stress);
+    return { property: p, assumptions: { ...a }, lines, totals, stress, flags };
+  }
+
+  // The lender's question: what if the optimistic revenue assumptions revert to
+  // what the property actually did last year?
+  function stressDSCR(p, a) {
+    const actual = actualRates(p);
+    const s = { ...a };
+    const reverted = [];
+    for (const [k, name] of [["vacancyPct", "vacancy"], ["concessionsPct", "concessions"], ["badDebtPct", "bad debt"]]) {
+      if (a[k] < actual[k]) { s[k] = actual[k]; reverted.push(name); }
+    }
+    if (!reverted.length) return null;
+    const t = p.t12;
+    const gpr = r0(t.gpr * (1 + s.rentGrowth / 100));
+    let egi = gpr;
+    for (const k of ["lossToLeasePct", "vacancyPct", "concessionsPct", "badDebtPct"]) egi -= r0(gpr * s[k] / 100);
+    egi += r0(t.otherIncome * (1 + s.otherIncomeGrowth / 100));
+    let opex = 0;
+    for (const E of EXPENSES) {
+      if (E.fee) opex += r0(egi * s.mgmtFeePct / 100);
+      else if (E.perUnit) opex += r0(p.units * s[E.perUnit]);
+      else opex += r0(t[E.key] * (1 + s[E.growth] / 100));
+    }
+    const noi = egi - opex;
+    return { reverted, noi, dscr: ratio(noi / p.debtService) };
+  }
+
+  function actualRates(p) {
+    const t = p.t12;
+    return {
+      lossToLeasePct: pct(t.lossToLease / t.gpr * 100), vacancyPct: pct(t.vacancy / t.gpr * 100),
+      concessionsPct: pct(t.concessions / t.gpr * 100), badDebtPct: pct(t.badDebt / t.gpr * 100),
+    };
+  }
+
+  function findFlags(p, a, lines, totals, stress) {
+    const flags = [];
+    const actual = actualRates(p);
+    const add = (f) => flags.push({ id: `${f.line || "noi"}:${f.rule}`, ...f });
+
+    for (const [k, line, label, th] of [["vacancyPct", "vacancy", "Vacancy", RULES.optimisticVacancy],
+                                         ["concessionsPct", "concessions", "Concessions", RULES.optimisticConcessions],
+                                         ["badDebtPct", "badDebt", "Bad debt", RULES.optimisticBadDebt]]) {
+      const gap = pct(actual[k] - a[k]);
+      if (gap > th) add({ line, label, rule: "optimistic", severity: gap >= 2 * th ? "high" : "warn",
+        facts: { assumedPct: a[k], actualPct: actual[k], gapPts: gap } });
+    }
+    for (const l of lines) {
+      if (l.section !== "expense" || l.key === "mgmtFee") continue;
+      const ch = Math.abs(l.change);
+      if (ch > RULES.historyWarn) add({ line: l.key, label: l.label, rule: "history",
+        severity: ch > RULES.historyHigh ? "high" : "warn",
+        facts: { t12: l.t12, budget: l.budget, changePct: l.change } });
+      if (l.vsPeer !== null && Math.abs(l.vsPeer) > RULES.peerBand) add({ line: l.key, label: l.label, rule: "peer",
+        severity: "warn", facts: { perUnit: l.perUnit, peerMedian: l.peer, vsPeerPct: l.vsPeer } });
+    }
+    const d = totals.dscr, c = p.covenant;
+    if (d < c) add({ label: "Debt service coverage", rule: "covenant", severity: "critical",
+      facts: { dscr: d, covenant: c, noi: totals.noi, debtService: p.debtService } });
+    else if (d < c + RULES.dscrCushion && !(stress && stress.dscr < c)) add({ label: "Debt service coverage", rule: "cushion", severity: "warn",
+      facts: { dscr: d, covenant: c, noi: totals.noi, debtService: p.debtService } });
+    if (stress && stress.dscr < c && d >= c) add({ label: "Debt service coverage", rule: "stress", severity: "high",
+      facts: { dscr: d, stressDscr: stress.dscr, covenant: c, reverted: stress.reverted.join(", "), stressNoi: stress.noi } });
+    const order = { critical: 0, high: 1, warn: 2 };
+    return flags.sort((x, y) => order[x.severity] - order[y.severity]);
+  }
+
+  // ---- formatting: the only forms the page and the drafts use ----
+  const money = (x) => (x < 0 ? "-" : "") + "$" + Math.abs(Math.round(x)).toLocaleString("en-US");
+  const pctStr = (x) => (Math.round(x * 10) / 10).toFixed(1) + "%";
+  const xStr = (x) => x.toFixed(2) + "x";
+
+  // Plain-English draft for one flag. Deterministic; used when no AI draft
+  // matches the current assumptions.
+  function ruleDraft(f) {
+    const F = f.facts;
+    switch (f.rule) {
+      case "optimistic":
+        return `${f.label} is budgeted at ${pctStr(F.assumedPct)} of gross potential rent against a trailing actual of ${pctStr(F.actualPct)}, a ${F.gapPts.toFixed(1)} point improvement. Confirm what changes on site to support it, or budget closer to the trailing rate.`;
+      case "history":
+        return `${f.label} moves from ${money(F.t12)} in the trailing twelve months to ${money(F.budget)}, a ${pctStr(F.changePct)} change. Document the driver (a renewal quote, a contract, a staffing change) before approval.`;
+      case "peer":
+        return `${f.label} is budgeted at ${money(F.perUnit)} per unit, ${pctStr(Math.abs(F.vsPeerPct))} ${F.vsPeerPct > 0 ? "above" : "below"} the peer median of ${money(F.peerMedian)}. Explain what is different about this property, or bring it closer to the peer set.`;
+      case "covenant":
+        return `Budgeted NOI of ${money(F.noi)} covers debt service of ${money(F.debtService)} at ${xStr(F.dscr)}, below the ${xStr(F.covenant)} covenant. This budget cannot be approved as drafted without a plan for the lender.`;
+      case "cushion":
+        return `Budgeted NOI of ${money(F.noi)} covers debt service of ${money(F.debtService)} at ${xStr(F.dscr)}, within reach of the ${xStr(F.covenant)} covenant. A small miss on revenue or expenses would breach it.`;
+      case "stress":
+        return `At the drafted assumptions coverage is ${xStr(F.dscr)}, but if ${F.reverted} return to last year's actual rates it falls to ${xStr(F.stressDscr)}, below the ${xStr(F.covenant)} covenant. The approval depends on those assumptions holding.`;
+    }
+    return "";
+  }
+
+  // ---- the gate: every dollar amount, percentage, and coverage multiple in a
+  // draft must match a figure on this budget ----
+  function allowedFigures(res) {
+    const money = new Set(), pcts = new Set(), xs = new Set();
+    const addM = (v) => { if (typeof v === "number") money.add(Math.abs(Math.round(v))); };
+    const addP = (v) => { if (typeof v === "number") pcts.add(Math.round(Math.abs(v) * 10) / 10); };
+    for (const l of res.lines) { addM(l.t12); addM(l.budget); addM(l.perUnit); addM(l.peer); addP(l.change); addP(l.vsPeer); }
+    const T = res.totals;
+    for (const v of [T.egi, T.opex, T.noi, T.t12.egi, T.t12.opex, T.t12.noi, res.property.debtService]) addM(v);
+    for (const v of [T.egiChange, T.opexChange, T.noiChange, T.noiMargin]) addP(v);
+    for (const v of Object.values(res.assumptions)) { addP(v); addM(v); }
+    for (const v of Object.values(actualRates(res.property))) addP(v);
+    for (const f of res.flags) for (const v of Object.values(f.facts)) if (typeof v === "number") { addP(v); addM(v); }
+    for (const v of [T.dscr, T.t12.dscr, res.property.covenant]) xs.add(Math.round(v * 100) / 100);
+    if (res.stress) { addM(res.stress.noi); xs.add(res.stress.dscr); }
+    return { money, pcts, xs };
+  }
+
+  const MONEY_RX = /\$\s?(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?\s?(MM|M|K|million|thousand)?\b/gi;
+  const PCT_RX = /(\d+(?:\.\d+)?)\s?(?:%|percent\b)/gi;
+  const X_RX = /(\d+\.\d+)\s?x\b/gi;
+
+  function gate(text, res) {
+    const A = allowedFigures(res);
+    const unsupported = [];
+    for (const m of text.matchAll(MONEY_RX)) {
+      const whole = Number(m[1].replace(/,/g, "")), frac = m[2] ? Number("0." + m[2]) : 0;
+      const unit = (m[3] || "").toLowerCase();
+      const mult = unit === "mm" || unit === "million" ? 1e6 : unit === "k" || unit === "thousand" || unit === "m" ? 1e3 : 1;
+      const v = (whole + frac) * mult;
+      // Tolerance is half of the last digit the writer showed.
+      const decimals = m[2] ? m[2].length : 0;
+      const tol = mult === 1 ? 0.5 : 0.5 * mult / Math.pow(10, decimals);
+      if (![...A.money].some((a) => Math.abs(a - v) <= tol)) unsupported.push(m[0].trim());
+    }
+    for (const m of text.matchAll(PCT_RX)) {
+      const v = Number(m[1]), decimals = (m[1].split(".")[1] || "").length;
+      const tol = decimals ? 0.05 : 0.5;
+      if (![...A.pcts].some((a) => Math.abs(a - v) <= tol + 1e-9)) unsupported.push(m[0].trim());
+    }
+    for (const m of text.matchAll(X_RX)) {
+      const v = Number(m[1]);
+      if (![...A.xs].some((a) => Math.abs(a - v) <= 0.005 + 1e-9)) unsupported.push(m[0].trim());
+    }
+    return { passed: unsupported.length === 0, unsupported };
+  }
+
+  function hashAssumptions(a) {
+    const s = JSON.stringify(Object.keys(a).sort().map((k) => [k, a[k]]));
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return (h >>> 0).toString(16).padStart(8, "0");
+  }
+
+  const api = { REVENUE, EXPENSES, RULES, PROPERTIES, compute, t12Totals, actualRates, ruleDraft, gate,
+                allowedFigures, hashAssumptions, fmt: { money, pct: pctStr, x: xStr } };
+  if (typeof module !== "undefined" && module.exports) module.exports = api;
+  else root.BudgetEngine = api;
+})(typeof window !== "undefined" ? window : globalThis);
+</script>
+<script>
+const COMMENTARY = {
+  "generated": "2026-10-27",
+  "model": "gpt-5.4-mini-2026-03-17",
+  "properties": {
+    "A": {
+      "assumptionsHash": "7b0ca497",
+      "notes": {
+        "insurance:history": {
+          "text": "Insurance is budgeted at $215,040 versus $168,000 trailing twelve months, a 28.0% increase. That helps explain the higher expense load, but budget NOI is only $2,860,992 versus $2,842,336, so the change needs support before approval. Please confirm the renewal quote or other documentation for the increase.",
+          "gate": {
+            "passed": true,
+            "unsupported": []
+          }
+        },
+        "insurance:peer": {
+          "text": "Insurance is budgeted at $896 per unit versus the peer median of $680 per unit, or 31.8% above peer. That makes this line look elevated even though budget NOI is $2,860,992 versus $2,842,336. Please confirm why this property needs to sit above peer and provide support.",
+          "gate": {
+            "passed": true,
+            "unsupported": []
+          }
+        },
+        "noi:cushion": {
+          "text": "Budgeted debt service coverage is 1.27x against a loan covenant of 1.25x, so the budget leaves only a small cushion. Budgeted NOI is $2,860,992 versus $2,842,336, so any shortfall could pressure compliance. Please confirm the assumptions behind the NOI and whether a larger buffer is available.",
+          "gate": {
+            "passed": true,
+            "unsupported": []
+          }
+        }
+      },
+      "tokens": {
+        "input": 596,
+        "output": 251
+      }
+    },
+    "B": {
+      "assumptionsHash": "896dc6b5",
+      "notes": {
+        "concessions:optimistic": {
+          "text": "Concessions are budgeted at 2.0% versus a trailing actual rate of 4.0%, so the budget assumes a full 2.0 point improvement. That supports higher NOI, but the driver needs to be documented before approval. Please confirm the leasing plan and why this reduction is achievable.",
+          "gate": {
+            "passed": true,
+            "unsupported": []
+          }
+        },
+        "noi:stress": {
+          "text": "Budgeted debt service coverage is 1.21x, which is only slightly above the 1.20x loan covenant. If vacancy and concessions revert to trailing actuals, coverage falls to 1.13x, so the budget has limited cushion. Please confirm the downside case and whether the operating assumptions are supportable.",
+          "gate": {
+            "passed": true,
+            "unsupported": []
+          }
+        },
+        "vacancy:optimistic": {
+          "text": "Vacancy is budgeted at 5.0% versus a trailing actual rate of 6.5%, so the budget assumes a 1.5 point improvement. That lifts NOI, but the support for this improvement needs to be documented. Please confirm the occupancy plan and the timing behind the lower vacancy.",
+          "gate": {
+            "passed": true,
+            "unsupported": []
+          }
+        },
+        "marketing:history": {
+          "text": "Marketing is budgeted at $43,200 versus trailing twelve months of $54,000, a -20.0% change. That reduction helps NOI, but the reason for the lower spend is not documented. Please confirm the marketing plan and what activity is being removed.",
+          "gate": {
+            "passed": true,
+            "unsupported": []
+          }
+        },
+        "insurance:history": {
+          "text": "Insurance is budgeted at $114,240 versus trailing twelve months of $102,000, a 12.0% increase. That raises operating expense and pressures NOI, so approval should confirm the basis for the higher cost. Please ask for the renewal detail or other support behind the increase.",
+          "gate": {
+            "passed": true,
+            "unsupported": []
+          }
+        }
+      },
+      "tokens": {
+        "input": 870,
+        "output": 366
+      }
+    },
+    "C": {
+      "assumptionsHash": "77985066",
+      "notes": {
+        "badDebt:optimistic": {
+          "text": "Bad debt is budgeted at 2.5% versus a trailing actual rate of 4.5%, so the plan assumes a sizable improvement that supports the higher NOI. That needs to be documented, and the asset manager should ask what specific collection or occupancy changes justify the reduction.",
+          "gate": {
+            "passed": true,
+            "unsupported": []
+          }
+        },
+        "insurance:history": {
+          "text": "Insurance increases from $56,320 to $68,710, which lowers support for the higher NOI and should be reviewed before approval. The asset manager should confirm the renewal quote or other documentation behind the 22.0% change.",
+          "gate": {
+            "passed": true,
+            "unsupported": []
+          }
+        },
+        "noi:stress": {
+          "text": "Budgeted debt service coverage is 1.25x versus a loan covenant of 1.20x, but coverage would fall to 1.17x if vacancy and bad debt revert to trailing actuals. That makes the budget sensitive to those assumptions, so the asset manager should confirm the support for both items before approving.",
+          "gate": {
+            "passed": true,
+            "unsupported": []
+          }
+        },
+        "insurance:peer": {
+          "text": "Insurance is budgeted at $1,074 per unit versus a peer median of $760 per unit, which is 41.3% above peers and weighs on the NOI plan. The asset manager should ask for the carrier quote and any property-specific explanation for the higher cost.",
+          "gate": {
+            "passed": true,
+            "unsupported": []
+          }
+        }
+      },
+      "tokens": {
+        "input": 731,
+        "output": 275
+      }
+    }
+  }
+};
+const GOLDEN = {
+  "A": {
+    "egi": 5218639,
+    "opex": 2357647,
+    "noi": 2860992,
+    "dscr": 1.27,
+    "stressDscr": 1.26
+  },
+  "B": {
+    "egi": 3647664,
+    "opex": 1648071,
+    "noi": 1999593,
+    "dscr": 1.21,
+    "stressDscr": 1.13
+  },
+  "C": {
+    "egi": 1104151,
+    "opex": 636588,
+    "noi": 467563,
+    "dscr": 1.25,
+    "stressDscr": 1.17
+  }
+};
+</script>
+<script>
+(function () {
+  "use strict";
+  const E = window.BudgetEngine, F = E.fmt;
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, attrs = {}, kids = []) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === "text") n.textContent = v; else if (k === "cls") n.className = v; else n.setAttribute(k, v);
+    }
+    for (const c of [].concat(kids)) if (c) n.append(c);
+    return n;
+  };
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem("bd:" + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem("bd:" + k, JSON.stringify(v)); } catch {} },
+  };
+
+  // ---------- state ----------
+  let pid = store.get("pid", "A");
+  if (!E.PROPERTIES.some((p) => p.id === pid)) pid = "A";
+  const S = {};
+  function st() {
+    if (!S[pid]) {
+      const p = prop();
+      S[pid] = store.get("s:" + pid, null) || { a: { ...p.defaults }, notes: {}, disp: {}, status: "draft", log: [] };
+      for (const k of Object.keys(p.defaults)) if (typeof S[pid].a[k] !== "number") S[pid].a[k] = p.defaults[k];
+    }
+    return S[pid];
+  }
+  const prop = () => E.PROPERTIES.find((p) => p.id === pid);
+  const save = () => store.set("s:" + pid, st());
+  const now = () => new Date().toISOString().replace("T", " ").slice(0, 19);
+  function log(action, detail) {
+    const s = st();
+    s.log.push(`${now()}  ${action.padEnd(22)} assumptions ${E.hashAssumptions(s.a)}${detail ? "  " + detail : ""}`);
+    if (s.log.length > 200) s.log.shift();
+  }
+  let res;
+
+  // ---------- assumptions ----------
+  const RATES = [
+    ["rentGrowth", "Rent growth", "%", null],
+    ["lossToLeasePct", "Loss to lease", "% of GPR", "lossToLeasePct"],
+    ["vacancyPct", "Vacancy", "% of GPR", "vacancyPct"],
+    ["concessionsPct", "Concessions", "% of GPR", "concessionsPct"],
+    ["badDebtPct", "Bad debt", "% of GPR", "badDebtPct"],
+    ["otherIncomeGrowth", "Other income growth", "%", null],
+  ];
+  const EXP = [
+    ["payrollGrowth", "Payroll", "%"], ["repairsGrowth", "Repairs and maintenance", "%"], ["turnoverGrowth", "Turnover", "%"],
+    ["contractGrowth", "Contract services", "%"], ["utilitiesGrowth", "Utilities", "%"], ["marketingGrowth", "Marketing", "%"],
+    ["adminGrowth", "Administrative", "%"], ["mgmtFeePct", "Management fee", "% of EGI"], ["taxChange", "Real estate taxes (reassessment)", "%"],
+    ["insuranceChange", "Insurance (renewal)", "%"], ["reservesPerUnit", "Replacement reserves", "$ per unit"],
+  ];
+  function buildAssumptions() {
+    const b = $("assumpBody"); b.textContent = "";
+    const p = prop(), actual = E.actualRates(p);
+    const row = ([k, label, unit, actKey]) => {
+      const pre = unit.startsWith("$");
+      const input = el("input", { cls: "inp", type: "number", step: k === "reservesPerUnit" ? "25" : "0.1", id: "a_" + k, "aria-label": label });
+      input.value = st().a[k];
+      input.addEventListener("input", () => {
+        const v = Number(input.value);
+        if (input.value === "" || !Number.isFinite(v)) return;
+        const s = st();
+        if (s.a[k] === v) return;
+        s.a[k] = v;
+        if (s.status !== "draft") { log("assumption changed", `${k}=${v}; approval reset to draft`); s.status = "draft"; }
+        else log("assumption changed", `${k}=${v}`);
+        save(); recompute();
+      });
+      const wrap = el("div", { cls: "unit" + (pre ? " pre" : "") }, [input, el("span", { text: pre ? "$" : "%" })]);
+      const kids = [el("label", { cls: "lbl", for: "a_" + k, text: label }), wrap];
+      const hints = [];
+      if (unit !== "%" && !pre) hints.push(unit);
+      if (pre) hints.push("per unit per year");
+      if (actKey) hints.push(`T-12 actual ${F.pct(actual[actKey])}`);
+      if (hints.length) kids.push(el("div", { cls: "hint", text: hints.join(" · ") }));
+      return el("div", { cls: "arow" }, kids);
+    };
+    b.append(el("div", { cls: "lbl", text: "Revenue" }));
+    RATES.forEach((r) => b.append(row(r)));
+    b.append(el("hr", { cls: "sep" }), el("div", { cls: "lbl", text: "Expenses (change vs T-12)" }));
+    EXP.forEach((r) => b.append(row(r)));
+  }
+
+  // ---------- render ----------
+  function chg(v, invert) {
+    if (v === null || v === undefined) return "";
+    const s = (v > 0 ? "+" : "") + v.toFixed(1) + "%";
+    return s;
+  }
+  function render() {
+    const p = prop(), T = res.totals, s = st();
+    $("crumbProp").textContent = `${p.name} · ${p.type}`;
+    $("title").textContent = `FY2027 budget draft: ${p.name}, ${p.units} units, ${p.market}`;
+    $("story").textContent = p.story;
+
+    $("kEgi").textContent = F.money(T.egi);
+    $("kEgiS").textContent = `${chg(T.egiChange)} vs T-12 of ${F.money(T.t12.egi)}`;
+    $("kOpex").textContent = F.money(T.opex);
+    $("kOpexS").textContent = `${chg(T.opexChange)} vs T-12 of ${F.money(T.t12.opex)}`;
+    $("kNoi").textContent = F.money(T.noi);
+    $("kNoiS").textContent = `${chg(T.noiChange)} vs T-12 · margin ${F.pct(T.noiMargin)}`;
+    $("kDscr").textContent = "";
+    const dBad = T.dscr < p.covenant, dWarn = !dBad && (T.dscr < p.covenant + E.RULES.dscrCushion || (res.stress && res.stress.dscr < p.covenant));
+    $("kDscr").append(document.createTextNode(F.x(T.dscr) + " "), el("span", { cls: "badge " + (dBad ? "t-bad" : dWarn ? "t-warn" : "t-good"), text: dBad ? "below covenant" : dWarn ? "thin" : "clears" }));
+    $("kDscrS").textContent = `covenant ${F.x(p.covenant)} · T-12 ${F.x(T.t12.dscr)}` + (res.stress ? ` · at T-12 rates ${F.x(res.stress.dscr)}` : "");
+
+    // banners
+    const bn = $("banners"); bn.textContent = "";
+    const crit = res.flags.find((f) => f.severity === "critical");
+    if (crit) bn.append(el("div", { cls: "banner bad" }, [el("b", { text: "Below covenant." }), document.createTextNode(" " + E.ruleDraft(crit))]));
+    const stale = !aiCurrent();
+    if (stale) bn.append(el("div", { cls: "banner info" }, [el("b", { text: "Assumptions changed." }), document.createTextNode(" The AI-drafted notes matched the starting assumptions, so the notes below are rule-based drafts of the new numbers. Reset assumptions to see the AI drafts.")]));
+
+    // table
+    const tb = $("budgetTbl").querySelector("tbody"); tb.textContent = "";
+    const flagged = {};
+    for (const f of res.flags) if (f.line) flagged[f.line] = (flagged[f.line] === "high" || f.severity === "high" || f.severity === "critical") ? "high" : "warn";
+    const lineRow = (l) => {
+      const tr = el("tr", { cls: flagged[l.key] === "high" ? "flagged-high" : flagged[l.key] ? "flagged" : "" });
+      tr.append(el("td", { text: l.label }), el("td", { cls: "r", text: F.money(l.t12) }), el("td", { cls: "r", text: F.money(l.budget) }),
+        el("td", { cls: "r", text: chg(l.change) }), el("td", { cls: "r", text: F.money(l.perUnit) }),
+        el("td", { cls: "r", text: l.peer ? F.money(l.peer) : "" }), el("td", { cls: "r", text: l.vsPeer === null ? "" : chg(l.vsPeer) }));
+      return tr;
+    };
+    const subRow = (label, t12, b, c) => {
+      const tr = el("tr", { cls: "sub" });
+      tr.append(el("td", { text: label }), el("td", { cls: "r", text: t12 }), el("td", { cls: "r", text: b }), el("td", { cls: "r", text: c }),
+        el("td", { cls: "r" }), el("td", { cls: "r" }), el("td", { cls: "r" }));
+      return tr;
+    };
+    res.lines.filter((l) => l.section === "revenue").forEach((l) => tb.append(lineRow(l)));
+    tb.append(subRow("Effective gross income", F.money(T.t12.egi), F.money(T.egi), chg(T.egiChange)));
+    res.lines.filter((l) => l.section === "expense").forEach((l) => tb.append(lineRow(l)));
+    tb.append(subRow("Total operating expenses", F.money(T.t12.opex), F.money(T.opex), chg(T.opexChange)));
+    tb.append(subRow("Net operating income", F.money(T.t12.noi), F.money(T.noi), chg(T.noiChange)));
+    tb.append(subRow("Debt service", F.money(p.debtService), F.money(p.debtService), ""));
+    tb.append(subRow("Coverage (NOI / debt service)", F.x(T.t12.dscr), F.x(T.dscr), ""));
+
+    renderFlags();
+    renderApproval();
+    $("navFlags").textContent = res.flags.length;
+  }
+
+  function aiCurrent() {
+    const c = COMMENTARY.properties[pid];
+    return c && c.assumptionsHash === E.hashAssumptions(st().a);
+  }
+  function noteFor(f) {
+    const s = st();
+    if (s.notes[f.id] && s.notes[f.id].hash === E.hashAssumptions(s.a)) return { text: s.notes[f.id].text, src: "Edited by reviewer" };
+    const c = COMMENTARY.properties[pid];
+    if (aiCurrent() && c.notes[f.id] && c.notes[f.id].gate.passed)
+      return { text: c.notes[f.id].text, src: `AI draft · ${COMMENTARY.model} · ${COMMENTARY.generated} · passed the gate when drafted` };
+    return { text: E.ruleDraft(f), src: "Rule-based draft from the current numbers" };
+  }
+  const RULE_TEXT = {
+    optimistic: "Budgeted better than last year's actual",
+    history: "Large change from the trailing twelve months",
+    peer: "Far from the peer median per unit",
+    covenant: "Coverage below the loan covenant",
+    cushion: "Coverage close to the loan covenant",
+    stress: "Clears the covenant only on optimistic assumptions",
+  };
+  const SEV = { critical: "t-bad", high: "t-bad", warn: "t-warn" };
+
+  function renderFlags() {
+    const box = $("flagList"); box.textContent = "";
+    if (!res.flags.length) { box.append(el("div", { cls: "flag" }, [el("div", { cls: "hint", text: "No flags on these assumptions." })])); return; }
+    const s = st();
+    for (const f of res.flags) {
+      const n = noteFor(f);
+      const ta = el("textarea", { cls: "inp", "aria-label": `Variance note for ${f.label}` }); ta.value = n.text;
+      const gateBox = el("div", { cls: "gate" });
+      const showGate = () => {
+        const g = E.gate(ta.value, res);
+        gateBox.textContent = "";
+        if (g.passed) gateBox.append(el("span", { cls: "badge t-good", text: "Gate: passed" }), el("span", { cls: "src", text: "every figure in this note is on the budget" }));
+        else { gateBox.append(el("span", { cls: "badge t-bad", text: "Gate: blocked" }), el("span", { cls: "src", text: "not on this budget:" })); g.unsupported.forEach((u) => gateBox.append(el("code", { text: u }))); }
+        return g;
+      };
+      ta.addEventListener("input", () => {
+        s.notes[f.id] = { text: ta.value, hash: E.hashAssumptions(s.a) };
+        save(); showGate(); renderApproval();
+        srcEl.textContent = "Edited by reviewer";
+      });
+      ta.addEventListener("change", () => { log("note edited", f.id + (E.gate(ta.value, res).passed ? "" : " (blocked by gate)")); save(); renderLog(); });
+      const srcEl = el("div", { cls: "src", text: n.src });
+      const sel = el("select", { cls: "inp", "aria-label": `Decision for ${f.label}` });
+      for (const [v, t] of [["", "Decision..."], ["accept", "Accept as budgeted"], ["change", "Assumption will change"], ["explain", "Explained in the note"]]) {
+        const o = el("option", { value: v, text: t }); sel.append(o);
+      }
+      sel.value = (s.disp[f.id] && s.disp[f.id].hash === E.hashAssumptions(s.a)) ? s.disp[f.id].v : "";
+      sel.addEventListener("change", () => {
+        s.disp[f.id] = { v: sel.value, hash: E.hashAssumptions(s.a) };
+        log("flag decided", `${f.id} -> ${sel.value || "none"}`); save(); renderApproval();
+      });
+      const facts = factLine(f);
+      const card = el("div", { cls: "flag", id: "flag-" + f.id.replace(/[^a-z0-9]/gi, "-") }, [
+        el("div", { cls: "top" }, [el("span", { cls: "badge " + SEV[f.severity], text: f.severity }), el("span", { cls: "nm", text: f.label }), el("span", { cls: "rule", text: RULE_TEXT[f.rule] })]),
+        el("div", { cls: "hint", text: facts }),
+        ta, el("div", { cls: "top" }, [gateBox]), srcEl,
+        el("div", { cls: "disp" }, [sel, el("div")]),
+      ]);
+      box.append(card);
+      showGate();
+    }
+  }
+  function factLine(f) {
+    const x = f.facts;
+    switch (f.rule) {
+      case "optimistic": return `Budgeted ${F.pct(x.assumedPct)} vs T-12 actual ${F.pct(x.actualPct)} (${x.gapPts.toFixed(1)} points better)`;
+      case "history": return `T-12 ${F.money(x.t12)} to budget ${F.money(x.budget)} (${chg(x.changePct)})`;
+      case "peer": return `${F.money(x.perUnit)} per unit vs peer median ${F.money(x.peerMedian)} (${chg(x.vsPeerPct)})`;
+      case "stress": return `Coverage ${F.x(x.dscr)} as drafted; ${F.x(x.stressDscr)} if ${x.reverted} return to T-12 rates; covenant ${F.x(x.covenant)}`;
+      default: return `Coverage ${F.x(x.dscr)} vs covenant ${F.x(x.covenant)}; NOI ${F.money(x.noi)}, debt service ${F.money(x.debtService)}`;
+    }
+  }
+
+  // ---------- approval ----------
+  function blockers() {
+    const s = st(), h = E.hashAssumptions(s.a), out = [];
+    for (const f of res.flags) {
+      if ((f.severity === "high" || f.severity === "critical") && !(s.disp[f.id] && s.disp[f.id].hash === h && s.disp[f.id].v)) out.push(`decide the ${f.label.toLowerCase()} flag`);
+      if (!E.gate(noteFor(f).text, res).passed) out.push(`fix the ${f.label.toLowerCase()} note (gate blocked)`);
+    }
+    return [...new Set(out)];
+  }
+  function renderApproval() {
+    const s = st(), b = blockers(), crit = res.flags.some((f) => f.severity === "critical");
+    const steps = $("steps"); steps.textContent = "";
+    const order = ["draft", "submitted", "approved"];
+    const at = s.status === "returned" ? 0 : order.indexOf(s.status);
+    ["Draft", "Submitted", "Approved"].forEach((t, i) => {
+      let c = "s"; if (i < at) c += " done"; if (i === at) c += s.status === "returned" && i === 0 ? " ret" : " on";
+      steps.append(el("span", { cls: c, text: i === 0 && s.status === "returned" ? "Returned" : t }));
+      if (i < 2) steps.append(document.createTextNode("→"));
+    });
+    const req = $("approvalReq");
+    const msgs = [];
+    if (s.status === "draft" || s.status === "returned") { if (b.length) msgs.push("Before submitting: " + b.join("; ") + "."); }
+    if (s.status === "submitted" && crit) msgs.push("Coverage is below the covenant, so this budget cannot be approved as drafted. Return it with a plan.");
+    req.hidden = !msgs.length; req.textContent = msgs.join(" ");
+    $("submitBtn").disabled = !(s.status === "draft" || s.status === "returned") || b.length > 0;
+    $("approveBtn").disabled = s.status !== "submitted" || crit;
+    $("returnBtn").disabled = s.status !== "submitted";
+    renderLog();
+  }
+  function renderLog() { const s = st(); $("log").textContent = s.log.length ? s.log.slice().reverse().join("\n") : "No actions yet."; }
+  function act(kind) {
+    const s = st(), who = $("reviewer").value.trim() || "anonymous", note = $("apNote").value.trim();
+    if (kind === "return" && !note) { $("apNote").focus(); $("apNote").placeholder = "A note is required to return the budget"; return; }
+    s.status = kind === "submit" ? "submitted" : kind === "approve" ? "approved" : "returned";
+    log(kind === "submit" ? "submitted" : kind === "approve" ? "approved" : "returned", `by ${who}${note ? ": " + note : ""}`);
+    $("apNote").value = ""; save(); renderApproval();
+  }
+
+  // ---------- checks ----------
+  function runChecks() {
+    const out = $("checkList"); out.textContent = "";
+    let pass = 0, n = 0;
+    for (const p of E.PROPERTIES) {
+      const r = E.compute(p, p.defaults), g = GOLDEN[p.id];
+      const got = { egi: r.totals.egi, opex: r.totals.opex, noi: r.totals.noi, dscr: r.totals.dscr, stressDscr: r.stress ? r.stress.dscr : r.totals.dscr };
+      for (const k of Object.keys(g)) { n++; if (got[k] === g[k]) pass++; else out.append(el("div", { cls: "no", text: `MISMATCH ${p.name} ${k}: page ${got[k]}, Python ${g[k]}` })); }
+    }
+    const p0 = E.PROPERTIES[0], r0 = E.compute(p0, p0.defaults);
+    const tests = [["Insurance rises 28.0% to $215,040.", true], ["Insurance rises to $220,000.", false], ["Coverage is 1.27x.", true], ["Coverage is 1.30x.", false],
+                   ["NOI of $2.9MM", true], ["NOI of $3.1MM", false], ["31.8% above the peer median", true], ["35% above the peer median", false]];
+    let gp = 0; for (const [t, exp] of tests) if (E.gate(t, r0).passed === exp) gp++;
+    let drafted = 0, dpass = 0;
+    for (const c of Object.values(COMMENTARY.properties)) for (const nn of Object.values(c.notes)) { drafted++; if (nn.gate.passed) dpass++; }
+    const line = (ok, t) => out.append(el("div", { cls: ok ? "ok" : "no", text: (ok ? "PASS  " : "FAIL  ") + t }));
+    line(pass === n, `${pass} of ${n} budget figures match the independent Python implementation (EGI, expenses, NOI, coverage, stressed coverage for each property)`);
+    line(gp === tests.length, `${gp} of ${tests.length} gate tests return the expected answer (4 sentences that should pass, 4 that should be blocked)`);
+    line(true, `${dpass} of ${drafted} AI-drafted notes passed the gate when they were drafted (${COMMENTARY.model}, ${COMMENTARY.generated})`);
+  }
+
+  // ---------- wiring ----------
+  function recompute() { res = E.compute(prop(), st().a); render(); }
+  function loadProperty() { store.set("pid", pid); buildAssumptions(); recompute(); }
+  const sel = $("propSel");
+  for (const p of E.PROPERTIES) sel.append(el("option", { value: p.id, text: `${p.name} · ${p.type} · ${p.units} units` }));
+  sel.value = pid;
+  sel.addEventListener("change", () => { pid = sel.value; loadProperty(); });
+  $("resetBtn").addEventListener("click", () => {
+    const s = st(); s.a = { ...prop().defaults }; s.notes = {}; s.disp = {}; s.status = "draft";
+    log("assumptions reset", "to starting values"); save(); loadProperty();
+  });
+  $("submitBtn").addEventListener("click", () => act("submit"));
+  $("approveBtn").addEventListener("click", () => act("approve"));
+  $("returnBtn").addEventListener("click", () => act("return"));
+  $("tryGate").addEventListener("click", () => {
+    const first = document.querySelector("#flagList textarea");
+    if (!first) return;
+    first.value = first.value + " Next year's premium should settle near $150,000, about 12.5% below today.";
+    first.dispatchEvent(new Event("input")); first.dispatchEvent(new Event("change"));
+    first.scrollIntoView({ behavior: "smooth", block: "center" }); first.focus();
+  });
+  const root = document.documentElement;
+  const theme = store.get("theme", null); if (theme) root.setAttribute("data-theme", theme);
+  $("themeBtn").addEventListener("click", () => {
+    const dark = root.getAttribute("data-theme") ? root.getAttribute("data-theme") === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    const next = dark ? "light" : "dark"; root.setAttribute("data-theme", next); store.set("theme", next);
+  });
+  $("modelName").textContent = COMMENTARY.model;
+  loadProperty();
+  runChecks();
+})();
+</script>
+</body>
+</html>
