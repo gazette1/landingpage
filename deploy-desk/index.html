@@ -1,0 +1,2093 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Deploy Desk</title>
+<meta name="description" content="A go-live pack for an FP&amp;A variance Custom Agent: spec, variance engine, numbers gate, evals with simulated regressions, and a named sign-off. Prototype on synthetic data.">
+<style>
+:root{
+  --bg:#f5f6f7; --surface:#ffffff; --surface-2:#f9fafb; --border:#e3e5e8; --border-strong:#cfd3d8;
+  --fg:#16181b; --fg-2:#4d535b; --fg-3:#737981; --accent:#16181b; --accent-fg:#ffffff;
+  --brand:#0f6b63; --brand-soft:#e3f3f1; --good:#15803d; --good-soft:#e7f6ec; --warn:#a16207; --warn-soft:#fbf3dc;
+  --bad:#b91c1c; --bad-soft:#fde8e8; --info:#1d4f8a; --info-soft:#e9f2fb; --hover:rgba(0,0,0,.04); --active:rgba(0,0,0,.06);
+  --shadow-card:0 1px 2px rgba(20,20,18,.04); --on-brand:#ffffff;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; --mono:ui-monospace,"Cascadia Mono",Menlo,Consolas,monospace;
+  --r-sm:4px; --r-md:6px; --r-lg:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111315; --surface:#181b1e; --surface-2:#1e2125; --border:#2b2f34; --border-strong:#3a3f45;
+  --fg:#e9ebee; --fg-2:#b3b8bf; --fg-3:#8a9098; --accent:#e9ebee; --accent-fg:#111315;
+  --brand:#5cc8bc; --brand-soft:#12302d; --good:#5fca83; --good-soft:#15291d; --warn:#e8b94e; --warn-soft:#33290f;
+  --bad:#f08080; --bad-soft:#371818; --info:#8fbcf0; --info-soft:#16253a; --hover:rgba(255,255,255,.05); --active:rgba(255,255,255,.08);
+  --shadow-card:0 1px 2px rgba(0,0,0,.3); --on-brand:#111315; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111315; --surface:#181b1e; --surface-2:#1e2125; --border:#2b2f34; --border-strong:#3a3f45;
+  --fg:#e9ebee; --fg-2:#b3b8bf; --fg-3:#8a9098; --accent:#e9ebee; --accent-fg:#111315;
+  --brand:#5cc8bc; --brand-soft:#12302d; --good:#5fca83; --good-soft:#15291d; --warn:#e8b94e; --warn-soft:#33290f;
+  --bad:#f08080; --bad-soft:#371818; --info:#8fbcf0; --info-soft:#16253a; --hover:rgba(255,255,255,.05); --active:rgba(255,255,255,.08);
+  --shadow-card:0 1px 2px rgba(0,0,0,.3); --on-brand:#111315; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:clip}
+a{color:var(--brand);text-decoration:none} a:hover{text-decoration:underline}
+code{font-family:var(--mono);font-size:.9em;overflow-wrap:anywhere}
+:focus-visible{outline:2px solid color-mix(in srgb,var(--brand) 50%,transparent);outline-offset:1px}
+.app{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;min-width:0}
+.brandblk{display:flex;gap:10px;align-items:center;padding:16px;border-bottom:1px solid var(--border)}
+.logo{height:28px;width:28px;flex:none;border-radius:var(--r-sm);background:var(--brand);color:var(--on-brand);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;font-family:var(--mono)}
+.brandblk .t{font-size:14px;font-weight:600} .brandblk .s{font-size:12px;color:var(--fg-3)}
+.nav{display:flex;flex-direction:column;gap:2px;padding:12px 8px;flex:1}
+.nav a{display:flex;align-items:center;gap:10px;border-radius:var(--r-md);padding:6px 10px;font-size:14px;color:var(--fg-2)}
+.nav a:hover{background:var(--hover);color:var(--fg);text-decoration:none}
+.nav .cnt{margin-left:auto}
+.side-foot{border-top:1px solid var(--border);padding:12px;font-size:12px;color:var(--fg-3);display:grid;gap:6px}
+.side-foot b{color:var(--warn);font-weight:600}
+.mtag{display:none}
+.main{min-width:0;padding-inline:clamp(16px,3vw,32px);padding-block:24px 64px;display:grid;gap:16px;align-content:start;max-width:1280px}
+.pagehead{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;min-width:0}
+.pagehead>div{min-width:0}
+.crumbs{font-size:13px;color:var(--fg-3);margin-bottom:4px}
+h1{font-size:24px;font-weight:600;letter-spacing:-.01em;margin:0;line-height:1.25}
+.desc{font-size:15px;color:var(--fg-2);margin:6px 0 0;max-width:78ch}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.card{border:1px solid var(--border);background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--shadow-card);min-width:0}
+.card[id]{scroll-margin-top:16px}
+.card-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.card-h>div{min-width:0;flex:1 1 300px}
+.card-h h2{font-size:16px;font-weight:600;margin:0;line-height:22px}
+.card-h h2 .n{font-family:var(--mono);font-size:13px;color:var(--fg-3);font-weight:500;margin-right:6px}
+.card-h p{font-size:14px;color:var(--fg-3);margin:2px 0 0;max-width:82ch}
+.card-b{padding:14px 16px;display:grid;gap:12px;min-width:0}
+.card-b>*{min-width:0}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{padding:12px 16px;display:grid;gap:4px;align-content:start}
+.kpi .l{font-size:13px;color:var(--fg-3);font-weight:500}
+.kpi .v{font-size:20px;font-weight:600;font-family:var(--mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.kpi .sub{font-size:12px;color:var(--fg-3);overflow-wrap:anywhere}
+.kpi.good .v{color:var(--good)} .kpi.bad .v{color:var(--bad)}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:500;line-height:16px;white-space:nowrap}
+.t-neutral{background:var(--active);color:var(--fg-2)} .t-brand{background:var(--brand-soft);color:var(--brand)} .t-good{background:var(--good-soft);color:var(--good)}
+.t-warn{background:var(--warn-soft);color:var(--warn)} .t-bad{background:var(--bad-soft);color:var(--bad)} .t-info{background:var(--info-soft);color:var(--info)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;border-radius:var(--r-md);font:inherit;font-size:14px;font-weight:500;height:34px;padding:0 12px;cursor:pointer;border:1px solid transparent}
+.btn-primary{background:var(--brand);color:var(--on-brand)} .btn-primary:hover{opacity:.9}
+.btn-outline{border-color:var(--border);background:var(--surface);color:var(--fg)} .btn-outline:hover{background:var(--surface-2)}
+.btn-sm{height:30px;padding:0 10px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.field{display:grid;gap:4px;min-width:0}
+.lbl{font-size:13px;font-weight:500;color:var(--fg-2)}
+.hint{font-size:13px;color:var(--fg-3)}
+.inp{display:flex;height:34px;width:100%;min-width:0;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface);padding:0 10px;font:inherit;font-size:14px;color:var(--fg)}
+.inp:focus-visible{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 22%,transparent)}
+select.inp{appearance:none;padding-right:28px;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%2380868f" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>');background-repeat:no-repeat;background-position:right 8px center}
+textarea.inp{height:auto;min-height:92px;padding:8px 10px;line-height:1.55;resize:vertical}
+.tw{overflow-x:auto;min-width:0}
+table.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl thead th{background:var(--surface-2);font-size:12px;color:var(--fg-3);font-weight:500;text-align:right;padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl thead th.l{text-align:left}
+.tbl td{padding:7px 10px;border-bottom:1px solid color-mix(in srgb,var(--border) 70%,transparent);vertical-align:top}
+.tbl td.r{text-align:right;font-family:var(--mono);font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--fg-2)}
+.tbl td .sm{display:block;font-size:12px;color:var(--fg-3);font-family:var(--sans)}
+.tbl tr.hit td:first-child{box-shadow:inset 3px 0 0 var(--brand)}
+.tbl tfoot td{font-weight:600;background:var(--surface-2)}
+.tbl.wrap td{white-space:normal}
+.pos{color:var(--bad)!important} .neg{color:var(--info)!important}
+.banner{display:flex;gap:10px;align-items:flex-start;border-radius:var(--r-md);padding:10px 14px;font-size:14px;border:1px solid;min-width:0}
+.banner>span{min-width:0}
+.banner.warn{background:var(--warn-soft);color:var(--warn);border-color:color-mix(in srgb,var(--warn) 25%,transparent)}
+.banner.bad{background:var(--bad-soft);color:var(--bad);border-color:color-mix(in srgb,var(--bad) 25%,transparent)}
+.banner.good{background:var(--good-soft);color:var(--good);border-color:color-mix(in srgb,var(--good) 25%,transparent)}
+.banner.info{background:var(--info-soft);color:var(--info);border-color:color-mix(in srgb,var(--info) 25%,transparent)}
+.banner b{font-weight:600}
+.topbanner{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:12px;align-items:center;padding:12px 14px}
+@media (max-width:760px){.topbanner{grid-template-columns:minmax(0,1fr)}}
+.topbanner .txt{font-size:14px;color:var(--warn)}
+.topbanner .txt b{font-weight:600}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:860px){.tiles{grid-template-columns:minmax(0,1fr)}}
+.tile{border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;display:grid;gap:6px;align-content:start;background:var(--surface-2);min-width:0}
+.tile h3{margin:0;font-size:13px;font-weight:600;color:var(--fg-2);text-transform:uppercase;letter-spacing:.04em}
+.tile p,.tile ul{margin:0;font-size:14px;color:var(--fg-2)}
+.tile ul{padding-left:18px;display:grid;gap:3px}
+.tile.wide{grid-column:1/-1}
+.pol{display:grid;grid-template-columns:repeat(2,minmax(0,200px)) auto;gap:12px;align-items:end}
+@media (max-width:560px){.pol{grid-template-columns:minmax(0,1fr)}}
+.ctrl{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;background:var(--surface-2)}
+.ctrl .what{font-size:14px;min-width:0;flex:1 1 280px}
+.ctrl .what b{font-weight:600}
+.fnd{border-top:1px solid var(--border);padding:16px;display:grid;gap:10px;min-width:0}
+.fnd>*{min-width:0}
+.fnd:first-child{border-top:0}
+.fnd .top{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.fnd .nm{font-size:15px;font-weight:600}
+.fnd .amt{margin-left:auto;font-family:var(--mono);font-weight:600;font-size:15px}
+.src{font-size:12px;color:var(--fg-3);overflow-wrap:anywhere}
+.gate{font-size:13px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;min-width:0}
+.gate code{font-size:12px;border-radius:var(--r-sm);padding:1px 5px;background:var(--active);color:var(--fg-2)}
+.gate code.x{background:var(--bad-soft);color:var(--bad)}
+.nodraft{padding:12px 16px;border-top:1px solid var(--border);font-size:14px;color:var(--fg-2);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+details.blocked{font-size:13px;color:var(--fg-3)} details.blocked p{margin:6px 0 0;font-style:italic}
+.disp{display:grid;grid-template-columns:280px minmax(0,1fr);gap:8px;align-items:center}
+@media (max-width:700px){.disp{grid-template-columns:minmax(0,1fr)}}
+.checks{display:grid;gap:8px}
+.chk{display:grid;grid-template-columns:44px 40px minmax(0,1fr);gap:8px;font-size:14px}
+.chk .tag{font-family:var(--mono);font-size:12px;font-weight:600;padding-top:2px}
+.chk .id{font-family:var(--mono);font-size:12px;color:var(--fg-3);padding-top:2px}
+.chk .dt{grid-column:3;font-family:var(--mono);font-size:12px;color:var(--fg-3);display:grid;gap:2px;overflow-wrap:anywhere}
+.ok{color:var(--good)} .no{color:var(--bad)}
+.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:700px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.summary div{border:1px solid var(--border);border-radius:var(--r-md);padding:8px 10px;display:grid;gap:2px;min-width:0}
+.summary .l{font-size:12px;color:var(--fg-3)} .summary .v{font-family:var(--mono);font-weight:600;font-size:15px;overflow-wrap:anywhere}
+.cl{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.cl li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:6px;font-size:14px}
+.cl .m{font-family:var(--mono);font-weight:600}
+.classes{display:grid;gap:8px}
+.classes .crow{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:8px;align-items:center}
+@media (max-width:560px){.classes .crow{grid-template-columns:minmax(0,1fr)}}
+.sign{display:grid;grid-template-columns:repeat(2,minmax(0,1fr)) auto;gap:12px;align-items:end}
+@media (max-width:700px){.sign{grid-template-columns:minmax(0,1fr)}}
+.prose{font-size:15px;color:var(--fg-2);display:grid;gap:10px;max-width:80ch}
+.prose p,.prose ul{margin:0} .prose b{color:var(--fg)} .prose ul{padding-left:20px;display:grid;gap:4px}
+.foot{font-size:13px;color:var(--fg-3);max-width:90ch}
+@media (max-width:1024px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .sidebar{position:sticky;top:0;height:auto;z-index:5;flex-direction:row;align-items:center;border-right:0;border-bottom:1px solid var(--border)}
+  .brandblk{border-bottom:0;padding:10px 12px} .brandblk .s{display:none}
+  .nav{flex-direction:row;overflow-x:auto;padding:8px;flex:1;min-width:0} .nav a{white-space:nowrap}
+  .side-foot{display:none} .mtag{display:inline-flex;margin-right:10px;flex:none} .card[id]{scroll-margin-top:64px}
+}
+@media (max-width:480px){.brandblk .t{display:none} .kpi .v{font-size:17px} h1{font-size:21px} .kpis{gap:8px} .kpi{padding:10px 12px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brandblk"><div class="logo">DD</div><div><div class="t">Deploy Desk</div><div class="s">Q3 close, synthetic</div></div></div>
+    <nav class="nav" aria-label="Sections">
+      <a href="#spec">1. Spec</a>
+      <a href="#results">2. Variances <span class="cnt badge t-brand" id="navF">0</span></a>
+      <a href="#commentary">3. Commentary</a>
+      <a href="#evals">4. Evals <span class="cnt badge" id="navE"></span></a>
+      <a href="#signoff">5. Sign-off <span class="cnt badge" id="navG"></span></a>
+      <a href="#about">How it works</a>
+    </nav>
+    <span class="mtag badge t-warn">Synthetic</span>
+    <div class="side-foot"><span><b>Synthetic data.</b> Prototype built outside Pigment. Not affiliated with or endorsed by Pigment.</span><span>Built by Russell Harris.</span></div>
+  </aside>
+
+  <main class="main">
+    <div class="banner warn topbanner" role="note">
+      <div class="txt"><b>Synthetic data.</b> A prototype built outside Pigment for a job application. Not deployed to any customer. Not affiliated with or endorsed by Pigment. Modeled on Pigment's public documentation of <a href="https://kb.pigment.com/docs/create-custom-agents" target="_blank" rel="noopener noreferrer">Custom Agents</a> and the <a href="https://community.pigment.com/discover-stencil-212/01-pigment-stencil-overview-4333" target="_blank" rel="noopener noreferrer">Stencil method</a>.</div>
+      <div class="field"><label class="lbl" for="caseSel">Close state</label><select class="inp" id="caseSel"></select></div>
+    </div>
+
+    <div class="pagehead" id="overview">
+      <div>
+        <div class="crumbs">Customer deployment / Sample Co (synthetic) / Q3 opex variance agent</div>
+        <h1>Is the Q3 variance agent ready to go live?</h1>
+        <p class="desc">A go-live pack for one Custom Agent of the kind Pigment documents: an FP&amp;A analyst that explains opex variances against plan and flags those over 5 percent. Code computes every figure. An AI model drafted the commentary at build time and a numbers gate checks it. A person classifies each variance and signs. The evals decide whether the configuration can ship, and the close decides whether the agent may speak.</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-outline btn-sm" id="resetBtn" type="button">Reset page</button>
+        <button class="btn btn-outline btn-sm" id="themeBtn" type="button" aria-label="Toggle dark mode">Theme</button>
+      </div>
+    </div>
+
+    <section class="kpis" aria-label="Status">
+      <div class="card kpi" id="kpiC"><span class="l">Needs commentary</span><span class="v" id="kC"></span><span class="sub" id="kCs"></span></div>
+      <div class="card kpi" id="kpiT"><span class="l">Company variance</span><span class="v" id="kT"></span><span class="sub" id="kTs"></span></div>
+      <div class="card kpi" id="kpiR"><span class="l">Release gate</span><span class="v" id="kR"></span><span class="sub" id="kRs"></span></div>
+      <div class="card kpi" id="kpiG"><span class="l">Go-live</span><span class="v" id="kG"></span><span class="sub" id="kGs"></span></div>
+    </section>
+
+    <div class="banner bad" id="regBanner" hidden></div>
+
+    <section class="card" id="spec">
+      <div class="card-h"><div><h2><span class="n">1</span>Spec: the proposed Custom Agent configuration</h2><p>Written in the shape of Pigment's Custom Agent settings (General, Instructions, Knowledge, Skills, Conversation Starters). Not loaded into Pigment. Change the policy and every section below recomputes.</p></div></div>
+      <div class="card-b">
+        <div class="pol">
+          <div class="field"><label class="lbl" for="polT">Threshold T (percent, 1.0 to 20.0)</label><input class="inp" id="polT" inputmode="decimal" autocomplete="off"></div>
+          <div class="field"><label class="lbl" for="polF">Dollar floor F (0 to 1,000,000)</label><input class="inp" id="polF" inputmode="numeric" autocomplete="off"></div>
+          <div class="actions"><button class="btn btn-primary" id="polApply" type="button">Apply policy</button><button class="btn btn-outline" id="polReset" type="button">Defaults</button></div>
+        </div>
+        <div class="banner bad" id="polMsg" hidden role="alert"></div>
+        <div class="hint" id="polNow"></div>
+        <div class="tiles" id="tiles"></div>
+        <div>
+          <div class="lbl" style="margin-bottom:6px">Where each rule comes from</div>
+          <div class="tw"><table class="tbl wrap" id="originTbl"><thead><tr><th class="l">Rule</th><th class="l">Source</th><th class="l">Tested by</th></tr></thead><tbody></tbody></table></div>
+        </div>
+        <div>
+          <div class="lbl" style="margin-bottom:6px">Mapping to Pigment objects: the candidate's reading of public docs, not verified in a workspace</div>
+          <div class="tw"><table class="tbl wrap" id="mapTbl"><thead><tr><th class="l">In this prototype</th><th class="l">Pigment object (as read from public docs)</th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="results">
+      <div class="card-h"><div><h2><span class="n">2</span>Variance results</h2><p>Variance is adjusted actual minus plan; positive is overspend. Percent is rounded half away from zero to one decimal, and the flag rule uses the rounded figure. FTE is the September value. Deferred beats held, and held beats the flag rules.</p></div></div>
+      <div class="card-b">
+        <div id="ctrl"></div>
+        <div class="tw"><table class="tbl" id="resTbl"><thead><tr>
+          <th class="l">Cost center</th><th>Q3 plan</th><th>Q3 actual</th><th>Variance</th><th>Percent</th><th class="l">Direction</th><th>FTE Sep / plan</th><th class="l">Status</th>
+        </tr></thead><tbody></tbody><tfoot></tfoot></table></div>
+      </div>
+    </section>
+
+    <section class="card" id="commentary">
+      <div class="card-h">
+        <div><h2><span class="n">3</span>Commentary and numbers gate</h2><p>Every dollar amount, percent, and FTE count in a draft must match a figure in that row's facts, the company totals, or the policy, within half of the last digit shown. A draft must name the cost center and its exact variance, and may not use an em dash, an exclamation point, or the words one-time, continuing, or timing. Edit a draft and the gate runs again. The gate cannot catch an invented cause stated without numbers; the reviewer covers that.</p></div>
+        <button class="btn btn-outline btn-sm" id="tryGate" type="button">Try the gate</button>
+      </div>
+      <div id="dList"></div>
+    </section>
+
+    <section class="card" id="evals">
+      <div class="card-h"><div><h2><span class="n">4</span>Eval and release gate</h2><p>Fourteen close scenarios checked against a hand-built answer key, an independent Python implementation, and seven gate tests. The same checks run in Node before every publish. Pick a simulated regression: it changes the engine for the whole page, and the evals have to block it.</p></div></div>
+      <div class="card-b">
+        <div class="disp">
+          <div class="field"><label class="lbl" for="regSel">Code version</label><select class="inp" id="regSel"></select></div>
+          <div class="hint" id="regDetail"></div>
+        </div>
+        <div class="banner" id="relBanner"></div>
+        <div class="summary" id="evSum"></div>
+        <div class="checks" id="checkList"></div>
+        <div>
+          <div class="lbl" style="margin-bottom:6px">Gate tests (fixed strings, checked against the Case 1 Sales row)</div>
+          <div class="tw"><table class="tbl wrap" id="gtTbl"><thead><tr><th class="l">#</th><th class="l">Draft text</th><th class="l">Expected</th><th class="l">Gate says</th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="signoff">
+      <div class="card-h"><div><h2><span class="n">5</span>Sign-off and go-live pack</h2><p>The agent never classifies a variance. The FP&amp;A lead classifies each flagged one and signs the Functionality / Use Case Sign-Off (Stencil's term). Go-live needs the release gate allowed, no deferred or held rows, every flagged row classified with a passing draft, and a name.</p></div></div>
+      <div class="card-b">
+        <ul class="cl" id="checklist"></ul>
+        <div class="classes" id="classes"></div>
+        <div class="sign">
+          <div class="field"><label class="lbl" for="soName">Sign-off name</label><input class="inp" id="soName" placeholder="Name" autocomplete="off"></div>
+          <div class="field"><label class="lbl" for="soRole">Role</label><input class="inp" id="soRole" autocomplete="off"></div>
+          <div class="actions"><button class="btn btn-primary" id="exportBtn" type="button">Export go-live pack</button></div>
+        </div>
+        <div class="banner warn" id="goReasons" hidden></div>
+        <div class="hint">The pack downloads as Markdown from this page; nothing is sent anywhere. The name is typed, not verified, and is not saved.</div>
+      </div>
+    </section>
+
+    <section class="card" id="about">
+      <div class="card-h"><div><h2>How it works</h2></div></div>
+      <div class="card-b prose">
+        <p><b>The decision.</b> Is this variance agent ready to go live for the Q3 close, and if not, what blocks it and who has to decide. The deployer owns the configuration and its acceptance tests; the Controller owns journal decisions; the FP&amp;A lead owns classification and sign-off.</p>
+        <p><b>What the model is allowed to do.</b> Write. <span id="modelLine"></span> drafted one note per cost center at build time from figures the engine computed, with the Spec's Instructions and Knowledge as its system prompt. It never computes, never classifies, and never runs in the browser. A draft is shown only when its facts match the current figures exactly; otherwise the page shows the rule-based draft and says so.</p>
+        <p><b>Why the evals look like this.</b> A variance agent fails in quiet ways on a messy close. The four simulated regressions are realistic mistakes: headcount summed across months, favorable variances ignored, an unloaded month counted as zero, and a pending reclass ignored. Each one must fail a named scenario, or the suite reports itself as too weak. G&amp;A at 4.9 percent and Customer Success at $9,000 are decoys that sit just inside the policy.</p>
+        <p><b>Implemented.</b> The variance engine, deferral and hold, the numbers gate, 14 eval scenarios, 4 regressions, 7 gate tests, the Python cross-check, rule drafts, build-time AI drafts, sign-off logic, and the pack export. <b>Mocked or absent.</b> Pigment itself, the Custom Agent runtime, Skills, permission inheritance, data connectors, and identity and persistence of sign-offs.</p>
+        <p><b>Sources.</b> Modeled on Pigment's public documentation and method, read from outside the product:</p>
+        <ul>
+          <li><a href="https://kb.pigment.com/docs/create-custom-agents" target="_blank" rel="noopener noreferrer">Create custom agents</a> (Pigment knowledge base): the configuration tiles and the FP&amp;A Analyst example that flags variances over 5 percent.</li>
+          <li><a href="https://community.pigment.com/discover-stencil-212/01-pigment-stencil-overview-4333" target="_blank" rel="noopener noreferrer">Pigment Stencil overview</a>, <a href="https://community.pigment.com/discover-stencil-212/03-roles-ownership-and-governance-4335" target="_blank" rel="noopener noreferrer">Roles, ownership and governance</a> (sign-off gates), <a href="https://community.pigment.com/discover-stencil-212/06-build-4338" target="_blank" rel="noopener noreferrer">Build</a>, and <a href="https://community.pigment.com/discover-stencil-212/07-test-4339" target="_blank" rel="noopener noreferrer">Test</a> (Pigment community). Stencil terms (Spec, Eval, Steer, sign-off gates, Project Memory) are used only for the artifacts Stencil names. This eval suite is an independent design; Pigment's own Eval Checklist was not read.</li>
+          <li><a href="https://www.pigment.com/blog/ai-agents-finance-workflows" target="_blank" rel="noopener noreferrer">From Variance to Decision</a> (guest post on Pigment's blog): code does the math, AI drafts, people make the call. Pigment's own blog already shows this pattern; the contribution here is the acceptance layer around it.</li>
+        </ul>
+        <p><b>Product feedback note</b> (hypotheses from public docs; may already be addressed):</p>
+        <ul id="pfList"></ul>
+        <p><b>What this does not establish.</b> Behavior inside Pigment, LLM quality on real customer data, that 14 scenarios are enough, time saved, adoption, or Pigment modeling skill. The author has not built in Pigment.</p>
+        <p><b>Not real data.</b> Sample Co, its cost centers, figures, headcount, and journals are synthetic.</p>
+      </div>
+    </section>
+
+    <p class="foot">Deploy Desk, a demo by Russell Harris (<a href="https://russh.work">russh.work</a>). Synthetic data. October 2026.</p>
+  </main>
+</div>
+
+<script>/* Deploy Desk engine. Pure functions, no DOM. Runs in the browser and in Node
+   (gen_drafts.mjs and check.mjs import this same file), so the page, the AI
+   drafts, the numbers gate, and the evals all see identical figures.
+
+   Spec (golden.py implements it separately from this text, not from this code):
+     All money is whole dollars. Q3 plan = sum of the three monthly plans.
+     Q3 actual = sum of the three monthly actuals, only if every month is
+       closed and loaded; otherwise the row is DEFERRED (no actual, variance,
+       percent, or draft).
+     Adjusted actual = Q3 actual - approved journals moved out + approved
+       journals moved in.
+     Variance = adjusted actual - Q3 plan (positive is overspend,
+       unfavorable; negative is favorable).
+     Percent = variance / plan x 100, rounded half away from zero to one
+       decimal; none when plan is 0.
+     Flag when plan > 0 and |rounded percent| > T and |variance| >= F.
+     Unplanned when plan = 0 and actual >= F. Defaults T = 5.0, F = 10,000.
+     FTE = September (end of period) value; difference = actual - plan.
+       Never summed across months.
+     Status precedence: deferred, then held (a pending journal touches the
+       row), then the flag rules. A held row reports "as posted" figures and
+       "if approved" figures and releases no draft.
+     Company total: rows that are deferred are excluded; the total is then
+       labeled incomplete and names the excluded rows. */
+(function (root) {
+  "use strict";
+
+  const DEFAULT_POLICY = { T: 5.0, F: 10000 };
+  const POLICY_LIMITS = { T: [1.0, 20.0], F: [0, 1000000] };
+
+  // Simulated code changes. Each reintroduces a realistic close mistake; the
+  // evals must catch every one, and each names the scenario it should fail.
+  const REGRESSIONS = {
+    none: { label: "Current code", detail: "The engine as published.", expect: null },
+    fteSum: { label: "R1: FTE summed across months", expect: "E06",
+      detail: "Headcount is summed over July, August, and September instead of taking the end-of-period value. Sales would report 132 FTEs." },
+    overspendOnly: { label: "R2: Only overspend flagged", expect: "E02",
+      detail: "Favorable variances are never flagged, so an underspend that may hide a delayed hire or project goes without commentary." },
+    missingAsZero: { label: "R3: Missing month treated as zero", expect: "E07",
+      detail: "An open, unloaded month counts as $0. In Case 3, People looks $102,500 under plan and gets a draft praising savings that do not exist." },
+    ignorePending: { label: "R4: Pending journals ignored", expect: "E08",
+      detail: "Rows touched by a pending journal are reported as posted, so commentary goes out before the Controller decides J-0917." },
+  };
+
+  const STATUS = {
+    flagged: { label: "Flagged", needs: true },
+    unplanned: { label: "Unplanned spend", needs: true },
+    not_flagged: { label: "Not flagged", needs: false },
+    deferred: { label: "Deferred", needs: false },
+    held: { label: "Held", needs: false },
+  };
+  const needsCommentary = (row) => !!STATUS[row.status] && STATUS[row.status].needs;
+
+  // ---- arithmetic ----
+  // Tenths of a percent, rounded half away from zero, using integers only.
+  function pct1(variance, plan) {
+    if (!plan) return null;
+    const num = Math.abs(variance) * 1000;
+    const t = Math.floor((2 * num + plan) / (2 * plan));
+    return (variance < 0 ? -t : t) / 10;
+  }
+  const direction = (v) => (v === null ? null : v > 0 ? "unfavorable" : v < 0 ? "favorable" : "on plan");
+
+  function flagStatus(plan, actual, variance, pct, P, opts) {
+    if (plan === 0) return actual >= P.F ? "unplanned" : "not_flagged";
+    if (opts.overspendOnly && variance <= 0) return "not_flagged";
+    return Math.abs(pct) > P.T && Math.abs(variance) >= P.F ? "flagged" : "not_flagged";
+  }
+  function figures(plan, actual, P, opts) {
+    const variance = actual - plan, pct = pct1(variance, plan);
+    const st = flagStatus(plan, actual, variance, pct, P, opts);
+    return { actual, variance, pct, direction: direction(variance), would_flag: STATUS[st].needs, status: st };
+  }
+
+  function journalStatuses(data, inputs) {
+    const c = data.cases[inputs.case], out = {};
+    for (const j of data.journals) {
+      const base = c.journal_status[j.id];
+      if (!base) continue; // the journal does not exist in this close state
+      const d = inputs.journal_decisions && inputs.journal_decisions[j.id];
+      out[j.id] = base === "pending" && (d === "approved" || d === "rejected") ? d : base;
+    }
+    return out;
+  }
+
+  // ---- one scenario: a close state, a policy, and Controller decisions ----
+  function compute(data, inputs, opts = {}) {
+    const P = { T: inputs.T, F: inputs.F };
+    const c = data.cases[inputs.case];
+    const js = journalStatuses(data, inputs);
+    const rows = data.cost_centers.map((cc) => {
+      const plan = data.months.reduce((s, m) => s + cc.plan[m], 0);
+      const open = (c.open[cc.id] || []).slice(), nul = c.null_actuals[cc.id] || [];
+      const monthly = {};
+      for (const m of data.months) monthly[m] = nul.includes(m) ? null : cc.actual[m];
+      const fte = opts.fteSum ? data.months.reduce((s, m) => s + cc.fte_actual[m], 0) : cc.fte_actual[data.months[data.months.length - 1]];
+      const row = { id: cc.id, name: cc.name, owner_role: cc.owner_role, plan, monthly, monthly_plan: { ...cc.plan },
+                    fte, fte_plan: cc.fte_plan_sep, fte_diff: fte - cc.fte_plan_sep, journals: [] };
+      const waiting = data.months.filter((m) => open.includes(m) || monthly[m] === null);
+      if (waiting.length && !opts.missingAsZero) {
+        return Object.assign(row, { status: "deferred", waiting, actual: null, variance: null, pct: null, direction: null });
+      }
+      const posted = data.months.reduce((s, m) => s + (monthly[m] || 0), 0);
+      let approvedAdj = 0, pendingAdj = 0;
+      const pending = [];
+      for (const j of data.journals) {
+        if (!js[j.id] || (j.from !== cc.id && j.to !== cc.id)) continue;
+        const sign = j.from === cc.id ? -1 : 1;
+        const other = data.cost_centers.find((x) => x.id === (sign < 0 ? j.to : j.from)).name;
+        const entry = { id: j.id, amount: j.amount, dir: sign < 0 ? "out" : "in", other, status: js[j.id], description: j.description };
+        row.journals.push(entry);
+        if (js[j.id] === "approved") approvedAdj += sign * j.amount;
+        if (js[j.id] === "pending") { pendingAdj += sign * j.amount; pending.push(entry); }
+      }
+      row.posted_actual = posted;
+      if (pending.length && !opts.ignorePending) {
+        const asPosted = figures(plan, posted + approvedAdj, P, opts);
+        const ifApproved = figures(plan, posted + approvedAdj + pendingAdj, P, opts);
+        return Object.assign(row, { status: "held", pending: pending.map((p) => p.id),
+          actual: asPosted.actual, variance: asPosted.variance, pct: asPosted.pct, direction: asPosted.direction,
+          as_posted: strip(asPosted), if_approved: strip(ifApproved) });
+      }
+      const f = figures(plan, posted + approvedAdj, P, opts);
+      return Object.assign(row, { status: f.status, actual: f.actual, variance: f.variance, pct: f.pct, direction: f.direction });
+    });
+    const inc = rows.filter((r) => r.status !== "deferred");
+    const tPlan = inc.reduce((s, r) => s + r.plan, 0), tAct = inc.reduce((s, r) => s + r.actual, 0);
+    const total = { complete: inc.length === rows.length, excluded: rows.filter((r) => r.status === "deferred").map((r) => r.id),
+                    plan: tPlan, actual: tAct, variance: tAct - tPlan, pct: pct1(tAct - tPlan, tPlan) };
+    return { inputs, policy: P, journalStatus: js, rows, total, flagged: rows.filter(needsCommentary).map((r) => r.id) };
+  }
+  const strip = (f) => ({ actual: f.actual, variance: f.variance, pct: f.pct, would_flag: f.would_flag });
+
+  // ---- formatting: the only forms the page, the drafts, and the pack use ----
+  const money = (n) => (n < 0 ? "-" : "") + "$" + Math.abs(n).toLocaleString("en-US");
+  const pct = (p) => (p === null || p === undefined ? "n/a" : (p < 0 ? "-" : "") + Math.abs(p).toFixed(1) + "%");
+  const fteWord = (n) => (n === 1 ? "FTE" : "FTEs");
+
+  // ---- the facts a draft may use; drafts are keyed by a hash of them ----
+  function factsFor(row) {
+    const f = { id: row.id, name: row.name, plan: row.plan, actual: row.actual, variance: row.variance, pct: row.pct,
+                fte: row.fte, fte_plan: row.fte_plan };
+    const appr = row.journals.filter((j) => j.status === "approved");
+    if (appr.length) { f.posted_actual = row.posted_actual; f.journals = appr.map((j) => ({ id: j.id, amount: j.amount, dir: j.dir, other: j.other })); }
+    return f;
+  }
+  function hash(o) {
+    const s = JSON.stringify(o);
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return (h >>> 0).toString(16).padStart(8, "0");
+  }
+  const factsHash = (row) => hash(factsFor(row));
+
+  // Deterministic draft (templates from the brief, Section 9).
+  function ruleDraft(row) {
+    if (row.plan === 0) return `${row.name} recorded ${money(row.actual)} of Q3 spend with no plan. Confirm the owner and whether a plan line should be added.`;
+    const appr = row.journals.filter((j) => j.status === "approved");
+    const jr = appr.map((j) => ` That figure reflects approved journal ${j.id}, which moved ${money(j.amount)} ${j.dir === "out" ? "out to " : "in from "}${j.other}.`).join("");
+    return `${row.name} spent ${money(row.actual)} in Q3 against a plan of ${money(row.plan)}, ${money(Math.abs(row.variance))} (${pct(Math.abs(row.pct))}) ${row.variance > 0 ? "over" : "under"} plan.${jr} Headcount ended the quarter at ${row.fte} ${fteWord(row.fte)} against a plan of ${row.fte_plan}. The owner should document the driver before FP&A review.`;
+  }
+
+  // ---- the numbers gate ----
+  // Every dollar amount, percent, and FTE count in a draft must match a figure
+  // in that row's facts, the company totals, or the policy, within half of the
+  // last digit shown. Policy breaches and missing required content block too.
+  function allowedFigures(row, res) {
+    const money = new Set(), pcts = new Set(), counts = new Set();
+    const addM = (v) => { if (typeof v === "number") money.add(Math.abs(v)); };
+    const addP = (v) => { if (typeof v === "number") pcts.add(Math.abs(v)); };
+    for (const v of [row.plan, row.actual, row.variance, row.posted_actual]) addM(v);
+    for (const m of Object.keys(row.monthly)) { addM(row.monthly[m]); addM(row.monthly_plan[m]); }
+    for (const j of row.journals) addM(j.amount);
+    addP(row.pct);
+    for (const v of [row.fte, row.fte_plan, Math.abs(row.fte_diff)]) counts.add(v);
+    const T = res.total;
+    for (const v of [T.plan, T.actual, T.variance]) addM(v);
+    addP(T.pct);
+    addM(res.policy.F); addP(res.policy.T);
+    return { money, pcts, counts };
+  }
+  const MONEY_RX = /\$\s?(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?\s?(MM|M|K|million|thousand)?\b/gi;
+  const PCT_RX = /(\d+(?:\.\d+)?)\s?(?:%|percent\b)/gi;
+  const COUNT_RX = /(?<![\d.,$])\b(\d{1,3}(?:,\d{3})+|\d+)\s*(?:FTEs?|full-time equivalents?|employees|heads|people)\b/gi;
+  const HEAD_RX = /\bheadcount\s+(?:of|at|to|was|is|reached|ended at|ended the quarter at|ended Q3 at)\s+(\d{1,3}(?:,\d{3})+|\d+)\b(?!\s?%|\.\d)/gi;
+  const CLASS_RX = /\b(one[- ]time|continuing|timing)\b/i;
+
+  function gate(text, row, res) {
+    const A = allowedFigures(row, res), unsupported = [], policy = [], missing = [];
+    const push = (s) => { if (!unsupported.includes(s)) unsupported.push(s); };
+    for (const m of text.matchAll(MONEY_RX)) {
+      const whole = Number(m[1].replace(/,/g, "")), frac = m[2] ? Number("0." + m[2]) : 0;
+      const unit = (m[3] || "").toLowerCase();
+      const mult = unit === "mm" || unit === "million" ? 1e6 : unit === "k" || unit === "thousand" || unit === "m" ? 1e3 : 1;
+      const v = (whole + frac) * mult, decimals = m[2] ? m[2].length : 0;
+      const tol = mult === 1 ? 0.5 : (0.5 * mult) / Math.pow(10, decimals);
+      if (![...A.money].some((a) => Math.abs(a - v) <= tol + 1e-9)) push(m[0].trim());
+    }
+    for (const m of text.matchAll(PCT_RX)) {
+      const v = Number(m[1]), decimals = (m[1].split(".")[1] || "").length;
+      const tol = 0.5 / Math.pow(10, decimals);
+      if (![...A.pcts].some((a) => Math.abs(a - v) <= tol + 1e-9)) push(m[0].trim());
+    }
+    for (const rx of [COUNT_RX, HEAD_RX]) for (const m of text.matchAll(rx)) {
+      if (!A.counts.has(Number(m[1].replace(/,/g, "")))) push(rx === HEAD_RX ? m[1] + " (headcount)" : m[0].trim());
+    }
+    if (text.includes(String.fromCharCode(0x2014))) policy.push("contains an em dash");
+    if (text.includes(String.fromCharCode(0x2013))) policy.push("contains an en dash");
+    if (text.includes("!")) policy.push("contains an exclamation point");
+    const cw = text.match(CLASS_RX);
+    if (cw) policy.push(`uses the classification word "${cw[1]}"; a person classifies variances`);
+    if (!text.toLowerCase().includes(row.name.toLowerCase())) missing.push(`the cost center name (${row.name})`);
+    if (typeof row.variance === "number") {
+      const need = money(Math.abs(row.variance));
+      if (!text.includes(need)) missing.push(`the variance figure (${need})`);
+    }
+    return { passed: !unsupported.length && !policy.length && !missing.length, unsupported, policy, missing };
+  }
+  const gateSummary = (g) => (g.passed ? "passed" : g.unsupported.map((u) => "unsupported " + u).concat(g.policy, g.missing.map((m) => "missing " + m)).join("; "));
+
+  // The draft the page shows for a row: the build-time AI draft when one exists
+  // for these exact facts and it passes the gate now; otherwise the rule draft.
+  // Deferred, held, and unflagged rows get no draft.
+  function draftFor(row, res, drafts) {
+    if (!needsCommentary(row)) return null;
+    const h = factsHash(row), ai = drafts && drafts.drafts ? drafts.drafts[h] : null;
+    if (ai) {
+      const g = gate(ai.text, row, res);
+      if (g.passed) return { text: ai.text, source: "ai", model: drafts.model, generated: drafts.generated, hash: h };
+      return { text: ruleDraft(row), source: "rule", replaced: { text: ai.text, gate: g }, hash: h, model: drafts.model, generated: drafts.generated };
+    }
+    return { text: ruleDraft(row), source: "rule", hash: h };
+  }
+
+  // ---- policy validation: invalid input is rejected and the old value kept ----
+  function validatePolicy(tRaw, fRaw, prev) {
+    const errors = [], out = { ...prev };
+    const ts = String(tRaw).trim(), t = Number(ts);
+    if (ts === "" || !Number.isFinite(t)) errors.push(`Threshold "${ts}" is not a number. Kept ${prev.T.toFixed(1)}.`);
+    else if (t < POLICY_LIMITS.T[0] || t > POLICY_LIMITS.T[1]) errors.push(`Threshold must be between 1.0 and 20.0. Kept ${prev.T.toFixed(1)}.`);
+    else out.T = t;
+    const fs = String(fRaw).trim().replace(/^\$/, "").replace(/,/g, "");
+    if (!/^-?\d+$/.test(fs)) errors.push(`Floor "${String(fRaw).trim()}" is not a whole-dollar amount. Kept ${money(prev.F)}.`);
+    else {
+      const f = Number(fs);
+      if (f < POLICY_LIMITS.F[0] || f > POLICY_LIMITS.F[1]) errors.push(`Floor must be between $0 and $1,000,000. Kept ${money(prev.F)}.`);
+      else out.F = f;
+    }
+    return { ok: errors.length === 0, policy: out, errors };
+  }
+
+  // ---- evals E01 to E11: engine output against the hand-built answer key ----
+  const EVALS = [
+    { id: "E01", text: "Sales flagged unfavorable, $112,500, 7.5%", rows: [["case1_default", "SAL", ["status", "actual", "variance", "pct", "direction"]]] },
+    { id: "E02", text: "Marketing flagged favorable, -$54,000, -6.0% (favorable variances are not ignored)", rows: [["case1_default", "MKT", ["status", "actual", "variance", "pct", "direction"]]] },
+    { id: "E03", text: "G&A at 4.9% not flagged (threshold decoy)", rows: [["case1_default", "GNA", ["status", "variance", "pct"]], ["case1_floor5000", "GNA", ["status", "pct"]]] },
+    { id: "E04", text: "Customer Success not flagged at F = $10,000; flagged at F = $5,000", rows: [["case1_default", "CS", ["status", "variance", "pct"]], ["case1_floor5000", "CS", ["status", "variance", "pct", "direction"]]], sets: ["case1_floor5000"] },
+    { id: "E05", text: "Engineering at 1.5% not flagged", rows: [["case1_default", "ENG", ["status", "variance", "pct"]]] },
+    { id: "E06", text: "Sales FTE reported as 45 against a plan of 42 (end of period, never summed)", rows: [["case1_default", "SAL", ["fte", "fte_plan"]]] },
+    { id: "E07", text: "People deferred while September is open: no variance, no percent, no draft; total incomplete, partial $150,900 (2.7%)", rows: [["case3_pending", "PEO", ["status", "actual", "variance", "pct", "draft"]]], totals: ["case3_pending"] },
+    { id: "E08", text: "Sales and Marketing held while J-0917 is pending; both outcomes shown; no drafts", rows: [["case3_pending", "SAL", ["status", "as_posted", "if_approved", "draft"]], ["case3_pending", "MKT", ["status", "as_posted", "if_approved", "draft"]]], sets: ["case3_pending"] },
+    { id: "E09", text: "J-0917 approved: Sales $72,500 (4.8%), Marketing -$14,000 (-1.6%), neither flagged; rejected: as posted", rows: [["case3_approved", "SAL", null], ["case3_approved", "MKT", null], ["case3_rejected", "SAL", null], ["case3_rejected", "MKT", null]], sets: ["case3_approved", "case3_rejected"] },
+    { id: "E10", text: "Data Platform flagged as unplanned spend, $18,000, no percent", rows: [["case1_default", "DP", ["status", "actual", "variance", "pct"]]], sets: ["case1_default"], totals: ["case1_default"] },
+    { id: "E11", text: "Threshold 7.0 with the default floor: flagged set is Sales and Data Platform only", rows: [["case1_t7", "SAL", null], ["case1_t7", "MKT", null]], sets: ["case1_t7"] },
+  ];
+  const show = (v) => (v === null || v === undefined ? "none" : typeof v === "object" ? JSON.stringify(v) : String(v));
+  function cmpRow(sid, rid, fields, key, scen, drafts) {
+    const exp = key.scenarios[sid].rows[rid], row = scen[sid].rows.find((r) => r.id === rid), out = [];
+    for (const f of fields || Object.keys(exp)) {
+      if (!(f in exp)) continue;
+      if (f === "draft") { const d = draftFor(row, scen[sid], drafts); if (d !== null) out.push(`${sid} ${rid} draft: engine produced a draft, key says none`); continue; }
+      if (f === "as_posted" || f === "if_approved") {
+        if (!row[f]) { out.push(`${sid} ${rid} ${f}: engine none, key ${show(exp[f])}`); continue; }
+        for (const k of Object.keys(exp[f])) if (row[f][k] !== exp[f][k]) out.push(`${sid} ${rid} ${f}.${k}: engine ${show(row[f][k])}, key ${show(exp[f][k])}`);
+        continue;
+      }
+      if (row[f] !== exp[f]) out.push(`${sid} ${rid} ${f}: engine ${show(row[f])}, key ${show(exp[f])}`);
+    }
+    return out;
+  }
+  function cmpTotal(sid, key, scen) {
+    const exp = key.scenarios[sid].total, t = scen[sid].total, out = [];
+    for (const k of Object.keys(exp)) {
+      const a = Array.isArray(exp[k]) ? exp[k].join(",") : exp[k], b = Array.isArray(t[k]) ? t[k].join(",") : t[k];
+      if (a !== b) out.push(`${sid} total ${k}: engine ${show(b)}, key ${show(a)}`);
+    }
+    return out;
+  }
+  function cmpSet(sid, key, scen) {
+    const a = scen[sid].flagged.slice().sort().join(","), b = key.scenarios[sid].flagged.slice().sort().join(",");
+    return a === b ? [] : [`${sid} flagged set: engine {${a}}, key {${b}}`];
+  }
+
+  // E12: every engine figure against the independent Python implementation.
+  const GOLD_ROW = ["status", "actual", "variance", "pct", "fte", "fte_plan"];
+  const GOLD_SUB = ["actual", "variance", "pct", "would_flag"];
+  const GOLD_TOT = ["complete", "excluded", "plan", "actual", "variance", "pct"];
+  function goldenMatch(scen, golden) {
+    let n = 0, ok = 0;
+    const mism = [];
+    const eq = (a, b) => (Array.isArray(a) ? a.join(",") : a) === (Array.isArray(b) ? b.join(",") : b);
+    for (const sid of Object.keys(golden.scenarios)) {
+      const g = golden.scenarios[sid], s = scen[sid];
+      if (!s) { mism.push(`${sid}: engine did not run this scenario`); continue; }
+      for (const gr of g.rows) {
+        const r = s.rows.find((x) => x.id === gr.id);
+        for (const k of GOLD_ROW) { n++; if (r && eq(r[k], gr[k])) ok++; else mism.push(`${sid} ${gr.id} ${k}: engine ${show(r && r[k])}, Python ${show(gr[k])}`); }
+        for (const sub of ["as_posted", "if_approved"]) if (gr[sub]) for (const k of GOLD_SUB) {
+          n++; if (r && r[sub] && eq(r[sub][k], gr[sub][k])) ok++; else mism.push(`${sid} ${gr.id} ${sub}.${k}: engine ${show(r && r[sub] && r[sub][k])}, Python ${show(gr[sub][k])}`);
+        }
+      }
+      for (const k of GOLD_TOT) { n++; if (eq(s.total[k], g.total[k])) ok++; else mism.push(`${sid} total ${k}: engine ${show(s.total[k])}, Python ${show(g.total[k])}`); }
+      n++; if (eq(s.flagged.slice().sort(), g.flagged.slice().sort())) ok++; else mism.push(`${sid} flagged set: engine ${s.flagged.join(",")}, Python ${g.flagged.join(",")}`);
+    }
+    return { n, ok, mism };
+  }
+
+  // E13: fixed gate strings against the Case 1 Sales row (current code).
+  const GATE_TESTS = [
+    ["Sales spent $1,612,500 against a plan of $1,500,000, $112,500 (7.5%) over plan.", true],
+    ["Sales is $112,500 over plan, and headcount ended Q3 at 45 FTEs against a plan of 42.", true],
+    ["Sales is $121,500 over plan.", false],
+    ["Sales is $112,500 over plan with 132 FTEs.", false],
+    ["Sales is $112,500 or 9% over plan.", false],
+    ["Sales is $112,500 over plan, a timing difference.", false],
+    ["Sales is $112,500 over plan!", false],
+  ];
+
+  function runChecks(data, key, golden, drafts, opts = {}) {
+    const scen = {};
+    for (const sid of Object.keys(key.scenarios)) scen[sid] = compute(data, key.scenarios[sid].inputs, opts);
+    const checks = [];
+    const add = (id, ok, text, detail) => checks.push({ id, ok, text, detail: detail || [] });
+    for (const e of EVALS) {
+      let d = [];
+      for (const [sid, rid, fields] of e.rows) d = d.concat(cmpRow(sid, rid, fields, key, scen, drafts));
+      for (const sid of e.sets || []) d = d.concat(cmpSet(sid, key, scen));
+      for (const sid of e.totals || []) d = d.concat(cmpTotal(sid, key, scen));
+      add(e.id, d.length === 0, e.text, d);
+    }
+    const gm = goldenMatch(scen, golden);
+    add("E12", gm.ok === gm.n && gm.n > 0, `${gm.ok} of ${gm.n} engine figures match the independent Python implementation`, gm.mism);
+    const baseRes = compute(data, key.scenarios.case1_default.inputs);
+    const base = baseRes.rows.find((r) => r.id === "SAL");
+    let gp = 0;
+    const gfail = [];
+    for (const [t, exp] of GATE_TESTS) { const g = gate(t, base, baseRes); if (g.passed === exp) gp++; else gfail.push(`expected ${exp ? "pass" : "block"}, got ${g.passed ? "pass" : "block"}: ${t}`); }
+    add("E13", gp === GATE_TESTS.length, `${gp} of ${GATE_TESTS.length} gate tests return the expected answer`, gfail);
+    let shown = 0, okd = 0, ai = 0, replaced = 0;
+    const dfail = [];
+    for (const sid of Object.keys(scen)) for (const row of scen[sid].rows) {
+      const d = draftFor(row, scen[sid], drafts);
+      if (!d) continue;
+      shown++; if (d.source === "ai") ai++; if (d.replaced) replaced++;
+      const g = gate(d.text, row, scen[sid]);
+      if (g.passed) okd++; else dfail.push(`${sid} ${row.id} (${d.source} draft): ${gateSummary(g)}`);
+    }
+    add("E14", okd === shown, `${okd} of ${shown} displayed drafts pass the gate against current figures (${ai} AI, ${shown - ai} rule-based, ${replaced} AI drafts replaced after failing the gate)`, dfail);
+    return { scen, checks, release: checks.every((c) => c.ok) };
+  }
+
+  // ---- go-live decision: release, people, and the close all have to agree ----
+  function goLive(ctx) {
+    // ctx: { release, failing, res, drafts, texts: {id: text}, classes: {id: value}, signoff: {name, role} }
+    const reasons = [];
+    if (!ctx.release) reasons.push(`Release gate is BLOCKED (${ctx.failing.join(", ")} failing).`);
+    for (const r of ctx.res.rows) {
+      if (r.status === "deferred") reasons.push(`${r.name} is deferred: ${r.waiting.join(", ")} not closed.`);
+      if (r.status === "held") reasons.push(`${r.name} is held: ${r.pending.join(", ")} waits on the Controller.`);
+    }
+    for (const id of ctx.res.flagged) {
+      const r = ctx.res.rows.find((x) => x.id === id);
+      if (!ctx.classes[id]) reasons.push(`Classify the ${r.name} variance.`);
+      const d = draftFor(r, ctx.res, ctx.drafts);
+      const text = ctx.texts && ctx.texts[id] !== undefined ? ctx.texts[id] : d.text;
+      if (!gate(text, r, ctx.res).passed) reasons.push(`The ${r.name} draft is blocked by the numbers gate.`);
+    }
+    if (!ctx.signoff || !String(ctx.signoff.name || "").trim()) reasons.push("Enter a sign-off name.");
+    return { allowed: reasons.length === 0, reasons };
+  }
+
+  // ---- the proposed Custom Agent configuration (not loaded into Pigment) ----
+  function spec(P) {
+    return {
+      general: { name: "Q3 Opex Variance Analyst (Sample Co, synthetic)",
+                 description: "Explains Q3 opex variances against plan for department owners and drafts commentary for FP&A review." },
+      instructions: `You explain opex variances against plan for Sample Co department owners. Use only figures that exist in the model; do not compute or round new figures. Flag a variance when the percent is above ${P.T.toFixed(1)} and the amount is at least ${money(P.F)}; call cost centers with no plan "unplanned spend." Report headcount as the end-of-period value. If any month in the quarter is not closed, say the cost center is waiting on close and do not comment on its variance. If a journal affecting the cost center is pending, say so and do not comment until it is decided. Do not state whether a variance is one-time, continuing, or timing; FP&A decides that. Plain sentences, under 70 words per cost center, no exclamation points.`,
+      knowledge: [
+        `Variance policy: threshold above ${P.T.toFixed(1)} percent (rounded to one decimal), floor ${money(P.F)}, sign convention: positive is overspend (unfavorable), negative is underspend (favorable).`,
+        "Glossary: FTE is the end-of-period value, never a sum of months. Favorable and unfavorable refer to opex against plan.",
+        "Close calendar with month status per cost center (closed or open).",
+        "Pending journal list with amount, source, destination, and approval status.",
+        "Cost center owner list.",
+      ],
+      skills: "Data querying and analysis on AI-enabled Metrics. Described only: how Skills are modified is not published, and this prototype replaces the Skill with the deterministic engine.",
+      starters: ["Which Q3 variances need commentary?", "Draft commentary for Sales.", "What is blocking the Q3 variance pack?", "Which variances are waiting on a person?"],
+    };
+  }
+
+  const PROJECT_MEMORY = [
+    "Policy chosen: 5.0 percent and $10,000, set by the FP&A lead. The floor was added because Customer Success at $9,000 would otherwise require commentary every quarter.",
+    "Known limits: the gate does not catch an invented cause stated without numbers; drafts are regenerated only at build time.",
+    "Steer decisions: deferral on open months and hold on pending journals were added after regressions R3 and R4 were written.",
+  ];
+  const FEEDBACK = [
+    ["PF1", "Mission output is not rechecked for other viewers (per Pigment's Missions documentation as read).", "An option to check figures in Mission text output against current Metric values when viewed, and to mark text whose figures changed since the run."],
+    ["PF2", "Custom Agent docs recommend testing with real user questions but describe no saved evaluation set.", "Saved test questions with expected figures per agent, rerun on any configuration change and shown before Activate."],
+    ["PF3", "No documented way was found, in the pages reviewed, for an agent to know a period is not yet closed.", "A model-level close status that agents read, so they defer rather than report partial actuals."],
+  ];
+  const CLASSES = [["one_time", "One-time"], ["continuing", "Continuing"], ["timing", "Timing"], ["owner_input", "Needs owner input"]];
+
+  // ---- the go-live pack (Markdown) ----
+  function buildPack(ctx) {
+    // ctx: { data, res, checks (runChecks result), regressions: [{label, blocked, failing}], drafts, texts, classes, signoff, date, caseLabel, decision }
+    const S = spec(ctx.res.policy), L = [];
+    const cell = (s) => String(s).replace(/\|/g, "/");
+    L.push("# Go-live pack: Q3 Opex Variance Analyst (Sample Co, synthetic)", "");
+    L.push("Synthetic data. A prototype built outside Pigment for a job application. Not deployed to any customer. Not affiliated with or endorsed by Pigment. Modeled on Pigment's public documentation of Custom Agents and the Stencil method.", "");
+    L.push(`Exported ${ctx.date}. Close state: ${ctx.caseLabel}. Go-live: ${ctx.decision.allowed ? "ALLOWED" : "BLOCKED"}.`, "");
+    if (!ctx.decision.allowed) { L.push("Blocking reasons:"); for (const r of ctx.decision.reasons) L.push(`- ${r}`); L.push(""); }
+    L.push("## 1. Spec: Custom Agent configuration (proposed; not loaded into Pigment)", "");
+    L.push(`- General. Name: ${S.general.name}. Description: ${S.general.description}`);
+    L.push(`- Instructions. ${S.instructions}`);
+    L.push(`- Knowledge. ${S.knowledge.join(" ")}`);
+    L.push(`- Skills. ${S.skills}`);
+    L.push(`- Conversation Starters (${S.starters.length}). ${S.starters.join(" ")}`, "");
+    L.push("## 2. Policy in effect", "");
+    L.push(`- Threshold T: above ${ctx.res.policy.T.toFixed(1)} percent (rounded percent)`);
+    L.push(`- Floor F: ${money(ctx.res.policy.F)}`);
+    const js = Object.entries(ctx.res.journalStatus);
+    L.push(`- Journals: ${js.length ? js.map(([k, v]) => `${k} ${v}`).join(", ") : "none in this close state"}`, "");
+    L.push("## 3. Eval results", "");
+    L.push(`Run ${ctx.date}. AI drafts: ${ctx.drafts && ctx.drafts.model ? `${ctx.drafts.model}, generated ${ctx.drafts.generated}` : "none; rule-based drafts only"}. Release: ${ctx.checks.release ? "ALLOWED" : "BLOCKED"}.`, "");
+    L.push("| Check | Result | Description |", "|---|---|---|");
+    for (const c of ctx.checks.checks) L.push(`| ${c.id} | ${c.ok ? "PASS" : "FAIL"} | ${cell(c.text)}${c.ok ? "" : ": " + cell(c.detail.slice(0, 3).join("; "))} |`);
+    L.push("", "| Simulated regression | Result | Failing checks |", "|---|---|---|");
+    for (const r of ctx.regressions) L.push(`| ${cell(r.label)} | ${r.blocked ? "Blocked" : "NOT BLOCKED: evals too weak"} | ${r.failing.join(", ")} |`);
+    L.push("", "## 4. Variance results", "");
+    L.push("| Cost center | Q3 plan | Q3 actual | Variance | Percent | FTE (Sep) vs plan | Status |", "|---|---|---|---|---|---|---|");
+    for (const r of ctx.res.rows) {
+      const st = STATUS[r.status].label + (r.status === "deferred" ? ` (${r.waiting.join(", ")} open)` : r.status === "held" ? ` (${r.pending.join(", ")} pending; if approved ${money(r.if_approved.variance)}, ${pct(r.if_approved.pct)})` : "");
+      L.push(`| ${r.name} | ${money(r.plan)} | ${r.actual === null ? "waiting on close" : money(r.actual)} | ${r.variance === null ? "n/a" : money(r.variance)} | ${pct(r.pct)} | ${r.fte} vs ${r.fte_plan} | ${st} |`);
+    }
+    const T = ctx.res.total;
+    L.push(`| ${T.complete ? "Company total" : "Partial total (excludes " + T.excluded.map((id) => ctx.res.rows.find((r) => r.id === id).name).join(", ") + ")"} | ${money(T.plan)} | ${money(T.actual)} | ${money(T.variance)} | ${pct(T.pct)} | | ${T.complete ? "Complete" : "Incomplete"} |`, "");
+    L.push("## 5. Flags, drafts, and gate results", "");
+    if (!ctx.res.flagged.length) L.push("No cost center needs commentary in this state.", "");
+    for (const id of ctx.res.flagged) {
+      const r = ctx.res.rows.find((x) => x.id === id), d = draftFor(r, ctx.res, ctx.drafts);
+      const text = ctx.texts && ctx.texts[id] !== undefined ? ctx.texts[id] : d.text;
+      const edited = ctx.texts && ctx.texts[id] !== undefined && ctx.texts[id] !== d.text;
+      const g = gate(text, r, ctx.res);
+      L.push(`### ${r.name}: ${STATUS[r.status].label}, ${money(r.variance)}${r.pct === null ? "" : ` (${pct(r.pct)})`}`, "");
+      L.push(`Source: ${edited ? "edited on the page" : d.source === "ai" ? `AI draft (${d.model}, ${d.generated})` : "rule-based draft"}. Gate: ${g.passed ? "passed" : "BLOCKED (" + gateSummary(g) + ")"}.`, "");
+      L.push(g.passed ? `> ${text}` : "> Draft excluded from the pack: it did not pass the numbers gate.", "");
+    }
+    L.push("## 6. Classifications (by a person; the agent never classifies)", "");
+    if (!ctx.res.flagged.length) L.push("None required.");
+    for (const id of ctx.res.flagged) {
+      const r = ctx.res.rows.find((x) => x.id === id), c = CLASSES.find((x) => x[0] === ctx.classes[id]);
+      L.push(`- ${r.name}: ${c ? c[1] : "not classified"}`);
+    }
+    L.push("", "## 7. Sign-off record", "");
+    L.push("- Gate: Functionality / Use Case Sign-Off (Stencil's term)");
+    L.push(`- Signed by: ${ctx.signoff.name && ctx.signoff.name.trim() ? ctx.signoff.name.trim() : "not signed"}, ${ctx.signoff.role || "role not entered"}`);
+    L.push(`- Date: ${ctx.date}`);
+    const open = ctx.decision.allowed ? ["None at sign-off."] : ctx.decision.reasons;
+    L.push(`- Open items: ${open.join(" ")}`);
+    L.push("- Identity is typed, not verified. This record is simulated and not persisted.", "");
+    L.push("## 8. Project Memory note", "");
+    for (const p of PROJECT_MEMORY) L.push(`- ${p}`);
+    L.push("", "## 9. Product feedback note (hypotheses from public docs; may already be addressed)", "");
+    for (const [id, obs, req] of FEEDBACK) L.push(`- ${id}. ${obs} Requirement: ${req}`);
+    L.push("", "## What this pack does not establish", "");
+    L.push("Behavior inside Pigment; LLM quality on real customer data; that the 14 scenarios are sufficient; time saved; adoption; Pigment modeling skill. Mocked or absent: Pigment itself, the Custom Agent runtime, Skills, permission inheritance, data connectors, and identity and persistence of sign-offs.", "");
+    return L.join("\n");
+  }
+
+  const api = { DEFAULT_POLICY, POLICY_LIMITS, REGRESSIONS, STATUS, EVALS, GATE_TESTS, CLASSES, PROJECT_MEMORY, FEEDBACK,
+                compute, needsCommentary, factsFor, factsHash, hash, ruleDraft, gate, gateSummary, allowedFigures, draftFor,
+                validatePolicy, runChecks, goldenMatch, goLive, spec, buildPack, pct1, fmt: { money, pct, fteWord } };
+  if (typeof module !== "undefined" && module.exports) module.exports = api;
+  else root.DeployEngine = api;
+})(typeof window !== "undefined" ? window : globalThis);
+</script>
+<script>
+const DATA = {
+ "synthetic": "Synthetic data. Sample Co and every figure in this file are invented for a demo.",
+ "company": "Sample Co (synthetic)",
+ "quarter": "Q3",
+ "months": [
+  "Jul",
+  "Aug",
+  "Sep"
+ ],
+ "cost_centers": [
+  {
+   "id": "ENG",
+   "name": "Engineering",
+   "owner_role": "VP Engineering (synthetic)",
+   "plan": {
+    "Jul": 800000,
+    "Aug": 800000,
+    "Sep": 800000
+   },
+   "actual": {
+    "Jul": 806000,
+    "Aug": 812000,
+    "Sep": 818000
+   },
+   "fte_plan_sep": 120,
+   "fte_actual": {
+    "Jul": 119,
+    "Aug": 120,
+    "Sep": 121
+   }
+  },
+  {
+   "id": "SAL",
+   "name": "Sales",
+   "owner_role": "VP Sales (synthetic)",
+   "plan": {
+    "Jul": 500000,
+    "Aug": 500000,
+    "Sep": 500000
+   },
+   "actual": {
+    "Jul": 520000,
+    "Aug": 538000,
+    "Sep": 554500
+   },
+   "fte_plan_sep": 42,
+   "fte_actual": {
+    "Jul": 43,
+    "Aug": 44,
+    "Sep": 45
+   }
+  },
+  {
+   "id": "MKT",
+   "name": "Marketing",
+   "owner_role": "VP Marketing (synthetic)",
+   "plan": {
+    "Jul": 300000,
+    "Aug": 300000,
+    "Sep": 300000
+   },
+   "actual": {
+    "Jul": 301000,
+    "Aug": 287000,
+    "Sep": 258000
+   },
+   "fte_plan_sep": 25,
+   "fte_actual": {
+    "Jul": 25,
+    "Aug": 25,
+    "Sep": 24
+   }
+  },
+  {
+   "id": "GNA",
+   "name": "G&A",
+   "owner_role": "Controller (synthetic)",
+   "plan": {
+    "Jul": 200000,
+    "Aug": 200000,
+    "Sep": 200000
+   },
+   "actual": {
+    "Jul": 208000,
+    "Aug": 210400,
+    "Sep": 211000
+   },
+   "fte_plan_sep": 18,
+   "fte_actual": {
+    "Jul": 18,
+    "Aug": 18,
+    "Sep": 18
+   }
+  },
+  {
+   "id": "CS",
+   "name": "Customer Success",
+   "owner_role": "VP Customer Success (synthetic)",
+   "plan": {
+    "Jul": 50000,
+    "Aug": 50000,
+    "Sep": 50000
+   },
+   "actual": {
+    "Jul": 52000,
+    "Aug": 53000,
+    "Sep": 54000
+   },
+   "fte_plan_sep": 12,
+   "fte_actual": {
+    "Jul": 12,
+    "Aug": 12,
+    "Sep": 12
+   }
+  },
+  {
+   "id": "PEO",
+   "name": "People",
+   "owner_role": "VP People (synthetic)",
+   "plan": {
+    "Jul": 100000,
+    "Aug": 100000,
+    "Sep": 100000
+   },
+   "actual": {
+    "Jul": 99000,
+    "Aug": 98500,
+    "Sep": 99500
+   },
+   "fte_plan_sep": 10,
+   "fte_actual": {
+    "Jul": 10,
+    "Aug": 10,
+    "Sep": 10
+   }
+  },
+  {
+   "id": "DP",
+   "name": "Data Platform",
+   "owner_role": "Head of Data (synthetic)",
+   "plan": {
+    "Jul": 0,
+    "Aug": 0,
+    "Sep": 0
+   },
+   "actual": {
+    "Jul": 6000,
+    "Aug": 6000,
+    "Sep": 6000
+   },
+   "fte_plan_sep": 0,
+   "fte_actual": {
+    "Jul": 2,
+    "Aug": 2,
+    "Sep": 2
+   }
+  }
+ ],
+ "journals": [
+  {
+   "id": "J-0917",
+   "from": "SAL",
+   "to": "MKT",
+   "amount": 40000,
+   "description": "Reclass travel and entertainment for the September field event from Sales to Marketing"
+  }
+ ],
+ "cases": {
+  "case1": {
+   "label": "Case 1: ordinary close",
+   "detail": "All three months closed for every cost center. No journals pending.",
+   "open": {},
+   "null_actuals": {},
+   "journal_status": {}
+  },
+  "case3": {
+   "label": "Case 3: close in progress",
+   "detail": "People September is still open and not loaded. Journal J-0917 is pending Controller approval.",
+   "open": {
+    "PEO": [
+     "Sep"
+    ]
+   },
+   "null_actuals": {
+    "PEO": [
+     "Sep"
+    ]
+   },
+   "journal_status": {
+    "J-0917": "pending"
+   }
+  }
+ }
+};
+const KEY = {
+ "synthetic": "Synthetic data. Written by hand from the formulas in the brief (Section 7), not from engine output. Sample Co is invented.",
+ "written": "2026-10-27",
+ "hand_arithmetic": {
+  "Engineering": "806,000 + 812,000 + 818,000 = 2,436,000; 2,436,000 - 2,400,000 = 36,000; 36,000 / 2,400,000 = 1.50%",
+  "Sales": "520,000 + 538,000 + 554,500 = 1,612,500; - 1,500,000 = 112,500; / 1,500,000 = 7.50%",
+  "Marketing": "301,000 + 287,000 + 258,000 = 846,000; - 900,000 = -54,000; / 900,000 = -6.00%",
+  "G&A": "208,000 + 210,400 + 211,000 = 629,400; - 600,000 = 29,400; / 600,000 = 4.90%",
+  "Customer Success": "52,000 + 53,000 + 54,000 = 159,000; - 150,000 = 9,000; / 150,000 = 6.00%",
+  "People": "99,000 + 98,500 + 99,500 = 297,000; - 300,000 = -3,000; / 300,000 = -1.00%",
+  "Data Platform": "6,000 x 3 = 18,000 against a plan of 0: unplanned, no percent",
+  "Company": "actual 5,997,900; plan 5,850,000; variance 147,900; 147,900 / 5,850,000 = 2.528% -> 2.5%",
+  "Case 3 partial": "excluding People: plan 5,550,000; actual 5,997,900 - 297,000 = 5,700,900; variance 150,900; / 5,550,000 = 2.719% -> 2.7%",
+  "J-0917 approved": "Sales 1,612,500 - 40,000 = 1,572,500; variance 72,500; / 1,500,000 = 4.833% -> 4.8%. Marketing 846,000 + 40,000 = 886,000; variance -14,000; / 900,000 = -1.556% -> -1.6%",
+  "People Sep as zero (regression R3)": "99,000 + 98,500 + 0 = 197,500; variance -102,500; / 300,000 = -34.167% -> -34.2%"
+ },
+ "scenarios": {
+  "case1_default": {
+   "label": "Case 1 ordinary close, T = 5.0, F = $10,000",
+   "inputs": {"case": "case1", "T": 5.0, "F": 10000, "journal_decisions": {}},
+   "rows": {
+    "ENG": {"status": "not_flagged", "actual": 2436000, "variance": 36000, "pct": 1.5, "direction": "unfavorable", "fte": 121, "fte_plan": 120},
+    "SAL": {"status": "flagged", "actual": 1612500, "variance": 112500, "pct": 7.5, "direction": "unfavorable", "fte": 45, "fte_plan": 42},
+    "MKT": {"status": "flagged", "actual": 846000, "variance": -54000, "pct": -6.0, "direction": "favorable", "fte": 24, "fte_plan": 25},
+    "GNA": {"status": "not_flagged", "actual": 629400, "variance": 29400, "pct": 4.9, "direction": "unfavorable", "fte": 18, "fte_plan": 18},
+    "CS": {"status": "not_flagged", "actual": 159000, "variance": 9000, "pct": 6.0, "direction": "unfavorable", "fte": 12, "fte_plan": 12},
+    "PEO": {"status": "not_flagged", "actual": 297000, "variance": -3000, "pct": -1.0, "direction": "favorable", "fte": 10, "fte_plan": 10},
+    "DP": {"status": "unplanned", "actual": 18000, "variance": 18000, "pct": null, "direction": "unfavorable", "fte": 2, "fte_plan": 0}
+   },
+   "flagged": ["SAL", "MKT", "DP"],
+   "total": {"complete": true, "excluded": [], "plan": 5850000, "actual": 5997900, "variance": 147900, "pct": 2.5}
+  },
+  "case1_floor5000": {
+   "label": "Case 1, floor lowered to F = $5,000",
+   "inputs": {"case": "case1", "T": 5.0, "F": 5000, "journal_decisions": {}},
+   "rows": {
+    "CS": {"status": "flagged", "actual": 159000, "variance": 9000, "pct": 6.0, "direction": "unfavorable"},
+    "GNA": {"status": "not_flagged", "pct": 4.9}
+   },
+   "flagged": ["SAL", "MKT", "CS", "DP"],
+   "total": {"complete": true, "excluded": [], "plan": 5850000, "actual": 5997900, "variance": 147900, "pct": 2.5}
+  },
+  "case1_t7": {
+   "label": "Case 1, threshold raised to T = 7.0",
+   "inputs": {"case": "case1", "T": 7.0, "F": 10000, "journal_decisions": {}},
+   "rows": {
+    "SAL": {"status": "flagged", "pct": 7.5},
+    "MKT": {"status": "not_flagged", "pct": -6.0},
+    "DP": {"status": "unplanned", "variance": 18000, "pct": null}
+   },
+   "flagged": ["SAL", "DP"],
+   "total": {"complete": true, "excluded": [], "plan": 5850000, "actual": 5997900, "variance": 147900, "pct": 2.5}
+  },
+  "case3_pending": {
+   "label": "Case 3 close in progress, J-0917 pending",
+   "inputs": {"case": "case3", "T": 5.0, "F": 10000, "journal_decisions": {}},
+   "rows": {
+    "PEO": {"status": "deferred", "actual": null, "variance": null, "pct": null, "draft": null},
+    "SAL": {"status": "held", "draft": null,
+            "as_posted": {"actual": 1612500, "variance": 112500, "pct": 7.5, "would_flag": true},
+            "if_approved": {"actual": 1572500, "variance": 72500, "pct": 4.8, "would_flag": false}},
+    "MKT": {"status": "held", "draft": null,
+            "as_posted": {"actual": 846000, "variance": -54000, "pct": -6.0, "would_flag": true},
+            "if_approved": {"actual": 886000, "variance": -14000, "pct": -1.6, "would_flag": false}},
+    "DP": {"status": "unplanned", "variance": 18000, "pct": null},
+    "ENG": {"status": "not_flagged", "pct": 1.5},
+    "GNA": {"status": "not_flagged", "pct": 4.9},
+    "CS": {"status": "not_flagged", "pct": 6.0}
+   },
+   "flagged": ["DP"],
+   "total": {"complete": false, "excluded": ["PEO"], "plan": 5550000, "actual": 5700900, "variance": 150900, "pct": 2.7}
+  },
+  "case3_approved": {
+   "label": "Case 3, Controller approves J-0917",
+   "inputs": {"case": "case3", "T": 5.0, "F": 10000, "journal_decisions": {"J-0917": "approved"}},
+   "rows": {
+    "SAL": {"status": "not_flagged", "actual": 1572500, "variance": 72500, "pct": 4.8, "direction": "unfavorable"},
+    "MKT": {"status": "not_flagged", "actual": 886000, "variance": -14000, "pct": -1.6, "direction": "favorable"},
+    "PEO": {"status": "deferred", "pct": null}
+   },
+   "flagged": ["DP"],
+   "total": {"complete": false, "excluded": ["PEO"], "plan": 5550000, "actual": 5700900, "variance": 150900, "pct": 2.7}
+  },
+  "case3_rejected": {
+   "label": "Case 3, Controller rejects J-0917",
+   "inputs": {"case": "case3", "T": 5.0, "F": 10000, "journal_decisions": {"J-0917": "rejected"}},
+   "rows": {
+    "SAL": {"status": "flagged", "actual": 1612500, "variance": 112500, "pct": 7.5},
+    "MKT": {"status": "flagged", "actual": 846000, "variance": -54000, "pct": -6.0},
+    "PEO": {"status": "deferred", "pct": null}
+   },
+   "flagged": ["SAL", "MKT", "DP"],
+   "total": {"complete": false, "excluded": ["PEO"], "plan": 5550000, "actual": 5700900, "variance": 150900, "pct": 2.7}
+  }
+ },
+ "worked_example_regression_r3": {
+  "scenario": "case3_pending",
+  "row": "PEO",
+  "expected": {"actual": 197500, "variance": -102500, "pct": -34.2, "direction": "favorable", "status": "flagged"}
+ }
+};
+const GOLDEN = {
+ "synthetic": "Synthetic data. Independent Python check of the Deploy Desk engine.",
+ "scenarios": {
+  "case1_default": {
+   "rows": [
+    {
+     "id": "ENG",
+     "fte": 121,
+     "fte_plan": 120,
+     "actual": 2436000,
+     "variance": 36000,
+     "pct": 1.5,
+     "status": "not_flagged"
+    },
+    {
+     "id": "SAL",
+     "fte": 45,
+     "fte_plan": 42,
+     "actual": 1612500,
+     "variance": 112500,
+     "pct": 7.5,
+     "status": "flagged"
+    },
+    {
+     "id": "MKT",
+     "fte": 24,
+     "fte_plan": 25,
+     "actual": 846000,
+     "variance": -54000,
+     "pct": -6.0,
+     "status": "flagged"
+    },
+    {
+     "id": "GNA",
+     "fte": 18,
+     "fte_plan": 18,
+     "actual": 629400,
+     "variance": 29400,
+     "pct": 4.9,
+     "status": "not_flagged"
+    },
+    {
+     "id": "CS",
+     "fte": 12,
+     "fte_plan": 12,
+     "actual": 159000,
+     "variance": 9000,
+     "pct": 6.0,
+     "status": "not_flagged"
+    },
+    {
+     "id": "PEO",
+     "fte": 10,
+     "fte_plan": 10,
+     "actual": 297000,
+     "variance": -3000,
+     "pct": -1.0,
+     "status": "not_flagged"
+    },
+    {
+     "id": "DP",
+     "fte": 2,
+     "fte_plan": 0,
+     "actual": 18000,
+     "variance": 18000,
+     "pct": null,
+     "status": "unplanned"
+    }
+   ],
+   "total": {
+    "complete": true,
+    "excluded": [],
+    "plan": 5850000,
+    "actual": 5997900,
+    "variance": 147900,
+    "pct": 2.5
+   },
+   "flagged": [
+    "SAL",
+    "MKT",
+    "DP"
+   ]
+  },
+  "case1_floor5000": {
+   "rows": [
+    {
+     "id": "ENG",
+     "fte": 121,
+     "fte_plan": 120,
+     "actual": 2436000,
+     "variance": 36000,
+     "pct": 1.5,
+     "status": "not_flagged"
+    },
+    {
+     "id": "SAL",
+     "fte": 45,
+     "fte_plan": 42,
+     "actual": 1612500,
+     "variance": 112500,
+     "pct": 7.5,
+     "status": "flagged"
+    },
+    {
+     "id": "MKT",
+     "fte": 24,
+     "fte_plan": 25,
+     "actual": 846000,
+     "variance": -54000,
+     "pct": -6.0,
+     "status": "flagged"
+    },
+    {
+     "id": "GNA",
+     "fte": 18,
+     "fte_plan": 18,
+     "actual": 629400,
+     "variance": 29400,
+     "pct": 4.9,
+     "status": "not_flagged"
+    },
+    {
+     "id": "CS",
+     "fte": 12,
+     "fte_plan": 12,
+     "actual": 159000,
+     "variance": 9000,
+     "pct": 6.0,
+     "status": "flagged"
+    },
+    {
+     "id": "PEO",
+     "fte": 10,
+     "fte_plan": 10,
+     "actual": 297000,
+     "variance": -3000,
+     "pct": -1.0,
+     "status": "not_flagged"
+    },
+    {
+     "id": "DP",
+     "fte": 2,
+     "fte_plan": 0,
+     "actual": 18000,
+     "variance": 18000,
+     "pct": null,
+     "status": "unplanned"
+    }
+   ],
+   "total": {
+    "complete": true,
+    "excluded": [],
+    "plan": 5850000,
+    "actual": 5997900,
+    "variance": 147900,
+    "pct": 2.5
+   },
+   "flagged": [
+    "SAL",
+    "MKT",
+    "CS",
+    "DP"
+   ]
+  },
+  "case1_t7": {
+   "rows": [
+    {
+     "id": "ENG",
+     "fte": 121,
+     "fte_plan": 120,
+     "actual": 2436000,
+     "variance": 36000,
+     "pct": 1.5,
+     "status": "not_flagged"
+    },
+    {
+     "id": "SAL",
+     "fte": 45,
+     "fte_plan": 42,
+     "actual": 1612500,
+     "variance": 112500,
+     "pct": 7.5,
+     "status": "flagged"
+    },
+    {
+     "id": "MKT",
+     "fte": 24,
+     "fte_plan": 25,
+     "actual": 846000,
+     "variance": -54000,
+     "pct": -6.0,
+     "status": "not_flagged"
+    },
+    {
+     "id": "GNA",
+     "fte": 18,
+     "fte_plan": 18,
+     "actual": 629400,
+     "variance": 29400,
+     "pct": 4.9,
+     "status": "not_flagged"
+    },
+    {
+     "id": "CS",
+     "fte": 12,
+     "fte_plan": 12,
+     "actual": 159000,
+     "variance": 9000,
+     "pct": 6.0,
+     "status": "not_flagged"
+    },
+    {
+     "id": "PEO",
+     "fte": 10,
+     "fte_plan": 10,
+     "actual": 297000,
+     "variance": -3000,
+     "pct": -1.0,
+     "status": "not_flagged"
+    },
+    {
+     "id": "DP",
+     "fte": 2,
+     "fte_plan": 0,
+     "actual": 18000,
+     "variance": 18000,
+     "pct": null,
+     "status": "unplanned"
+    }
+   ],
+   "total": {
+    "complete": true,
+    "excluded": [],
+    "plan": 5850000,
+    "actual": 5997900,
+    "variance": 147900,
+    "pct": 2.5
+   },
+   "flagged": [
+    "SAL",
+    "DP"
+   ]
+  },
+  "case3_pending": {
+   "rows": [
+    {
+     "id": "ENG",
+     "fte": 121,
+     "fte_plan": 120,
+     "actual": 2436000,
+     "variance": 36000,
+     "pct": 1.5,
+     "status": "not_flagged"
+    },
+    {
+     "id": "SAL",
+     "fte": 45,
+     "fte_plan": 42,
+     "actual": 1612500,
+     "variance": 112500,
+     "pct": 7.5,
+     "status": "held",
+     "as_posted": {
+      "actual": 1612500,
+      "variance": 112500,
+      "pct": 7.5,
+      "would_flag": true
+     },
+     "if_approved": {
+      "actual": 1572500,
+      "variance": 72500,
+      "pct": 4.8,
+      "would_flag": false
+     }
+    },
+    {
+     "id": "MKT",
+     "fte": 24,
+     "fte_plan": 25,
+     "actual": 846000,
+     "variance": -54000,
+     "pct": -6.0,
+     "status": "held",
+     "as_posted": {
+      "actual": 846000,
+      "variance": -54000,
+      "pct": -6.0,
+      "would_flag": true
+     },
+     "if_approved": {
+      "actual": 886000,
+      "variance": -14000,
+      "pct": -1.6,
+      "would_flag": false
+     }
+    },
+    {
+     "id": "GNA",
+     "fte": 18,
+     "fte_plan": 18,
+     "actual": 629400,
+     "variance": 29400,
+     "pct": 4.9,
+     "status": "not_flagged"
+    },
+    {
+     "id": "CS",
+     "fte": 12,
+     "fte_plan": 12,
+     "actual": 159000,
+     "variance": 9000,
+     "pct": 6.0,
+     "status": "not_flagged"
+    },
+    {
+     "id": "PEO",
+     "fte": 10,
+     "fte_plan": 10,
+     "status": "deferred",
+     "actual": null,
+     "variance": null,
+     "pct": null
+    },
+    {
+     "id": "DP",
+     "fte": 2,
+     "fte_plan": 0,
+     "actual": 18000,
+     "variance": 18000,
+     "pct": null,
+     "status": "unplanned"
+    }
+   ],
+   "total": {
+    "complete": false,
+    "excluded": [
+     "PEO"
+    ],
+    "plan": 5550000,
+    "actual": 5700900,
+    "variance": 150900,
+    "pct": 2.7
+   },
+   "flagged": [
+    "DP"
+   ]
+  },
+  "case3_approved": {
+   "rows": [
+    {
+     "id": "ENG",
+     "fte": 121,
+     "fte_plan": 120,
+     "actual": 2436000,
+     "variance": 36000,
+     "pct": 1.5,
+     "status": "not_flagged"
+    },
+    {
+     "id": "SAL",
+     "fte": 45,
+     "fte_plan": 42,
+     "actual": 1572500,
+     "variance": 72500,
+     "pct": 4.8,
+     "status": "not_flagged"
+    },
+    {
+     "id": "MKT",
+     "fte": 24,
+     "fte_plan": 25,
+     "actual": 886000,
+     "variance": -14000,
+     "pct": -1.6,
+     "status": "not_flagged"
+    },
+    {
+     "id": "GNA",
+     "fte": 18,
+     "fte_plan": 18,
+     "actual": 629400,
+     "variance": 29400,
+     "pct": 4.9,
+     "status": "not_flagged"
+    },
+    {
+     "id": "CS",
+     "fte": 12,
+     "fte_plan": 12,
+     "actual": 159000,
+     "variance": 9000,
+     "pct": 6.0,
+     "status": "not_flagged"
+    },
+    {
+     "id": "PEO",
+     "fte": 10,
+     "fte_plan": 10,
+     "status": "deferred",
+     "actual": null,
+     "variance": null,
+     "pct": null
+    },
+    {
+     "id": "DP",
+     "fte": 2,
+     "fte_plan": 0,
+     "actual": 18000,
+     "variance": 18000,
+     "pct": null,
+     "status": "unplanned"
+    }
+   ],
+   "total": {
+    "complete": false,
+    "excluded": [
+     "PEO"
+    ],
+    "plan": 5550000,
+    "actual": 5700900,
+    "variance": 150900,
+    "pct": 2.7
+   },
+   "flagged": [
+    "DP"
+   ]
+  },
+  "case3_rejected": {
+   "rows": [
+    {
+     "id": "ENG",
+     "fte": 121,
+     "fte_plan": 120,
+     "actual": 2436000,
+     "variance": 36000,
+     "pct": 1.5,
+     "status": "not_flagged"
+    },
+    {
+     "id": "SAL",
+     "fte": 45,
+     "fte_plan": 42,
+     "actual": 1612500,
+     "variance": 112500,
+     "pct": 7.5,
+     "status": "flagged"
+    },
+    {
+     "id": "MKT",
+     "fte": 24,
+     "fte_plan": 25,
+     "actual": 846000,
+     "variance": -54000,
+     "pct": -6.0,
+     "status": "flagged"
+    },
+    {
+     "id": "GNA",
+     "fte": 18,
+     "fte_plan": 18,
+     "actual": 629400,
+     "variance": 29400,
+     "pct": 4.9,
+     "status": "not_flagged"
+    },
+    {
+     "id": "CS",
+     "fte": 12,
+     "fte_plan": 12,
+     "actual": 159000,
+     "variance": 9000,
+     "pct": 6.0,
+     "status": "not_flagged"
+    },
+    {
+     "id": "PEO",
+     "fte": 10,
+     "fte_plan": 10,
+     "status": "deferred",
+     "actual": null,
+     "variance": null,
+     "pct": null
+    },
+    {
+     "id": "DP",
+     "fte": 2,
+     "fte_plan": 0,
+     "actual": 18000,
+     "variance": 18000,
+     "pct": null,
+     "status": "unplanned"
+    }
+   ],
+   "total": {
+    "complete": false,
+    "excluded": [
+     "PEO"
+    ],
+    "plan": 5550000,
+    "actual": 5700900,
+    "variance": 150900,
+    "pct": 2.7
+   },
+   "flagged": [
+    "SAL",
+    "MKT",
+    "DP"
+   ]
+  }
+ },
+ "reference_r3_people": {
+  "actual": 197500,
+  "variance": -102500,
+  "pct": -34.2
+ }
+};
+const DRAFTS = {
+  "synthetic": "Synthetic data. AI drafts for invented Sample Co figures, generated at build time.",
+  "generated": "2026-10-27",
+  "requested_model": "gpt-5.4-mini",
+  "model": "gpt-5.4-mini-2026-03-17",
+  "tokens": {
+    "input": 5405,
+    "output": 496
+  },
+  "counts": {
+    "generated": 9,
+    "passed": 9,
+    "failed": 0,
+    "errors": 0
+  },
+  "drafts": {
+    "21e4950a": {
+      "row": "ENG",
+      "name": "Engineering",
+      "label": "Case 1, as posted",
+      "text": "Engineering was $36,000 over plan in Q3. Headcount at the end of September was 121 FTEs. The owner should document the driver before FP&A review.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      },
+      "tokens": {
+        "input": 594,
+        "output": 47
+      }
+    },
+    "f22a1a23": {
+      "row": "SAL",
+      "name": "Sales",
+      "label": "Case 1, as posted",
+      "text": "Sales was $112,500 over plan in Q3. Headcount at end of September was 45 FTEs versus a plan of 42 FTEs. The owner should document the driver before FP&A review.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      },
+      "tokens": {
+        "input": 594,
+        "output": 55
+      }
+    },
+    "a81895fd": {
+      "row": "MKT",
+      "name": "Marketing",
+      "label": "Case 1, as posted",
+      "text": "Marketing is $54,000 under plan for Q3. Headcount at end of September is 24 FTEs versus a plan of 25 FTEs. The owner should document the driver before FP&A review.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      },
+      "tokens": {
+        "input": 589,
+        "output": 55
+      }
+    },
+    "0a85b7c1": {
+      "row": "GNA",
+      "name": "G&A",
+      "label": "Case 1, as posted",
+      "text": "G&A was $29,400 over plan in Q3. Headcount ended September at 18 FTEs. The driver is not provided here, so the owner should document it before FP&A review.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      },
+      "tokens": {
+        "input": 590,
+        "output": 52
+      }
+    },
+    "284cdad9": {
+      "row": "CS",
+      "name": "Customer Success",
+      "label": "Case 1, as posted",
+      "text": "Customer Success is $9,000 over plan in Q3. Headcount at end of September was 12 FTEs, matching plan. The owner should document the driver before FP&A review.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      },
+      "tokens": {
+        "input": 592,
+        "output": 50
+      }
+    },
+    "ab50032e": {
+      "row": "PEO",
+      "name": "People",
+      "label": "Case 1, as posted",
+      "text": "People was under plan by $3,000. Headcount ended September at 10 FTEs, in line with plan. The driver is not stated in the facts, so the owner should document it before FP&A review.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      },
+      "tokens": {
+        "input": 589,
+        "output": 56
+      }
+    },
+    "01ad581c": {
+      "row": "DP",
+      "name": "Data Platform",
+      "label": "Case 1, as posted",
+      "text": "Data Platform has $18,000 of unplanned spend versus no Q3 plan. Headcount at end of September was 2 FTEs. The owner should document the driver before FP&A review.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      },
+      "tokens": {
+        "input": 598,
+        "output": 51
+      }
+    },
+    "bd825f42": {
+      "row": "SAL",
+      "name": "Sales",
+      "label": "After J-0917 approved",
+      "text": "Sales is $72,500 over plan for Q3. The quarter is closed, and headcount at the end of September was 45 FTEs. The approved journal J-0917 moved $40,000 of travel and entertainment to Marketing.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      },
+      "tokens": {
+        "input": 633,
+        "output": 61
+      }
+    },
+    "d9e594d1": {
+      "row": "MKT",
+      "name": "Marketing",
+      "label": "After J-0917 approved",
+      "text": "Marketing was under plan by $14,000 in Q3. Headcount at the end of September was 24 FTEs against a plan of 25 FTEs. J-0917, approved by the Controller, moved $40,000 of travel and entertainment in from Sales.",
+      "gate": {
+        "passed": true,
+        "unsupported": [],
+        "policy": [],
+        "missing": []
+      },
+      "tokens": {
+        "input": 626,
+        "output": 69
+      }
+    }
+  }
+};
+</script>
+<script>
+(function () {
+  "use strict";
+  const E = window.DeployEngine, F = E.fmt;
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, attrs = {}, kids = []) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === "text") n.textContent = v; else if (k === "cls") n.className = v; else n.setAttribute(k, v);
+    }
+    for (const c of [].concat(kids)) if (c !== null && c !== undefined && c !== false) n.append(typeof c === "string" ? document.createTextNode(c) : c);
+    return n;
+  };
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem("dd:" + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem("dd:" + k, JSON.stringify(v)); } catch {} },
+  };
+  const fresh = () => ({ caseId: "case1", policy: { ...E.DEFAULT_POLICY }, decisions: {}, reg: "none", texts: {}, classes: {},
+                         signoff: { name: "", role: "FP&A Lead (synthetic)" } });
+  let S = fresh();
+  const opts = () => (S.reg === "none" ? {} : { [S.reg]: true });
+  const inputs = () => ({ case: S.caseId, T: S.policy.T, F: S.policy.F, journal_decisions: { ...S.decisions } });
+  let res, chk;
+  const recompute = () => { res = E.compute(DATA, inputs(), opts()); chk = E.runChecks(DATA, KEY, GOLDEN, DRAFTS, opts()); };
+  const rowById = (id) => res.rows.find((r) => r.id === id);
+  const textKey = (row) => row.id + ":" + E.factsHash(row);
+  const draftOf = (row) => E.draftFor(row, res, DRAFTS);
+  const currentText = (row) => { const k = textKey(row); return S.texts[k] !== undefined ? S.texts[k] : draftOf(row).text; };
+  const editedTexts = () => { const o = {}; for (const id of res.flagged) o[id] = currentText(rowById(id)); return o; };
+  const signedClass = (v) => (v > 0 ? "pos" : v < 0 ? "neg" : "");
+  const STATUS_BADGE = { flagged: "t-brand", unplanned: "t-brand", not_flagged: "t-neutral", deferred: "t-info", held: "t-warn" };
+  const decision = () => E.goLive({ release: chk.release, failing: chk.checks.filter((c) => !c.ok).map((c) => c.id), res, drafts: DRAFTS,
+                                    texts: editedTexts(), classes: S.classes, signoff: S.signoff });
+
+  // ---------- banner and KPIs ----------
+  function renderTop() {
+    const nC = res.flagged.length;
+    $("kC").textContent = String(nC);
+    $("kCs").textContent = nC ? res.flagged.map((id) => rowById(id).name).join(", ") : "none in this state";
+    const T = res.total;
+    $("kT").textContent = (T.complete ? "" : "partial ") + F.money(T.variance);
+    $("kTs").textContent = T.complete ? `${F.pct(T.pct)} on plan of ${F.money(T.plan)}` : `${F.pct(T.pct)}; incomplete, excludes ${T.excluded.map((id) => rowById(id).name).join(", ")}`;
+    const failing = chk.checks.filter((c) => !c.ok).map((c) => c.id);
+    $("kR").textContent = chk.release ? "ALLOWED" : "BLOCKED";
+    $("kRs").textContent = chk.release ? `${chk.checks.length} of ${chk.checks.length} checks pass` : `failing: ${failing.join(", ")}`;
+    $("kpiR").className = "card kpi " + (chk.release ? "good" : "bad");
+    const d = decision();
+    $("kG").textContent = d.allowed ? "ALLOWED" : "BLOCKED";
+    $("kGs").textContent = d.allowed ? "signed off" : `${d.reasons.length} open item${d.reasons.length === 1 ? "" : "s"}`;
+    $("kpiG").className = "card kpi " + (d.allowed ? "good" : "bad");
+    const rb = $("regBanner");
+    rb.hidden = S.reg === "none";
+    rb.textContent = S.reg === "none" ? "" : `Simulated regression active: ${E.REGRESSIONS[S.reg].label}. Every section on this page now runs the broken engine. ${E.REGRESSIONS[S.reg].detail}`;
+    $("navF").textContent = String(nC);
+    const ne = $("navE"); ne.textContent = chk.release ? "pass" : "fail"; ne.className = "cnt badge " + (chk.release ? "t-good" : "t-bad");
+    const ng = $("navG"); ng.textContent = d.allowed ? "ready" : "blocked"; ng.className = "cnt badge " + (d.allowed ? "t-good" : "t-warn");
+  }
+
+  // ---------- 1. Spec ----------
+  const ORIGINS = [
+    ["Flag a variance above 5 percent against plan", "Pigment-documented example (FP&A Analyst Agent, Create custom agents)", "E01, E02, E03, E11"],
+    ["Dollar floor of $10,000", "Design judgment", "E04"],
+    ["Cost center with no plan is unplanned spend", "Design judgment", "E10"],
+    ["Defer a cost center while any month is open", "Design judgment (added after R3)", "E07"],
+    ["Hold rows touched by a pending journal", "Design judgment (added after R4)", "E08, E09"],
+    ["Headcount is the end-of-period value, never a sum", "Design judgment", "E06"],
+    ["The rounded percent drives the flag", "Design judgment", "E03, E12"],
+    ["Classification words belong to a person", "Design judgment, following the guest post's human classification step", "E13 (test 6)"],
+    ["Every figure in a draft must exist in the model", "Design judgment, following the guest post's code-validates-numbers step", "E13, E14"],
+  ];
+  const MAPPING = [
+    ["Cost center", "Dimension list"],
+    ["Month (Jul, Aug, Sep)", "Time dimension at month grain"],
+    ["Plan and actual", "Versions of one opex Metric"],
+    ["Opex amount", "Metric by cost center, month, and version"],
+    ["FTE", "Metric whose time aggregation takes the last value, not the sum"],
+    ["Month close status", "A boolean Metric by cost center and month (no native close status was found; see PF3)"],
+    ["Journals with approval status", "An imported transaction list with a status property"],
+    ["Variance, percent, flag", "Calculated Metrics"],
+    ["Commentary draft", "Text Metric by cost center"],
+    ["Agent configuration", "Custom Agent: General, Instructions, Knowledge, Skills, Conversation Starters; tested in Preview, then Activate"],
+  ];
+  function renderSpec() {
+    const sp = E.spec(res.policy), box = $("tiles");
+    box.textContent = "";
+    box.append(
+      el("div", { cls: "tile wide" }, [el("h3", { text: "General" }), el("p", { text: `${sp.general.name}. ${sp.general.description}` })]),
+      el("div", { cls: "tile" }, [el("h3", { text: "Instructions" }), el("p", { text: sp.instructions })]),
+      el("div", { cls: "tile" }, [el("h3", { text: "Knowledge" }), el("ul", {}, sp.knowledge.map((k) => el("li", { text: k })))]),
+      el("div", { cls: "tile" }, [el("h3", { text: "Skills" }), el("p", { text: sp.skills })]),
+      el("div", { cls: "tile" }, [el("h3", { text: `Conversation Starters (${sp.starters.length})` }), el("ul", {}, sp.starters.map((k) => el("li", { text: k })))]));
+    $("polNow").textContent = `In effect: flag when the rounded percent is above ${res.policy.T.toFixed(1)} and the variance is at least ${F.money(res.policy.F)}. Defaults are 5.0 and $10,000.`;
+  }
+  function renderStatic() {
+    const ot = $("originTbl").querySelector("tbody");
+    for (const [a, b, c] of ORIGINS) ot.append(el("tr", {}, [el("td", { text: a }), el("td", {}, [el("span", { cls: "badge " + (b.startsWith("Pigment") ? "t-info" : "t-neutral"), text: b.startsWith("Pigment") ? "Pigment-documented" : "Design judgment" }), el("span", { cls: "sm", text: b })]), el("td", { text: c })]));
+    const mt = $("mapTbl").querySelector("tbody");
+    for (const [a, b] of MAPPING) mt.append(el("tr", {}, [el("td", { text: a }), el("td", { text: b })]));
+    const pf = $("pfList");
+    for (const [id, obs, req] of E.FEEDBACK) pf.append(el("li", {}, [el("b", { text: id + ". " }), `${obs} Requirement: ${req}`]));
+    const cs = $("caseSel");
+    for (const [k, c] of Object.entries(DATA.cases)) cs.append(el("option", { value: k, text: c.label }));
+    const rs = $("regSel");
+    for (const [k, v] of Object.entries(E.REGRESSIONS)) rs.append(el("option", { value: k, text: v.label }));
+    $("modelLine").textContent = DRAFTS && DRAFTS.model ? `${DRAFTS.model} (requested as ${DRAFTS.requested_model}, generated ${DRAFTS.generated})` : "No model: no API key was available at build, so every draft is rule-based. A model";
+  }
+  function applyPolicy() {
+    const v = E.validatePolicy($("polT").value, $("polF").value, S.policy), msg = $("polMsg");
+    msg.hidden = v.ok; msg.textContent = v.errors.join(" ");
+    S.policy = v.policy;
+    $("polT").value = S.policy.T.toFixed(1); $("polF").value = String(S.policy.F);
+    renderAll();
+  }
+
+  // ---------- 2. Variance results ----------
+  function renderControl() {
+    const box = $("ctrl"); box.textContent = "";
+    const c = DATA.cases[S.caseId];
+    const js = Object.entries(res.journalStatus);
+    if (!js.length) { box.append(el("div", { cls: "hint", text: `${c.detail}` })); return; }
+    for (const [id, st] of js) {
+      const j = DATA.journals.find((x) => x.id === id);
+      const from = DATA.cost_centers.find((x) => x.id === j.from).name, to = DATA.cost_centers.find((x) => x.id === j.to).name;
+      const badge = el("span", { cls: "badge " + (st === "pending" ? "t-warn" : st === "approved" ? "t-good" : "t-neutral"), text: st });
+      const what = el("div", { cls: "what" }, [el("b", { text: `${id}: ${F.money(j.amount)} from ${from} to ${to}. ` }), `${j.description}. `, badge,
+        el("div", { cls: "hint", text: st === "pending" ? "The Controller decides, not the agent. Both rows are held until then." : "Decided by the Controller on this page (simulated)." })]);
+      const b1 = el("button", { cls: "btn btn-outline btn-sm", type: "button", text: "Approve as Controller" });
+      const b2 = el("button", { cls: "btn btn-outline btn-sm", type: "button", text: "Reject as Controller" });
+      const b3 = el("button", { cls: "btn btn-outline btn-sm", type: "button", text: "Back to pending" });
+      b1.disabled = st === "approved"; b2.disabled = st === "rejected"; b3.hidden = st === "pending";
+      b1.addEventListener("click", () => { S.decisions[id] = "approved"; renderAll(); });
+      b2.addEventListener("click", () => { S.decisions[id] = "rejected"; renderAll(); });
+      b3.addEventListener("click", () => { delete S.decisions[id]; renderAll(); });
+      box.append(el("div", { cls: "ctrl" }, [what, el("div", { cls: "actions" }, [b1, b2, b3])]));
+    }
+    if (c.open && Object.keys(c.open).length) box.append(el("div", { cls: "hint", style: "margin-top:8px", text: c.detail }));
+  }
+  function renderResults() {
+    const tb = $("resTbl").querySelector("tbody"); tb.textContent = "";
+    for (const r of res.rows) {
+      const tr = el("tr", { cls: E.needsCommentary(r) ? "hit" : "" });
+      const name = el("td", {}, [r.name, el("span", { cls: "sm", text: r.owner_role })]);
+      let act, vr, pc, dir, st;
+      if (r.status === "deferred") {
+        act = el("td", { cls: "r" }, ["waiting", el("span", { cls: "sm", text: `${r.waiting.join(", ")} not closed` })]);
+        vr = el("td", { cls: "r", text: "n/a" }); pc = el("td", { cls: "r", text: "n/a" }); dir = el("td", { text: "" });
+        st = el("td", {}, [el("span", { cls: "badge t-info", text: "Deferred" }), el("span", { cls: "sm", text: "no variance, no draft" })]);
+      } else {
+        const ia = r.if_approved;
+        const appr = r.journals.filter((j) => j.status === "approved");
+        act = el("td", { cls: "r" }, [F.money(r.actual), ia ? el("span", { cls: "sm", text: `if approved ${F.money(ia.actual)}` }) : appr.length ? el("span", { cls: "sm", text: `after ${appr.map((j) => j.id).join(", ")}` }) : null]);
+        vr = el("td", { cls: "r " + signedClass(r.variance) }, [F.money(r.variance), ia ? el("span", { cls: "sm", text: `if approved ${F.money(ia.variance)}` }) : null]);
+        pc = el("td", { cls: "r " + signedClass(r.variance) }, [F.pct(r.pct), ia ? el("span", { cls: "sm", text: `if approved ${F.pct(ia.pct)}` }) : null]);
+        dir = el("td", { text: r.direction || "" });
+        const sub = r.status === "held" ? `${r.pending.join(", ")} pending. As posted: ${r.as_posted.would_flag ? "flagged" : "not flagged"}; if approved: ${ia.would_flag ? "flagged" : "not flagged"}`
+          : r.status === "not_flagged" && r.plan > 0 ? (Math.abs(r.pct) > res.policy.T ? `under the ${F.money(res.policy.F)} floor` : `within ${res.policy.T.toFixed(1)}%`) : "";
+        st = el("td", {}, [el("span", { cls: "badge " + STATUS_BADGE[r.status], text: E.STATUS[r.status].label }), sub ? el("span", { cls: "sm", text: sub }) : null]);
+      }
+      const fte = el("td", { cls: "r" }, [`${r.fte} / ${r.fte_plan}`, el("span", { cls: "sm", text: r.fte_diff === 0 ? "on plan" : (r.fte_diff > 0 ? "+" : "") + r.fte_diff }) ]);
+      tr.append(name, el("td", { cls: "r", text: F.money(r.plan) }), act, vr, pc, dir, fte, st);
+      tb.append(tr);
+    }
+    const T = res.total, tf = $("resTbl").querySelector("tfoot"); tf.textContent = "";
+    const lab = T.complete ? "Company total" : `Partial total, excludes ${T.excluded.map((id) => rowById(id).name).join(", ")}`;
+    tf.append(el("tr", {}, [el("td", {}, [lab, el("span", { cls: "sm", text: T.complete ? "all months closed" : "incomplete: not a company figure" })]),
+      el("td", { cls: "r", text: F.money(T.plan) }), el("td", { cls: "r", text: F.money(T.actual) }), el("td", { cls: "r " + signedClass(T.variance), text: F.money(T.variance) }),
+      el("td", { cls: "r " + signedClass(T.variance), text: F.pct(T.pct) }), el("td", { text: "" }), el("td", { text: "" }),
+      el("td", {}, [el("span", { cls: "badge " + (T.complete ? "t-good" : "t-info"), text: T.complete ? "Complete" : "Incomplete" })])]));
+  }
+
+  // ---------- 3. Commentary ----------
+  function gateView(box, g) {
+    box.textContent = "";
+    if (g.passed) { box.append(el("span", { cls: "badge t-good", text: "Gate: passed" }), el("span", { cls: "src", text: "every figure is in the model; policy checks clear" })); return; }
+    box.append(el("span", { cls: "badge t-bad", text: "Gate: blocked" }));
+    if (g.unsupported.length) { box.append(el("span", { cls: "src", text: "not in the model:" })); g.unsupported.forEach((u) => box.append(el("code", { cls: "x", text: u }))); }
+    for (const p of g.policy) box.append(el("span", { cls: "src", text: "policy: " + p }));
+    for (const m of g.missing) box.append(el("span", { cls: "src", text: "missing " + m }));
+    box.append(el("span", { cls: "src", text: "Excluded from the pack until fixed." }));
+  }
+  function sourceLabel(d, edited) {
+    if (edited) return "Edited on this page";
+    if (d.source === "ai") return `AI draft, ${d.model}, generated ${d.generated}`;
+    if (d.replaced) return "Rule-based draft. The AI draft for these figures failed the gate and was replaced.";
+    return "Rule-based draft. AI draft not available for these figures.";
+  }
+  function renderCommentary() {
+    const box = $("dList"); box.textContent = "";
+    for (const id of res.flagged) {
+      const r = rowById(id), d = draftOf(r), k = textKey(r);
+      const ta = el("textarea", { cls: "inp", "aria-label": `Draft for ${r.name}`, "data-row": r.id }); ta.value = currentText(r);
+      const gbox = el("div", { cls: "gate" }), srcEl = el("div", { cls: "src", text: sourceLabel(d, S.texts[k] !== undefined && S.texts[k] !== d.text) });
+      ta.addEventListener("input", () => { S.texts[k] = ta.value; gateView(gbox, E.gate(ta.value, r, res)); srcEl.textContent = sourceLabel(d, ta.value !== d.text); renderTop(); renderSignoff(); });
+      const facts = `Plan ${F.money(r.plan)}, actual ${F.money(r.actual)}, variance ${F.money(r.variance)}${r.pct === null ? ", no percent (no plan)" : ` (${F.pct(r.pct)})`}, FTE ${r.fte} against ${r.fte_plan}.`;
+      const kids = [el("div", { cls: "top" }, [el("span", { cls: "badge " + STATUS_BADGE[r.status], text: E.STATUS[r.status].label }), el("span", { cls: "nm", text: r.name }),
+          el("span", { cls: "src", text: r.owner_role }), el("span", { cls: "amt " + signedClass(r.variance), text: F.money(r.variance) })]),
+        el("div", { cls: "src", text: "Facts the draft may use: " + facts }), ta, gbox, srcEl];
+      if (d.replaced) kids.push(el("details", { cls: "blocked" }, [el("summary", { text: "Show the blocked AI draft" }), el("p", { text: d.replaced.text }), el("span", { text: "Gate: " + E.gateSummary(d.replaced.gate) })]));
+      box.append(el("div", { cls: "fnd" }, kids));
+      gateView(gbox, E.gate(ta.value, r, res));
+    }
+    for (const r of res.rows) {
+      if (r.status === "deferred") box.append(el("div", { cls: "nodraft" }, [el("span", { cls: "badge t-info", text: "No draft released" }), `${r.name}: deferred, ${r.waiting.join(", ")} not closed. The agent says it is waiting on close and does not comment on the variance.`]));
+      if (r.status === "held") box.append(el("div", { cls: "nodraft" }, [el("span", { cls: "badge t-warn", text: "No draft released" }), `${r.name}: held, ${r.pending.join(", ")} pending Controller approval. Commentary waits for the decision.`]));
+    }
+    const quiet = res.rows.filter((r) => r.status === "not_flagged").map((r) => r.name);
+    if (quiet.length) box.append(el("div", { cls: "nodraft" }, [el("span", { cls: "badge t-neutral", text: "No commentary required" }), quiet.join(", ")]));
+  }
+
+  // ---------- 4. Evals ----------
+  function renderEvals() {
+    $("regSel").value = S.reg;
+    const reg = E.REGRESSIONS[S.reg];
+    $("regDetail").textContent = reg.detail + (reg.expect ? ` Expected to fail: ${reg.expect}.` : "");
+    const failing = chk.checks.filter((c) => !c.ok).map((c) => c.id);
+    const bn = $("relBanner"); bn.textContent = "";
+    let cls = chk.release ? "good" : "bad", msg;
+    if (S.reg === "none") msg = chk.release ? [el("b", { text: "Release ALLOWED." }), ` All ${chk.checks.length} checks pass on the current code.`] : [el("b", { text: "Release BLOCKED." }), ` Failing: ${failing.join(", ")}.`];
+    else if (chk.release || !failing.includes(reg.expect)) { cls = "warn"; msg = [el("b", { text: "Evals too weak." }), ` ${reg.label} was not caught by ${reg.expect}.`]; }
+    else msg = [el("b", { text: "Release BLOCKED." }), ` ${failing.length} of ${chk.checks.length} checks fail (${failing.join(", ")}), including ${reg.expect} as designed. This change would not be published.`];
+    bn.className = "banner " + cls; bn.append(el("span", {}, msg));
+    const e12 = chk.checks.find((c) => c.id === "E12"), e14 = chk.checks.find((c) => c.id === "E14"), e13 = chk.checks.find((c) => c.id === "E13");
+    const nScen = chk.checks.filter((c) => /^E(0\d|1[01])$/.test(c.id));
+    const sum = $("evSum"); sum.textContent = "";
+    for (const [l, v] of [["Scenarios E01 to E11", `${nScen.filter((c) => c.ok).length} of ${nScen.length}`], ["Python match", e12.text.split(" engine")[0]],
+                          ["Gate tests", e13.text.split(" gate")[0]], ["Drafts passing gate", e14.text.split(" displayed")[0]]])
+      sum.append(el("div", {}, [el("span", { cls: "l", text: l }), el("span", { cls: "v", text: v })]));
+    const cl = $("checkList"); cl.textContent = "";
+    for (const c of chk.checks) {
+      cl.append(el("div", { cls: "chk" }, [el("span", { cls: "tag " + (c.ok ? "ok" : "no"), text: c.ok ? "PASS" : "FAIL" }), el("span", { cls: "id", text: c.id }), el("span", { text: c.text }),
+        c.detail.length ? el("div", { cls: "dt" }, c.detail.slice(0, 5).map((d) => el("span", { text: d })).concat(c.detail.length > 5 ? [el("span", { text: `and ${c.detail.length - 5} more` })] : [])) : null]));
+    }
+    const gt = $("gtTbl").querySelector("tbody"); gt.textContent = "";
+    const baseRes = E.compute(DATA, KEY.scenarios.case1_default.inputs), base = baseRes.rows.find((r) => r.id === "SAL");
+    E.GATE_TESTS.forEach(([t, exp], i) => {
+      const g = E.gate(t, base, baseRes), right = g.passed === exp;
+      gt.append(el("tr", {}, [el("td", { text: String(i + 1) }), el("td", {}, [el("code", { text: t })]), el("td", { text: exp ? "pass" : "block" }),
+        el("td", {}, [el("span", { cls: "badge " + (right ? "t-good" : "t-bad"), text: g.passed ? "pass" : "block" }), g.passed ? null : el("span", { cls: "sm", text: E.gateSummary(g) })])]));
+    });
+  }
+
+  // ---------- 5. Sign-off ----------
+  function renderSignoff() {
+    const d = decision();
+    const items = [
+      [chk.release, `Release gate ${chk.release ? "ALLOWED" : "BLOCKED"}`],
+      [!res.rows.some((r) => r.status === "deferred"), "No cost center deferred (every month closed)"],
+      [!res.rows.some((r) => r.status === "held"), "No cost center held (no pending journals)"],
+      [res.flagged.every((id) => S.classes[id]), `Every flagged variance classified (${res.flagged.filter((id) => S.classes[id]).length} of ${res.flagged.length})`],
+      [res.flagged.every((id) => E.gate(currentText(rowById(id)), rowById(id), res).passed), "Every draft passes the numbers gate"],
+      [!!S.signoff.name.trim(), "Sign-off name entered"],
+    ];
+    const ul = $("checklist"); ul.textContent = "";
+    for (const [ok, t] of items) ul.append(el("li", {}, [el("span", { cls: "m " + (ok ? "ok" : "no"), text: ok ? "✓" : "×" }), el("span", { text: t })]));
+    const gr = $("goReasons");
+    gr.hidden = d.allowed; gr.className = "banner " + (d.allowed ? "good" : "warn");
+    gr.textContent = d.allowed ? "" : "Go-live blocked: " + d.reasons.join(" ");
+    $("exportBtn").disabled = !d.allowed;
+    $("exportBtn").title = d.allowed ? "Download the Markdown go-live pack" : "Export is available once go-live is allowed";
+  }
+  function renderClasses() {
+    const box = $("classes"); box.textContent = "";
+    if (!res.flagged.length) { box.append(el("div", { cls: "hint", text: "No flagged variances to classify in this state." })); return; }
+    for (const id of res.flagged) {
+      const r = rowById(id);
+      const sel = el("select", { cls: "inp", "aria-label": `Classification for ${r.name}` });
+      sel.append(el("option", { value: "", text: "Classify..." }));
+      for (const [v, t] of E.CLASSES) sel.append(el("option", { value: v, text: t }));
+      sel.value = S.classes[id] || "";
+      sel.addEventListener("change", () => { if (sel.value) S.classes[id] = sel.value; else delete S.classes[id]; renderTop(); renderSignoff(); });
+      box.append(el("div", { cls: "crow" }, [el("div", {}, [el("b", { text: r.name }), el("span", { cls: "hint", text: ` ${F.money(r.variance)}${r.pct === null ? ", unplanned" : ` (${F.pct(r.pct)})`}, ${r.direction}` })]), sel]));
+    }
+  }
+  function exportPack() {
+    const d = decision();
+    if (!d.allowed) return;
+    const regs = Object.keys(E.REGRESSIONS).filter((k) => k !== "none").map((k) => {
+      const r = E.runChecks(DATA, KEY, GOLDEN, DRAFTS, { [k]: true });
+      return { label: E.REGRESSIONS[k].label, blocked: !r.release, failing: r.checks.filter((c) => !c.ok).map((c) => c.id) };
+    });
+    const now = new Date(), date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    const md = E.buildPack({ data: DATA, res, checks: chk, regressions: regs, drafts: DRAFTS, texts: editedTexts(), classes: S.classes,
+                             signoff: S.signoff, date, caseLabel: DATA.cases[S.caseId].label, decision: d });
+    const url = URL.createObjectURL(new Blob([md], { type: "text/markdown" }));
+    const a = el("a", { href: url, download: `deploy-desk-go-live-pack-${date}.md` });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function renderAll() {
+    recompute();
+    $("caseSel").value = S.caseId;
+    renderTop(); renderSpec(); renderControl(); renderResults(); renderCommentary(); renderEvals(); renderClasses(); renderSignoff();
+  }
+
+  // ---------- wiring ----------
+  renderStatic();
+  $("polT").value = S.policy.T.toFixed(1); $("polF").value = String(S.policy.F); $("soRole").value = S.signoff.role;
+  $("caseSel").addEventListener("change", (e) => { S.caseId = e.target.value; S.decisions = {}; renderAll(); });
+  $("regSel").addEventListener("change", (e) => { S.reg = e.target.value; renderAll(); });
+  $("polApply").addEventListener("click", applyPolicy);
+  for (const id of ["polT", "polF"]) $(id).addEventListener("keydown", (e) => { if (e.key === "Enter") applyPolicy(); });
+  $("polReset").addEventListener("click", () => { $("polT").value = "5.0"; $("polF").value = "10000"; applyPolicy(); });
+  $("soName").addEventListener("input", (e) => { S.signoff.name = e.target.value; renderTop(); renderSignoff(); });
+  $("soRole").addEventListener("input", (e) => { S.signoff.role = e.target.value; });
+  $("exportBtn").addEventListener("click", exportPack);
+  $("resetBtn").addEventListener("click", () => {
+    S = fresh(); $("polT").value = "5.0"; $("polF").value = "10000"; $("soName").value = ""; $("soRole").value = S.signoff.role; $("polMsg").hidden = true; renderAll();
+  });
+  $("tryGate").addEventListener("click", () => {
+    const ta = document.querySelector('#dList textarea[data-row="SAL"]') || document.querySelector("#dList textarea");
+    if (!ta) return;
+    const r = rowById(ta.getAttribute("data-row")), need = F.money(Math.abs(r.variance));
+    ta.value = ta.value.includes(need) ? ta.value.split(need).join(r.id === "SAL" ? "$121,500" : "$1,000") : ta.value + " A further $1,000 was saved.";
+    ta.dispatchEvent(new Event("input"));
+    ta.scrollIntoView({ behavior: "smooth", block: "center" }); ta.focus();
+  });
+  const root = document.documentElement;
+  const theme = store.get("theme", null); if (theme) root.setAttribute("data-theme", theme);
+  $("themeBtn").addEventListener("click", () => {
+    const dark = root.getAttribute("data-theme") ? root.getAttribute("data-theme") === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    const next = dark ? "light" : "dark"; root.setAttribute("data-theme", next); store.set("theme", next);
+  });
+  renderAll();
+})();
+</script>
+</body>
+</html>
