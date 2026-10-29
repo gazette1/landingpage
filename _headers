@@ -38,3 +38,7 @@
 /rerun-desk/*
   X-Robots-Tag: noindex, nofollow, noarchive
   Referrer-Policy: no-referrer
+
+/covenant-desk/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Referrer-Policy: no-referrer
