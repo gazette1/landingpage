@@ -1,28 +1,27 @@
 {
-  "generated": "2026-10-26T19:08:55Z",
+  "generated": "2026-10-29T14:18:58Z",
   "count": 23,
   "posts": [
     {
-      "title": "Field Note: a season of strikeout picks, graded against the market",
+      "title": "Field Note: a season of strikeout picks that hit 80 percent on the alt line",
       "slug": "field-strikeout-season-2026",
       "url": "blog/field-strikeout-season-2026.html",
       "archetype": "field-note",
-      "date": "2026-10-26",
+      "date": "2026-10-29",
       "project": "strikeout",
       "version": "season / 2026",
       "tags": [
         "baseball",
         "statcast",
         "lightgbm",
-        "market-lines",
+        "alt-lines",
         "calibration",
-        "evaluation",
         "github-actions",
-        "clv"
+        "evaluation"
       ],
-      "summary": "492 picks over 109 game days, every one regraded against Statcast after the season. The posted record is 80 percent. The honest record is 55 percent, and the sportsbook's line forecast strikeouts better than the model did. What the cushion hid, what the operations got right, and the one thing that was never logged.",
-      "word_count": 1394,
-      "read_time_min": 7
+      "summary": "492 pitcher strikeout picks over 109 game days, 383-95 at the posted alt line, every one regraded against Statcast. How a conservative-floor strategy ran unattended all season, where the money came from, and the one upgrade for 2027.",
+      "word_count": 1273,
+      "read_time_min": 6
     },
     {
       "title": "Field Note: what 1,000 inputs found in an extraction pipeline",
