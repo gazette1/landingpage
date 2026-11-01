@@ -37,7 +37,7 @@
         <span class="post-sep">/</span>
         <span class="post-date">2026.05.20</span>
         <span class="post-sep">/</span>
-        <span class="post-read">8 MIN / 1,700 WORDS</span>
+        <span class="post-read">9 MIN / 1,914 WORDS</span>
       </div>
 
       <h1 class="post-title">Field Note: the Obsidian-Claude Code loop for project tracking and roadmaps</h1>
@@ -161,6 +161,23 @@
 <p class="body">Those are the questions this Field Note is meant to answer.</p>
 
 <p class="body">For the multi-source data-fusion counterpart that runs the same shared-data, separate-tools pattern on parcel data, see <a href="inside-atlas.html">Inside Atlas</a>. For the prompt-suite workflow that produces structured outputs from the same kind of paired-tool discipline, see <a href="inside-cre-feasibility.html">Inside the Mosaic feasibility workflow</a>.</p>
+
+<hr class="rule">
+
+<h2 class="h2" id="update-2026-11">Update, November 2026</h2>
+<p class="body">The two-surface, one-disk pattern in this post held. The layout around it did not. I now run one Obsidian vault as the only memory for every Claude Code session, and the default memory directory holds a single pointer to it.</p>
+<pre><code>Obsidian Vault/
+  00 Profile/00 Profile.md        identity, voice rules, domain map
+  Jobs/Jobs.md                    procedures, one folder per job
+  Daily Notes/2026-10-31.md       INDEX, then time-stamped DETAILED entries
+  StrikeOut Bot/StrikeOut Bot.md  a domain master note; its links reach the folder
+</code></pre>
+<p class="body"><strong>What forced it.</strong> Memory had forked. Claude Code keeps a memory directory per project, and each of my projects had written its own. My profile existed in eight places and my voice rules in five. The consolidated profile note flags the conflicts between its eight sources inline instead of resolving them.</p>
+<p class="body"><strong>How it works.</strong> One user-level constitution file, <code>CLAUDE.md</code>, is read at the start of every session. Before working in a domain, the agent reads that domain's master note, named like its folder, and follows every wiki-link until it has traversed the folder. Repeatable work lives in Jobs as SOP index notes with numbered steps that link to the domain master, so procedure and context load together. User-level skills read the relevant vault notes before they act.</p>
+<p class="body">The agent appends to the day's note at the end of every session. The anti-bloat rule: add to an existing note before creating one, and update the master index so nothing is orphaned. Sessions scan recent daily notes before starting; on October 31 a side session sent a labeled test post for the double-double bot, and the day's note carries that entry beside the main session's.</p>
+<p class="body"><strong>What held.</strong> Two surfaces, one disk: I plan in Obsidian and the agent reads the same files. The decision log survives as the master note, in a looser form: the Double Double Bot note holds numbered decisions with dated updates as each one resolves.</p>
+<p class="body"><strong>What did not.</strong> The auto-context loading hook never became a hook. A constitution file plus a traversal rule does that job, and it also answers the second failure mode above: the instruction to follow links now sits in the file instead of in my head. The typed roadmap frontmatter did not happen. Some notes carry a free-text status line, but none has a <code>current_phase</code>, <code>next_milestone</code> or <code>blocked_on</code> field.</p>
+<p class="body">The argument from May stands with one change: the shared disk needs a written rule for what the agent reads first and what it writes back.</p>
 
     </div>
 

@@ -88,4 +88,18 @@ For the production-ML calibration discipline behind the score-review workflow Mo
 
 ---
 
+## Update, November 2026
+
+The data layer and the citation discipline now both exist. They do not yet work as one system.
+
+The data layer is the corridor pipeline, written up in [Inside the corridor pipeline](inside-corridor-pipeline.html). It fuses Census ACS, HUD QCT, IRS OZ, USDA Food Atlas, state DDD and land bank inventory on a parcel key, and keeps the result in workbooks and data files rather than the Postgres table proposed here.
+
+The retrieval layer shipped in August as the [QAP Engine](../qap-engine/), a public demo on this site: retrieval-augmented Q&A over the Maryland 2025 QAP, the Maryland 2025 MRFP Guide and the DC 2025 QAP, 505 chunks across 186 pages. Every answer cites document and page, and when the corpus cannot answer, it says so. Its gated retrieval eval passed 16 of 16.
+
+The scoring discipline became a product. The $750 QAP Quick Check is the entry rung of the Mosaic service ladder (Quick Check $750, Feasibility Review $3,500, Full Underwriting $10,000 to $15,000, Application Support $15,000 and up): a 2 to 3 page scoring gap analysis for one developer and one deal, in which every point claim cites its QAP section. The mosaic-lihtc skill does the credit math (eligible basis with the QCT or DDA boost, pricing at $0.85, $0.90 and $0.95 per credit, the 50 percent test on bond deals) and will not guess state point scoring. Without the QAP in hand, it names the item and the allocating agency and stops. That is my answer so far to the closing question on state-by-state variation: retrieve and cite the plan rather than let a model answer from memory.
+
+**Still not built.** The narrative layer that takes a parcel and returns its designation stack, the scoring implication of each designation and comparable deals that used similar stacks does not exist. The QAP Engine answers natural-language questions; it does not read a parcel record, and its corpus stops at Maryland and DC, so Delaware, where this post's corridor sits, is not covered. The nightly refresh, the part I called the value, is not running today; the newest pipeline output on disk is dated April 2026, and the corridor post's description of the cron is now historical.
+
+---
+
 Russ

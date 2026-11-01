@@ -114,4 +114,30 @@ For the multi-source data-fusion counterpart that runs the same shared-data, sep
 
 ---
 
+## Update, November 2026
+
+The two-surface, one-disk pattern in this post held. The layout around it did not. I now run one Obsidian vault as the only memory for every Claude Code session, and the default memory directory holds a single pointer to it.
+
+```
+Obsidian Vault/
+  00 Profile/00 Profile.md        identity, voice rules, domain map
+  Jobs/Jobs.md                    procedures, one folder per job
+  Daily Notes/2026-10-31.md       INDEX, then time-stamped DETAILED entries
+  StrikeOut Bot/StrikeOut Bot.md  a domain master note; its links reach the folder
+```
+
+**What forced it.** Memory had forked. Claude Code keeps a memory directory per project, and each of my projects had written its own. My profile existed in eight places and my voice rules in five. The consolidated profile note flags the conflicts between its eight sources inline instead of resolving them.
+
+**How it works.** One user-level constitution file, `CLAUDE.md`, is read at the start of every session. Before working in a domain, the agent reads that domain's master note, named like its folder, and follows every wiki-link until it has traversed the folder. Repeatable work lives in Jobs as SOP index notes with numbered steps that link to the domain master, so procedure and context load together. User-level skills read the relevant vault notes before they act.
+
+The agent appends to the day's note at the end of every session. The anti-bloat rule: add to an existing note before creating one, and update the master index so nothing is orphaned. Sessions scan recent daily notes before starting; on October 31 a side session sent a labeled test post for the double-double bot, and the day's note carries that entry beside the main session's.
+
+**What held.** Two surfaces, one disk: I plan in Obsidian and the agent reads the same files. The decision log survives as the master note, in a looser form: the Double Double Bot note holds numbered decisions with dated updates as each one resolves.
+
+**What did not.** The auto-context loading hook never became a hook. A constitution file plus a traversal rule does that job, and it also answers the second failure mode above: the instruction to follow links now sits in the file instead of in my head. The typed roadmap frontmatter did not happen. Some notes carry a free-text status line, but none has a `current_phase`, `next_milestone` or `blocked_on` field.
+
+The argument from May stands with one change: the shared disk needs a written rule for what the agent reads first and what it writes back.
+
+---
+
 Russ

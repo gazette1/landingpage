@@ -93,4 +93,14 @@ For the multi-pass orchestration discipline that produces structured documentati
 
 ---
 
+## Update, November 2026
+
+What I built after this post sits on the other side of the capital stack. This post called senior debt a technical problem and LP equity the wall; the CRE Loan Packaging Agent works the technical problem. Its steps are intake, enrich, analyze and package. Intake has to be format-agnostic because every developer packages a deal differently, and the output is a lender-ready XLSX with live formulas, so every number shows its work. A first batch of ten real deals produced ten workbooks. I call it Harvey for credit analysts: the agent does the paralegal-tier assembly, and the analyst opens a workbook with the numbers already fed through, moves the levers and makes the credit decision. The workbook's Read rows are labeled a screen, not a decision. My value claim is 10 to 15 analyst hours saved per deal; it is a claim, not a measurement. The live engagement is a loan broker with roughly $200MM of deals; the ask is full packages, not executive summaries, built so lenders reach decisions faster.
+
+One piece answers mode two above, where the memo cites documents that do not exist yet. The document classifier reads each file's body with a typed model. It corrects filename-only misfiles, such as a personal financial statement named like a model, but it can never promote a document into executed legal, audited financial, bank statement or appraisal. The model can fix a filing error; it cannot grant a document authority. A reclassified personal financial statement also loses its property-field claims, so the sponsor's finances stay out of the asset numbers.
+
+**Still not built.** That boundary is deliberate, and it is why the core of this post is unbuilt. In July I scoped the agent strictly to the asset and left sponsor and guarantor analysis to a separate agent that does not exist yet. The lender-side skills write a sponsor section deal by deal from whatever the package holds; nothing keeps a structured sponsor profile across deals. There is no pattern-selection pass across the four packaging patterns, and no LP-facing renderer for the offering memo, operating-partner LOI, GP commitment letter, LP Q&A or diligence-response packet. The gap audit exists only as the outstanding-items list a credit memo opens with. The 80 to 200 hours of packaging work described here are still done by hand.
+
+---
+
 Russ

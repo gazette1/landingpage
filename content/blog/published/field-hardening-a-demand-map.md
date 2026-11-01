@@ -1,18 +1,18 @@
 ---
-title: What it took to make an AI demand map safe to sell
+title: Field Note: what it took to make an AI demand map safe to sell
 slug: field-hardening-a-demand-map
 archetype: field-note
-date: 2026-08-02
-project: ODI Bot
-version: v9.3
-status: draft
+date: 2026-11-01
+project: heat-map
+version: v8 to v9.5
+status: published
 tags: [demand-research, local-services, llm-pipelines, data-quality, fail-loud, provider-routing, odi]
-summary: A demand heat map that worked in demo mode met funded API accounts and real clients. Five defects surfaced in two weeks, every one caught by a gate before shipping. Field notes on what broke, what the fixes cost, and why the guardrails were the product.
+summary: A demand heat map that worked in demo mode met funded API accounts and real clients. Five defects surfaced in two weeks, every one caught by a gate before shipping, and a sixth seven weeks later. Field notes on what broke, what the fixes cost, and why the guardrails were the product.
 ---
 
-# What it took to make an AI demand map safe to sell
+# Field Note: what it took to make an AI demand map safe to sell
 
-By Russ. 2026-08-02. Field Note.
+By Russ. Written 2026-08-02, published 2026-11-01. Field Note.
 
 ---
 
@@ -59,6 +59,14 @@ The domain logic survived untouched. The job map, the awareness rows, the honest
 ## Closing
 
 This is the kind of work a Forward Deployed AI Architect does in the unglamorous middle of an engagement: not choosing the model, but building the gates that catch the model and the data being confidently wrong, and pricing every fix in dollars and minutes. If your firm ships numbers to clients through an LLM pipeline, the first question I would ask is which of your invariants can fail without throwing. The honest answer is usually the roadmap.
+
+## Postscript, November 2026
+
+The hardening did not stop at v9.3. On 2026-09-19 a sixth defect class surfaced, and it had been invisible on every shipped board: the job step was never classified. Discovery gave every keyword the cell of the seed that found it, at confidence 1.0, and only the awareness row was judged by a model. Unassigned sat at zero on every board while brand searches, career searches and off-topic queries sat inside the matrix. Re-running two shipped boards through a per-keyword typed classifier moved 12 percent of one dental board's volume and 25 percent of another's into Unassigned, where it belonged.
+
+The fix is a typed pass, one bounded question per keyword, two independent choices plus brand and off-topic checks, with the reason written into the audit trail and an unassigned file per run. It sits before the matrix, so the books still balance and the ship gate is untouched. A 6,600-keyword board takes about three and a half minutes and 27 cents. Two rules came out of it: gate on the top probability rather than the API's rescaled confidence field, and describe the business by its own general type, because a narrower description made the off-topic check reject searches the client plainly serves.
+
+In July the engine went under a feature freeze tied to a 30-day program that put an audit log, an approval gate, a payload schema and an eval suite ahead of new features. The one engine change recorded since is this classifier, and it is a gate, not a feature.
 
 ---
 

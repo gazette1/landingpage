@@ -38,9 +38,9 @@
 
     <!-- §6.2 Terminal block, bottom-left (counter-position to RECEIPTS) -->
     <aside class="terminal" aria-hidden="true">
-      <div class="line"><span class="prompt">&gt;</span> <span class="k">CURRENTLY:</span> field notes / day 0 of 40 / finance ai solutions</div>
+      <div class="line"><span class="prompt">&gt;</span> <span class="k">CURRENTLY:</span> field notes / week 4 of 11 / finance ai solutions</div>
       <div class="line"><span class="prompt">&gt;</span> <span class="k">CLAUDE CODE:</span> 10B+ tokens / 130 active days / 95 sessions</div>
-      <div class="line"><span class="prompt">&gt;</span> <span class="k">BUILD:</span> 2026.10.04 <span class="cursor"></span></div>
+      <div class="line"><span class="prompt">&gt;</span> <span class="k">BUILD:</span> 2026.11.01 <span class="cursor"></span></div>
     </aside>
 
     <!-- §6.3 WORK as broadside -->
@@ -110,7 +110,7 @@ const out = await runPass(PASS_03, ctx);
             <span class="row">OPERATOR-TRAINED RULE REGISTRY</span>
             <span class="row">24 MACHINE + 14 JUDGMENT RULES</span>
             <span class="row">DEEPSEEK WRITER / K3 JUDGE</span>
-            <span class="row">/usr/bin/bash.0088 WRITER SPEND PER DRAFT</span>
+            <span class="row">$0.0088 WRITER SPEND PER DRAFT</span>
             <span class="row">EVERY LINK LIVE-CHECKED</span>
             <span class="row">TABBED GDOC DELIVERY TO DRIVE</span>
             <span class="row">SQLITE KEYWORD CACHE, 30-DAY</span>
@@ -332,6 +332,140 @@ const on  = runDeal({ ...deal, project: macModel });
 expect(on.acquisitions).toEqual(off.acquisitions);
 expect(on.wholesale).toEqual(off.wholesale);
 expect(on.offers).toEqual(off.offers);
+</code></pre>
+        </li>
+
+        <li class="project-row" data-href="blog/inside-corridor-pipeline.html">
+          <span class="num">13</span>
+          <span class="title">CORRIDOR&nbsp;PIPELINE</span>
+          <div class="meta">
+            <span class="row strong">v1 / 2026</span>
+            <span class="row">LIHTC CORRIDOR RESEARCH / MOSAIC</span>
+            <span class="row">PYTHON PIPELINE ON ONE PARCEL KEY</span>
+            <span class="row">CENSUS ACS / HUD QCT / IRS OZ / USDA</span>
+            <span class="row">STATE DDD + LAND BANK INVENTORY</span>
+            <span class="row">SCORED AGAINST THE STATE QAP</span>
+            <span class="row">LP-MEMO-READY OUTPUT</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code># every public layer joins on the parcel; the QAP arithmetic
+# runs in code, cited per criterion, never inside the model
+parcels = fuse([acs, hud_qct, irs_oz, usda_food, state_ddd, land_bank],
+               key="parcel_id")
+parcels["stack"] = parcels[DESIGNATIONS].sum(axis=1)   # 0 to 5
+scored = qap.score(parcels, cycle="2026-9pct")
+memo = render_lp_memo(scored[scored.points &gt;= funding_line])
+</code></pre>
+        </li>
+
+        <li class="project-row" data-href="blog/ship-gardencam.html">
+          <span class="num">14</span>
+          <span class="title">GARDENCAM</span>
+          <div class="meta">
+            <span class="row strong">v1 / 2026</span>
+            <span class="row">NYC DOT TRAFFIC CAMS AS A LIVE FEED</span>
+            <span class="row">ROUGHLY 950 PUBLIC CAMERAS / NO KEY</span>
+            <span class="row">STATIC SITE / VANILLA JS</span>
+            <span class="row">24 CAMS VERIFIED LIVE, 6 PER VENUE</span>
+            <span class="row">HAVERSINE NEAREST-CAM PICK</span>
+            <span class="row">ONE EVENING BUILD</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code>// a still refreshed on a timer is a feed; a 404 is a dead camera
+const src = () =&gt; `${API}/cameras/${id}/image?t=${Date.now()}`;
+img.onload  = () =&gt; tile.classList.remove("reconnecting");
+img.onerror = () =&gt; retire(id);   // stale UUIDs never come back
+setInterval(() =&gt; { img.src = src(); }, 2000);
+// the /api/cameras list is CORS-blocked in the browser,
+// so the curated per-venue lists are the source of truth
+</code></pre>
+        </li>
+
+        <li class="project-row" data-href="blog/field-hardening-a-demand-map.html">
+          <span class="num">15</span>
+          <span class="title">HEAT&nbsp;MAP</span>
+          <div class="meta">
+            <span class="row strong">v9.5 / 2026</span>
+            <span class="row">8 JOB STEPS X 5 AWARENESS STAGES</span>
+            <span class="row">DATAFORSEO VOLUME / SERP OCCUPANCY</span>
+            <span class="row">CLASSIFIER PICKED BY BENCH, NOT PREFERENCE</span>
+            <span class="row">PAYLOAD GUARD: NO CLIENT NAME SHIPS</span>
+            <span class="row">~$0.50 PER BOARD / $100 PRODUCT</span>
+            <span class="row">SHIP GATE: EVERY CELL AUDITABLE</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code>// invariants are gates that refuse to ship, not warnings that scroll past
+assert(books.total === api.total,          "books do not balance");
+assert(!payload.includes(client.name),     "identity leak");
+for (const cell of board.cells)
+  assert(cell.volume_cited || cell.recommendation,
+         `cell ${cell.id} has neither volume nor a read`);
+// a refused build costs a rerun; a wrong number costs the sale
+</code></pre>
+        </li>
+
+        <li class="project-row" data-href="blog/field-debt-sizing.html#update-2026-11">
+          <span class="num">16</span>
+          <span class="title">HERMES</span>
+          <div class="meta">
+            <span class="row strong">v1 / 2026</span>
+            <span class="row">CAPITAL OUTREACH ENGINE / MOSAIC</span>
+            <span class="row">4,174 FIRMS / 7,100 CONTACTS</span>
+            <span class="row">TWO-WAVE SCREEN, THEN ENRICH</span>
+            <span class="row">EVERY CRITERION CITED TO A FETCHED PAGE</span>
+            <span class="row">HUNTER-VERIFIED, DRAFTS NEVER SENT</span>
+            <span class="row">TYPED CLASSIFIER: ~$0.25 FOR THE DATABASE</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code># qualification is stricter than enrichment: four cited criteria or exclusion
+def qualify(firm, deal):
+    for key in ("product", "size_band", "asset_type", "geography"):
+        if not firm.cited(key, fetched_this_session=True):
+            return Exclude(firm, reason=f"no cited {key}")
+    if not hunter.verify(firm.contact.email).deliverable:
+        return Gap(firm, reason="unverified address")
+    return Draft(firm, deal)   # IMAP append to Drafts; never send
+</code></pre>
+        </li>
+
+        <li class="project-row" data-href="blog/ship-bid-desk.html">
+          <span class="num">17</span>
+          <span class="title">BID&nbsp;DESK</span>
+          <div class="meta">
+            <span class="row strong">v1 / 2026</span>
+            <span class="row">PUBLIC-CONTRACTS PIPELINE</span>
+            <span class="row">SAM.GOV + STATE AND COUNTY PORTALS</span>
+            <span class="row">GRADED A / B / C / PASS</span>
+            <span class="row">CLOUDFLARE WORKER + KV HUB</span>
+            <span class="row">44 OPPORTUNITIES / 56-STEP ROADMAP</span>
+            <span class="row">SELF-PERFORM SHARE ON EVERY A OR B</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code>// the rule that gates every set-aside bid: 13 CFR 125.6
+function grade(opp, profile) {
+  if (opp.bondRequired &amp;&amp; !profile.surety)     return pass("bond");
+  if (daysUntil(opp.due) &lt; profile.minDays)     return pass("fuse");
+  if (opp.setAside &amp;&amp; opp.value &gt; 350_000 &amp;&amp;
+      selfPerformShare(opp) &lt; 0.50)             return watch("workshare");
+  return fits(opp, profile.scopes) ? "A" : "C";  // owner decides, agent files
+}
+</code></pre>
+        </li>
+
+        <li class="project-row" data-href="blog/inside-double-double-bot.html">
+          <span class="num">18</span>
+          <span class="title">DOUBLE&nbsp;DOUBLE&nbsp;BOT</span>
+          <div class="meta">
+            <span class="row strong">PAPER TRADE / 2026</span>
+            <span class="row">NBA DOUBLE-DOUBLE PROPS</span>
+            <span class="row">239,334 PLAYER-GAMES / 155 FEATURES</span>
+            <span class="row">LIGHTGBM + PLATT, WALK-FORWARD</span>
+            <span class="row">RANK BY EDGE, NOT PROBABILITY</span>
+            <span class="row">LOG LOSS 0.1892 VS 0.2009 SEASON RATE</span>
+            <span class="row">100-PICK CLOSING-LINE GATE</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code># a Yes-only board hides the margin; measure it against two-way quotes
+fair = mean(devig(q, m) for q in twoway_quotes for m in ("mult", "power"))
+edge = p_platt - fair
+bar  = max(0.03, fanduel_one_sided_margin(tonight))
+if p_platt &gt;= 0.35 and edge &gt; bar and p_platt - fd_implied &gt;= 0.02:
+    picks.append(player)            # one paper unit; graded at the close
+picks = sorted(picks, key=edge_of, reverse=True)[:3]
 </code></pre>
         </li>
 

@@ -87,4 +87,16 @@ For the production-ML calibration discipline that shaped the screening-vs-decidi
 
 ---
 
+## Update, November 2026
+
+Two pieces of this pipeline exist now, and they divide the work differently than I drew it here.
+
+The constraint-check pass is the cre-deal-screen skill. It runs kill checks in a fixed order and stops at the first hard fail: the hard red lines for the asset class, a private-market reuse test, in-place arithmetic at 5 to 8 percent vacancy against the asking price, a single tenant above 30 percent of NOI, and whether plausible debt at current rates carries the deal at 1.20x DSCR in place. The verdict is DIG or PASS with exactly three reasons, the one unknown to resolve first on a DIG, and a one-sentence kill test. There is no third lane for senior review. The screen is conservative by default because it exists to protect underwriting hours.
+
+The parsing pass became a typed extractor in the loan packaging agent. Regex finds every figure in the document with its context, and a typed model (TypeSafe Jev) picks which candidate answers each of 14 numeric fields, or NONE. The model cannot invent a number that is not on the page. Period-scope vetoes read the words before each figure, which keeps trailing and stabilized NOI apart, the distinction mode one above turns on. In one hotel memo the regex took the $18.4MM facility as the price, while the typed pick was $16.5MM; the disagreement became two competing claims, settled on confidence. A live check on a hotel bridge memo took 1.1 seconds and cost $0.0013 for 31K input tokens, under the few cents per flyer this post estimated.
+
+**Still not built.** The one-page screen memo does not exist. The skill returns one message and no document unless asked, so the senior analyst reacts to a verdict, not to a memo that anchors the four lines against the firm's bands and lists the broker questions. Two of the four lines, the capex bill and the in-place versus market rent gap, have no dedicated check in the screen. Nothing feeds flyers in volume; the screen runs when I paste a listing. And the typed pass has not yet run against the golden set, the red-team fixtures or a shadow diff across my deal corpus, so I cannot yet say how it handles the long tail of brokerage formats.
+
+---
+
 Russ

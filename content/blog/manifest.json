@@ -1,7 +1,70 @@
 {
-  "generated": "2026-10-29T14:18:58Z",
-  "count": 23,
+  "generated": "2026-11-01T15:11:29Z",
+  "count": 31,
   "posts": [
+    {
+      "title": "Inside Double Double Bot: buying edge instead of favorites in a Yes-only prop market",
+      "slug": "inside-double-double-bot",
+      "url": "blog/inside-double-double-bot.html",
+      "archetype": "thesis",
+      "date": "2026-11-01",
+      "project": "double-double",
+      "version": "paper trade / 2026",
+      "tags": [
+        "nba",
+        "player-props",
+        "lightgbm",
+        "calibration",
+        "closing-line-value",
+        "walk-forward",
+        "paper-trading",
+        "evaluation"
+      ],
+      "summary": "Double Double Bot estimates each NBA player's double-double probability from ten seasons of box scores and picks by edge against de-vigged two-way prices, not by likelihood, because FanDuel prices the favorites above their realized rates. It runs on free data and a laptop, on paper stakes, until 100 picks show positive fair closing line value.",
+      "word_count": 2686,
+      "read_time_min": 12
+    },
+    {
+      "title": "Ship Note: Bid Desk v1, a public-contracts pipeline for a prime we have not formed yet",
+      "slug": "ship-bid-desk",
+      "url": "blog/ship-bid-desk.html",
+      "archetype": "ship-note",
+      "date": "2026-11-01",
+      "project": "bid-desk",
+      "version": "v1 / 2026",
+      "tags": [
+        "public-procurement",
+        "sam-gov",
+        "compliance",
+        "agent-workflows",
+        "cloudflare-workers",
+        "build-in-public"
+      ],
+      "summary": "An agent sweeps SAM.gov and the DMV portals and grades every find, a hosted hub shows two partners the pipeline, and nothing gets bid until the company exists.",
+      "word_count": 685,
+      "read_time_min": 3
+    },
+    {
+      "title": "Field Note: what it took to make an AI demand map safe to sell",
+      "slug": "field-hardening-a-demand-map",
+      "url": "blog/field-hardening-a-demand-map.html",
+      "archetype": "field-note",
+      "date": "2026-11-01",
+      "project": "heat-map",
+      "version": "v8 to v9.5",
+      "tags": [
+        "demand-research",
+        "local-services",
+        "llm-pipelines",
+        "data-quality",
+        "fail-loud",
+        "provider-routing",
+        "odi"
+      ],
+      "summary": "A demand heat map that worked in demo mode met funded API accounts and real clients. Five defects surfaced in two weeks, every one caught by a gate before shipping, and a sixth seven weeks later. Field notes on what broke, what the fixes cost, and why the guardrails were the product.",
+      "word_count": 1426,
+      "read_time_min": 6
+    },
     {
       "title": "Field Note: a season of strikeout picks that hit 80 percent on the alt line",
       "slug": "field-strikeout-season-2026",
@@ -22,6 +85,66 @@
       "summary": "492 pitcher strikeout picks over 109 game days, 383-95 at the posted alt line, every one regraded against Statcast. How a conservative-floor strategy ran unattended all season, where the money came from, and the one upgrade for 2027.",
       "word_count": 1273,
       "read_time_min": 6
+    },
+    {
+      "title": "Inside DealCalc: a CRM built around a spreadsheet nobody wants to retire",
+      "slug": "inside-dealcalc",
+      "url": "blog/inside-dealcalc.html",
+      "archetype": "thesis",
+      "date": "2026-10-01",
+      "project": "dealcalc",
+      "version": "v0.3 / 2026",
+      "tags": [
+        "workbook-parity",
+        "golden-fixtures",
+        "next.js",
+        "supabase",
+        "provider-boundaries",
+        "row-level-security"
+      ],
+      "summary": "A residential wholesale and flip operator runs his acquisitions on one Excel workbook and a Mac app he commissioned years ago. The brief was a CRM his team can work in, with the analyzer inside it, that does not change a single number he already trusts. These are the six decisions that carried it, including why the workbook's own mistakes are reproduced on purpose and how a richer financing model ships without touching the first one.",
+      "word_count": 1354,
+      "read_time_min": 6
+    },
+    {
+      "title": "Inside Content Bot: the questions that became the architecture",
+      "slug": "inside-content-bot",
+      "url": "blog/inside-content-bot.html",
+      "archetype": "thesis",
+      "date": "2026-08-11",
+      "project": "content-bot",
+      "version": "v2026.08",
+      "tags": [
+        "fde",
+        "operator-discovery",
+        "rule-registry",
+        "verification-first",
+        "cost-architecture",
+        "seo"
+      ],
+      "summary": "A client came to me tired of arguing with ChatGPT: re-pasting her rules every morning, watching the model ignore them, regenerating, losing the thread, fixing the same violations by hand. We replaced that loop with a system that carries her rules permanently and enforces them mechanically. This post is about the part that made it work, which was not the pipeline. It was the discovery interview. The questions I asked, the answers that became hard-coded rules, and the Forward Deployed engineering decisions that followed. The client is real and every number is from production.",
+      "word_count": 1808,
+      "read_time_min": 8
+    },
+    {
+      "title": "Field Note: five failures that returned success",
+      "slug": "field-failures-that-returned-success",
+      "url": "blog/field-failures-that-returned-success.html",
+      "archetype": "field-note",
+      "date": "2026-08-04",
+      "project": "workflow",
+      "version": "silent failure",
+      "tags": [
+        "silent-failure",
+        "gates",
+        "llm-pipelines",
+        "data-quality",
+        "outbound",
+        "ai-architecture"
+      ],
+      "summary": "In one evening across four systems, every defect that mattered exited clean. A download job that moved nothing, a classifier that dropped a third of its input at the buzzer, an email that addressed its recipient in the third person. Notes on the dominant failure mode of model-assisted building, the three defenses that catch it ranked by what they cost, and one wrong diagnosis of my own.",
+      "word_count": 1821,
+      "read_time_min": 8
     },
     {
       "title": "Field Note: what 1,000 inputs found in an extraction pipeline",
@@ -64,6 +187,46 @@
       "summary": "A recipe notation from 2004 that solved the format problem and was ignored for twenty years, rebuilt as an extraction pipeline. Any TikTok, Reel, article or photo compiles into one merge table with every unit normalized and checked against a density table.",
       "word_count": 1900,
       "read_time_min": 9
+    },
+    {
+      "title": "Inside my agentic workflow: spec, fan-out, verify",
+      "slug": "inside-agentic-workflow",
+      "url": "blog/inside-agentic-workflow.html",
+      "archetype": "method",
+      "date": "2026-07-23",
+      "project": "method",
+      "version": null,
+      "tags": [
+        "claude-code",
+        "multi-agent",
+        "spec-driven",
+        "evals",
+        "context-engineering",
+        "guardrails"
+      ],
+      "summary": "How I actually ship with agents. Two shapes, a sequential contract pipeline and a parallel fan-out, both gated by evals. The spec comes before the prompt, the merge happens in plain code, and nothing ships unless the gate is green.",
+      "word_count": 1334,
+      "read_time_min": 6
+    },
+    {
+      "title": "Inside the fit judge: an LLM-as-judge that corrected my own labels",
+      "slug": "inside-fit-judge",
+      "url": "blog/inside-fit-judge.html",
+      "archetype": "method",
+      "date": "2026-07-23",
+      "project": "method",
+      "version": "v1",
+      "tags": [
+        "eval",
+        "llm-as-judge",
+        "rubric",
+        "golden-set",
+        "self-consistency",
+        "guardrails"
+      ],
+      "summary": "An LLM-as-judge scores how well a resume fits a role, gated by a regression suite over a human-labeled golden set. It disagreed with my labels twice and was right both times, caught overqualification that keyword matching cannot, and was non-deterministic at temperature zero until self-consistency voting fixed it. A field guide to building an eval you can actually trust.",
+      "word_count": 1495,
+      "read_time_min": 7
     },
     {
       "title": "Inside Adoption Chain: an auditable second-order research engine for small-cap equity",
@@ -339,8 +502,8 @@
         "fdaa"
       ],
       "summary": "Five public-records distress designations on a single parcel. The Mosaic framework to stack them, and the AI architecture that compresses three weeks of research to three hours.",
-      "word_count": 1600,
-      "read_time_min": 7
+      "word_count": 1866,
+      "read_time_min": 8
     },
     {
       "title": "Field Note: matching a $25M hospitality deal to five lenders in thirty minutes",
@@ -360,8 +523,8 @@
         "fdaa"
       ],
       "summary": "Hospitality debt sourcing as constraint satisfaction followed by ranking. The architecture that compresses a week of broker research into thirty minutes.",
-      "word_count": 1500,
-      "read_time_min": 7
+      "word_count": 1824,
+      "read_time_min": 8
     },
     {
       "title": "Field Note: the NOI projection gap and why hospitality sponsors systematically over-promise",
@@ -381,7 +544,7 @@
         "fdaa"
       ],
       "summary": "A coastal hospitality asset has an appraisal-stabilized NOI and a sponsor pro forma that differ by 17 percent. The gap decomposes into four components.",
-      "word_count": 1500,
+      "word_count": 1649,
       "read_time_min": 7
     },
     {
@@ -401,8 +564,8 @@
         "fdaa"
       ],
       "summary": "A brokerage marketing flyer is the highest-volume unstructured document in CRE. Four lines actually matter. The AI-architected workflow that closes the gap.",
-      "word_count": 1500,
-      "read_time_min": 7
+      "word_count": 1774,
+      "read_time_min": 8
     },
     {
       "title": "Field Note: packaging an emerging sponsor for institutional capital",
@@ -422,8 +585,8 @@
         "fdaa"
       ],
       "summary": "An emerging sponsor faces a structural problem in the capital stack: senior debt is reachable, LP equity is the wall. The four packaging patterns institutional LPs evaluate against.",
-      "word_count": 1500,
-      "read_time_min": 7
+      "word_count": 1913,
+      "read_time_min": 9
     },
     {
       "title": "Field Note: the Obsidian-Claude Code loop for project tracking and roadmaps",
@@ -442,8 +605,8 @@
         "fdaa"
       ],
       "summary": "Obsidian as the human-facing planning layer, Claude Code as the execution layer, both reading the same file system. Conventions, failure modes, what changes at team scale.",
-      "word_count": 1700,
-      "read_time_min": 8
+      "word_count": 1914,
+      "read_time_min": 9
     },
     {
       "title": "Field Note: Discord as the second screen for Claude Code activity",
@@ -463,8 +626,8 @@
         "fdaa"
       ],
       "summary": "Discord webhooks for AI alerts: ship notifications, build failures, long-task completions, daily summaries. Hook architecture and channel layout.",
-      "word_count": 1500,
-      "read_time_min": 7
+      "word_count": 1701,
+      "read_time_min": 8
     },
     {
       "title": "Field Note: Perplexity deep research as the synthesis layer for binary and trinary decision trees",

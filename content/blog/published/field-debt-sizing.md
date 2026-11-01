@@ -86,4 +86,18 @@ For the multi-pass orchestration discipline that produces structured narrative o
 
 ---
 
+## Update, November 2026
+
+The lender match now runs as a standing job, Hermes, and building it changed one claim. I wrote that the constraint filter is a SQL query, not an LLM call. The query exists, but it returns a call list, not a qualified list. A lender qualifies for outreach only when pages fetched in that session state its product type, a size range covering the request, its asset type and its geography. Missing any one puts the firm in exclusions, with the reason.
+
+The database is one workbook: about 4,174 firms and 7,100 contacts after consolidating source files, including 605 family offices. Agents work in two waves. Wave 1 screens stated criteria and returns a verdict per firm; wave 2 goes back for each firm's thesis in its own words, observed deals, a buy box inferred from those deals, and named contacts. Both waves write JSONL that a merge script folds into the workbook, so no agent touches the file. A typed-model pass (TypeSafe Jev) then ran the whole table, reading each firm's own pages or list notes: about $0.25 in total, a median 350 ms per firm. After that pass, 3,227 of 4,174 rows were filter-ready, and a filter needs no model call.
+
+Any address derived from a pattern or a list file goes through Hunter; a catch-all or unknown result becomes a gap, never a draft. Drafts land in Gmail Drafts, and I send by hand.
+
+The first deal was a US$13MM construction bridge in the Caribbean. The database screen covered 480 firms across two waves; every one failed or only partly passed on geography, and the two lenders that qualified came from the open-web pass the day before. A later multifamily bridge benchmark applied the pattern to terms: 56 lenders' marketed rate, fee and closing language, quoted verbatim.
+
+**Still not built.** The table has no LTV ceiling, DSCR floor, recourse posture or sponsor-experience columns, so this post's DSCR-floor cut cannot run as a filter. There is no quarterly refresh; each row carries a last-enriched date the job checks before re-researching. Ranking is a deterministic pre-filter on fit signals, not the 0 to 200 weighted score. The per-lender narrative pass (expected term sheet, likely concerns, recourse posture) does not exist; each draft's lender-specific content is an opener citing the firm's own program or closing.
+
+---
+
 Russ

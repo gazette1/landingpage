@@ -100,4 +100,20 @@ For the project-tracking counterpart that pairs Obsidian and Claude Code into a 
 
 ---
 
+## Update, November 2026
+
+Since May, Discord has become a delivery surface as well as an alert surface.
+
+**Scheduled posts.** The strikeout bot's picks went out from a GitHub Action at 13:00 UTC that graded yesterday, posted today and committed the predictions back to the repository. It ran on 108 of 109 game days through October 24, 492 picks in all, with no human touching anything ([season note](field-strikeout-season-2026.html)).
+
+The double-double bot is set to post five names through the strikeout bot's webhook at 3 PM Eastern. Two UTC crons, 19:00 and 20:00, cover the clock change, and a guard script reads the New York hour and lets one through, so the November change needs no edit. As of October 31 that workflow was written and dry-run but not live: its repository did not exist yet, and the posts so far came from my local sessions. Its posting tool defaults to a dry run, labels test posts, and never prints the webhook value.
+
+**Deliverables.** In July a demand board went to a partner channel with a screenshot and the board HTML. In August a planning document went to a team channel, and the editor guide for a paid editor went to an editing webhook; the API confirmed that delivery. A finished outbound build posts its Google Sheet link to my own webhook, and on October 21 a demo link and a drafted message came the same way, so nothing reaches a recipient until I forward it. A delivery spec for a services venture calls for an ops feed of one line per job step, reusing a helper another pipeline of mine calls after every step.
+
+**What held.** The allowlist discipline, where I applied it: the picks channel carries picks and results, and the double-double bot's run logs stay in files. The one-glance format: my first double-double post listed probability, price and edge per pick, I found it confusing, and that evening I replaced it with five names in the strikeout format. Channel per purpose held; channel per project did not, because two bots now share one picks channel.
+
+**What did not.** The 8 AM daily-summary cron is not part of what I run, and the Stop hook is no longer where the useful posts come from. It is still installed, but plainer than I described: one global hook that posts the working directory and a session id. The posts I act on come from per-bot Actions and per-step pipeline posts. I never built the ack loop or the threading.
+
+---
+
 Russ

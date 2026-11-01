@@ -37,7 +37,7 @@
         <span class="post-sep">/</span>
         <span class="post-date">2026.05.19</span>
         <span class="post-sep">/</span>
-        <span class="post-read">7 MIN / 1,500 WORDS</span>
+        <span class="post-read">7 MIN / 1,649 WORDS</span>
       </div>
 
       <h1 class="post-title">Field Note: the NOI projection gap and why hospitality sponsors systematically over-promise</h1>
@@ -135,6 +135,15 @@
 <p class="body">Those are the questions this Field Note is meant to answer.</p>
 
 <p class="body">For the customer-facing constraint-then-rank discipline this pattern echoes, see <a href="field-debt-sizing.html">Field Note: matching a $25M hospitality deal to five lenders</a>. For the prompt-suite workflow that produces structured CRE underwriting outputs, see <a href="inside-cre-feasibility.html">Inside the Mosaic feasibility workflow</a>.</p>
+
+<hr class="rule">
+
+<h2 class="h2" id="update-2026-11">Update, November 2026</h2>
+<p class="body">I have not built the decomposition this post describes. What I built handles the gap more simply, and the difference is worth stating.</p>
+<p class="body">Mosaic's Standard Underwriting Schema v2.0 requires two labeled NOI scenarios in every underwriting deliverable. Scenario A is the seller or broker pro forma exactly as presented. Scenario B is the Mosaic adjustment: market vacancy, replacement reserves, a normalized management fee and real expense loads. Every value and return conclusion keys off B. Version 1.0 used the letters for conservative and base case; v2.0 labels each number by whose it is. The verdicts changed with it, from BUY / MONITOR / PASS to PURSUE / MONITOR / PASS, and a MONITOR has to name the specific condition that would convert it to PURSUE. The feasibility suite presents the bridge from A to B as a table, each adjustment line with its dollar impact.</p>
+<p class="body">The credit memo skill applies the same discipline from the lender side. The in-place T-12 comes first. Every adjustment to underwritten NOI is itemized and justified. Vacancy has a floor of 5 to 8 percent unless the note justifies otherwise, and the base case carries no pro forma rent growth. The stress tests are rate +200bps, vacancy to market average and exit cap +100bps, and the memo states which one breaks 1.0x DSCR first.</p>
+<p class="body">So the gap reaches committee as two labeled scenarios and an itemized adjustment list. That shows, line by line, where my number departs from the presented one. It cannot show whether a sponsor's ADR claim is ordinary or sits at the 95th percentile of realized comparables.</p>
+<p class="body"><strong>Still not built.</strong> The comp-rate database does not exist, and neither does the automated decomposition into occupancy uplift, ADR growth, expense efficiency and top-line monetization, the per-component percentile placement, or the one-page committee read that would carry them. The no-growth base case leaves the growth claim out rather than measuring it, which is conservative but says nothing about whether the claim is defensible. The nearest piece of the structured input layer is the hotel schema in the loan packaging agent (ADR, RevPAR, occupancy, departmental P&amp;L, PIP), where every figure is stored with its source and confidence. The parsing is partly there; the reference rates are not.</p>
 
     </div>
 

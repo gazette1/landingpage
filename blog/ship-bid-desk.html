@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ship Note: Bid Desk v1, a public-contracts pipeline for a prime we have not formed yet / russh.work</title>
+  <meta name="description" content="An agent sweeps SAM.gov and the DMV portals and grades every find, a hosted hub shows two partners the pipeline, and nothing gets bid until the company exists." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">SHIP NOTE</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">BID DESK / V1 / 2026</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.11.01</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">3 MIN / 685 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Ship Note: Bid Desk v1, a public-contracts pipeline for a prime we have not formed yet</h1>
+
+      <p class="post-summary">An agent sweeps SAM.gov and the DMV portals and grades every find, a hosted hub shows two partners the pipeline, and nothing gets bid until the company exists.</p>
+
+      <div class="post-tags">PUBLIC-PROCUREMENT / SAM-GOV / COMPLIANCE / AGENT-WORKFLOWS / CLOUDFLARE-WORKERS / BUILD-IN-PUBLIC</div>
+    </header>
+
+    <div class="post-body">
+      
+<p class="body">By Russ. 2026-11-01. Ship Note for Bid Desk.</p>
+<hr class="rule">
+<h2 class="h2">What shipped</h2>
+<p class="body">I shipped Bid Desk v1 on 2026-10-11: a weekly-sweep procurement desk for a project-management prime that wins the contract, subs the labor and materials to vetted vendors, and manages schedule, quality and billing. Two partners, one in Washington DC and one in Raleigh NC, cover the DMV (DC, Maryland, Virginia) and the Research Triangle. An agent sweeps and grades against a written bidder profile; a hosted hub shows the partners the board. The company does not exist yet.</p>
+<h2 class="h2">What changed</h2>
+<ul>
+<li><strong>Sweep.</strong> One pass on 10/11 across SAM.gov and the DMV state and county portals. Every record carries a source link and read date; unconfirmed fields read "not found."</li>
+<li><strong>Grading.</strong> Each find gets A or B (bid), C (watch) or Pass; every row has an "owner action needed" column. A second agent, in a fresh context, re-checks each A and B at the source.</li>
+<li><strong>Scope clusters.</strong> Our 376 service categories, minus 79 consumer-only and 38 medical, roll up into 34 sweep clusters with NAICS and PSC codes, unverified until checked at census.gov and the SAM PSC manual.</li>
+<li><strong>Subcontracting gate.</strong> A pure pass-through prime cannot win most set-aside work: federal set-aside services above $350,000 cap payments to subs that are not similarly situated at 50 percent (13 CFR 125.6), DC CBE preference awards require 35 percent self-performance (D.C. Code 2-218.46), and Montgomery County's reserve program 51 percent. No A or B is final until its record states the planned self-performed share.</li>
+<li><strong>Compliance roadmap.</strong> 56 steps in five phases from no entity to national bidding; 52 cite sources, 46 are ours. The critical path, partly estimated, runs about 33 days to DMV bid-ready and 37 to an active SAM.gov registration.</li>
+<li><strong>Reference library.</strong> 36 public awards, bid tabulations, rate schedules and guides, with observed prices. Two bids on one Montgomery College snow tabulation priced a dump truck with operator at $160.00 and $550.00 an hour, so rates get built from cost, not copied.</li>
+<li><strong>Hosted hub.</strong> One Cloudflare Worker with a KV namespace at bids.trialedge.io: three logins (one held open) and an agent import endpoint. <code>build-data</code> assembles the files, <code>push-data</code> posts the result; partner edits to grade, stage and notes survive unless forced.</li>
+<li><strong>Portal memory.</strong> One lesson per file: eMMA's bot check never clears for the agent, eVA hides detail pages behind reCAPTCHA, most DMV portals are JavaScript shells or logins, and SAM.gov service quote windows run 2 to 4 weeks.</li>
+</ul>
+<h2 class="h2">Why this, not the alternative</h2>
+<p class="body">I replaced the first hub, a claude.ai artifact with a shared database, the same day with a Worker on my own domain behind logins I issue. The markdown files are the readable record and the hub is the live view; the agent writes both, so the hub is replaceable.</p>
+<p class="body">The agent researches and grades; a partner does every portal login, download approval and submission. Bot checks and CAPTCHAs draw part of that line; the agent logs each as an owner action. The rest is liability: misstating small-business status on a federal set-aside carries damages presumed at the full contract value (15 USC 632(w)).</p>
+<h2 class="h2">Measured impact</h2>
+<ul>
+<li>Hub at first push: 44 opportunities, 12 owner actions, 15 subs, 56 roadmap steps, 34 clusters, 36 proposal references</li>
+<li>National SAM.gov sweep: 32 open in-scope notices, all due 10/12 to 11/6, short fuse without a UEI</li>
+<li>DMV sweep: 1 A (City of Fairfax grounds and snow, provisional), 3 B (Anne Arundel, Howard and Manassas Park snow), 7 C, 14 Pass</li>
+<li>Zeros: no entity, UEI, bonding or bid; two B deadlines have passed</li>
+<li>Cost: $0 on the Workers free tier</li>
+</ul>
+<h2 class="h2">What's next</h2>
+<p class="body">The next moves are ours: form the LLC, get the EIN, register in SAM.gov and the state and county portals, and schedule the weekly sweep, which has not run since 10/11 or covered the Research Triangle. The first-bid candidate is Anne Arundel's roadway snow contract (target submit 12/15/2026), the one A or B row with time to get bid-ready.</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="field-hardening-a-demand-map.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Field Note: hardening a demand map</span>
+        </a>
+        <a class="next" href="inside-double-double-bot.html">
+          <span class="k">NEXT</span>
+          <span class="v">Inside Double Double Bot</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to writing index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / AI SOLUTIONS ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+  <script src="../scripts/menu.js"></script>
+</body>
+</html>

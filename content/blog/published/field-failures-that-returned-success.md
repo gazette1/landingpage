@@ -3,9 +3,9 @@ title: Field Note: five failures that returned success
 slug: field-failures-that-returned-success
 archetype: field-note
 date: 2026-08-04
-project: Workflow / silent failure
-version: n/a
-status: rendered to blog/field-failures-that-returned-success.html, not yet committed
+project: workflow
+version: silent failure
+status: published
 tags: [silent-failure, gates, llm-pipelines, data-quality, outbound, ai-architecture]
 summary: In one evening across four systems, every defect that mattered exited clean. A download job that moved nothing, a classifier that dropped a third of its input at the buzzer, an email that addressed its recipient in the third person. Notes on the dominant failure mode of model-assisted building, the three defenses that catch it ranked by what they cost, and one wrong diagnosis of my own.
 ---

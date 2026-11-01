@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Field Note: what it took to make an AI demand map safe to sell / russh.work</title>
+  <meta name="description" content="A demand heat map that worked in demo mode met funded API accounts and real clients. Five defects surfaced in two weeks, every one caught by a gate before shipping, and a sixth seven weeks later. Field notes on what broke, what the fixes cost, and why the guardrails were the product." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <link rel="stylesheet" href="../styles/post.css" />
+</head>
+<body class="post-page">
+
+  <a class="wordmark site-wordmark" href="../">RUSSH WORK</a>
+
+  <nav class="site-nav" aria-label="Primary">
+    <a href="../#work">Work</a>
+    <a href="./" aria-current="page">Writing</a>
+    <a href="./#field-notes">Field Notes</a>
+    <a href="../#about">About</a>
+    <a href="../#contact">Contact</a>
+  </nav>
+
+  <article class="post">
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-archetype">FIELD NOTE</span>
+        <span class="post-sep">/</span>
+        <span class="post-project">HEAT MAP / V8 TO V9.5</span>
+        <span class="post-sep">/</span>
+        <span class="post-date">2026.11.01</span>
+        <span class="post-sep">/</span>
+        <span class="post-read">6 MIN / 1,426 WORDS</span>
+      </div>
+
+      <h1 class="post-title">Field Note: what it took to make an AI demand map safe to sell</h1>
+
+      <p class="post-summary">A demand heat map that worked in demo mode met funded API accounts and real clients. Five defects surfaced in two weeks, every one caught by a gate before shipping, and a sixth seven weeks later. Field notes on what broke, what the fixes cost, and why the guardrails were the product.</p>
+
+      <div class="post-tags">DEMAND-RESEARCH / LOCAL-SERVICES / LLM-PIPELINES / DATA-QUALITY / FAIL-LOUD / PROVIDER-ROUTING / ODI</div>
+    </header>
+
+    <div class="post-body">
+      
+<p class="body">By Russ. Written 2026-08-02, published 2026-11-01. Field Note.</p>
+<hr class="rule">
+<h2 class="h2">The existing approach</h2>
+<p class="body">The ODI Bot demand heat map is a research deliverable for local service businesses. It maps a market's search demand onto a 40-cell grid: eight steps of the customer's job to be done against five levels of buying awareness. Every cell carries real Google Ads search volume, localized to the client's service area, with every keyword auditable down to its classification rationale. The deliverable ends in a positioning read: which cells the client owns, which cells competitors own, and what to say to capture the empty ones.</p>
+<p class="body">The pipeline is a chain of API calls and model passes. A scrape establishes what the business is and where it operates. A keyword-ideas index expands seed queries into the market's real search universe. A classifier buckets each keyword by awareness level. A SERP pass names who actually holds each cell. A reasoning model writes the positioning analysis. In mock mode, running on fixtures, this pipeline had been stable for weeks. Demos looked clean. Tests were green.</p>
+<p class="body">Then the data accounts got funded and real businesses went through the pipe. This note is the record of what happened next, because the gap between a working demo and a sellable data product turned out to be exactly five defects wide, and every one of them is a category, not a one-off.</p>
+<h2 class="h2">Where the demo-grade version works</h2>
+<p class="body">A fixture-driven pipeline is the right tool while the product is being shaped. Deterministic inputs make renderer changes reviewable, keep iteration free, and let the sales narrative develop against stable numbers. Nothing in this note argues against mock mode. The argument is about what mock mode cannot surface.</p>
+<h2 class="h2">Where it breaks</h2>
+<p class="body">The first funded run returned 4 keywords and 40 searches a month for a junk removal operator whose market we knew carried thousands. The pipeline had resolved the client's county to a county with the same name in the wrong state, then honestly reported that rural demand elsewhere was near zero. The geo matcher had no concept of state. Nothing errored. The numbers were simply wrong in a way only a human who knew the market would catch.</p>
+<p class="body">The second class of defect was silent starvation. Seed queries longer than six words return zero results from the keyword-ideas index, so a long category name quietly killed entire steps of the job map. A classifier timeout set inside the model's normal latency band killed chunks of keywords at the buzzer, and the dropped keywords vanished from the books instead of landing in the audit trail. None of this threw. Coverage just shrank.</p>
+<p class="body">The third class was identity leakage, and it is the one worth the most attention. The product has a hard rule: the client is never named on the board, because boards live at unlisted URLs and the no-name rule is what makes that safe. The rule held for weeks because the first test subject was a business nobody searches for. The first client who actually ranks broke it three ways in two runs. Their name entered the payload through their own map-pack listing, because pack entries are names rather than domains. It entered through their branded keywords, because the keyword index correctly reports that people search the brand, and the keyword string is the name. It entered through the positioning prose, because the reasoning model absorbed the name from the client's own site copy. A payload guard refused to ship both builds. Both refusals were correct.</p>
+<h2 class="h2">What an AI architect would change</h2>
+<p class="body">The fixes themselves were small. The architecture that made them findable is the point.</p>
+<p class="body">First, every invariant is a gate that refuses to ship, not a warning that scrolls past. The books must balance to the API total. The payload must not contain the client's name. Every cell must carry either auditable volume or a written recommendation. A live build that violates any of these throws. The refund conversation this occasionally costs is cheaper than one prospect auditing a wrong number on a sales call.</p>
+<p class="body">Second, probe before rerunning. A full build costs about a dollar and ten minutes. A targeted probe costs cents and seconds. Wrong-state geo, the six-word seed limit, county support per endpoint, and a provider's default reasoning mode were each established by a probe that turned a guess into a fact before the next build spent real money on it.</p>
+<p class="body">Third, counting rules over redaction hacks. The branded-keyword leak could have been patched by masking strings. The correct fix changed the counting: branded keywords leave the map before the matrix and survive as a count and a volume with no strings attached. The books still balance, the board can still say the brand is searched N times a month, and the identity rule holds structurally instead of cosmetically.</p>
+<p class="body">Fourth, provider choices are bench results, not preferences. The classifier had been producing truncated JSON at chunk scale. We ran the production rubric with 123 real keywords against the incumbent and a challenger, twice. The incumbent failed both runs with unparseable output at 33 seconds. The challenger classified everything in 13 with valid JSON both times, at roughly half the token price, before a context-cache discount that applies because the rubric is identical across chunks. The router flipped that day. The bench script stays in the repo so the next challenger gets the same trial.</p>
+<h2 class="h2">What it would cost</h2>
+<p class="body">The hardened board costs about fifty cents to produce against a hundred-dollar price: volume data in cents, one SERP per lit cell at two tenths of a cent each, a classifier pass that now rides cached input at fractions of a cent, and one reasoning-model call for the positioning read. The two weeks of hardening consumed roughly three rebuilt boards and a few dollars of probes. The dominant cost of the whole exercise was model wall time on rebuilds, which is exactly the cost the probe discipline exists to avoid.</p>
+<h2 class="h2">What would not change</h2>
+<p class="body">The domain logic survived untouched. The job map, the awareness rows, the honest-counting rules, the positioning framework, and the sales narrative are the same ones the mock pipeline ran. Localization got more truthful and the totals got smaller, which improved the product, because a number that survives an audit beats a bigger one that does not. AI changed the throughput and the unit cost. The research method was never the bottleneck.</p>
+<h2 class="h2">Closing</h2>
+<p class="body">This is the kind of work a Forward Deployed AI Architect does in the unglamorous middle of an engagement: not choosing the model, but building the gates that catch the model and the data being confidently wrong, and pricing every fix in dollars and minutes. If your firm ships numbers to clients through an LLM pipeline, the first question I would ask is which of your invariants can fail without throwing. The honest answer is usually the roadmap.</p>
+<h2 class="h2">Postscript, November 2026</h2>
+<p class="body">The hardening did not stop at v9.3. On 2026-09-19 a sixth defect class surfaced, and it had been invisible on every shipped board: the job step was never classified. Discovery gave every keyword the cell of the seed that found it, at confidence 1.0, and only the awareness row was judged by a model. Unassigned sat at zero on every board while brand searches, career searches and off-topic queries sat inside the matrix. Re-running two shipped boards through a per-keyword typed classifier moved 12 percent of one dental board's volume and 25 percent of another's into Unassigned, where it belonged.</p>
+<p class="body">The fix is a typed pass, one bounded question per keyword, two independent choices plus brand and off-topic checks, with the reason written into the audit trail and an unassigned file per run. It sits before the matrix, so the books still balance and the ship gate is untouched. A 6,600-keyword board takes about three and a half minutes and 27 cents. Two rules came out of it: gate on the top probability rather than the API's rescaled confidence field, and describe the business by its own general type, because a narrower description made the off-topic check reject searches the client plainly serves.</p>
+<p class="body">In July the engine went under a feature freeze tied to a 30-day program that put an audit log, an approval gate, a payload schema and an eval suite ahead of new features. The one engine change recorded since is this classifier, and it is a gate, not a feature.</p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-byline">
+        <span class="k">By</span>
+        <span class="v">Russ</span>
+      </div>
+
+      <nav class="post-nav" aria-label="Adjacent posts">
+        <a class="prev" href="field-strikeout-season-2026.html">
+          <span class="k">PREVIOUS</span>
+          <span class="v">Field Note: a season of strikeout picks</span>
+        </a>
+        <a class="next" href="ship-bid-desk.html">
+          <span class="k">NEXT</span>
+          <span class="v">Ship Note: Bid Desk v1</span>
+        </a>
+      </nav>
+
+      <div class="post-back">
+        <a href="./">Back to writing index</a>
+      </div>
+    </footer>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="colophon">
+      <span class="left">RUSSH WORK / AI SOLUTIONS ARCHITECT / 2026</span>
+      <span class="right">SET IN INTER TIGHT AND JETBRAINS MONO</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="../scripts/post.js"></script>
+  <script src="../scripts/menu.js"></script>
+</body>
+</html>
