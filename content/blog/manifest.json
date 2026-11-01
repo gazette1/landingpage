@@ -420,8 +420,8 @@
         "cost-economics"
       ],
       "summary": "A 15-script Python pipeline that fuses Census ACS, HUD QCT, IRS OZ, USDA Food Atlas, state DDD, and land bank inventory data on a parcel key, scores against the state QAP, and produces an LP-memo-ready output.",
-      "word_count": 2500,
-      "read_time_min": 12
+      "word_count": 2311,
+      "read_time_min": 11
     },
     {
       "title": "Inside TrialEdge: a calibrated probability ensemble for FDA catalyst prediction",

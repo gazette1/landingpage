@@ -18,9 +18,9 @@ By Russ. Solo build, 2026. Production tooling for Mosaic Capital Solutions corri
 
 ## What this post is
 
-This is a Python pipeline I wrote to automate the corridor-evaluation work behind LIHTC applications. Fifteen scripts, a handful of structured-data manifests, and a small collection of analysis markdown files that get regenerated nightly. The system takes a corridor (a contiguous set of parcels in a target market). It fuses six public-records layers against a land-bank inventory, scores every parcel against the relevant state Qualified Allocation Plan, and produces an LP-memo-ready output that a senior underwriter reviews and ships.
+This is a Python pipeline I wrote to automate the corridor-evaluation work behind LIHTC applications. Fifteen scripts, a handful of structured-data manifests, and a small collection of analysis markdown files that the pipeline regenerates on each run. The system takes a corridor (a contiguous set of parcels in a target market). It fuses six public-records layers against a land-bank inventory, scores every parcel against the relevant state Qualified Allocation Plan, and produces an LP-memo-ready output that a senior underwriter reviews and ships.
 
-The pipeline is the engineering backbone of the LIHTC field-note workflow described in [stacking R/ECAP, QCT, OZ, and DDD](/blog/field-lihtc-triple-stack.html). That post explained the analytical pattern. This post is the engineering. The pipeline took several weeks to build and runs in production now. It compresses the per-corridor research timeline from roughly three weeks of senior-analyst work to under a day of operator review on auto-generated output.
+The pipeline is the engineering backbone of the LIHTC field-note workflow described in [stacking R/ECAP, QCT, OZ, and DDD](/blog/field-lihtc-triple-stack.html). That post explained the analytical pattern. This post is the engineering. The pipeline took several weeks to build and last ran in April 2026 (see the update at the end of this post). It compresses the per-corridor research timeline from roughly three weeks of senior-analyst work to under a day of operator review on auto-generated output.
 
 This post is for engineers and architects evaluating whether a similar fuse-and-score shape applies to their domain. The architectural decisions and the cost economics are what transfer. The LIHTC framing is the vehicle.
 
@@ -101,11 +101,11 @@ The cost of this discipline is real. The renderer is more work to maintain than 
 
 ## Decision 5: nightly refresh with explicit drift detection
 
-The pipeline runs on a nightly cron against the source APIs. Each refresh writes its outputs alongside the prior night's outputs and produces a drift report: which parcels gained or lost designation status, which census tracts shifted demographic bands, which DDD boundaries changed, which corridor scores moved by more than a configurable threshold.
+The design was a nightly cron against the source APIs. Each refresh would write its outputs alongside the prior night's outputs and produce a drift report: which parcels gained or lost designation status, which census tracts shifted demographic bands, which DDD boundaries changed, which corridor scores moved by more than a configurable threshold.
 
 The decision was whether to overwrite the prior outputs (simpler) or to maintain the historical trail (more work, more disk).
 
-I maintain the trail. The reasoning is operational. An application that cited a designation on the date of submission needs to be defensible against the source data on that exact date, even if the designation has since changed. The historical trail makes that defense possible. The drift report also surfaces the cases where overnight refresh changed something that the underwriter needs to know about before they ship the next deliverable.
+I maintain the trail. The reasoning is operational. An application that cited a designation on the date of submission needs to be defensible against the source data on that exact date, even if the designation has since changed. The historical trail makes that defense possible. The drift report would also surface the cases where an overnight refresh changed something that the underwriter needs to know about before they ship the next deliverable.
 
 ==The transferable lesson: in any pipeline whose outputs get cited in time-bound deliverables (applications, filings, reports), preserve the historical state. The application is dated. The data has to be dated to match.==
 
@@ -133,7 +133,7 @@ Three things.
 
 1. **Express the QAP scoring rules as a versioned manifest, not as Python functions.** The current scoring rules are encoded in Python. Each state QAP has its own scoring rule set, and the rules change year over year. A YAML or JSON manifest that the scoring engine loads at runtime would let me ship new state QAPs without touching the engine code, and would let me version-control the rule set independently of the engine.
 
-2. **Move the source-API ingestion to a job queue.** The current ingestion runs as a single nightly script. As I added more sources, the script grew. A proper job queue (each source as its own job, with explicit retry and dead-letter behavior) would let me handle source-API failures gracefully without re-running the whole nightly pass.
+2. **Move the source-API ingestion to a job queue.** The current ingestion runs as a single script. As I added more sources, the script grew. A proper job queue (each source as its own job, with explicit retry and dead-letter behavior) would let me handle source-API failures gracefully without re-running the whole pass.
 
 3. **Build the LP memo renderer as a templated system, not as procedural code.** The current renderer is procedural Python that writes out HTML and Excel. A templating system (Jinja2 with explicit section partials) would let me ship new memo formats without rewriting the renderer.
 
@@ -150,6 +150,16 @@ If you are building something similar in a different domain (any analysis pipeli
 Those are the questions this post is meant to answer.
 
 For the customer-facing data-fusion counterpart that runs on a different domain, see [Inside Atlas](/blog/inside-atlas.html). For the production-ML calibration discipline that shaped the score-review workflow, see [Inside TrialEdge](/blog/inside-trialedge.html). For the LIHTC field-note that explains the analytical pattern this pipeline implements, see [stacking R/ECAP, QCT, OZ, and DDD](/blog/field-lihtc-triple-stack.html).
+
+---
+
+## Update, November 2026
+
+The nightly refresh in Decision 5 is not running, and the lines above that described it as live now read as the design it was. The newest pipeline output on disk is dated April 7, 2026. Nothing in the working folder has changed since, no scheduled task exists for it, and no script in the folder writes a drift report. What shipped was the fusion, the scoring and the memo output, run by hand per corridor. The refresh and the drift report were never built.
+
+The corridor the pipeline was built for has been in pre-development since April. The decision stands as design: a pipeline whose outputs get cited in dated applications needs a dated trail. Whether that trail gets built depends on the next live corridor.
+
+What was built around the pipeline since May is in the [November update](field-lihtc-triple-stack.html#update-2026-11) to the LIHTC field note: the QAP Engine for retrieval and the $750 QAP Quick Check.
 
 ---
 
