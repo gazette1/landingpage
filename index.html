@@ -469,6 +469,28 @@ picks = sorted(picks, key=edge_of, reverse=True)[:3]
 </code></pre>
         </li>
 
+        <li class="project-row" data-href="blue-sweep/">
+          <span class="num">19</span>
+          <span class="title">BLUE&nbsp;SWEEP&nbsp;BOOK</span>
+          <div class="meta">
+            <span class="row strong">RESEARCH NOTE / NOV 2026</span>
+            <span class="row">ASTRA RESEARCH HARNESS</span>
+            <span class="row">THEMES FIRST: 6 UP, 4 DOWN</span>
+            <span class="row">12 MID-CAPS, $2B TO $40B</span>
+            <span class="row">OPUS 5.5 RESEARCHES / FABLE 5.1 JUDGES</span>
+            <span class="row">SEC XBRL + PRICES, MATH IN CODE</span>
+            <span class="row">4 OF 15 APPROVED BY THE JUDGE</span>
+          </div>
+          <pre class="bg-reveal" aria-hidden="true"><code># theme first, then stocks; the model argues, code does the math
+themes = opus.rank_themes(scenario="dem_sweep")   # dated evidence only
+for name in opus.midcaps(themes.winners, mcap=(2e9, 40e9)):
+    case = opus.deep_dive(name)                   # bear / base / bull
+    value = valuation(case, xbrl(name), price(name))
+    verdict = fable.judge(name, case, value)      # approve, cap or reject
+book = mandate(names=12, hurdle=0.08, caps=verdicts)
+</code></pre>
+        </li>
+
       </ol>
     </section>
 
