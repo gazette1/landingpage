@@ -13,7 +13,8 @@ When run, this command:
 5. Renders the markdown to a standalone HTML page at `blog/<slug>.html` using the template at `blog/_template.html`
 6. Regenerates `content/blog/manifest.json` with all published posts
 7. Regenerates `blog/index.html` (the blog listing page)
-8. Reports back to Russ with the post URL and a summary
+8. Regenerates `sitemap.xml` and `feed.xml` with `python tools/build_feeds.py`
+9. Reports back to Russ with the post URL and a summary
 
 This is the only command that writes to `published/`. Drafts cannot be promoted by hand because the manifest, the blog index, and the individual HTML page must stay in sync. Run `/publish` and it does all of them.
 
@@ -145,7 +146,11 @@ Empty fields (e.g. project null on a Field Note) are omitted from the meta line.
 
 Write to `blog/index.html`.
 
-### 8. Report back
+### 8. Regenerate the sitemap and RSS feed
+
+Run `python tools/build_feeds.py` from the repo root. It rebuilds `sitemap.xml` (homepage, writing index, every published post and the listed pages named in the script) and `feed.xml` (the RSS link in the writing index footer) from the manifest. Commit both with the post.
+
+### 9. Report back
 
 After all writes succeed, tell Russ:
 1. The published post URL: `/blog/<slug>.html`
