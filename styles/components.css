@@ -286,7 +286,12 @@
   -webkit-text-stroke: 1px var(--paper);
 }
 
-.project-row:hover .meta {
+/* Row titles are real links, so keyboards and crawlers can follow them; the row stays clickable as before. */
+.project-row a.title { text-decoration: none; }
+.project-row a.title:focus-visible { outline: 2px solid var(--paper); outline-offset: 6px; }
+
+.project-row:hover .meta,
+.project-row:focus-within .meta {
   opacity: 1;
   transform: translateX(0);
 }
