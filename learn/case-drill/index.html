@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1f4fd8">
+<title>Case Picture Drill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f5f7;--card:#ffffff;--ink:#14181f;--sub:#4a5361;--line:#d5d9e0;--acc:#1f4fd8;--accSoft:#e6ecfc;--good:#17734a;--goodSoft:#e3f3ea;--bad:#b3261e;--badSoft:#fbe9e7;--r1:4px;--r2:8px;--r3:14px}
+@media (prefers-color-scheme:dark){:root{--bg:#11141a;--card:#1a1f28;--ink:#eef0f4;--sub:#a4adba;--line:#323a47;--acc:#7b9cff;--accSoft:#1e2a4d;--good:#5fd09a;--goodSoft:#15301f;--bad:#ff8f86;--badSoft:#3a1a18}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans","Segoe UI",system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Bricolage Grotesque","Segoe UI Variable Display","Segoe UI",sans-serif;line-height:1.15}
+h1{font-size:2.1rem;font-weight:700;letter-spacing:-.02em}
+h2{font-size:1.45rem;font-weight:700}
+h3{font-size:1.1rem;font-weight:500}
+.mono{font-family:"IBM Plex Mono",Consolas,monospace;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--sub)}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 16px 64px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+header p{color:var(--sub);max-width:60ch;margin-top:6px}
+button{font:inherit;color:inherit;cursor:pointer}
+.link{background:none;border:0;color:var(--acc);font-weight:600;padding:6px 0}
+.five{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+.five span{background:var(--card);border:1px solid var(--line);border-radius:var(--r1);padding:5px 10px;font-size:.9rem}
+.five b{color:var(--acc)}
+.list{display:grid;gap:10px}
+.row{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--r2);padding:14px 16px;width:100%}
+.row:hover,.row:focus-visible{border-color:var(--acc);outline:none}
+.row .n{font-family:"Bricolage Grotesque",sans-serif;font-size:1.5rem;font-weight:700;color:var(--acc)}
+.row small{display:block;color:var(--sub);font-size:.9rem}
+.score{font-family:"IBM Plex Mono",monospace;font-size:.9rem;color:var(--sub);white-space:nowrap}
+.score.done{color:var(--good)}
+.play{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:22px;align-items:start}
+@media (max-width:820px){.play{grid-template-columns:1fr}}
+.brief{background:var(--card);border:1px solid var(--line);border-radius:var(--r3);padding:20px;position:sticky;top:14px}
+@media (max-width:820px){.brief{position:static}}
+.brief p{margin-top:10px}
+.brief h2{margin-top:4px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:var(--r3);padding:20px}
+.q h3{margin:6px 0 14px;font-size:1.25rem;font-weight:700}
+.bar{display:flex;gap:5px;margin-bottom:14px}
+.bar i{flex:1;height:6px;border-radius:var(--r1);background:var(--line)}
+.bar i.ok{background:var(--good)}.bar i.no{background:var(--bad)}.bar i.now{background:var(--acc)}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:10px;width:100%;text-align:left;background:var(--bg);border:1.5px solid var(--line);border-radius:var(--r2);padding:12px 14px;margin-bottom:9px}
+.opt:hover:enabled,.opt:focus-visible{border-color:var(--acc);outline:none}
+.opt kbd{font-family:"IBM Plex Mono",monospace;font-size:.85rem;color:var(--sub);border:1px solid var(--line);border-radius:var(--r1);height:24px;text-align:center;line-height:22px;background:var(--card)}
+.opt.right{background:var(--goodSoft);border-color:var(--good)}
+.opt.wrong{background:var(--badSoft);border-color:var(--bad)}
+.opt:disabled{cursor:default;opacity:1;color:var(--ink)}
+.why{margin-top:12px;padding:14px;border-radius:var(--r2);background:var(--accSoft)}
+.why b{display:block;margin-bottom:4px}
+.next{margin-top:14px;background:var(--acc);color:#fff;border:0;border-radius:var(--r2);padding:11px 20px;font-weight:600}
+@media (prefers-color-scheme:dark){.next{color:#0d1220}}
+.hint{color:var(--sub);font-size:.85rem;margin-top:10px}
+.sum dl{margin-top:14px;display:grid;grid-template-columns:110px 1fr;gap:8px 14px}
+.sum dt{font-family:"IBM Plex Mono",monospace;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);padding-top:4px}
+.say{margin-top:18px;padding:16px;border:1.5px solid var(--ink);border-radius:var(--r2);background:var(--bg)}
+.say p{margin-top:6px}
+</style></head><body><div class="wrap">
+<header><div><div class="mono">Case practice</div><h1>Case Picture Drill</h1>
+<p>Read the case. Pick out the full picture before you design anything. Six questions per case, then the restatement to say out loud.</p></div>
+<button class="link" id="home" hidden>All cases</button></header>
+<main id="app"></main>
+</div>
+
+<script id="data">
+const KINDS = ["Pain", "Risk", "Success", "Limits", "Parts", "First question"];
+const CASES = [
+{t:"The flux memo", s:"Balance sheet commentary after close",
+ b:["A 300-person distribution company has a three-person accounting team. After each close, the controller spends two days writing a flux memo for the CFO: every balance sheet account that moved more than the threshold, by how much, and why. The CFO reads it before signing off on the month.",
+    "Last month the memo said receivables rose 'due to timing of customer payments.' Two weeks later they found a $180,000 invoice billed twice. The CFO is now wary of anything automated touching the memo. The controller wants the two days back.",
+    "The general ledger syncs to Datarails daily. You have 25 hours this quarter."],
+ q:[
+ {q:"What is the pain?", o:["The controller loses two days every month writing the memo by hand","The ledger sync is too slow","The CFO does not read the memo","The accounting team is understaffed"], w:"Pain is the cost someone feels today. Here it is the controller's two days. The sync works, the CFO does read it, and staffing is not something you were asked to solve."},
+ {q:"What is the risk that matters most?", o:["A cause that sounds right but is wrong hides a real error","The memo goes out a day late","The variance math is off by a rounding error","The controller leaves the company"], w:"Last month's failure was not math. A plausible story covered a duplicate invoice. Any design that writes smooth explanations faster makes that risk worse unless causes are backed by evidence."},
+ {q:"What does success look like?", o:["The controller gets the time back and every stated cause is backed by evidence or labeled unknown","The memo is written with no person involved","The memo covers every account, not only the ones over the threshold","The memo is delivered the same day as close"], w:"Success has two halves: time back, and a memo more trustworthy than today's. Removing the person is the opposite of what a wary CFO wants."},
+ {q:"Which limits belong in your restatement?", o:["25 hours, a CFO wary of automation, and a three-person team","The company has 300 employees","Datarails pricing is usage based","The controller prefers Excel"], w:"Limits are what shape the design: the hour budget, the trust problem, and how little spare capacity the team has to review things."},
+ {q:"Which set of parts, in order, fits best?", o:["When it runs, measure the flux in code, explain causes from the entries without guessing, how the CFO comes to trust it","Pick the model, write the prompt, build the memo template, launch","Build a dashboard, add a chat window, train the team","Rebuild the close process, then automate the memo"], w:"Good parts follow the work: trigger, numbers, words, trust. Model and prompt choices come inside a part, not first. Rebuilding close is far outside 25 hours."},
+ {q:"What is the best first clarifying question?", o:["What threshold puts an account in the memo, and who set it?","Which model should write the memo?","Can we get write access to the ledger?","How long should the memo be?"], w:"Start with the definition and its owner. The threshold decides what the whole system looks at. Write access is never needed for commentary."}
+ ],
+ r:{pain:"The controller loses two days a month writing the flux memo.", risk:"A plausible but wrong cause hid a $180,000 duplicate invoice, and the CFO no longer trusts automation here.", success:"The controller gets the days back and the memo is more trustworthy than it is now.", limits:"25 hours, a wary CFO, a three-person team.", parts:"When it runs. Finding and measuring the flux. Explaining causes without guessing. How the CFO comes to trust it.",
+    say:"So the controller loses two days a month on the flux memo, and the CFO was burned when a duplicate invoice got explained away as timing. The goal is to give her those days back while making the memo more trustworthy than it is today, inside 25 hours. I see four parts: when it runs, finding and measuring the flux, explaining causes without guessing, and how the CFO comes to trust it. Can we take them in that order?"}},
+
+{t:"The board pack", s:"Two ARR numbers in front of the board",
+ b:["A 150-person SaaS company sends its board a monthly pack: P&L summary, ARR, cash runway, and a page of commentary. The FP&A lead builds it by hand in about three days after close, pulling numbers from Datarails into PowerPoint.",
+    "Last quarter the ARR in the pack did not match the ARR the CEO gave investors. One team counted signed contracts that had not started; the other did not. A board member noticed. The CEO wants 'one number, every time' and the pack out within two days of close.",
+    "The FP&A lead leaves in three months and nobody else knows how she builds it. The ERP and billing system both sync to Datarails. You have 25 hours this quarter."],
+ q:[
+ {q:"What is the pain?", o:["Three days of manual work after every close to build the pack","The billing system does not sync","The board meets too often","PowerPoint is the wrong tool"], w:"The felt cost is three days of hand assembly each month. Both systems already sync, and the tool choice is a detail."},
+ {q:"What is the risk that matters most?", o:["The board saw two different ARR numbers, which damages the CEO's credibility","The pack has too many slides","The FP&A lead is slow","Datarails could go down during close"], w:"The credibility hit in front of investors is why this is urgent. The lead leaving is a real second risk. Name the board problem first, then the key-person problem."},
+ {q:"What does success look like?", o:["One signed ARR definition, every number computed from it, the pack out in two days, and the process documented","A prettier board deck","ARR goes up next quarter","The CEO writes the commentary"], w:"Success restates what the CEO asked for in testable terms: one definition, on time, and not dependent on one person."},
+ {q:"Which limits belong in your restatement?", o:["Two days after close, 25 hours, and the lead gone in three months","The company sells software","The board has five members","The pack is in PowerPoint"], w:"The deadline, the hour budget and the departure date all constrain what you can build and when it must be handed off."},
+ {q:"Which set of parts, in order, fits best?", o:["Agree the ARR definition and owner, compute every number from it, draft commentary from those numbers, document and hand off","Connect the systems, build a reporting tool, add AI","Write the commentary prompt, then find the data","Hire a replacement, then decide the definition"], w:"The first step is a decision by a person, not a build. The systems are already connected. A general 'reporting tool' is too big for 25 hours."},
+ {q:"What is the best first clarifying question?", o:["Who owns the ARR definition, and which number did the CEO already give investors?","What font does the board prefer?","Can the model pick the better definition?","How many customers do you have?"], w:"A definition needs an owner, and the number already said in public limits your choices. A model never settles a definition."}
+ ],
+ r:{pain:"The FP&A lead spends three days after every close building the pack by hand.", risk:"The board saw two ARR numbers, and the only person who knows the process leaves in three months.", success:"One signed ARR definition, every number computed from it, out within two days of close, documented so anyone can run it.", limits:"Two days after close, 25 hours, three months until she leaves.", parts:"The ARR definition and its owner. Computing every number from it. Drafting commentary from those numbers. Documenting and handing off.",
+    say:"So the board saw two different ARR numbers, which is a credibility problem for the CEO, and the pack takes three days by hand from someone who leaves in three months. Success is one signed definition, every number computed from it, out within two days of close, and a process that does not live in one person's head. I see four parts: agree the definition and who owns it, compute the numbers from it, draft the commentary from those numbers, and document the handoff. Can we start with the definition?"}},
+
+{t:"The variance deck", s:"Monthly budget versus actuals commentary",
+ b:["A mid-market finance team builds a monthly variance deck. An analyst runs an AI skill on a laptop, connected to Datarails, that pulls actuals and budget, drafts the commentary and builds the deck.",
+    "The CFO has two rules. One: the books are closed and validated before anything runs, and every number matches the database. Two: the commentary explains at least 80% of each variance, or says what is unexplained instead of guessing.",
+    "Last month the deck went out before a data reload finished. Close ends on a different day each month, between the 3rd and the 6th. The ask: a version that runs on its own every month for the whole team."],
+ q:[
+ {q:"What is the pain?", o:["The deck depends on one analyst running it by hand from a laptop","The budget is wrong","The CFO has too many rules","The deck has no charts"], w:"The cost today is a manual run that lives on one machine. The rules are requirements, not the pain."},
+ {q:"What is the risk that matters most?", o:["Numbers go out before the data is final, or commentary guesses at a cause","The deck is too long","The analyst is replaced","The model costs too much"], w:"Both CFO rules point at trust: wrong numbers from early data, and invented explanations. Last month the first one happened."},
+ {q:"What does '80% explained' mean?", o:["At least 80% of the dollar variance is tied to named causes with numbers","Comments appear on 80% of the lines","The model is 80% confident","80% of the months have commentary"], w:"It is about dollars. A $500,000 gap needs at least $400,000 tied to named drivers. Code computes that share, and the rest is labeled unexplained."},
+ {q:"Which limits belong in your restatement?", o:["It must wait for a close that ends on a different day each month, and it must run for the whole team, not one laptop","The team uses Datarails","The deck is monthly","The analyst likes the current skill"], w:"The moving close date rules out a calendar schedule. Running for the team rules out a laptop."},
+ {q:"Which set of parts, in order, fits best?", o:["The trigger, the numbers, the commentary and its 80% check, where it runs","A reasoning agent, a judge, a retry loop, a golden set","Folder ingestion, document parsing, then the deck","The deck design, then the data"], w:"Name parts by the job each does. Listing agents and judges first is the 'getting ahead of ourselves' problem from the real round."},
+ {q:"What should start the run?", o:["The controller marking the books closed, after the last reload finished","The 5th of every month","A variance under one cent","The analyst clicking run"], w:"An event, not a date. Close moves between the 3rd and the 6th. A one-cent tie-out is a check on data, not a signal that the books are closed."}
+ ],
+ r:{pain:"The deck depends on one analyst running a skill from a laptop.", risk:"A deck built on unfinished data went out last month, and commentary can guess at causes.", success:"It runs on its own after close, every number matches Datarails, and commentary explains 80% of each variance in dollars or says what is unexplained.", limits:"Close ends on a different day each month. It has to work for the whole team.", parts:"The trigger. The numbers. The commentary and the 80% check. Where it runs.",
+    say:"So today the variance deck depends on one analyst and a laptop, and last month it went out before the data was final. The goal is a run that starts itself once the books are truly closed, where every number matches Datarails and the commentary explains at least 80% of each variance in dollars or says what it cannot explain. I see four parts: the trigger, the numbers, the commentary with its check, and where it runs. Does that order work?"}},
+
+{t:"The cash forecast", s:"13-week cash and a bank covenant",
+ b:["A 200-person manufacturer has a bank loan with a covenant: cash must stay above $2MM. Every Monday the treasurer builds a 13-week cash forecast in Excel. It takes most of a day.",
+    "Last month a large customer paid three weeks late. Cash came within $150,000 of the covenant, and the CFO first heard about it from the bank. The forecast had assumed every customer pays on the due date.",
+    "Receivables and payables are in Datarails. Bank balances arrive as a file each morning. You have 25 hours this quarter."],
+ q:[
+ {q:"What is the pain?", o:["The treasurer spends most of a day every week rebuilding the forecast by hand","The bank is too strict","Customers pay late","Excel is outdated"], w:"The weekly day of manual work is the felt cost. Late payers are a fact of the business, not something your build fixes."},
+ {q:"What is the risk that matters most?", o:["Cash nears the covenant and nobody inside the company sees it coming","The forecast file gets too large","The treasurer makes a typing mistake","The bank changes its file format"], w:"The CFO heard it from the bank. The real failure is no early warning, caused by an assumption that everyone pays on time."},
+ {q:"What does success look like?", o:["The forecast is ready Monday without the manual day, and it warns early when projected cash nears the covenant, with assumptions shown","The forecast is exactly right every week","The covenant is renegotiated","The forecast covers 52 weeks"], w:"No forecast is exactly right. Success is time back plus an early, explained warning."},
+ {q:"Which limits belong in your restatement?", o:["25 hours, a $2MM covenant floor, and bank data that arrives each morning","The company makes physical goods","The loan has a fixed rate","The treasurer has ten years of experience"], w:"The covenant sets the alert line, the bank file sets when a run can start, and the hours set the scope."},
+ {q:"Which set of parts, in order, fits best?", o:["When it runs, compute the forecast from receivables and payables using real payment history, check headroom against the covenant, explain what changed for the treasurer to sign","Train a model to predict cash, then show a chart","Replace Excel, then ask the treasurer what she needs","Call the bank, then build alerts"], w:"Trigger, numbers, check, words and sign-off. The forecast math belongs in code using how customers have paid before."},
+ {q:"What is the best first clarifying question?", o:["How do you estimate when each customer will pay today: the due date, or how they have paid before?","Which chart type do you want?","Can the model move money between accounts?","How many bank accounts are there?"], w:"The miss came from the payment-timing assumption, so ask about it first. Moving money is never in scope."}
+ ],
+ r:{pain:"The treasurer loses most of a day every week rebuilding the forecast.", risk:"Cash came within $150,000 of the covenant and the CFO heard it from the bank.", success:"A forecast ready Monday without the manual day, with an early warning when projected cash nears $2MM and the assumptions shown.", limits:"25 hours, the $2MM floor, bank data arriving each morning.", parts:"When it runs. Computing the forecast from real payment history. The covenant headroom check. Explaining what changed, with the treasurer signing.",
+    say:"So the treasurer spends a day every Monday on the forecast, and last month cash came within $150,000 of the covenant with no warning because the forecast assumed everyone pays on time. Success is a forecast that is ready Monday without that day and that warns early when cash nears the $2MM floor, with its assumptions visible. I see four parts: when it runs, how the forecast is computed, the covenant check, and the explanation the treasurer signs. Can we start with when it runs?"}},
+
+{t:"The headcount gap", s:"Finance and HR disagree before budget season",
+ b:["A 400-person software company. The finance headcount report says 412. The HR system says 398. The gap is contractors, people with accepted offers who have not started, and leavers working their notice.",
+    "Department heads no longer trust the report. Each month an FP&A analyst spends two days reconciling the two lists by hand. Budget season starts in six weeks, and salaries are about 70% of the company's costs.",
+    "Both systems sync to Datarails. You have 25 hours this quarter."],
+ q:[
+ {q:"What is the pain?", o:["An analyst spends two days a month reconciling two headcount lists by hand","The company has too many contractors","HR will not share data","The report is ugly"], w:"The monthly two days is the felt cost. Both systems already sync, so access is not the issue."},
+ {q:"What is the risk that matters most?", o:["The budget gets built on a headcount number nobody agrees on","The analyst gets bored","A contractor is paid late","The HR system is replaced"], w:"Salaries are most of the cost base. If department heads reject the headcount, they reject the budget built on it."},
+ {q:"What does success look like?", o:["One headcount definition signed by finance and HR, and a monthly reconciliation that lists each difference by type, live before budget season","The two systems always show the same number","Headcount goes down","HR adopts the finance number"], w:"The systems count different things on purpose, so they will not match. Success is an agreed definition and every difference explained."},
+ {q:"Which limits belong in your restatement?", o:["Six weeks until budget season and 25 hours","The company has 400 people","The report is monthly","The analyst uses VLOOKUP"], w:"The budget deadline is the real clock. It decides what must be done first."},
+ {q:"Which set of parts, in order, fits best?", o:["Agree who counts and who decides, match the two lists and classify each difference in code, send exceptions to a person, hand off before budget season","Build an org chart tool, then a chatbot","Ask the model which number is right","Merge the two systems"], w:"Definition first, then code for the matching, then people for the exceptions. A model cannot decide who counts as headcount."},
+ {q:"What is the best first clarifying question?", o:["Who counts as headcount (contractors, accepted offers, people in notice), and who decides?","What color should the report be?","Can we see individual salaries?","How many departments are there?"], w:"The 14-person gap is a definition problem. Ask for the definition and its owner before anything else."}
+ ],
+ r:{pain:"An analyst spends two days a month reconciling finance and HR headcount by hand.", risk:"Department heads do not trust the number, and the budget is about to be built on it.", success:"One definition signed by finance and HR, with every difference listed by type each month, in place before budget season.", limits:"Six weeks to budget season, 25 hours.", parts:"Who counts and who decides. Matching and classifying differences in code. Exceptions to a person. Handoff before budget season.",
+    say:"So finance says 412, HR says 398, an analyst loses two days a month reconciling them, and department heads have stopped trusting the report six weeks before budget season. Success is one definition both sides sign and a monthly reconciliation that explains every difference by type. I see four parts: the definition and its owner, the matching in code, the exceptions a person clears, and the handoff before budgeting starts. Can we start with the definition?"}},
+
+{t:"The budget owner assistant", s:"Forty managers asking finance the same questions",
+ b:["A 600-person company has 40 budget owners. They email finance the same questions every week: how much budget do I have left, what hit my cost center, why is this line over.",
+    "The five-person finance team spends about 10 hours a week answering. The CFO wants an assistant in Teams that answers these directly from Datarails.",
+    "Cost center data includes salaries. Last year a manager saw another team's salary detail in a shared spreadsheet, and it became an HR issue. You have 25 hours this quarter."],
+ q:[
+ {q:"What is the pain?", o:["Finance spends about 10 hours a week answering repeat questions","Budget owners are lazy","Teams is hard to use","The budget is too tight"], w:"Ten hours a week of repeat answers is the cost. Keep judgment about people out of the restatement."},
+ {q:"What is the risk that matters most?", o:["Someone sees data they should not, such as another team's salaries","The assistant is slow to reply","A manager asks an off-topic question","The assistant has a dull name"], w:"It already happened once and became an HR issue. Permissions come before convenience. A wrong number is the second risk."},
+ {q:"What does success look like?", o:["Budget owners get correct answers for their own cost centers only, with the source shown, and finance's weekly hours drop","The assistant answers any finance question","Finance no longer talks to budget owners","Every employee can use it"], w:"Scope it to their own data and the common questions. 'Any question' and 'every employee' both widen the risk."},
+ {q:"Which limits belong in your restatement?", o:["25 hours and salary data that each person may only see for their own area","The company uses Teams","There are 40 budget owners","Finance has five people"], w:"The permission boundary and the hours shape the design. The rest is context."},
+ {q:"Which set of parts, in order, fits best?", o:["Which questions cover most of the volume, who can see what, how each answer is computed and sourced, what happens when it cannot answer","Pick a chatbot platform, write a persona, launch","Load all finance data into the model, then test","Train budget owners on Excel"], w:"Scope, permissions, numbers, fallback. Loading all data into a model is how the salary leak repeats."},
+ {q:"What is the best first clarifying question?", o:["Which five questions make up most of the volume?","What should the assistant be called?","Can it also approve budget changes?","Should it use emojis?"], w:"Scoping to the top questions makes 25 hours realistic. Approvals are a different and riskier job."}
+ ],
+ r:{pain:"Finance spends about 10 hours a week answering the same budget questions.", risk:"A manager seeing another team's salaries, which has already happened once.", success:"Budget owners get correct, sourced answers for their own cost centers only, and finance's hours drop.", limits:"25 hours, and strict limits on who can see salary data.", parts:"The questions that cover most volume. Who can see what. How answers are computed and sourced. What happens when it cannot answer.",
+    say:"So finance loses about 10 hours a week answering the same questions from 40 budget owners, and the last time data was shared loosely a manager saw another team's salaries. Success is budget owners getting correct, sourced answers for their own cost centers only, and finance getting those hours back. I see four parts: which questions to cover, who can see what, how each answer is computed, and what happens when it cannot answer. Can we start with the questions?"}},
+
+{t:"The missing accruals", s:"An audit finding and a slow close",
+ b:["A 250-person services firm closes its books in eight days. The CFO wants five. Near month end, the AP clerk emails every manager asking what vendor costs have been incurred but not yet billed.",
+    "Managers reply late or not at all. In last year's audit, $320,000 of expenses were found booked in the wrong month, and the auditor wrote it up as a finding.",
+    "Purchase orders and invoices are in Datarails. The controller wants a check that runs before close. You have 25 hours this quarter."],
+ q:[
+ {q:"What is the pain?", o:["Accruals are gathered by chasing managers over email, which is slow and incomplete","Managers do not like the AP clerk","The firm has too many vendors","Auditors are picky"], w:"The email chase costs days and misses items. That is the pain in plain terms."},
+ {q:"What is the risk that matters most?", o:["Expenses land in the wrong month and the audit finding repeats","The close takes nine days","The AP clerk is on vacation","A vendor raises prices"], w:"A repeat finding is the serious outcome. Misstated months also make every variance report wrong."},
+ {q:"What is an accrual?", o:["An expense that has been incurred but not yet billed, booked so the month is complete","A payment made in advance","A discount from a vendor","Cash held in reserve"], w:"If the work happened in March, the cost belongs in March even if the invoice arrives in April."},
+ {q:"Which limits belong in your restatement?", o:["25 hours, and it cannot add days to a close the CFO wants shorter","The firm sells services","There are 250 employees","Invoices are PDFs"], w:"The check has to help the five-day goal, not slow it."},
+ {q:"Which set of parts, in order, fits best?", o:["Agree what 'likely missing' means, run those rules in code on orders and invoices, have the controller approve each accrual, test on the months the auditor flagged","Have the model book the accruals automatically","Email managers more often","Replace the AP system"], w:"Rules with the controller, code to find candidates, a person to approve, last year's finding as the test. A model never books entries."},
+ {q:"What is the best first clarifying question?", o:["Which expenses did the auditor find, and what did they have in common?","What is the auditor's name?","Can the tool post journal entries?","How many invoices arrive each month?"], w:"The finding is your answer key. It tells you which patterns the rules must catch."}
+ ],
+ r:{pain:"Accruals depend on an email chase that is slow and misses items.", risk:"$320,000 landed in the wrong month last year, and a repeat audit finding is on the line.", success:"Before close, the controller gets a list of likely missing accruals to approve, the finding does not repeat, and close gets no slower.", limits:"25 hours, and a CFO who wants close down from eight days to five.", parts:"What 'likely missing' means. Running the rules in code. Controller approval. Testing on the flagged months.",
+    say:"So accruals today depend on emailing managers, it is slow and incomplete, and last year $320,000 landed in the wrong month and became an audit finding. Success is a check before close that hands the controller a list of likely missing accruals to approve, without adding days to a close the CFO wants shorter. I see four parts: agreeing the rules, running them in code, the controller's approval, and testing against the months the auditor flagged. Can we start with the rules?"}},
+
+{t:"The stale reforecast", s:"A forecast that is old on arrival",
+ b:["A 500-person company reforecasts every quarter. It takes the three-person FP&A team two weeks. By the time it is finished, a month of the quarter is already gone.",
+    "Last quarter the revenue forecast missed by 15%. It was built on the sales pipeline in the CRM, which was optimistic. The CEO now wants a reforecast every month.",
+    "Actuals and the CRM pipeline both sync to Datarails. You have 25 hours this quarter."],
+ q:[
+ {q:"What is the pain?", o:["The reforecast takes two weeks and is out of date when it lands","The CEO is impatient","The CRM is hard to use","FP&A has only three people"], w:"Two weeks of work for a stale result is the cost. Team size is a limit, not the pain."},
+ {q:"What is the risk that matters most?", o:["A faster forecast built on the same untested inputs is wrong sooner","The forecast has too many tabs","Sales reps dislike forecasting","The CEO changes their mind"], w:"The 15% miss came from an input nobody tested. Speed alone gives the CEO a wrong number every month instead of every quarter."},
+ {q:"What does success look like?", o:["A monthly reforecast in days, with each assumption listed and approved by FP&A, and accuracy tracked against actuals","A forecast that is never wrong","The model sets the revenue target","The reforecast is skipped in slow months"], w:"Faster, with assumptions owned by people and accuracy measured so the miss cannot hide."},
+ {q:"Which limits belong in your restatement?", o:["25 hours and a three-person team that has to run this every month","The company has 500 people","The CRM is in the cloud","The forecast is in Excel"], w:"Whatever you build, three people have to run it twelve times a year."},
+ {q:"Which set of parts, in order, fits best?", o:["Which drivers matter and who owns each, roll the forecast in code from actuals and drivers, explain changes for FP&A to approve, track accuracy","Ask the model to predict revenue","Rebuild the CRM pipeline stages","Add more scenarios, then more charts"], w:"Owners for assumptions, code for the roll, the model for the explanation, and a measure of whether it worked."},
+ {q:"What is the best first clarifying question?", o:["Where did the 15% miss come from: which input was wrong?","Which month is busiest?","Can the model adjust the pipeline itself?","How many scenarios do you run?"], w:"Find the cause of the last failure before designing. A model changing inputs on its own is exactly what FP&A should own."}
+ ],
+ r:{pain:"The reforecast takes two weeks and is stale when it lands.", risk:"Last quarter missed by 15% on an optimistic pipeline. Going monthly on the same inputs is wrong faster.", success:"A monthly reforecast in days, assumptions listed and approved by FP&A, accuracy tracked against actuals.", limits:"25 hours, a three-person team running it every month.", parts:"The drivers and who owns each. Rolling the forecast in code. Explaining changes for approval. Tracking accuracy.",
+    say:"So the reforecast takes two weeks and is stale on arrival, and last quarter it missed revenue by 15% because the pipeline it relied on was optimistic. The CEO wants it monthly, but faster on the same inputs is just wrong sooner. Success is a monthly reforecast in days, where FP&A approves each assumption and we track accuracy against actuals. I see four parts: the drivers and their owners, rolling the forecast in code, explaining the changes for approval, and measuring accuracy. Can we start with the drivers?"}}
+];
+</script>
+
+<script>
+(function () {
+  const app = document.getElementById("app");
+  const homeBtn = document.getElementById("home");
+  const KEY = "casePictureDrill.v1";
+  let best = {};
+  try { best = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { best = {}; }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(best)); } catch (e) {} }
+  function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+  function shuffle(a) { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = b[i]; b[i] = b[j]; b[j] = t; } return b; }
+  let st = null;
+
+  function home() {
+    st = null; homeBtn.hidden = true; app.textContent = "";
+    const five = el("div", "five");
+    ["Pain: what it costs someone today", "Risk: what goes wrong if this is done badly", "Success: the test for done", "Limits: hours, deadlines, trust", "Parts: the order you will work in"].forEach(function (s) {
+      const sp = el("span"); const i = s.indexOf(":"); const b = el("b", null, s.slice(0, i)); sp.appendChild(b); sp.appendChild(document.createTextNode(s.slice(i))); five.appendChild(sp);
+    });
+    app.appendChild(five);
+    const list = el("div", "list");
+    CASES.forEach(function (c, i) {
+      const r = el("button", "row");
+      r.appendChild(el("span", "n", String(i + 1)));
+      const mid = el("span"); mid.appendChild(el("strong", null, c.t)); mid.appendChild(el("small", null, c.s)); r.appendChild(mid);
+      const has = best[i] != null;
+      r.appendChild(el("span", "score" + (has && best[i] === c.q.length ? " done" : ""), has ? "best " + best[i] + "/" + c.q.length : "not started"));
+      r.onclick = function () { start(i); };
+      list.appendChild(r);
+    });
+    app.appendChild(list);
+    app.appendChild(el("p", "hint", "Keys: 1 to 4 to answer, Enter for next. Options are shuffled every time."));
+  }
+
+  function start(i) {
+    st = { c: i, n: 0, res: [], answered: false, order: null };
+    homeBtn.hidden = false; render();
+  }
+
+  function briefCard(c) {
+    const b = el("aside", "brief");
+    b.appendChild(el("div", "mono", "The case"));
+    b.appendChild(el("h2", null, c.t));
+    c.b.forEach(function (p) { b.appendChild(el("p", null, p)); });
+    return b;
+  }
+
+  function render() {
+    const c = CASES[st.c]; app.textContent = "";
+    const play = el("div", "play"); play.appendChild(briefCard(c));
+    const right = el("section", "q");
+    const bar = el("div", "bar");
+    c.q.forEach(function (_, k) { bar.appendChild(el("i", k < st.res.length ? (st.res[k] ? "ok" : "no") : (k === st.n ? "now" : ""))); });
+    right.appendChild(bar);
+    if (st.n >= c.q.length) { summary(c, right); play.appendChild(right); app.appendChild(play); return; }
+    const q = c.q[st.n];
+    if (st.order == null) st.order = shuffle([0, 1, 2, 3]);
+    right.appendChild(el("div", "mono", KINDS[st.n] + " · " + (st.n + 1) + " of " + c.q.length));
+    right.appendChild(el("h3", null, q.q));
+    st.order.forEach(function (oi, pos) {
+      const b = el("button", "opt"); b.appendChild(el("kbd", null, String(pos + 1))); b.appendChild(el("span", null, q.o[oi]));
+      b.dataset.oi = oi; b.onclick = function () { answer(oi); };
+      right.appendChild(b);
+    });
+    play.appendChild(right); app.appendChild(play);
+  }
+
+  function answer(oi) {
+    if (st == null || st.answered) return;
+    const c = CASES[st.c]; const q = c.q[st.n]; const ok = oi === 0;
+    st.answered = true; st.res.push(ok);
+    const right = app.querySelector(".q");
+    right.querySelectorAll(".opt").forEach(function (b) {
+      b.disabled = true; const v = Number(b.dataset.oi);
+      if (v === 0) b.classList.add("right"); else if (v === oi) b.classList.add("wrong");
+    });
+    const bars = right.querySelectorAll(".bar i"); bars[st.n].className = ok ? "ok" : "no";
+    const why = el("div", "why"); why.appendChild(el("b", null, ok ? "Correct." : "Not this one.")); why.appendChild(document.createTextNode(q.w));
+    right.appendChild(why);
+    const nx = el("button", "next", st.n + 1 < c.q.length ? "Next question" : "See the full picture");
+    nx.onclick = next; right.appendChild(nx); nx.focus();
+  }
+
+  function next() { st.n += 1; st.answered = false; st.order = null; render(); window.scrollTo(0, 0); }
+
+  function summary(c, right) {
+    const score = st.res.filter(Boolean).length;
+    if (best[st.c] == null || score > best[st.c]) { best[st.c] = score; save(); }
+    right.classList.add("sum");
+    right.appendChild(el("div", "mono", "The full picture · " + score + " of " + c.q.length + " correct"));
+    right.appendChild(el("h3", null, c.t));
+    const dl = el("dl");
+    [["Pain", c.r.pain], ["Risk", c.r.risk], ["Success", c.r.success], ["Limits", c.r.limits], ["Parts", c.r.parts]].forEach(function (p) { dl.appendChild(el("dt", null, p[0])); dl.appendChild(el("dd", null, p[1])); });
+    right.appendChild(dl);
+    const say = el("div", "say"); say.appendChild(el("div", "mono", "Say it out loud")); say.appendChild(el("p", null, c.r.say)); right.appendChild(say);
+    const last = st.c + 1 >= CASES.length;
+    const nx = el("button", "next", last ? "Back to all cases" : "Next case: " + CASES[st.c + 1].t);
+    const ci = st.c; nx.onclick = function () { if (last) home(); else start(ci + 1); window.scrollTo(0, 0); };
+    right.appendChild(nx);
+    const again = el("button", "link", "Retry this case"); again.style.marginLeft = "16px"; again.onclick = function () { start(ci); }; right.appendChild(again);
+  }
+
+  homeBtn.onclick = home;
+  document.addEventListener("keydown", function (e) {
+    if (st == null) return;
+    if (st.answered === false && st.order && e.key >= "1" && e.key <= "4") { answer(st.order[Number(e.key) - 1]); }
+  });
+  const m = /^#c(\d+)$/.exec(location.hash);
+  if (m && CASES[Number(m[1])]) start(Number(m[1])); else home();
+})();
+</script>
+</body></html>
