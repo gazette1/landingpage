@@ -50,3 +50,11 @@
 /payoff-desk/*
   X-Robots-Tag: noindex, nofollow, noarchive
   Referrer-Policy: no-referrer
+
+/covenant-review/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Referrer-Policy: no-referrer
+
+/lender-first-14-days/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Referrer-Policy: no-referrer
