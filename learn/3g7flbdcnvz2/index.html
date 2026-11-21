@@ -171,7 +171,7 @@ th{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;
   <header class="top">
     <a class="wm" href="#today">FDE 401</a>
     <nav class="nav xs" aria-label="Course">
-      <a href="#today">Today</a><a href="#syllabus">Syllabus</a><a href="#posts">Posts</a><a href="#ready">Ready</a><a href="#course">Course</a><a href="#progress">Progress</a><a href="#" id="lockbtn">Lock</a>
+      <a href="#today">Today</a><a href="#syllabus">Syllabus</a><a href="#ready">Ready</a><a href="#course">Course</a><a href="#progress">Progress</a><a href="#" id="lockbtn">Lock</a>
     </nav>
   </header>
   <main id="view" class="wrap" tabindex="-1"></main>
@@ -247,9 +247,10 @@ const list = (arr, ordered) => arr && arr.length ? md(arr.map((x, i) => (ordered
 /* dates */
 const today = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
 const fmt = iso => new Date(iso + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-const doneCount = () => C.modules.filter(m => mp(m.n).done).length;
+const isDone = m => mp(m.n).done || Boolean(m.credited);
+const doneCount = () => C.modules.filter(isDone).length;
 const dueCount = () => C.modules.filter(m => m.date <= today()).length;
-const next = () => C.modules.find(m => !mp(m.n).done) || C.modules[C.modules.length - 1];
+const next = () => C.modules.find(m => !isDone(m)) || C.modules[C.modules.length - 1];
 
 /* router */
 window.addEventListener("hashchange", route);
@@ -263,7 +264,6 @@ function route() {
   if (h.startsWith("m/")) v.innerHTML = moduleView(+h.slice(2));
   else if (h === "syllabus") v.innerHTML = syllabusView();
   else if (h === "course") v.innerHTML = courseView();
-  else if (h === "posts") v.innerHTML = postsView();
   else if (h === "ready") v.innerHTML = readyView();
   else if (h === "progress") v.innerHTML = progressView();
   else v.innerHTML = todayView();
@@ -272,25 +272,25 @@ function route() {
 
 /* views */
 function row(m) {
-  const p = mp(m.n), late = !p.done && m.date < today();
-  return `<a class="row ${p.done ? "done" : ""}" href="#m/${m.n}">
+  const p = mp(m.n), fin = isDone(m), late = !fin && m.date < today();
+  return `<a class="row ${fin ? "done" : ""}" href="#m/${m.n}">
     <span class="num">${String(m.n).padStart(2, "0")}</span>
     <span><span class="t">${esc(m.title)}</span><br><span class="xs mid">${fmt(m.date)} &nbsp; ${esc(m.type)}${m.field_rep ? " &nbsp; field rep" : ""}${m.capstone ? " &nbsp; capstone" : ""}${late ? " &nbsp; overdue" : ""}</span></span>
-    <span class="side xs ${p.done ? "" : "dim"}">${p.done ? "Done" : m.missing ? "Content pending" : ""}</span></a>`;
+    <span class="side xs ${fin ? "" : "dim"}">${p.done ? "Done" : m.credited ? "Credited" : m.missing ? "Content pending" : ""}</span></a>`;
 }
 function todayView() {
   const n = next(), d = doneCount(), due = dueCount(), gap = due - d;
   const pace = d >= due ? (d > due ? "Ahead by " + (d - due) : "On pace") : "Behind by " + gap;
   const wk = C.modules.filter(m => m.week === n.week);
-  const upcoming = C.modules.filter(m => (m.field_rep || m.capstone) && !mp(m.n).done).slice(0, 3);
+  const upcoming = C.modules.filter(m => (m.field_rep || m.capstone) && !isDone(m)).slice(0, 3);
   return `<div class="hero">
-      <p class="xs mid">Next session, module ${n.n} of 40, ${fmt(n.date)}</p>
+      <p class="xs mid">Next session, module ${n.n} of ${C.modules.length}, ${fmt(n.date)}</p>
       <h1 class="h1">${esc(n.title)}</h1>
       <p class="read mid">${esc(n.focus)}</p>
       <div><a class="btn fill" href="#m/${n.n}">Start module ${n.n}</a></div>
     </div>
     <div class="kpis">
-      <div class="kpi xs mid">Completed<b>${d}<span class="mid" style="font-size:20px"> / 40</span></b></div>
+      <div class="kpi xs mid">Completed<b>${d}<span class="mid" style="font-size:20px"> / ${C.modules.length}</span></b></div>
       <div class="kpi xs mid">Due by today<b>${due}</b></div>
       <div class="kpi xs mid">Pace<b style="font-size:26px;margin-top:14px">${pace}</b></div>
       <div class="kpi xs mid">Hours logged<b>${d}</b></div>
@@ -320,6 +320,7 @@ function moduleView(n) {
       <p class="xs mid">Unit ${m.unit}, ${esc(m.unit_name)} &nbsp; Module ${n} of ${C.modules.length} &nbsp; ${fmt(m.date)} &nbsp; ${esc(m.type)}</p>
       <h1 class="h1">${esc(m.title)}</h1>
       <p class="read mid">${esc(m.focus)}</p>
+      ${m.credited ? `<p class="callout">Credited on evidence: ${esc(m.credited)} The course counts this module as done. Run it any time you want the rep.</p>` : ""}
       <div class="plan" id="plan">${hour.map((h, i) => `<div data-i="${i}"><span class="xs">${esc(h.name)}</span><span class="xs mid">${h.min}m</span></div>`).join("")}</div>
       <div class="timer"><span class="clock" id="clock">60:00</span><button class="btn" id="tstart">Start the hour</button><button class="btn" id="treset">Reset</button><span class="sm mid" id="tlabel"></span></div>
     </div>
@@ -356,106 +357,21 @@ function moduleView(n) {
       <label class="check"><input type="checkbox" data-k="deliv" ${p.deliv ? "checked" : ""}><span class="box"></span><span class="sm">Saved</span></label>
       ${m.stretch ? `<p class="xs mid" style="margin-top:var(--space-4)">Stretch</p><p class="mid">${inline(m.stretch)}</p>` : ""}
     </section>
-    ${postSection(m, p)}
     <div class="complete"><button class="btn fill" id="done" ${p.exit && p.deliv ? "" : "disabled"}>${p.done ? "Completed " + esc(p.doneAt || "") : "Mark module complete"}</button><span class="sm mid">${p.exit && p.deliv ? "" : "Unlocks when the exit ticket is recorded and the deliverable is saved."}</span></div>
     ${pager(prev, nxt)}
     </div>`;
 }
-/* LinkedIn series */
-const HYPE = ["amazing", "powerful", "game-changing", "game changer", "revolutionary", "unlock", "supercharge", "seamless", "excited to", "thrilled", "cutting-edge", "next-level", "10x"];
-const EMPLOYER = /potomac|\bpbs\b/i;
-function pp(n) { const p = mp(n); return p.post || (p.post = { hook: "", built: "", how1: "", how2: "", how3: "", why: "", change: "", link: "", status: "", url: "" }); }
-function compose(m) {
-  const d = pp(m.n), hook = d.hook || (m.postplan && m.postplan.hook) || "";
-  const how = [d.how1, d.how2, d.how3].filter(x => x && x.trim());
-  const parts = [hook, d.built,
-    how.length ? "How it works:\n" + how.map(h => "- " + h).join("\n") : "",
-    d.why ? "Why this way: " + d.why : "",
-    d.change ? "What I would change: " + d.change : "",
-    d.link,
-    "Field Notes, day " + m.n + " of 40. #FinanceAI #SolutionsEngineering #CommercialLending"];
-  return parts.filter(x => x && x.trim()).join("\n\n");
-}
-function lint(text) {
-  const out = [];
-  if (/[—–]/.test(text)) out.push("Long dash found. Use a comma, colon, or period.");
-  if (text.includes("!")) out.push("Exclamation point found.");
-  const lower = text.toLowerCase(); HYPE.forEach(w => { if (lower.includes(w)) out.push("Hype word: " + w + "."); });
-  if (EMPLOYER.test(text)) out.push("Employer name found. Posts use synthetic data and no employer names.");
-  if (text.length > 3000) out.push("Over LinkedIn's 3,000 character limit.");
-  return out;
-}
-function postSection(m, p) {
-  const plan = m.postplan; if (!plan) return "";
-  const d = pp(m.n), f = (k, label, ph, area) => `<label class="field"><span class="xs mid">${label}</span>${area ? `<textarea class="input" style="min-height:90px" data-post="${k}" placeholder="${esc(ph)}">${esc(d[k])}</textarea>` : `<input class="input" data-post="${k}" value="${esc(d[k])}" placeholder="${esc(ph)}">`}</label>`;
-  return `<section><div class="rule"><h2 class="h3">Post it</h2><span class="xs mid">${esc(C.course.posts.series)} &nbsp; ${plan.post === "roundup" ? "folds into the week " + m.week + " roundup" : "standalone post"}</span></div>
-    <div class="analogy"><div><p class="xs mid">Angle</p><p style="margin-top:6px">${esc(plan.hook)}</p></div><div><p class="xs mid">Show (${esc(plan.visual)})</p><p style="margin-top:6px">${esc(plan.show)}</p><p class="mid" style="margin-top:8px">Answer this: ${esc(plan.why)}</p></div></div>
-    <div style="display:grid;gap:var(--space-4)">
-      ${f("hook", "Hook, one line", plan.hook)}
-      ${f("built", "What I built or did, two sentences", "I built ... to ...", true)}
-      ${f("how1", "How it works, line 1", "")}${f("how2", "Line 2", "")}${f("how3", "Line 3", "")}
-      ${f("why", "Why this way, the tradeoff", plan.why, true)}
-      ${f("change", "What I would change", "One honest line")}
-      ${f("link", "Proof link (demo, video, or repo)", "https://russh.work/...")}
-    </div>
-    <p class="xs mid" style="margin-top:var(--space-5)">Preview</p>
-    <pre class="key" id="postprev" style="white-space:pre-wrap;font-family:var(--font-mono);font-size:14px"></pre>
-    <ul id="postlint" class="sm" style="margin-top:8px"></ul>
-    <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;margin-top:var(--space-4)">
-      <button class="btn" id="copypost">Copy post</button><button class="btn" id="mkcard">Download card image</button>
-    </div>
-    <div style="display:grid;gap:var(--space-3);margin-top:var(--space-5)">
-      <label class="check"><input type="checkbox" data-poststat="posted" ${d.status === "posted" ? "checked" : ""}><span class="box"></span><span class="sm">Posted on LinkedIn</span></label>
-      <label class="field"><span class="xs mid">Post URL</span><input class="input" data-post="url" value="${esc(d.url)}" placeholder="https://www.linkedin.com/posts/..."></label>
-    </div></section>`;
-}
-async function card(m, show) {
-  const d = pp(m.n), hook = d.hook || m.postplan.hook, how = [d.how1, d.how2, d.how3].filter(x => x && x.trim());
-  await Promise.all(['800 64px "Inter Tight"', '500 28px "JetBrains Mono"'].map(f => document.fonts.load(f).catch(() => {})));
-  const W = 1080, H = 1350, c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d");
-  g.fillStyle = "#0A0A0A"; g.fillRect(0, 0, W, H); g.fillStyle = "#F4F4F4";
-  const wrap = (text, font, x, y, max, lh) => { g.font = font; let line = "", yy = y; for (const w of text.split(/\s+/)) { const t = line ? line + " " + w : w; if (g.measureText(t).width > max && line) { g.fillText(line, x, yy); line = w; yy += lh; } else line = t; } if (line) { g.fillText(line, x, yy); yy += lh; } return yy; };
-  g.font = '500 24px "JetBrains Mono", monospace'; g.fillText(("FIELD NOTES   DAY " + String(m.n).padStart(2, "0") + " OF 40").split("").join(String.fromCharCode(8202)), 72, 104);
-  g.fillRect(72, 132, W - 144, 2);
-  let y = wrap(hook, '800 68px "Inter Tight", Arial, sans-serif', 72, 240, W - 144, 76);
-  y += 40; g.fillStyle = "#8A8A8A";
-  for (const h of how) { g.fillRect(72, y - 10, 18, 2); y = wrap(h, '400 30px "JetBrains Mono", monospace', 110, y, W - 182, 42) + 18; }
-  g.fillStyle = "#F4F4F4"; g.fillRect(72, H - 140, W - 144, 1);
-  g.font = '500 24px "JetBrains Mono", monospace'; g.fillText("RUSSH.WORK", 72, H - 92);
-  g.fillStyle = "#8A8A8A"; g.fillText(m.title.toUpperCase().slice(0, 60), 72, H - 56);
-  c.toBlob(b => { if (show) return show(URL.createObjectURL(b)); const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "field-notes-day-" + String(m.n).padStart(2, "0") + ".png"; a.click(); }, "image/png");
-}
-function postsView() {
-  const S = C.course.posts, weeks = [...new Set(C.modules.map(m => m.week))];
-  const posted = C.modules.filter(m => pp(m.n).status === "posted").length;
-  const drafted = C.modules.filter(m => pp(m.n).built || pp(m.n).how1).length;
-  return `<h1 class="h1">${esc(S.series)}</h1>
-    <div class="kpis" style="margin-top:var(--space-6)"><div class="kpi xs mid">Posted<b>${posted}</b></div><div class="kpi xs mid">Drafted<b>${drafted}</b></div><div class="kpi xs mid">Planned standalone<b>${C.modules.filter(m => m.postplan && m.postplan.post === "yes").length}</b></div></div>
-    <section><div class="rule"><h2 class="h2">How to post</h2></div><div class="read"><p>${esc(S.cadence)}</p><p class="callout">${esc(S.framing)}</p>
-      <p class="xs mid" style="margin-top:var(--space-5)">Structure</p><div class="md">${list(S.structure, true)}</div>
-      <p class="xs mid" style="margin-top:var(--space-5)">Guardrails</p><div class="md">${list(S.guardrails)}</div></div></section>
-    ${weeks.map(w => { const ms = C.modules.filter(m => m.week === w), rs = ms.filter(m => m.postplan && m.postplan.post === "roundup");
-      return `<section><div class="rule"><h2 class="h3">Week ${w}</h2>${rs.length ? `<button class="btn" data-roundup="${w}" style="margin-left:auto">Copy week ${w} roundup draft</button>` : ""}</div>
-      <div class="rows">${ms.map(m => { const d = pp(m.n); return `<a class="row ${d.status === "posted" ? "done" : ""}" href="#m/${m.n}"><span class="num">${String(m.n).padStart(2, "0")}</span><span><span class="t">${esc(m.postplan ? m.postplan.hook : m.title)}</span><br><span class="xs mid">${m.postplan ? esc(m.postplan.post === "roundup" ? "roundup" : m.postplan.visual) : ""}${d.url ? " &nbsp; linked" : ""}</span></span><span class="side xs ${d.status === "posted" ? "" : "dim"}">${d.status === "posted" ? "Posted" : d.built || d.how1 ? "Draft" : ""}</span></a>`; }).join("")}</div></section>`; }).join("")}`;
-}
-function roundup(w) {
-  const ms = C.modules.filter(m => m.week === w && m.postplan && m.postplan.post === "roundup");
-  const body = ms.map(m => { const d = pp(m.n); const how = [d.how1, d.how2, d.how3].filter(Boolean); return (d.hook || m.postplan.hook) + (d.built ? "\n" + d.built : "") + (how.length ? "\n" + how.map(h => "- " + h).join("\n") : ""); }).join("\n\n");
-  return "Week " + w + " of 11, the less glamorous half of solutions work.\n\n" + body + "\n\nField Notes, week " + w + ". #FinanceAI #SolutionsEngineering";
-}
 /* readiness: the definition of ready, checked from progress where it can be */
 function rp() { return P.ready || (P.ready = { manual: {}, notes: {}, fin: {}, studied: {}, skills: {} }); }
-const postedCount = () => C.modules.filter(m => pp(m.n).status === "posted").length;
 function rcheck(c) {
   const ex = P.exams || {}, s = rp();
   switch (c.auto) {
     case "discovery": { const ok = [4, 30].filter(n => mp(n).field && mp(n).scores[0] >= 3 && mp(n).scores[1] >= 3).length; return [ok === 2, ok + " of 2 field reps at 3 or better"]; }
     case "mid": return [+ex.mid >= 80, ex.mid === undefined || ex.mid === "" ? "Midterm not scored yet" : "Midterm " + ex.mid];
-    case "unit3": { const d = C.modules.filter(m => m.n >= 21 && m.n <= 30 && mp(m.n).done).length; return [d === 10, d + " of 10 modules"]; }
+    case "unit3": { const d = C.modules.filter(m => m.n >= 21 && m.n <= 30 && isDone(m)).length; return [d === 10, d + " of 10 modules"]; }
     case "m37": return [mp(37).done, mp(37).done ? "Module 37 complete" : "Module 37 not done"];
     case "final": return [+ex.final >= 80, ex.final === undefined || ex.final === "" ? "Final not scored yet" : "Final " + ex.final];
     case "cap": return [+ex.cap >= 70 && mp(40).cap, ex.cap === undefined || ex.cap === "" ? "Capstone not scored yet" : "Capstone " + ex.cap + (mp(40).cap ? ", published" : ", not marked published")];
-    case "posts": { const n = postedCount(); return [n >= 25, n + " of 25 posted"]; }
     case "elective": { const d = C.modules.filter(m => m.n >= 41 && m.n <= 44 && mp(m.n).done).length; return [d === 4, d + " of 4 elective modules"]; }
     default: return [!!s.manual[c.id], s.manual[c.id] ? "Checked by you" : "Check it yourself when the evidence exists"];
   }
@@ -477,8 +393,8 @@ function readyView() {
     <div class="kpis" style="margin-top:var(--space-6)">
       <div class="kpi xs mid">Ready items met<b>${met}<span class="mid" style="font-size:20px"> / ${R.criteria.length}</span></b></div>
       <div class="kpi xs mid">Days to Jan 31<b>${daysTo("2027-01-31")}</b></div>
-      <div class="kpi xs mid">Posted<b>${postedCount()}<span class="mid" style="font-size:20px"> / 25</span></b></div>
-      <div class="kpi xs mid">Modules<b>${doneCount()}<span class="mid" style="font-size:20px"> / 40</span></b></div>
+      
+      <div class="kpi xs mid">Modules<b>${doneCount()}<span class="mid" style="font-size:20px"> / ${C.modules.length}</span></b></div>
     </div>
     <section id="r-def"><div class="rule"><h2 class="h2">The definition of ready</h2></div><p class="read mid">${esc(R.why_defined)}</p>
       <div class="rows" style="margin-top:var(--space-5)">${R.criteria.map((c, i) => { const [ok, why] = rcheck(c); return `<div class="row ${ok ? "done" : ""}"><span class="num">${String(i + 1).padStart(2, "0")}</span>
@@ -529,7 +445,7 @@ function grades() {
   const repPct = reps.length ? reps.reduce((a, b) => a + b, 0) / (reps.length * 20) * 100 : 0;
   const field = C.modules.filter(m => m.field_rep && mp(m.n).field).length;
   const ex = P.exams || {};
-  const parts = [done / 40 * 100, repPct, field / 3 * 100, +ex.mid || 0, +ex.final || 0, +ex.cap || 0];
+  const parts = [done / C.modules.length * 100, repPct, field / 3 * 100, +ex.mid || 0, +ex.final || 0, +ex.cap || 0];
   const total = C.course.grading.reduce((a, g, i) => a + g.weight * parts[i] / 100, 0);
   return { parts, total, reps: reps.length, field };
 }
@@ -543,7 +459,7 @@ function progressView() {
       <div class="kpi xs mid">Modules<b>${doneCount()}<span class="mid" style="font-size:20px"> / 40</span></b></div>
       <div class="kpi xs mid">Field reps<b>${g.field}<span class="mid" style="font-size:20px"> / 3</span></b></div>
     </div>
-    <div class="strip" aria-label="Module completion">${C.modules.map(m => `<a href="#m/${m.n}" title="Module ${m.n}" class="${mp(m.n).done ? "d" : m.date < today() ? "late" : ""}"></a>`).join("")}</div>
+    <div class="strip" aria-label="Module completion">${C.modules.map(m => `<a href="#m/${m.n}" title="Module ${m.n}" class="${isDone(m) ? "d" : m.date < today() ? "late" : ""}"></a>`).join("")}</div>
     <section><div class="rule"><h2 class="h2">Grade parts</h2></div><div class="tablewrap read"><table><tr><th>Part</th><th>Weight</th><th>Score</th></tr>${names.map((nm, i) => `<tr><td>${esc(nm)}</td><td>${C.course.grading[i].weight}</td><td>${g.parts[i].toFixed(0)}</td></tr>`).join("")}</table></div>
       <div class="grid2 read" style="margin-top:var(--space-5)">
         ${[["mid", "Midterm, module 20"], ["final", "Final exam, module 39"], ["cap", "Capstone, module 40"]].map(([k, l]) => `<label class="field"><span class="xs mid">${l}, 0 to 100</span><input class="input num-in" type="number" min="0" max="100" data-exam="${k}" value="${esc(ex[k] ?? "")}"></label>`).join("")}
@@ -556,29 +472,22 @@ function progressView() {
 
 /* tour: a self-playing walkthrough for screen recording. Open the page with ?tour. Steps sum to 150 seconds. */
 function tourData() {
-  const ex = { hook: "", built: "I called the U.S. Treasury Fiscal Data API from the terminal, with no wrapper library, and read every line of the response.",
-    how1: "GET request to the average interest rates endpoint, filtered to one month", how2: "Read the status code, the headers, and the JSON fields by hand",
-    how3: "Checked one rate against the Treasury's own published table", why: "A wrapper hides the status code and the error body. When an integration breaks at a client, those are the first two things I need to read.",
-    change: "Next time I would save the raw response to a file first, so I can compare runs.", link: "", status: "", url: "" };
-  return { m: { 9: { answer: "", scores: [0, 0, 0, 0, 0], exit: false, deliv: false, field: false, cap: false, done: false, revealed: false, post: ex } }, exams: {}, ready: { manual: {}, notes: {}, fin: {}, studied: {}, skills: {} } };
+  return { m: { 9: { answer: "", scores: [0, 0, 0, 0, 0], exit: false, deliv: false, field: false, cap: false, done: false, revealed: false } }, exams: {}, ready: { manual: {}, notes: {}, fin: {}, studied: {}, skills: {} } };
 }
 const TSTEPS = [
   { h: "today", to: 0, s: 10, cap: "I gave myself 40 hours to go from credit analyst to finance AI solutions engineer. I designed the course for it and built it with Claude. Today is day 0." },
   { h: "today", to: ".kpis", s: 9, cap: "Four one-hour sessions a week, October 6 to December 19. The home screen shows the next session and whether I am on pace." },
-  { h: "syllabus", to: 0, s: 5, cap: "40 modules in four units." },
+  { h: "syllabus", to: 0, s: 5, cap: "40 core modules in four units, plus a GTM elective." },
   { h: "syllabus", to: "end", s: 12, glide: 10000, cap: "Hear the problem. Build the technical floor. Design the solution. Deploy and land. A midterm, a final, and a capstone." },
   { h: "m/9", to: 0, s: 9, cap: "Every module is a timed hour: warmup, concept, hands-on practice, self-check, and a 90-second spoken exit ticket." },
   { h: "m/9", to: ".analogy", s: 9, cap: "Concepts come with a sports version and a lending version, because that is how I learn." },
   { h: "m/9", to: "#answer", s: 10, cap: "Practice is hands-on. I write my own answer before the model answer unlocks. AI can explain and quiz me. It does not type for me." },
   { h: "m/9", to: ".score", s: 9, act: "score", cap: "Then I score myself on five criteria: listening, questions, framing, solution fit, and honesty." },
-  { h: "m/9", to: "#postprev", s: 10, cap: "When a module is done, the app drafts the LinkedIn post from what I built and flags hype words. This one is an example draft." },
-  { h: "m/9", to: "#postprev", s: 8, act: "card", cap: "It also makes the image for the post." },
-  { h: "posts", to: 0, s: 9, cap: "Every module has a planned post. That is this series: Field Notes, 40 hours of work in public." },
   { h: "ready", to: 0, s: 10, cap: "The goal: ready for a finance AI solutions engineer seat by January 31. No applications until then." },
-  { h: "ready", to: "#r-def", s: 10, cap: "Ready means ten items with evidence, not a feeling. Seven check themselves from my progress. Today I am at zero." },
+  { h: "ready", to: "#r-def", s: 10, cap: "Ready means a list of items with evidence, not a feeling. Most check themselves from my progress. Today I am at zero." },
   { h: "ready", to: "#r-market", s: 10, cap: "I mapped 30 finance AI companies to study, and counted what 14 real solutions engineer postings ask for." },
   { h: "course", to: ".grid2", s: 10, cap: "It is built on an honest audit of what I do well and what holds me back, with the fix for each gap." },
-  { h: "today", to: 0, s: 10, cap: "Follow along on LinkedIn. Field Notes, day 1 of 40, is Tuesday." }
+  { h: "today", to: 0, s: 10, cap: "Day 1 is Tuesday." }
 ];
 let tPaused = false, tStop = false, tSkip = false;
 const tSleep = ms => new Promise(res => { let left = ms; const iv = setInterval(() => { if (tStop || tSkip) { clearInterval(iv); return res(); } if (!tPaused) left -= 100; if (left <= 0) { clearInterval(iv); res(); } }, 100); });
@@ -599,17 +508,16 @@ async function tourRun() {
   const t0 = performance.now();
   for (let i = 0; i < TSTEPS.length && !tStop; i++) {
     const st = TSTEPS[i], start = performance.now(); tSkip = false;
-    $("#tourstep").textContent = "Field Notes   " + (i + 1) + " of " + TSTEPS.length;
+    $("#tourstep").textContent = "FDE 401   " + (i + 1) + " of " + TSTEPS.length;
     $("#tourcap").textContent = st.cap;
     if ((location.hash.replace(/^#/, "") || "today") !== st.h) { location.hash = "#" + st.h; await tSleep(450); }
     await tGlide(tY(st.to), st.glide || 1400);
     if (st.act === "score") { for (const [r, v] of [[0, 3], [1, 3], [2, 2], [3, 3], [4, 3]]) { const b = document.querySelector(`.score[data-r="${r}"] button[data-v="${v}"]`); if (b) b.click(); await tSleep(350); } }
-    if (st.act === "card") await new Promise(res => card(C.modules.find(m => m.n === 9), u => { const im = document.createElement("img"); im.id = "tourcard"; im.src = u; im.style.cssText = "position:fixed;z-index:49;top:72px;right:clamp(16px,4vw,48px);height:calc(100vh - 300px);max-height:620px;border:1px solid var(--rule)"; document.body.appendChild(im); res(); }));
     await tSleep(Math.max(0, st.s * 1000 - (performance.now() - start)));
     const im = $("#tourcard"); if (im) im.remove();
   }
   window.__tourSeconds = Math.round((performance.now() - t0) / 1000);
-  if (!tStop) { $("#tourstep").textContent = "Field Notes"; $("#tourcap").textContent = "russh.work"; }
+  if (!tStop) { $("#tourstep").textContent = "FDE 401"; $("#tourcap").textContent = "russh.work"; }
 }
 
 /* behavior */
@@ -631,17 +539,8 @@ function bind(h) {
     }));
     $("#done").addEventListener("click", () => { p.done = true; p.doneAt = today(); save(); toast("Module " + n + " complete."); route(); });
     setupTimer();
-    if (m.postplan) {
-      const d = pp(n), paintPost = () => { const t = compose(m); $("#postprev").textContent = t; const issues = lint(t); $("#postlint").innerHTML = (issues.length ? issues : ["Clean. " + t.length + " characters."]).map(x => `<li class="${issues.length ? "" : "mid"}">${esc(x)}</li>`).join(""); };
-      document.querySelectorAll("[data-post]").forEach(el => el.addEventListener("input", () => { d[el.dataset.post] = el.value; save(); paintPost(); }));
-      document.querySelectorAll("[data-poststat]").forEach(el => el.addEventListener("change", () => { d.status = el.checked ? "posted" : ""; save(); }));
-      $("#copypost").addEventListener("click", async () => { try { await navigator.clipboard.writeText(compose(m)); d.status = d.status || "drafted"; save(); toast("Post copied."); } catch { toast("Copy failed. Select the preview text instead."); } });
-      $("#mkcard").addEventListener("click", () => card(m));
-      paintPost();
-    }
   }
   if (h === "course") { const b = $("#copyta"); if (b) b.addEventListener("click", async () => { try { await navigator.clipboard.writeText(C.course.ta.replace(/^.*?Paste this to start a session: /, "").replace(/^"|"$/g, "")); toast("Copied."); } catch { toast("Copy failed. Select the text instead."); } }); }
-  if (h === "posts") document.querySelectorAll("[data-roundup]").forEach(b => b.addEventListener("click", async () => { try { await navigator.clipboard.writeText(roundup(+b.dataset.roundup)); toast("Roundup draft copied."); } catch { toast("Copy failed."); } }));
   if (C.course.ready && (h === "ready" || h === "today" || h === "")) {
     const s = rp(), on = (sel, fn) => document.querySelectorAll(sel).forEach(el => el.addEventListener(el.type === "checkbox" ? "change" : "input", () => { fn(el); save(); }));
     on("[data-fin]", el => { s.fin[el.dataset.fin] = el.checked; });
