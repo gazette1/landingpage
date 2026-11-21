@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS 100 Pencil Reps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: an exam blue book. Ruled paper to write on, a red pen to mark with, highlighter for textbook passages. */
+:root{
+  --desk:#e9eef6; --sheet:#ffffff; --ink:#17223b; --muted:#56627a; --rule:#c9d6ea; --line:#d9e1ee;
+  --red:#cf2f2a; --hi:#ffe866; --hi-ink:#3a3000; --go:#16795a; --ghost:#b9c4d8; --pen:#1b2a66;
+  --display:"Bricolage Grotesque","Trebuchet MS",sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --hand:"Caveat","Bradley Hand","Comic Sans MS",cursive;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --desk:#111722; --sheet:#1a2230; --ink:#e8edf6; --muted:#9ba8bf; --rule:#2d3b52; --line:#2a3547;
+    --red:#ff8072; --hi:#5d4f00; --hi-ink:#fff3b0; --go:#5fd0a6; --ghost:#46546c; --pen:#c9d6ff;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --desk:#111722; --sheet:#1a2230; --ink:#e8edf6; --muted:#9ba8bf; --rule:#2d3b52; --line:#2a3547;
+  --red:#ff8072; --hi:#5d4f00; --hi-ink:#fff3b0; --go:#5fd0a6; --ghost:#46546c; --pen:#c9d6ff;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--desk);color:var(--ink);font:400 17px/1.5 var(--body);-webkit-text-size-adjust:100%}
+button,input{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+p{margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px 64px}
+:focus-visible{outline:3px solid var(--pen);outline-offset:2px;border-radius:4px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;padding:20px 0 14px}
+.brand{flex:1 1 220px}
+.brand h1{font-size:30px;font-weight:800;letter-spacing:-.01em}
+.brand h1 span{font-family:var(--hand);color:var(--red);font-size:30px;font-weight:700;margin-left:6px;display:inline-block;transform:rotate(-4deg)}
+.brand p{color:var(--muted);font-size:15px}
+.meter{flex:1 1 260px;max-width:380px}
+.meter .lab{display:flex;justify-content:space-between;font-size:14px;color:var(--muted)}
+.meter .lab b{color:var(--ink);font-variant-numeric:tabular-nums}
+.bar{position:relative;height:14px;background:var(--sheet);border:1.5px solid var(--ink);border-radius:8px;margin-top:4px}
+.bar i{position:absolute;inset:0 auto 0 0;background:var(--go);border-radius:6px 0 0 6px;transition:width .4s}
+.bar u{position:absolute;left:80%;top:-5px;bottom:-5px;width:2px;background:var(--red)}
+.bar em{position:absolute;left:80%;top:15px;transform:translateX(-50%);font:700 18px/1 var(--hand);color:var(--red)}
+nav{display:flex;gap:6px;border-bottom:2px solid var(--ink);margin-top:10px}
+nav button{background:none;border:2px solid transparent;border-bottom:none;padding:9px 16px;border-radius:10px 10px 0 0;cursor:pointer;font-weight:700;color:var(--muted)}
+nav button[aria-current="page"]{background:var(--sheet);border-color:var(--ink);color:var(--ink);margin-bottom:-2px;padding-bottom:11px}
+main{padding-top:20px;display:grid;gap:18px}
+
+/* shared pieces */
+.sheet{background:var(--sheet);border:1.5px solid var(--line);border-radius:12px;padding:18px}
+.btn{background:var(--ink);color:var(--sheet);border:2px solid var(--ink);border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;min-height:44px}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.small{padding:6px 12px;min-height:38px;font-size:15px}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.muted{color:var(--muted)}
+.hand{font-family:var(--hand);color:var(--red);font-weight:700}
+.hl{background:var(--hi);color:var(--hi-ink);padding:1px 7px;border-radius:3px;font-size:13.5px;font-weight:700;white-space:nowrap}
+.tag{font-size:13.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 9px;white-space:nowrap}
+pre.code{margin:0;background:var(--desk);border-left:4px solid var(--pen);border-radius:6px;padding:12px 14px;font:400 15px/1.55 var(--mono);overflow-x:auto;tab-size:4;font-variant-ligatures:none}
+pre.out{border-left-color:var(--go)}
+
+/* plan */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.steps div{border-top:3px solid var(--ink);padding-top:8px}
+.steps b{font-family:var(--display);font-size:19px;display:block}
+.day h2{font-size:22px}
+.day .when{font:700 24px/1 var(--hand);color:var(--red)}
+.day ul{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.day li{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border-top:1px dashed var(--rule);padding-top:8px}
+.day li span.n{font-variant-numeric:tabular-nums;color:var(--muted);font-size:15px}
+.day .away{margin-top:12px;padding:10px 12px;background:var(--desk);border-radius:8px;font-size:16px}
+
+/* practice list */
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.chips button{flex:none;background:var(--sheet);border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:700;color:var(--muted)}
+.chips button[aria-pressed="true"]{border-color:var(--ink);color:var(--ink);box-shadow:0 2px 0 var(--ink)}
+.chips small{font-weight:400;font-variant-numeric:tabular-nums;margin-left:4px}
+.listhead{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.die{width:44px;height:44px;border:2px solid var(--ink);border-radius:9px;background:var(--sheet);display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:6px;gap:2px;flex:none}
+.die i{border-radius:50%}
+.die i.on{background:var(--red)}
+.die.spin{animation:spin .5s linear}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cards{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.cards button{width:100%;text-align:left;background:var(--sheet);border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;cursor:pointer;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.cards button:hover{border-color:var(--ink)}
+.st{width:26px;height:26px;border-radius:50%;border:2px solid var(--rule);flex:none;display:grid;place-items:center;font:700 20px/1 var(--hand)}
+.st.s1{border-color:var(--pen);color:var(--pen)}
+.st.s2{border-color:var(--go);background:var(--go);color:var(--sheet)}
+.cards .ti{font-weight:700;flex:1 1 150px}
+
+/* workbench */
+.bench{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:920px){.bench{grid-template-columns:minmax(0,5fr) minmax(0,6fr);align-items:start}}
+.ask h2{font-size:24px;margin:8px 0}
+.ask .q{font-size:18px;max-width:62ch}
+.ask>*+*{margin-top:12px}
+.levels{display:flex;border:2px solid var(--ink);border-radius:10px;overflow:hidden}
+.levels button{flex:1;background:var(--sheet);border:0;border-left:2px solid var(--ink);padding:9px 6px;cursor:pointer;font-weight:700;min-height:44px}
+.levels button:first-child{border-left:0}
+.levels button[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+.padbox{display:grid;gap:8px}
+.padhost{border:2px solid var(--ink);border-radius:10px;overflow:hidden;background:var(--sheet);line-height:0}
+canvas.pad{display:block;width:100%;touch-action:none;cursor:crosshair}
+.papernote{border:2px dashed var(--ink);border-radius:10px;padding:22px 16px;text-align:center;background:var(--sheet)}
+.mark{border:2px solid var(--red);border-radius:12px;padding:16px;background:var(--sheet);display:grid;gap:12px}
+.mark h3{font:700 28px/1 var(--hand);color:var(--red)}
+.rubric{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.rubric label{display:flex;gap:10px;align-items:flex-start;padding:7px 4px;border-radius:6px;cursor:pointer}
+.rubric input{width:22px;height:22px;accent-color:var(--red);flex:none;margin-top:2px}
+.why{border-left:4px solid var(--hi);padding-left:10px}
+.score{font:700 34px/1 var(--hand);color:var(--red);font-variant-numeric:tabular-nums}
+.ai{background:var(--desk);border-radius:8px;padding:10px 12px;font-size:16px;display:grid;gap:6px}
+.ai pre{margin:0;font:400 14px/1.45 var(--mono);white-space:pre-wrap}
+
+/* mock */
+.qhead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:baseline}
+.qhead .pts{font:700 24px/1 var(--hand);color:var(--red)}
+.grade{display:grid;gap:12px}
+.grade img{max-width:100%;border:1.5px solid var(--line);border-radius:8px;background:#fff}
+.total{position:sticky;bottom:0;background:var(--sheet);border:2px solid var(--ink);border-radius:12px;padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;justify-content:space-between}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Pencil Reps <span>Exam 3</span></h1>
+      <p>CS 100. Every answer is written by hand, then marked with the red pen.</p>
+    </div>
+    <div class="meter" aria-live="polite">
+      <div class="lab"><span>Cards exam-ready from memory</span><b id="meterN">0%</b></div>
+      <div class="bar"><i id="meterBar" style="width:0%"></i><u></u><em>80</em></div>
+    </div>
+  </header>
+  <nav aria-label="Sections">
+    <button id="tab-plan" data-tab="plan">3-day plan</button>
+    <button id="tab-practice" data-tab="practice">Practice</button>
+    <button id="tab-mock" data-tab="mock">Mock exam</button>
+  </nav>
+  <main id="view"></main>
+</div>
+
+<script>
+const BANK={"cards": [{"id": "f1", "t": "fn", "k": "write", "title": "area function", "hl": "p.68", "q": "Write a function area(width, length) that returns the area of a rectangle. Then print area(2, 3).", "a": "def area(width, length):\n    a = width * length\n    return a\n\nprint(area(2, 3))", "chk": ["Line 1 starts with def", "Both parameters are inside ( ) with a comma", "The def line ends with a colon", "The body is indented", "It uses return, not print, inside the function", "The call is outside the function, not indented"], "why": "def builds the function. Nothing happens until you call it. area(2, 3) is replaced by the value it returns.", "out": "6"}, {"id": "f2", "t": "fn", "k": "write", "title": "avg function", "q": "Write a function avg(x, y) that returns the average of two numbers. Print avg(3, 4) and avg(5, 7).", "a": "def avg(x, y):\n    return (x + y) / 2.0\n\nprint(avg(3, 4))\nprint(avg(5, 7))", "chk": ["def avg(x, y): with the colon", "Parentheses around x + y before dividing", "return is indented", "Two separate print calls"], "why": "Define once, call many times. Without the parentheses, only y would be divided by 2.", "out": "3.5\n6.0"}, {"id": "f3", "t": "fn", "k": "write", "title": "maximum function", "q": "Write a function maximum(x, y) that returns the larger number. Use if / else. Print maximum(3, 2) and maximum(2, 3).", "a": "def maximum(x, y):\n    if x > y:\n        return x\n    else:\n        return y\n\nprint(maximum(3, 2))\nprint(maximum(2, 3))", "chk": ["def line ends with a colon", "if x > y: ends with a colon", "else: ends with a colon and lines up with if", "Each return is indented under its if or else", "Both calls print 3"], "why": "A function body can hold any code you know, including if / else.", "out": "3\n3"}, {"id": "f4", "t": "fn", "k": "output", "title": "Using a returned value", "q": "Write exactly what this prints.", "code": "def area(width, length):\n    a = width * length\n    return a\n\nresult = area(2, 3)\ndoubleA = 2 * area(2, 3)\nprint(result)\nprint(doubleA)", "chk": ["First line is 6", "Second line is 12", "Nothing else is printed"], "why": "area(2, 3) becomes 6. So doubleA is 2 * 6.", "a": "6\n12"}, {"id": "f5", "t": "fn", "k": "write", "title": "getName, no parameters", "q": "Write a function getName() with no parameters. It keeps asking 'Please enter your name: ' until the input is not empty, then returns it. Then call it, store the result in n, and print Hello and the name.", "a": "def getName():\n    s = \"\"\n    while s == \"\":\n        s = input(\"Please enter your name: \")\n    return s\n\nn = getName()\nprint(\"Hello,\", n)", "chk": ["Empty parentheses are still there: getName()", "s starts as an empty string", "while s == \"\": uses two equals signs and a colon", "input line is indented under while", "return s lines up with while, not inside it", "The call has parentheses: getName()"], "why": "No parameters still needs ( ). The return sits outside the loop so it runs after the loop ends."}, {"id": "f6", "t": "fn", "k": "output", "title": "sillyFunction", "hl": "p.70", "q": "Write exactly what this prints.", "code": "def sillyFunction(n, k):\n    if n == \"\":\n        print(\"You have no name\")\n        return\n    for i in range(k, 0, -1):\n        print(\"Let me tell you\", i, \"more times: Hello\", n, \"!\")\n\nsillyFunction(\"Bob\", 3)\nsillyFunction(\"\", 42)", "chk": ["Three Bob lines, counting 3, 2, 1", "Spaces between the pieces, including before the !", "Last line is: You have no name", "Nothing prints 42 times"], "why": "range(k, 0, -1) counts down and stops before 0. A bare return stops the function right there.", "a": "Let me tell you 3 more times: Hello Bob !\nLet me tell you 2 more times: Hello Bob !\nLet me tell you 1 more times: Hello Bob !\nYou have no name"}, {"id": "f7", "t": "fn", "k": "write", "title": "main function", "hl": "p.71", "q": "getName(), getNumber() and sillyFunction(n, k) already exist. Write a main() function that gets the name, gets the number, then calls sillyFunction. Then launch the program.", "a": "def main():\n    name = getName()\n    number = getNumber()\n    sillyFunction(name, number)\n\nmain()", "chk": ["def main(): with empty parentheses and a colon", "Three indented lines inside main", "Results are stored in variables", "sillyFunction gets both variables, in order", "main() is called at the bottom, not indented"], "why": "main takes nothing and returns nothing. Its job is to call the other functions. If you forget the last line, nothing runs."}, {"id": "f8", "t": "fn", "k": "output", "title": "Defined but never called", "q": "Write exactly what this prints.", "code": "def hello():\n    print(\"Hi\")\n\nprint(\"Done\")", "chk": ["Only one line: Done", "Hi is not printed"], "why": "A function does nothing until it is called. hello() never appears, so Hi never prints.", "a": "Done"}, {"id": "f9", "t": "fn", "k": "fix", "title": "Red pen: broken function", "q": "This code has four mistakes. Rewrite it correctly so it prints 6.", "code": "def area(width, length)\na = width * length\nprint a\narea(2, 3)", "a": "def area(width, length):\n    a = width * length\n    return a\n\nprint(area(2, 3))", "chk": ["Added the colon after the def line", "Indented the body", "Changed print a to return a", "Printed the call: print(area(2, 3))"], "why": "Colon, indent, return, then print the call. These four are worth points on every function question.", "out": "6"}, {"id": "f10", "t": "fn", "k": "say", "title": "What return does", "q": "In one or two sentences, write what a return statement does. Then write what happens when a function has no return.", "a": "return ends the function and sends a value back to the place that called it. With no return, the function stops when all of its code has run and gives back no value.", "chk": ["Said it ends or stops the function", "Said it sends a value back to the caller", "Said a function with no return just runs to the end"]}, {"id": "f11", "t": "fn", "k": "output", "title": "Named parameters", "q": "Write exactly what this prints.", "code": "def greet(name, greeting=\"Hello\", times=1):\n    for i in range(times):\n        print(greeting, name)\n\ngreet(\"Ana\")\ngreet(\"Bo\", times=2, greeting=\"Hey\")", "chk": ["First line: Hello Ana", "Then Hey Bo twice", "Three lines total"], "why": "Named parameters have default values. If you skip them, the default is used. You can give them in any order by name.", "a": "Hello Ana\nHey Bo\nHey Bo"}, {"id": "f12", "t": "fn", "k": "write", "title": "A named parameter", "q": "Write a function power(base, exp=2) that returns base to the power exp. Print power(3) and power(2, exp=3).", "a": "def power(base, exp=2):\n    return base ** exp\n\nprint(power(3))\nprint(power(2, exp=3))", "chk": ["exp=2 is in the def line, after base", "Used ** for power", "return, not print, inside", "Second call names the parameter: exp=3"], "why": "Named parameters come after the regular (positional) ones and carry a default value.", "out": "9\n8"}, {"id": "f13", "t": "fn", "k": "say", "title": "Parts of a function", "q": "Write the general shape of a function definition from memory (the three-line template). Label the name, the parameters, the body and the return value.", "a": "def function_name(parameters):\n    # Function code (body)\n    return return_value", "chk": ["Starts with def", "Name, then parameters in ( )", "Colon at the end of line 1", "Body is indented", "return at the end of the body"], "why": "The first line is called the signature. It must end with a colon."}, {"id": "s1", "t": "scope", "k": "output", "title": "Local x", "q": "Write exactly what this prints.", "code": "x = 42\n\ndef aFunction():\n    x = 100\n    print(x)\n    return\n\nprint(x)\naFunction()\nprint(x)", "chk": ["Line 1: 42", "Line 2: 100", "Line 3: 42"], "why": "The x inside the function is a new local x. The global x is still 42 afterwards.", "a": "42\n100\n42"}, {"id": "s2", "t": "scope", "k": "output", "title": "global x", "q": "Write exactly what this prints.", "code": "x = 42\n\ndef anotherFunction():\n    global x\n    x = 100\n    print(x)\n    return\n\nprint(x)\nanotherFunction()\nprint(x)", "chk": ["Line 1: 42", "Line 2: 100", "Line 3: 100"], "why": "global x tells the function to use the outside x. So the assignment changes it for good.", "a": "42\n100\n100"}, {"id": "s3", "t": "scope", "k": "output", "title": "The 3 5 example", "q": "Write exactly what this prints. Show the value of w, and of the x inside f, on the side.", "code": "x = 3\ny = 2\n\ndef f(w):\n    x = w + y\n    return x\n\ny = f(x)\nprint(x, y)", "chk": ["Output is 3 5 on one line", "w is 3 inside f", "The x inside f is 5 but the global x stays 3"], "why": "f(3): w = 3, local x = 3 + 2 = 5, returns 5. That 5 goes into the global y. The global x never changed.", "a": "3 5"}, {"id": "s4", "t": "scope", "k": "say", "title": "Local vs global", "q": "Write the definition of a local variable and of a global variable. Then finish the sentence: Outside a function, a local variable ...", "a": "Local variable: a variable defined inside a function. Global variable: a variable defined outside a function. Outside a function, a local variable cannot be accessed.", "chk": ["Local = defined inside a function", "Global = defined outside a function", "A local variable cannot be used outside its function"]}, {"id": "s5", "t": "scope", "k": "say", "title": "NameError", "q": "What happens when this code runs? Write the kind of error and why.", "code": "def myFunction():\n    localVariable = 100\n    return\n\nprint(localVariable)", "a": "NameError: name 'localVariable' is not defined. The variable only exists inside the function, so the print outside cannot see it.", "chk": ["Named the error: NameError", "Said the variable only exists inside the function"]}, {"id": "s6", "t": "scope", "k": "output", "title": "rotate, a side effect", "q": "Write exactly what this prints. Use the brackets and commas.", "code": "def rotate(l):\n    if len(l) > 1:\n        l.append(l[0])\n        del l[0]\n\nsomelist = [1, 2, 3, 4]\nprint(somelist)\nrotate(somelist)\nprint(somelist)\nrotate(somelist)\nprint(somelist)", "chk": ["Every line has [ ] and commas", "Line 2 is [2, 3, 4, 1]", "Line 3 is [3, 4, 1, 2]"], "why": "Lists are mutable. The function changes the list it was given. That is a side effect.", "a": "[1, 2, 3, 4]\n[2, 3, 4, 1]\n[3, 4, 1, 2]"}, {"id": "s7", "t": "scope", "k": "say", "title": "Deterministic, pure, side effect", "q": "Write a one-line meaning for each: deterministic, side effect, pure function. Then: is a function that uses randint deterministic?", "a": "Deterministic: the same input always gives the same result. Side effect: the function changes something outside itself, like printing or changing a list or a global variable. Pure function: a function with no side effects. A function that uses randint is not deterministic.", "chk": ["Deterministic = same input, same output", "Side effect = changes something outside the function", "Pure = no side effects", "randint makes it non-deterministic"]}, {"id": "r0", "t": "rec", "k": "output", "title": "g calls f", "q": "Write exactly what this prints. Show f(1) on the side.", "code": "def f(x):\n    return 3 * x\n\ndef g(x):\n    y = f(x)\n    return y + 1\n\nprint(g(1))", "chk": ["f(1) is 3", "Output is 4"], "why": "g waits for f to finish. f(1) returns 3, so g returns 3 + 1.", "a": "4"}, {"id": "r1", "t": "rec", "k": "write", "title": "Recursive f", "hl": "p.75", "q": "Write the recursive function f(x) from the textbook: if x is 1, y is 1. Otherwise y is f(x - 1) + 1. Return y. Then set z = f(3) and print z.", "a": "def f(x):\n    if x == 1:\n        y = 1\n    else:\n        y = f(x - 1) + 1\n    return y\n\nz = f(3)\nprint(z)", "chk": ["if x == 1: uses two equals signs and a colon", "y = 1 uses one equals sign", "else: lines up with if", "The function calls itself with x - 1", "return y lines up with if, not inside else", "z = f(3) and print(z) are not indented"], "why": "A function that calls itself is recursion. == compares, = assigns.", "out": "3"}, {"id": "r2", "t": "rec", "k": "output", "title": "Trace f(3)", "q": "Write the chain of calls for f(3), like f(3) = f(2) + 1. Then write what prints.", "code": "def f(x):\n    if x == 1:\n        y = 1\n    else:\n        y = f(x - 1) + 1\n    return y\n\nprint(f(3))", "chk": ["f(3) = f(2) + 1", "f(2) = f(1) + 1", "f(1) = 1", "Output is 3"], "why": "f(1) returns 1. Then f(2) finishes with 2. Then f(3) finishes with 3. The calls go down, the answers come back up.", "a": "3"}, {"id": "r3", "t": "rec", "k": "write", "title": "Recursive f, short form", "hl": "p.77", "q": "Write the short version of recursive f(x) with no else: return 1 when x is 1, otherwise return f(x - 1) + 1. Print f(3).", "a": "def f(x):\n    if x == 1:\n        return 1\n    return f(x - 1) + 1\n\nprint(f(3))", "chk": ["if x == 1: with the colon", "return 1 is indented under if", "Second return lines up with if", "Calls f(x - 1) and adds 1"], "why": "return stops the function. If the first return runs, the second line is never reached. So else is optional.", "out": "3"}, {"id": "r4", "t": "rec", "k": "say", "title": "Factorial relation", "hl": "p.77", "q": "Write the two-line recursive relation for factorial(n): one line for n <= 1 and one line for n > 1. Then work out factorial(4) by hand.", "a": "factorial(n) = 1                      when n <= 1\nfactorial(n) = n * factorial(n - 1)   when n > 1\n\nfactorial(4) = 4 * 3 * 2 * 1 = 24", "chk": ["Base case: 1 when n <= 1", "Recursive case: n * factorial(n - 1) when n > 1", "factorial(4) = 24"]}, {"id": "r5", "t": "rec", "k": "write", "title": "Factorial, recursive", "hl": "p.77", "q": "Write the recursive function factorial(n). Print factorial(3) and factorial(5).", "a": "def factorial(n):\n    if n <= 1:\n        return 1\n    else:\n        return n * factorial(n - 1)\n\nprint(factorial(3))\nprint(factorial(5))", "chk": ["def factorial(n): with the colon", "Base case: if n <= 1: return 1", "else: with the colon", "return n * factorial(n - 1)", "Both returns are indented one level deeper than if / else", "The two prints are not indented"], "why": "The relation turns straight into code. Base case first, then n times the smaller factorial.", "out": "6\n120"}, {"id": "r6", "t": "rec", "k": "write", "title": "Factorial, iterative", "hl": "p.78", "q": "Write factorial(n) with a for loop instead of recursion. Print factorial(3) and factorial(5).", "a": "def factorial(n):\n    f = 1\n    for i in range(2, n + 1):\n        f = f * i\n    return f\n\nprint(factorial(3))\nprint(factorial(5))", "chk": ["f starts at 1, not 0", "for i in range(2, n + 1): has the variable i and a colon", "Range goes to n + 1 so n is included", "f = f * i is indented under for", "return f lines up with for, outside the loop"], "why": "Iterative means using a loop. range stops before its end, so n + 1 is needed to reach n.", "out": "6\n120"}, {"id": "r7", "t": "rec", "k": "output", "title": "Factorial loop trace", "q": "Make a trace table with columns i and f. Then write exactly what prints.", "code": "f = 1\nfor i in range(2, 5):\n    f = f * i\n    print(i, f)", "chk": ["i takes 2, 3, 4 and stops before 5", "f goes 2, 6, 24", "Each line shows i then f with a space"], "why": "range(2, 5) is 2, 3, 4. Multiply f by each one in turn.", "a": "2 2\n3 6\n4 24"}, {"id": "r8", "t": "rec", "k": "write", "title": "triangleIter", "hl": "p.79", "q": "triangle(n) = 1 + 2 + 3 + ... + n. Write triangleIter(n) with a for loop. Print triangleIter(4).", "a": "def triangleIter(n):\n    t = 0\n    for i in range(1, n + 1):\n        t = t + i\n    return t\n\nprint(triangleIter(4))", "chk": ["t starts at 0", "for i in range(1, n + 1): with i and a colon", "t = t + i adds i, the loop variable", "return t is outside the loop"], "why": "Adding starts from 0. Multiplying starts from 1. This is the same shape as the sum loop on Exam 2.", "out": "10"}, {"id": "r9", "t": "rec", "k": "write", "title": "triangleRec", "hl": "p.79", "q": "Write triangleRec(n) using recursion: 1 when n is 1, otherwise n + triangleRec(n - 1). Print triangleRec(4).", "a": "def triangleRec(n):\n    if n == 1:\n        return 1\n    else:\n        return n + triangleRec(n - 1)\n\nprint(triangleRec(4))", "chk": ["Base case: if n == 1: return 1", "else: with the colon", "return n + triangleRec(n - 1)", "Function name is spelled the same in both places"], "why": "Same pattern as factorial, with + in place of *.", "out": "10"}, {"id": "r10", "t": "rec", "k": "output", "title": "Trace triangleRec(4)", "q": "Write the chain of calls for triangleRec(4). Then write what prints.", "code": "def triangleRec(n):\n    if n == 1:\n        return 1\n    else:\n        return n + triangleRec(n - 1)\n\nprint(triangleRec(4))", "chk": ["4 + triangleRec(3)", "3 + triangleRec(2), then 2 + triangleRec(1)", "triangleRec(1) = 1", "Output is 10"], "why": "4 + 3 + 2 + 1 = 10.", "a": "10"}, {"id": "r11", "t": "rec", "k": "write", "title": "Twist: power of 2", "q": "New problem, same pattern. Write a recursive function power2(n) that returns 2 to the power n: 1 when n is 0, otherwise 2 * power2(n - 1). Print power2(5).", "a": "def power2(n):\n    if n == 0:\n        return 1\n    else:\n        return 2 * power2(n - 1)\n\nprint(power2(5))", "chk": ["Base case returns 1 when n == 0", "Recursive case: 2 * power2(n - 1)", "Colons after def, if and else", "Output would be 32"], "why": "Every recursive function has a base case that stops it and a call to itself with a smaller value.", "out": "32"}, {"id": "r12", "t": "rec", "k": "say", "title": "Recursive vs iterative", "q": "Write what recursion means and what iterative means. Then write one downside of recursion.", "a": "Recursion: a function that calls itself. Iterative: the same job done with a loop. Downside: each call runs another copy of the function, so recursion can use a lot of memory and Python limits how deep it can go.", "chk": ["Recursion = a function calls itself", "Iterative = uses a loop", "Recursion can use a lot of memory or has a depth limit"]}, {"id": "d1", "t": "dice", "k": "write", "title": "All 36 rolls", "q": "Write a double for loop that prints every outcome of rolling two dice, one pair per line (1 1, 1 2, ... 6 6).", "a": "for d1 in range(1, 7):\n    for d2 in range(1, 7):\n        print(d1, d2)", "chk": ["Outer loop: for d1 in range(1, 7):", "Inner loop is indented and uses a different variable", "Both ranges are (1, 7) so 6 is included", "print is indented twice", "Colon on both for lines"], "why": "range(1, 7) gives 1 to 6. The inner loop runs fully for each value of the outer loop: 6 x 6 = 36 lines."}, {"id": "d2", "t": "dice", "k": "output", "title": "Small double loop", "q": "Write exactly what this prints.", "code": "for i in range(1, 3):\n    for j in range(1, 4):\n        print(i + j, end=\" \")\n    print()", "chk": ["Two rows", "Row 1: 2 3 4", "Row 2: 3 4 5"], "why": "i is 1 then 2. For each i, j runs 1, 2, 3. The empty print() ends the row.", "a": "2 3 4 \n3 4 5 "}, {"id": "d3", "t": "dice", "k": "output", "title": "Star grid", "q": "Write exactly what this prints.", "code": "for i in range(3):\n    for j in range(2):\n        print(\"*\", end=\"\")\n    print()", "chk": ["3 rows", "2 stars in each row", "No spaces between stars"], "why": "Outer loop = rows. Inner loop = what goes in each row. end=\"\" keeps the stars on one line.", "a": "**\n**\n**"}, {"id": "d4", "t": "dice", "k": "write", "title": "Count the sevens", "q": "Write a program that uses a double for loop to count how many of the 36 two-dice outcomes add up to 7. Print the count and the probability.", "a": "count = 0\nfor d1 in range(1, 7):\n    for d2 in range(1, 7):\n        if d1 + d2 == 7:\n            count += 1\n\nprint(count)\nprint(count / 36)", "chk": ["count = 0 comes before the loops", "Two for loops, both range(1, 7), with colons", "if d1 + d2 == 7: uses two equals signs and a colon", "count += 1 is indented under the if", "The prints are outside both loops, not indented", "Probability divides by 36"], "why": "Six pairs make 7: (1,6) (2,5) (3,4) (4,3) (5,2) (6,1). So 6 / 36.", "out": "6\n0.16666666666666666"}, {"id": "d5", "t": "dice", "k": "output", "title": "Count the doubles", "q": "Write exactly what this prints. List the pairs that count on the side.", "code": "count = 0\nfor d1 in range(1, 7):\n    for d2 in range(1, 7):\n        if d1 == d2:\n            count += 1\nprint(count, \"out of 36\")", "chk": ["Listed (1,1) through (6,6)", "Output is: 6 out of 36"], "why": "Doubles are the six pairs where both dice match.", "a": "6 out of 36"}, {"id": "d6", "t": "dice", "k": "output", "title": "Sum of 10 or more", "q": "Write exactly what this prints. List the pairs that count on the side.", "code": "count = 0\nfor d1 in range(1, 7):\n    for d2 in range(1, 7):\n        if d1 + d2 >= 10:\n            count += 1\n            print(d1, d2)\nprint(count)", "chk": ["Pairs are printed in loop order, starting 4 6", "Six pairs in all", "Last line is 6"], "why": "d1 is the slow loop. 4 6, then 5 5, 5 6, then 6 4, 6 5, 6 6.", "a": "4 6\n5 5\n5 6\n6 4\n6 5\n6 6\n6"}, {"id": "d7", "t": "dice", "k": "write", "title": "Tally every sum", "q": "Write a program that counts how many ways each sum from 2 to 12 can be rolled with two dice. Use a list of counters. Print each sum with its count.", "a": "counts = [0] * 13\nfor d1 in range(1, 7):\n    for d2 in range(1, 7):\n        counts[d1 + d2] += 1\n\nfor s in range(2, 13):\n    print(s, counts[s])", "chk": ["A list of 13 zeros so index 12 exists", "Double loop over range(1, 7)", "counts[d1 + d2] += 1 uses square brackets", "Second loop goes range(2, 13) to include 12", "Prints the sum and counts[s]"], "why": "The sum is used as the list index. 7 has the most ways (6). 2 and 12 have one each.", "out": "2 1\n3 2\n4 3\n5 4\n6 5\n7 6\n8 5\n9 4\n10 3\n11 2\n12 1"}, {"id": "d8", "t": "dice", "k": "fix", "title": "Red pen: broken dice loop", "q": "This code should count the rolls that add up to 7. It has four mistakes. Rewrite it correctly.", "code": "for d1 in range(1, 6):\n    for d2 in range(1, 6)\n        if d1 + d2 = 7:\n            count += 1\nprint(count)", "a": "count = 0\nfor d1 in range(1, 7):\n    for d2 in range(1, 7):\n        if d1 + d2 == 7:\n            count += 1\nprint(count)", "chk": ["Added count = 0 before the loops", "Changed both ranges to (1, 7)", "Added the missing colon on the inner for", "Changed = to == in the if"], "why": "range(1, 6) stops at 5. A counter must start at 0. = stores, == compares.", "out": "6"}, {"id": "d9", "t": "dice", "k": "say", "title": "Dice probabilities by hand", "q": "By hand: how many outcomes are there for two dice? Write the probability of a sum of 7, of doubles, and of a sum of 12, as fractions.", "a": "36 outcomes (6 x 6). Sum of 7: 6/36 = 1/6. Doubles: 6/36 = 1/6. Sum of 12: 1/36.", "chk": ["36 outcomes", "Sum of 7 is 6/36", "Doubles is 6/36", "Sum of 12 is 1/36"]}, {"id": "m0", "t": "sim", "k": "write", "title": "The simulation skeleton", "q": "Every program in the Nov 16 notes has the same five parts. Write the skeleton from memory, with a comment where the experiment goes.", "a": "import random\n\ntrials = 10000\nsuccesses = 0\n\nfor i in range(trials):\n    # do one experiment\n    # if it worked: successes += 1\n\nprint(\"Estimated probability:\", successes / trials)", "chk": ["import random on line 1", "trials = 10000", "A counter that starts at 0", "for i in range(trials): with i and a colon", "The final print is not indented", "It divides the counter by trials"], "why": "If you blank on a simulation question, write this skeleton first. It earns partial credit and shows you what is missing."}, {"id": "m1", "t": "sim", "k": "write", "title": "Three coin flips", "q": "Simulate 10000 trials of flipping a coin 3 times. Estimate the probability of at least one head. Also print the theoretical probability.", "a": "import random\n\ntrials = 10000\nsuccesses = 0\n\nfor i in range(trials):\n    heads = 0\n\n    for j in range(3):\n        coin = random.choice([\"H\", \"T\"])\n\n        if coin == \"H\":\n            heads += 1\n\n    if heads >= 1:\n        successes += 1\n\nprint(\"Estimated probability:\", successes / trials)\nprint(\"Theoretical probability:\", 7 / 8)", "chk": ["import random", "heads = 0 is inside the trial loop, before the flips", "Inner loop: for j in range(3):", "random.choice([\"H\", \"T\"]) with square brackets and quotes", "if coin == \"H\": with two equals signs", "if heads >= 1: lines up with the inner for, not inside it", "Prints successes / trials, then 7 / 8"], "why": "heads resets for every trial. The check for success happens after the three flips. Theoretical: 1 - (1/2)^3 = 7/8."}, {"id": "m2", "t": "sim", "k": "write", "title": "Rolls until a 6", "q": "Simulate 10000 trials of rolling a die until a 6 comes up. Print the average number of rolls.", "a": "import random\n\ntrials = 10000\ntotal_rolls = 0\n\nfor i in range(trials):\n    rolls = 0\n\n    while True:\n        die = random.randint(1, 6)\n        rolls += 1\n\n        if die == 6:\n            break\n\n    total_rolls += rolls\n\nprint(\"Average number of rolls:\", total_rolls / trials)", "chk": ["rolls = 0 is inside the trial loop", "while True: with a capital T and a colon", "random.randint(1, 6)", "rolls += 1 happens on every roll", "if die == 6: then break", "total_rolls += rolls is outside the while, inside the for", "Prints total_rolls / trials"], "why": "while True repeats until break. The answer comes out close to 6."}, {"id": "m3", "t": "sim", "k": "write", "title": "Guessing on a quiz", "q": "A quiz has 5 questions with 4 choices each. A student guesses every one. Simulate 10000 trials and estimate the probability of passing with at least 3 correct.", "a": "import random\n\ntrials = 10000\npasses = 0\n\nfor i in range(trials):\n    correct = 0\n\n    for question in range(5):\n        guess = random.randint(1, 4)\n\n        if guess == 1:\n            correct += 1\n\n    if correct >= 3:\n        passes += 1\n\nprint(\"Estimated probability of passing:\", passes / trials)", "chk": ["correct = 0 is inside the trial loop", "Inner loop runs 5 times", "random.randint(1, 4) for four choices", "if guess == 1: counts a correct answer", "if correct >= 3: is after the inner loop", "Prints passes / trials"], "why": "Choice 1 stands for the right answer. Each guess is right 1 time in 4. The result is close to 0.10."}, {"id": "m4", "t": "sim", "k": "write", "title": "Two reds from the bag", "q": "A bag has 3 red and 2 blue marbles. Draw 2 without putting any back. Simulate 10000 trials and estimate the probability that both are red. Also print the theoretical probability.", "a": "import random\n\nbag = [\"R\", \"R\", \"R\", \"B\", \"B\"]\n\ntrials = 10000\nsuccesses = 0\n\nfor i in range(trials):\n    drawn = random.sample(bag, 2)\n\n    if drawn == [\"R\", \"R\"]:\n        successes += 1\n\nprint(\"Estimated probability:\", successes / trials)\nprint(\"Theoretical probability:\", (3 / 5) * (2 / 4))", "chk": ["bag is a list with 3 \"R\" and 2 \"B\"", "random.sample(bag, 2) draws two without replacement", "if drawn == [\"R\", \"R\"]: compares to a list", "successes += 1 is under the if", "Theoretical: (3 / 5) * (2 / 4)"], "why": "sample never picks the same marble twice. First red is 3 of 5, second red is 2 of the 4 left: 0.3."}, {"id": "m5", "t": "sim", "k": "write", "title": "Birthday match", "q": "Simulate 10000 rooms of 23 people with random birthdays (1 to 365). Estimate the probability that at least two people share a birthday.", "a": "import random\n\ntrials = 10000\nmatches = 0\n\nfor i in range(trials):\n    birthdays = []\n\n    for person in range(23):\n        birthday = random.randint(1, 365)\n        birthdays.append(birthday)\n\n    if len(set(birthdays)) < len(birthdays):\n        matches += 1\n\nprint(\"Estimated probability:\", matches / trials)", "chk": ["birthdays = [] is inside the trial loop", "Inner loop runs 23 times", "random.randint(1, 365)", "birthdays.append(birthday)", "len(set(birthdays)) < len(birthdays) checks for a repeat", "Prints matches / trials"], "why": "A set drops duplicates. If the set is shorter than the list, two people matched. The result is close to 0.51."}, {"id": "m6", "t": "sim", "k": "write", "title": "Random walk", "q": "Start at position 0. Take 10 steps, each -1 or +1 at random. Simulate 10000 walks and estimate the probability of ending back at 0. Also print the theoretical probability.", "a": "import random\n\ntrials = 10000\nreturns = 0\n\nfor i in range(trials):\n    position = 0\n\n    for step in range(10):\n        move = random.choice([-1, 1])\n        position += move\n\n    if position == 0:\n        returns += 1\n\nprint(\"Estimated probability:\", returns / trials)\nprint(\"Theoretical probability:\", 252 / 1024)", "chk": ["position = 0 is inside the trial loop", "Inner loop runs 10 times", "random.choice([-1, 1]) with square brackets", "position += move", "if position == 0: is after the inner loop", "Theoretical: 252 / 1024"], "why": "To end at 0 you need 5 steps each way. There are 252 ways out of 2^10 = 1024."}, {"id": "m7", "t": "sim", "k": "write", "title": "Twist: two dice, sum of 7", "q": "New problem, same skeleton. Simulate 10000 rolls of two dice and estimate the probability that the sum is 7. Also print the theoretical probability.", "a": "import random\n\ntrials = 10000\nsevens = 0\n\nfor i in range(trials):\n    d1 = random.randint(1, 6)\n    d2 = random.randint(1, 6)\n\n    if d1 + d2 == 7:\n        sevens += 1\n\nprint(\"Estimated probability:\", sevens / trials)\nprint(\"Theoretical probability:\", 6 / 36)", "chk": ["import random and trials = 10000", "Counter starts at 0", "Two separate randint(1, 6) calls", "if d1 + d2 == 7:", "Prints counter / trials and 6 / 36"], "why": "The double for loop counts all 36 outcomes exactly. The simulation estimates the same number by trying it many times."}, {"id": "m8", "t": "sim", "k": "say", "title": "What the random tools return", "q": "Write what each one gives back: random.randint(1, 6), random.choice([\"H\", \"T\"]), random.sample(bag, 2).", "a": "random.randint(1, 6): a random whole number from 1 to 6, both ends included.\nrandom.choice([\"H\", \"T\"]): one item picked at random from the list.\nrandom.sample(bag, 2): a list of 2 different items from bag (no repeats of the same marble).", "chk": ["randint includes both 1 and 6", "choice picks one item from a list", "sample gives a list of items with no replacement"]}, {"id": "m9", "t": "sim", "k": "say", "title": "Theoretical answers by hand", "q": "Show the work for each theoretical probability: at least one head in 3 flips, two reds from the bag of 3 red and 2 blue, ending at 0 after 10 steps.", "a": "At least one head: 1 - (1/2)(1/2)(1/2) = 1 - 1/8 = 7/8 = 0.875\nTwo reds: (3/5) * (2/4) = 6/20 = 0.3\nBack at 0: 252 / 1024, about 0.246", "chk": ["7/8 from 1 minus the chance of no heads", "(3/5) * (2/4) = 0.3", "252 / 1024"]}, {"id": "m10", "t": "sim", "k": "fix", "title": "Red pen: broken simulation", "q": "This coin simulation gives a probability near 1.0, which is wrong. One line is in the wrong place. Rewrite the loop correctly and write what was wrong.", "code": "successes = 0\nheads = 0\n\nfor i in range(trials):\n    for j in range(3):\n        coin = random.choice([\"H\", \"T\"])\n        if coin == \"H\":\n            heads += 1\n    if heads >= 1:\n        successes += 1", "a": "successes = 0\n\nfor i in range(trials):\n    heads = 0\n    for j in range(3):\n        coin = random.choice([\"H\", \"T\"])\n        if coin == \"H\":\n            heads += 1\n    if heads >= 1:\n        successes += 1", "chk": ["Moved heads = 0 inside the trial loop", "Said why: heads was never reset, so it kept growing"], "why": "Anything that belongs to one trial must be reset at the top of the trial loop."}, {"id": "m11", "t": "sim", "k": "say", "title": "Estimated vs theoretical", "q": "Her run printed 0.8728 and the theoretical value is 0.875. Write why they are not equal, and what happens if trials is made bigger.", "a": "The estimate comes from random trials, so it changes a little on every run. The theoretical value is the exact answer. With more trials the estimate gets closer to it.", "chk": ["The estimate is random, so it varies", "The theoretical value is exact", "More trials gives a closer estimate"]}, {"id": "x1", "t": "slips", "k": "fix", "title": "= vs ==, and the colon", "q": "Exam 2, question 14. Rewrite these two lines correctly.", "code": "a = 0\nb = 5\nif a = 0\n    if b != 0\n        print(\"linear\")", "a": "a = 0\nb = 5\nif a == 0:\n    if b != 0:\n        print(\"linear\")", "chk": ["if a == 0: uses two equals signs", "Colon at the end of both if lines", "Not equal is written !="], "why": "One = stores a value. Two == asks a question. Every if, elif, else, for, while and def line ends with a colon.", "out": "linear"}, {"id": "x2", "t": "slips", "k": "write", "title": "Sum and average with range(len())", "q": "Exam 2, question 8. numbers = [4, 9, 7, 12, 8]. Use for i in range(len(numbers)) to calculate and print the sum and the average. Do not use sum().", "a": "numbers = [4, 9, 7, 12, 8]\n\ntotal = 0\nfor i in range(len(numbers)):\n    total = total + numbers[i]\n\naverage = total / len(numbers)\nprint(total)\nprint(average)", "chk": ["The loop has its variable: for i in ...", "Adds numbers[i], one item, not the whole list", "average = total / len(numbers)", "The prints are outside the loop", "print has both parentheses"], "why": "On the exam the i was missing and the whole list was added. numbers[i] is one item at position i.", "out": "40\n8.0"}, {"id": "x3", "t": "slips", "k": "write", "title": "Loop over a dictionary", "q": "Exam 2, question 10. grades = {\"Amy\": 88, \"Ben\": 91, \"Cindy\": 76}. Write a for loop that prints each name and score.", "a": "grades = {\"Amy\": 88, \"Ben\": 91, \"Cindy\": 76}\n\nfor name, score in grades.items():\n    print(name, score)", "chk": ["Two loop variables before in: name, score", "in grades.items(): with ( ) and a colon", "print(name, score) has no quotes around the variables"], "why": "Quotes turn a variable into plain text. print(\"name\") prints the word name.", "out": "Amy 88\nBen 91\nCindy 76"}, {"id": "x4", "t": "slips", "k": "output", "title": "end=\"-\"", "q": "Exam 2, question 4c. Write exactly what this prints.", "code": "for i in range(4):\n    print(i, end=\"-\")", "chk": ["A dash after every number", "Including a dash after the 3", "All on one line"], "why": "end replaces the new line with whatever is in the quotes. It is added after every print, including the last.", "a": "0-1-2-3-"}, {"id": "x5", "t": "slips", "k": "output", "title": "Slices and len", "q": "Exam 2, question 6. Write exactly what this prints.", "code": "L = [6, 12, 18, 24, 30, 36]\nprint(L[2:5])\nprint(len(L))", "chk": ["The slice has [ ] and commas", "The slice stops before index 5: no 36", "len is a single number, 6"], "why": "A slice stops before the second number. len counts the items, it does not list them.", "a": "[18, 24, 30]\n6"}, {"id": "x6", "t": "slips", "k": "output", "title": "List methods, step by step", "q": "Exam 2, question 7. Write the entire list after each step.", "code": "a = [9, 2, 7, 4]\na.append(5)\nprint(a)\na.insert(1, 8)\nprint(a)\ndel a[2]\nprint(a)\na.sort()\nprint(a)", "chk": ["append puts 5 at the end", "insert(1, 8) puts 8 at index 1, after the 9", "del a[2] removes the item at index 2, the 2", "Each step starts from the list before it", "sort gives [4, 5, 7, 8, 9]"], "why": "Each command changes the list left by the one before. Index 0 is the first item.", "a": "[9, 2, 7, 4, 5]\n[9, 8, 2, 7, 4, 5]\n[9, 8, 7, 4, 5]\n[4, 5, 7, 8, 9]"}, {"id": "x7", "t": "slips", "k": "output", "title": "Tuples print with ( )", "q": "Exam 2, question 9. Write the complete output, in order.", "code": "T = (2, 20, 200)\nt1 = T + (2000,)\nt2 = T * 2\nprint(t1)\nprint(t2)\nprint(20 in T)\nprint(5 not in T)\nfor v in T:\n    print(v, end=\"-\")", "chk": ["Tuples are written with ( ) and commas", "t2 repeats the tuple twice", "20 in T prints True", "5 not in T prints True", "Last line: 2-20-200-"], "why": "in and not in print True or False, not the number.", "a": "(2, 20, 200, 2000)\n(2, 20, 200, 2, 20, 200)\nTrue\nTrue\n2-20-200-"}, {"id": "x8", "t": "slips", "k": "write", "title": "Positive Even / Odd", "q": "Exam 2, question 3. Ask for an integer. Print Positive Even, Positive Odd, or Not Positive. Use if / elif / else and %.", "a": "x = int(input(\"Enter an integer: \"))\n\nif x > 0 and x % 2 == 0:\n    print(\"Positive Even\")\nelif x > 0:\n    print(\"Positive Odd\")\nelse:\n    print(\"Not Positive\")", "chk": ["Checks x > 0", "Even test is x % 2 == 0, a full comparison", "Colons after if, elif and else", "elif and else line up with if"], "why": "x % 2 alone is not a test. Compare it to 0. And positive has to be checked too."}, {"id": "x9", "t": "slips", "k": "write", "title": "Ask again, then while-sum", "q": "Exam 2, question 5. Ask for a positive integer n. While n <= 0, keep asking. Then use a while loop to calculate and print 1 + 2 + ... + n.", "a": "n = int(input(\"Enter a positive integer: \"))\nwhile n <= 0:\n    n = int(input(\"Enter a positive integer: \"))\n\ntotal = 0\ni = 1\nwhile i <= n:\n    total = total + i\n    i = i + 1\n\nprint(total)", "chk": ["First while repeats the input while n <= 0", "total = 0 and i = 1 before the second loop", "while i <= n: with a colon", "i = i + 1 inside the loop so it ends", "print(total) is outside the loop"], "why": "This was left blank for 9 points. Writing the input, the two while lines and the print already earns most of them."}, {"id": "x10", "t": "slips", "k": "write", "title": "Linear equation solver", "q": "Exam 2, question 12. Solve ax + b = 0. Ask for a and b as floats. Print the solution if a is not 0, All solutions if a and b are both 0, and No solution otherwise.", "a": "a = float(input(\"Enter a: \"))\nb = float(input(\"Enter b: \"))\n\nif a != 0:\n    print(-b / a)\nelif b == 0:\n    print(\"All solutions\")\nelse:\n    print(\"No solution\")", "chk": ["Not equal is written a != 0", "Prints the actual solution, -b / a", "elif b == 0: for All solutions", "else: for No solution"], "why": "Print the number, not the word Solution. x = -b / a."}, {"id": "x11", "t": "slips", "k": "say", "title": "Importing sqrt", "q": "Write the import line that lets you call sqrt(D). Then write the line that sets D to the discriminant b squared minus 4ac.", "a": "from math import sqrt\n\nD = b ** 2 - 4 * a * c", "chk": ["from math import sqrt, in that order", "b ** 2 for b squared", "4 * a * c with the * signs"]}], "mocks": {"A": [["f4", 6], ["s1", 6], ["s2", 6], ["f6", 8], ["r2", 8], ["r5", 12], ["r6", 12], ["d3", 6], ["d4", 12], ["m1", 12], ["m2", 12]], "B": [["f11", 6], ["s3", 6], ["s6", 6], ["r10", 8], ["f3", 8], ["r3", 8], ["r8", 10], ["d2", 6], ["d7", 12], ["f7", 6], ["m3", 12], ["m6", 12]]}, "topics": [["fn", "Functions", "Lecture 8, p.67 to 71 and 79 to 80"], ["scope", "Scope and side effects", "Lecture 8, p.71 to 74 and 80 to 82"], ["rec", "Recursion", "Lecture 8, p.74 to 79"], ["dice", "Dice and double for loops", "Class notes, Nov 11"], ["sim", "Simulations", "Class notes, Nov 16 and the notebook"], ["slips", "Red pen list", "Points lost on Exam 2"]]};
+const C=Object.fromEntries(BANK.cards.map(c=>[c.id,c]));
+const EXAM=BANK.cards.filter(c=>c.t!=='slips');
+const KIND={write:'Write the code',output:'Write the output',fix:'Fix it',say:'Write it in words'};
+const KEY='pencil-reps-v1';
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+
+/* ---------- saved progress (this browser only) ---------- */
+let S={cards:{},mock:{},paper:false};
+try{Object.assign(S,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const status=c=>{const r=S.cards[c.id];return !r?0:r.ready?2:1};
+const readyIn=t=>BANK.cards.filter(c=>c.t===t&&status(c)===2).length;
+const countIn=t=>BANK.cards.filter(c=>c.t===t).length;
+function meter(){
+  const p=Math.round(100*EXAM.filter(c=>status(c)===2).length/EXAM.length);
+  $('#meterN').textContent=p+'%';$('#meterBar').style.width=p+'%';
+}
+
+/* ---------- Claude marking (only where the page is allowed to ask) ---------- */
+let SAMPLE=null;
+(async()=>{try{if(window.claude&&claude.use){const s=await claude.use('sample');if(s){const l=await s.limits().catch(()=>null);if(l&&l.images){SAMPLE=s;document.querySelectorAll('.needs-ai').forEach(e=>e.hidden=false)}}}}catch(e){}})();
+
+/* ---------- handwriting pad ---------- */
+const LH=36,TOP=44,MARGIN=34;
+function palette(light){
+  if(light) return {sheet:'#ffffff',rule:'#c9d6ea',red:'#cf2f2a',ghost:'#b9c4d8',pen:'#1b2a66'};
+  const g=getComputedStyle(document.documentElement),v=n=>g.getPropertyValue(n).trim();
+  return {sheet:v('--sheet'),rule:v('--rule'),red:v('--red'),ghost:v('--ghost'),pen:v('--pen')};
+}
+function paint(ctx,w,h,strokes,ghost,col){
+  ctx.fillStyle=col.sheet;ctx.fillRect(0,0,w,h);
+  let fs=18;
+  if(ghost){const max=Math.max(10,...ghost.map(l=>l.length));fs=Math.max(9,Math.min(19,(w-MARGIN-10)/(max*0.602)))}
+  const ind=ghost?fs*0.602*4:40;
+  ctx.lineWidth=1;ctx.strokeStyle=col.rule;
+  ctx.setLineDash([2,5]);
+  for(let k=1;k<=4;k++){const x=MARGIN+ind*k;if(x<w){ctx.beginPath();ctx.moveTo(x,8);ctx.lineTo(x,h-8);ctx.stroke()}}
+  ctx.setLineDash([]);
+  for(let y=TOP;y<h;y+=LH){ctx.beginPath();ctx.moveTo(0,y+.5);ctx.lineTo(w,y+.5);ctx.stroke()}
+  ctx.strokeStyle=col.red;ctx.globalAlpha=.5;ctx.beginPath();ctx.moveTo(MARGIN-8,0);ctx.lineTo(MARGIN-8,h);ctx.stroke();ctx.globalAlpha=1;
+  if(ghost){ctx.font=fs+'px "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace';ctx.fillStyle=col.ghost;ctx.textBaseline='alphabetic';
+    ghost.forEach((l,i)=>ctx.fillText(l,MARGIN,TOP+i*LH-8))}
+  ctx.strokeStyle=col.pen;ctx.fillStyle=col.pen;ctx.lineWidth=2.6;ctx.lineCap='round';ctx.lineJoin='round';
+  for(const s of strokes){
+    if(s.length===1){ctx.beginPath();ctx.arc(s[0][0],s[0][1],1.6,0,7);ctx.fill();continue}
+    ctx.beginPath();ctx.moveTo(s[0][0],s[0][1]);
+    for(let i=1;i<s.length-1;i++){const mx=(s[i][0]+s[i+1][0])/2,my=(s[i][1]+s[i+1][1])/2;ctx.quadraticCurveTo(s[i][0],s[i][1],mx,my)}
+    const e=s[s.length-1];ctx.lineTo(e[0],e[1]);ctx.stroke();
+  }
+}
+function snapshot(strokes,w,h){           /* always light, cropped to the writing */
+  let maxY=120;for(const s of strokes)for(const p of s)if(p[1]>maxY)maxY=p[1];
+  h=Math.min(h,Math.ceil(maxY+30));
+  const c=document.createElement('canvas');c.width=w*2;c.height=h*2;const x=c.getContext('2d');x.scale(2,2);
+  paint(x,w,h,strokes,null,palette(true));return c;
+}
+class Pad{
+  constructor(host,o={}){
+    this.host=host;this.strokes=o.strokes||[];this.ghost=o.ghost||null;this.h=o.h||330;this.w=o.w||0;this.cur=null;this.pen=false;
+    if(this.ghost)this.h=Math.max(this.h,this.ghost.length*LH+TOP+16);
+    for(const s of this.strokes)for(const p of s)if(p[1]+40>this.h)this.h=Math.ceil(p[1]+40);
+    this.c=document.createElement('canvas');this.c.className='pad';this.c.setAttribute('role','img');this.c.setAttribute('aria-label','Handwriting paper');
+    host.appendChild(this.c);this.x=this.c.getContext('2d');
+    const pos=e=>{const r=this.c.getBoundingClientRect();return [Math.round((e.clientX-r.left)*10)/10,Math.round((e.clientY-r.top)*10)/10]};
+    this.c.addEventListener('pointerdown',e=>{
+      if(e.pointerType==='pen')this.pen=true;
+      if(this.pen&&e.pointerType==='touch')return;      /* palm rejection once a stylus is seen */
+      e.preventDefault();try{this.c.setPointerCapture(e.pointerId)}catch(_){}
+      this.cur=[pos(e)];this.id=e.pointerId;
+    });
+    this.c.addEventListener('pointermove',e=>{
+      if(!this.cur||e.pointerId!==this.id)return;
+      const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
+      const col=palette();this.x.strokeStyle=col.pen;this.x.lineWidth=2.6;this.x.lineCap='round';
+      for(const ev of (evs.length?evs:[e])){const a=this.cur[this.cur.length-1],b=pos(ev);
+        this.x.beginPath();this.x.moveTo(a[0],a[1]);this.x.lineTo(b[0],b[1]);this.x.stroke();this.cur.push(b)}
+    });
+    const end=e=>{if(!this.cur||e.pointerId!==this.id)return;this.strokes.push(this.cur);this.cur=null;this.draw();if(o.onchange)o.onchange()};
+    this.c.addEventListener('pointerup',end);this.c.addEventListener('pointercancel',end);
+    this.ro=new ResizeObserver(()=>this.fit());this.ro.observe(host);this.fit();
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>this.draw());
+  }
+  fit(){const w=this.host.clientWidth;if(!w)return;this.w=w;const d=window.devicePixelRatio||1;
+    this.c.style.height=this.h+'px';this.c.width=Math.round(w*d);this.c.height=Math.round(this.h*d);this.x.setTransform(d,0,0,d,0,0);this.draw()}
+  draw(){if(this.w)paint(this.x,this.w,this.h,this.strokes,this.ghost,palette())}
+  undo(){this.strokes.pop();this.draw()}
+  clear(){this.strokes=[];this.draw()}
+  more(){this.h+=6*LH;this.fit()}
+  blob(){return new Promise(r=>snapshot(this.strokes,this.w,this.h).toBlob(r,'image/png'))}
+}
+function padBlock(id){
+  return `<div class="padbox" id="${id}">
+    <div class="padhost"></div>
+    <div class="row"><button class="btn ghost small" data-pad="undo">Undo stroke</button><button class="btn ghost small" data-pad="clear">Clear page</button><button class="btn ghost small" data-pad="more">More paper</button>
+    <label class="row muted" style="gap:6px;margin-left:auto;font-size:15px"><input type="checkbox" id="${id}-paper" ${S.paper?'checked':''}> I am writing on real paper</label></div>
+  </div>`;
+}
+function mountPad(id,opts){
+  const box=$('#'+id),host=$('.padhost',box);let pad=null;
+  const build=()=>{host.innerHTML='';host.className='padhost';
+    if(S.paper){pad=null;host.className='papernote';host.style.lineHeight='1.5';host.innerHTML='<b>Paper mode.</b><br>Write this one with a real pencil. Skip lines the way you would on the exam.';
+      box.querySelectorAll('[data-pad]').forEach(b=>b.hidden=true)}
+    else{host.style.lineHeight='0';pad=new Pad(host,opts());box.querySelectorAll('[data-pad]').forEach(b=>b.hidden=false)}};
+  build();
+  box.addEventListener('click',e=>{const a=e.target.dataset&&e.target.dataset.pad;if(a&&pad)pad[a]()});
+  $('#'+id+'-paper').addEventListener('change',e=>{S.paper=e.target.checked;save();build()});
+  return {get pad(){return pad},rebuild:build};
+}
+
+/* ---------- views ---------- */
+const V={tab:'plan',topic:'fn',card:null,level:1,mock:null};
+const view=$('#view');
+function go(tab){V.tab=tab;V.card=null;if(location.hash!=='#'+tab)history.replaceState(null,'','#'+tab);render()}
+function render(){
+  document.querySelectorAll('nav button').forEach(b=>b.toggleAttribute('aria-current',false));
+  $('#tab-'+V.tab).setAttribute('aria-current','page');meter();
+  if(V.tab==='plan')plan();else if(V.tab==='practice')(V.card?bench():list());else mock();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.tab)));
+window.addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(['plan','practice','mock'].includes(t)&&t!==V.tab)go(t)});
+
+function plan(){
+  const tn=Object.fromEntries(BANK.topics.map(t=>[t[0],t]));
+  const rowT=t=>`<li><span><b>${tn[t][1]}</b> <span class="muted">${tn[t][2]}</span></span><span class="row"><span class="n">${readyIn(t)} of ${countIn(t)} ready</span><button class="btn small" data-topic="${t}">Open</button></span></li>`;
+  const best=k=>S.mock[k]!=null?`best ${S.mock[k]} / 100`:'not taken';
+  view.innerHTML=`
+  <section class="sheet"><div class="steps">
+    <div><b>1. Trace</b>The code is printed faintly on the paper. Write over it. Say each colon and indent out loud.</div>
+    <div><b>2. Copy</b>The code sits beside the paper. Copy it line by line.</div>
+    <div><b>3. From memory</b>The code is hidden. Write it cold. Only this step counts toward the 80.</div>
+    <div><b>Then mark it</b>Put the pen down, show the answer, and tick the rubric the way a grader would.</div>
+  </div></section>
+  <section class="sheet day"><div class="row" style="justify-content:space-between"><h2>Functions and recursion</h2><span class="when">Day 1</span></div>
+    <p class="muted">All of Lecture 8. Start with the cards marked <span class="hl">highlighted</span>. Those are the passages highlighted in the textbook.</p>
+    <ul>${rowT('fn')}${rowT('scope')}${rowT('rec')}</ul>
+    <div class="away"><b>Away from the screen:</b> stack three sticky notes labelled f(3), f(2), f(1). Peel them off from the top and say what each one returns.</div></section>
+  <section class="sheet day"><div class="row" style="justify-content:space-between"><h2>Dice loops and simulations</h2><span class="when">Day 2</span></div>
+    <p class="muted">The double for loop from Nov 11 and the six simulation programs from Nov 16.</p>
+    <ul>${rowT('dice')}${rowT('sim')}</ul>
+    <div class="away"><b>Away from the screen:</b> roll two real dice 36 times. Tally the sums on paper. Then compare with the card called Tally every sum.</div></section>
+  <section class="sheet day"><div class="row" style="justify-content:space-between"><h2>Mock exam and red pen list</h2><span class="when">Day 3</span></div>
+    <p class="muted">Take Mock A. Redo every card that lost points. Finish the red pen list. Then take Mock B.</p>
+    <ul>
+      <li><span><b>Mock exam A</b> <span class="muted">100 points</span></span><span class="row"><span class="n">${best('A')}</span><button class="btn small" data-mock="A">Start</button></span></li>
+      ${rowT('slips')}
+      <li><span><b>Mock exam B</b> <span class="muted">100 points</span></span><span class="row"><span class="n">${best('B')}</span><button class="btn small" data-mock="B">Start</button></span></li>
+    </ul>
+    <div class="away"><b>The night before:</b> on real paper, write the simulation skeleton and both factorial functions twice each. No screen.</div></section>`;
+  view.onclick=e=>{const d=e.target.dataset||{};
+    if(d.topic){V.topic=d.topic;go('practice')}
+    if(d.mock){V.tab='mock';startMock(d.mock)}};
+}
+
+function list(){
+  const t=BANK.topics.find(x=>x[0]===V.topic),cards=BANK.cards.filter(c=>c.t===V.topic);
+  view.innerHTML=`
+  <div class="chips" role="group" aria-label="Topics">${BANK.topics.map(x=>`<button data-topic="${x[0]}" aria-pressed="${x[0]===V.topic}">${x[1]}<small>${readyIn(x[0])}/${countIn(x[0])}</small></button>`).join('')}</div>
+  <div class="listhead"><div><h2>${t[1]}</h2><p class="muted">${t[2]}</p></div>
+    <button class="btn ghost row" id="roll"><span class="die" id="die" aria-hidden="true">${pips(5)}</span>Roll for a card</button></div>
+  <ul class="cards">${cards.map(c=>{const s=status(c);return `<li><button data-card="${c.id}"><span class="st s${s}" aria-label="${['Not started','Started','Ready'][s]}">${s===2?'✓':s===1?'·':''}</span><span class="ti">${esc(c.title)}</span>${c.hl?`<span class="hl">highlighted ${c.hl}</span>`:''}<span class="tag">${KIND[c.k]}</span></button></li>`}).join('')}</ul>`;
+  view.onclick=e=>{
+    const b=e.target.closest('button');if(!b)return;
+    if(b.dataset.topic){V.topic=b.dataset.topic;list()}
+    else if(b.dataset.card)open(b.dataset.card);
+    else if(b.id==='roll'){const pool=cards.filter(c=>status(c)!==2),from=pool.length?pool:cards,pick=from[Math.floor(Math.random()*from.length)];
+      const d=$('#die');d.classList.add('spin');let n=0;const iv=setInterval(()=>{d.innerHTML=pips(1+Math.floor(Math.random()*6));if(++n>5){clearInterval(iv);open(pick.id)}},90)}
+  };
+}
+function pips(n){const on={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]}[n];return Array.from({length:9},(_,i)=>`<i class="${on.includes(i)?'on':''}"></i>`).join('')}
+function open(id){const c=C[id],r=S.cards[id];V.card=id;V.topic=c.t;V.level=c.k==='write'?Math.min(3,((r&&r.lvl)||0)+1):3;render()}
+
+function answerHTML(c){
+  const isCode=c.k==='write'||c.k==='fix'||(c.k==='say'&&c.a.includes('\n'));
+  let h=c.k==='output'?`<p class="muted">It prints:</p><pre class="code out">${esc(c.a)}</pre>`
+    :isCode?`<pre class="code">${esc(c.a)}</pre>`:`<p style="max-width:62ch">${esc(c.a)}</p>`;
+  if(c.out)h+=`<p class="muted">It prints:</p><pre class="code out">${esc(c.out)}</pre>`;
+  return h;
+}
+function rubricHTML(c,pre){return `<ul class="rubric">${c.chk.map((t,i)=>`<li><label><input type="checkbox" id="${pre}-${i}"><span>${esc(t)}</span></label></li>`).join('')}</ul>`}
+
+function bench(){
+  const c=C[V.card],lv=V.level,isW=c.k==='write';
+  const showCode=c.code||(isW&&lv===2?c.a:null);
+  view.innerHTML=`
+  <div class="row"><button class="btn ghost small" id="back">Back to ${esc(BANK.topics.find(t=>t[0]===c.t)[1])}</button></div>
+  <div class="bench">
+    <section class="sheet ask">
+      <div class="row"><span class="tag">${KIND[c.k]}</span>${c.hl?`<span class="hl">highlighted in the textbook, ${c.hl}</span>`:''}</div>
+      <h2>${esc(c.title)}</h2>
+      <p class="q">${esc(c.q)}</p>
+      ${isW?`<div class="levels" role="group" aria-label="Step">${['1 Trace','2 Copy','3 From memory'].map((l,i)=>`<button data-level="${i+1}" aria-pressed="${lv===i+1}">${l}</button>`).join('')}</div>
+        <p class="muted">${['Write over the faint code. Keep each indent on its dotted guide.','Copy the code below onto the paper, one line at a time.','No peeking. Write the whole program, then check it.'][lv-1]}</p>`:''}
+      ${showCode?`<pre class="code">${esc(showCode)}</pre>`:''}
+    </section>
+    <section style="display:grid;gap:12px">
+      ${padBlock('pb')}
+      <div class="row" id="doneRow"><button class="btn" id="check">Pen down. Check it</button></div>
+      <div id="markSlot"></div>
+    </section>
+  </div>`;
+  const ghost=isW&&lv===1?c.a.split('\n').filter(l=>l.trim()):null;
+  const P=mountPad('pb',()=>({ghost}));
+  $('#back').onclick=()=>{V.card=null;render()};
+  view.onclick=e=>{const b=e.target.closest('[data-level]');if(b){V.level=+b.dataset.level;bench()}};
+  $('#check').onclick=()=>{
+    $('#doneRow').hidden=true;
+    $('#markSlot').innerHTML=`<div class="mark">
+      <h3>Mark it with the red pen</h3>
+      ${answerHTML(c)}
+      <p class="muted">Compare character by character. Tick only what is truly on your page.</p>
+      ${rubricHTML(c,'chk')}
+      ${c.why?`<p class="why">${esc(c.why)}</p>`:''}
+      <div class="needs-ai" ${SAMPLE?'':'hidden'}>
+        <div class="row"><button class="btn ghost small" id="aiBtn">Have Claude read my handwriting</button>
+        <label class="btn ghost small" style="display:inline-flex;align-items:center">Use a photo of my page<input type="file" id="aiFile" accept="image/*" hidden></label></div>
+        <div class="ai" id="aiOut" hidden></div>
+      </div>
+      <div class="row" style="justify-content:space-between"><span class="score" id="score">0 / ${c.chk.length}</span>
+        <span class="row"><button class="btn ghost" id="again">Try again</button><button class="btn" id="record">Record it. Next card</button></span></div>
+    </div>`;
+    const boxes=[...document.querySelectorAll('#markSlot .rubric input')];
+    const upd=()=>$('#score').textContent=boxes.filter(b=>b.checked).length+' / '+boxes.length;
+    boxes.forEach(b=>b.onchange=upd);
+    $('#again').onclick=()=>bench();
+    $('#record').onclick=()=>{
+      const frac=boxes.filter(b=>b.checked).length/boxes.length,r=S.cards[c.id]||{n:0,lvl:0};
+      r.n++;r.last=frac;if(frac>=.8)r.lvl=Math.max(r.lvl,isW?lv:3);
+      if(!isW||lv===3)r.ready=frac>=.8;
+      S.cards[c.id]=r;save();
+      if(isW&&lv<3&&frac>=.8){V.level=lv+1;render();return}
+      if(frac<.8){bench();return}
+      const rest=BANK.cards.filter(x=>x.t===c.t&&status(x)!==2);
+      if(rest.length){const i=rest.findIndex(x=>BANK.cards.indexOf(x)>BANK.cards.indexOf(c));open((rest[i>=0?i:0]).id)}else{V.card=null;render()}
+    };
+    const run=async blob=>{
+      const out=$('#aiOut');out.hidden=false;out.textContent='Reading your handwriting...';
+      try{const res=await askClaude(c,blob);
+        boxes.forEach((b,i)=>b.checked=!!res.marks[i]);upd();
+        out.innerHTML=`<b>What Claude read:</b><pre>${esc(res.read||'')}</pre><b>One thing to fix:</b><span>${esc(res.fix||'')}</span><span class="muted">Claude can misread handwriting. You have the final say on each tick.</span>`;
+      }catch(err){out.textContent=err&&err.code==='rate_limited'?'Claude is busy. Mark this one yourself and try again later.':'Claude could not read this one. Mark it yourself.'}
+    };
+    $('#aiBtn').onclick=async()=>{if(!P.pad||!P.pad.strokes.length){$('#aiOut').hidden=false;$('#aiOut').textContent='The paper is blank. Write on it, or use a photo of your page.';return}run(await P.pad.blob())};
+    $('#aiFile').onchange=async e=>{const f=e.target.files[0];if(f)run(await shrink(f))};
+    $('#markSlot').scrollIntoView({behavior:'smooth',block:'start'});
+  };
+}
+async function shrink(file){
+  try{const bm=await createImageBitmap(file),k=Math.min(1,1600/Math.max(bm.width,bm.height)),c=document.createElement('canvas');
+    c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
+    return await new Promise(r=>c.toBlob(r,'image/jpeg',.85))}catch(e){return file}
+}
+async function askClaude(c,blob){
+  const prompt=`You are marking a beginner Python student's HANDWRITTEN exam answer, shown in the image. Ignore printed ruled lines.
+Question: ${c.q}
+${c.code?'Code given with the question:\n'+c.code+'\n':''}Model answer:
+${c.a}
+Rubric (mark each item true only if it is clearly satisfied on the page):
+${c.chk.map((t,i)=>(i+1)+'. '+t).join('\n')}
+Be generous about letter shapes and spelling of prompts, but strict about Python syntax: colons, = versus ==, indentation, brackets, quotes, parentheses.
+Reply with JSON only, no prose: {"read":"<what is written, typed out line by line, keeping indentation>","marks":[true or false for each rubric item, in order],"fix":"<the single most important fix, one short encouraging sentence, or 'Nothing to fix.'>"}`;
+  const res=await SAMPLE(prompt,{images:[blob],cache:false});
+  const m=res.text.match(/\{[\s\S]*\}/);const j=JSON.parse(m[0]);
+  if(!Array.isArray(j.marks))throw new Error('bad');return j;
+}
+
+/* ---------- mock exam ---------- */
+let tick=null;
+function mock(){
+  clearInterval(tick);
+  if(!V.mock){
+    view.innerHTML=`<section class="sheet" style="display:grid;gap:14px">
+      <h2>Mock Exam 3</h2>
+      <p style="max-width:62ch">Same shape as Exam 2: trace the output, then write complete programs. No answers until you hand it in. Then you mark each question with the rubric, and the total is compared with 80.</p>
+      <p class="muted" style="max-width:62ch">The real exam allows 2 hours. Never leave a question blank. A def line, a loop line and a print line already earn points.</p>
+      <div class="row">${['A','B'].map(k=>`<button class="btn" data-mock="${k}">Start mock ${k}</button><span class="muted">${S.mock[k]!=null?'Best: '+S.mock[k]+' / 100':'Not taken yet'}</span>`).join('')}</div>
+    </section>`;
+    view.onclick=e=>{const k=e.target.dataset&&e.target.dataset.mock;if(k)startMock(k)};return;
+  }
+  V.mock.done?gradeMock():runMock();
+}
+function startMock(k){V.tab='mock';V.mock={k,i:0,ans:BANK.mocks[k].map(()=>({strokes:[],w:0,h:330})),t0:Date.now(),done:false};history.replaceState(null,'','#mock');render()}
+function runMock(){
+  const M=V.mock,qs=BANK.mocks[M.k],[id,pts]=qs[M.i],c=C[id],last=M.i===qs.length-1;
+  view.innerHTML=`
+  <div class="qhead"><h2>Mock ${M.k}, question ${M.i+1} of ${qs.length}</h2><span class="row"><span class="muted" id="clock"></span><span class="pts">[${pts} points]</span></span></div>
+  <div class="bench">
+    <section class="sheet ask"><span class="tag">${KIND[c.k]}</span><p class="q">${esc(c.q)}</p>${c.code?`<pre class="code">${esc(c.code)}</pre>`:''}</section>
+    <section style="display:grid;gap:12px">${padBlock('pm')}
+      <div class="row" style="justify-content:space-between"><button class="btn ghost" id="prev" ${M.i?'':'disabled'}>Previous</button>
+      <span class="row"><button class="btn ghost small" id="quit">Quit mock</button><button class="btn" id="next">${last?'Hand in the exam':'Next question'}</button></span></div>
+    </section>
+  </div>`;
+  const a=M.ans[M.i],P=mountPad('pm',()=>({strokes:a.strokes,h:a.h}));
+  const keep=()=>{if(P.pad){a.strokes=P.pad.strokes;a.w=P.pad.w;a.h=P.pad.h}};
+  const clock=()=>{const s=Math.floor((Date.now()-M.t0)/1000),el=$('#clock');if(el)el.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0')+' elapsed'};
+  clock();tick=setInterval(clock,1000);
+  view.onclick=null;
+  $('#prev').onclick=()=>{keep();M.i--;render()};
+  $('#next').onclick=()=>{keep();if(last)M.done=true;else M.i++;render()};
+  $('#quit').onclick=()=>{V.mock=null;render()};
+}
+function gradeMock(){
+  const M=V.mock,qs=BANK.mocks[M.k];
+  view.innerHTML=`<h2>Mark mock ${M.k} with the red pen</h2><p class="muted">Tick only what is truly on your page. Each tick is worth part of the question.</p>
+  ${qs.map(([id,pts],n)=>{const c=C[id],a=M.ans[n],img=a.strokes.length&&a.w?snapshot(a.strokes,a.w,a.h).toDataURL('image/png'):null;
+    return `<section class="sheet grade" data-q="${n}"><div class="qhead"><h3>${n+1}. ${esc(c.title)}</h3><span class="pts" id="g${n}">0 / ${pts}</span></div>
+      ${img?`<img src="${img}" alt="Your handwritten answer to question ${n+1}">`:S.paper?'<p class="muted">Written on paper. Mark your page.</p>':'<p class="hand" style="font-size:24px">Left blank. On the real exam, write the skeleton.</p>'}
+      ${answerHTML(c)}${rubricHTML(c,'m'+n)}${c.why?`<p class="why">${esc(c.why)}</p>`:''}</section>`}).join('')}
+  <div class="total"><span><span class="score" id="tot">0 / 100</span> <span id="verdict" class="muted"></span></span>
+    <span class="row"><button class="btn ghost" id="redo">Practice what I missed</button><button class="btn" id="saveMock">Save score</button></span></div>`;
+  const calc=()=>{let tot=0,missed=[];qs.forEach(([id,pts],n)=>{const bs=[...document.querySelectorAll(`[data-q="${n}"] .rubric input`)],k=bs.filter(b=>b.checked).length,
+      p=Math.round(pts*k/bs.length*2)/2;tot+=p;$('#g'+n).textContent=p+' / '+pts;if(k<bs.length)missed.push(id)});
+    $('#tot').textContent=tot+' / 100';$('#verdict').textContent=tot>=80?'At or above 80.':'Need '+(80-tot)+' more points for 80.';return {tot,missed}};
+  view.onclick=null;view.onchange=calc;calc();
+  $('#saveMock').onclick=()=>{const {tot}=calc();S.mock[M.k]=Math.max(S.mock[M.k]||0,tot);save();V.mock=null;view.onchange=null;go('plan')};
+  $('#redo').onclick=()=>{const {tot,missed}=calc();S.mock[M.k]=Math.max(S.mock[M.k]||0,tot);
+    missed.forEach(id=>{const r=S.cards[id]||{n:0,lvl:0};r.ready=false;S.cards[id]=r});save();V.mock=null;view.onchange=null;
+    if(missed.length){V.tab='practice';open(missed[0])}else go('plan')};
+}
+
+const h0=location.hash.slice(1);if(['plan','practice','mock'].includes(h0))V.tab=h0;
+render();
+</script>
+</body>
+</html>
