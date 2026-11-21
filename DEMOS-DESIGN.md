@@ -2,6 +2,8 @@
 
 Russ chose Tufte CSS as the visual world for every demo, and Impeccable as the design method. This file governs the demo pages only. The home page and blog keep `design.md`.
 
+**Exception, 2026-11-20 (Russ: "each demo should match the ui of the company i am applying to"; asked which rule wins, he chose "company look wins").** A demo built for one employer takes that employer's visual language instead of this file: palette, type, spacing, radius and component style pulled from their public site and recorded in the package's `research\ui_tokens.md`. Open-licensed fonts only (the closest open font when theirs is commercial), inlined so the page makes no runtime requests. No logos, wordmarks, product screenshots or copied markup; the independence banner stays. The numbers, gates, voice rules and the 375 px and 320 px checks in this file still apply. Shared demos used for several targets stay on Tufte. Per-company so far: `mandate-desk` (Sanity), `limit-desk` (Mercury).
+
 ## Why this world
 
 The demos are work samples a lender, a credit team or a finance operator reads to judge whether Russ thinks clearly. They should read like an analyst's report or a credit memo: a document first, with the working controls set into it. The old look (dark hero, lime pills, chip cards, giant KPI numbers, monospace everywhere, theme toggles) is the anti-reference.
