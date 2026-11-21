@@ -1,0 +1,110 @@
+/* russh.work demo extensions to Tufte CSS (2026-11-20).
+   Tufte CSS sets the reading world: ET Book, paper ground, sidenotes,
+   hairline rules. These rules add what a working demo needs and Tufte does
+   not ship: data tables, form controls, buttons, status text, focus,
+   selection, and a phone layout. One accent, a dark red, used for flags and
+   failures only. No pills, no cards, no eyebrows, no gradients, no shadows. */
+
+:root {
+    --paper: #fffff8;
+    --ink: #111;
+    --ink-2: #4a4a44;      /* secondary text, 8.6:1 on paper */
+    --rule: #c9c9bf;
+    --rule-strong: #111;
+    --tint: #f4f3e8;       /* quiet fill for a selected row or a note */
+    --accent: #8b1a1a;     /* flags and failures only, 8.9:1 on paper */
+    --ok: #2f5d34;         /* passes, 7.4:1 on paper */
+    --link: #111;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --paper: #151515;
+        --ink: #ddd;
+        --ink-2: #a9a9a0;
+        --rule: #3a3a36;
+        --rule-strong: #ddd;
+        --tint: #1f1f1c;
+        --accent: #e08a8a;
+        --ok: #9cc79f;
+        --link: #ddd;
+    }
+}
+
+body { background-color: var(--paper); color: var(--ink); }
+::selection { background: #e6e2c3; color: #111; }
+@media (prefers-color-scheme: dark) { ::selection { background: #4a4632; color: #eee; } }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+a:link, a:visited { color: var(--link); }
+
+/* Running text stays in the Tufte column; this keeps secondary text real. */
+.quiet, .muted, small { color: var(--ink-2); }
+p.subtitle { color: var(--ink-2); }
+
+/* The synthetic-data and affiliation notice: a plain italic line, not a banner. */
+.notice { font-style: italic; color: var(--ink-2); font-size: 1.2rem; line-height: 1.6; max-width: 55%; margin: 0.5rem 0 1.5rem; }
+
+/* Data tables: booktabs rules, lining tabular figures, numbers right-aligned. */
+.table-wrap { width: 55%; overflow-x: auto; margin: 1.4rem 0 2rem; }
+.table-wrap.wide { width: 100%; }
+table { border-collapse: collapse; width: 100%; font-size: 1.2rem; line-height: 1.45; font-variant-numeric: lining-nums tabular-nums; }
+caption { caption-side: top; text-align: left; font-style: italic; color: var(--ink-2); padding-bottom: 0.4rem; }
+thead th { font-weight: normal; font-style: italic; text-align: left; border-top: 2px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); padding: 0.35rem 0.75rem 0.35rem 0; vertical-align: bottom; }
+tbody td, tbody th { padding: 0.3rem 0.75rem 0.3rem 0; border-bottom: 1px solid var(--rule); vertical-align: top; text-align: left; font-weight: normal; }
+tbody tr:last-child td, tbody tr:last-child th { border-bottom: 2px solid var(--rule-strong); }
+tfoot td { padding: 0.35rem 0.75rem 0.35rem 0; border-bottom: 2px solid var(--rule-strong); font-weight: bold; }
+td.num, th.num { text-align: right; white-space: nowrap; }
+tr.selected td, tr[aria-selected="true"] td { background: var(--tint); }
+
+/* Figures that matter stay in the text, set as numbers, not as tiles. */
+.figure-line { font-size: 1.6rem; line-height: 1.4; max-width: 55%; }
+.figure-line .num { font-variant-numeric: lining-nums tabular-nums; }
+
+/* Status words, not badges. */
+.flag, .fail { color: var(--accent); }
+.pass { color: var(--ok); }
+.flag::before { content: "\2020\00a0"; } /* a dagger marks a flagged figure */
+
+/* Controls: plain, rectangular, readable. */
+button, input, select, textarea { font-family: inherit; font-size: 1.2rem; color: var(--ink); }
+button, .button {
+    background: transparent; color: var(--ink);
+    border: 1px solid var(--ink); border-radius: 2px;
+    padding: 0.3rem 0.9rem; cursor: pointer; line-height: 1.4;
+    transition: background-color 120ms ease-out, color 120ms ease-out;
+}
+button:hover, .button:hover { background: var(--ink); color: var(--paper); }
+button:active { transform: translateY(1px); }
+button:disabled { opacity: 0.45; cursor: not-allowed; background: transparent; color: var(--ink); }
+button[aria-pressed="true"], button.is-active { background: var(--ink); color: var(--paper); }
+input[type="text"], input[type="number"], input[type="search"], input:not([type]), select, textarea {
+    background: var(--paper); border: 1px solid var(--rule-strong); border-radius: 2px; padding: 0.25rem 0.4rem;
+}
+input[type="range"] { accent-color: var(--ink); }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--ink); }
+label { cursor: pointer; }
+fieldset { border: 0; padding: 0; margin: 1rem 0; }
+legend { font-style: italic; color: var(--ink-2); padding: 0; margin-bottom: 0.4rem; }
+.controls { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: center; margin: 1rem 0; max-width: 55%; }
+
+/* Disclosure for long detail: sources, rule text, audit records. */
+details { max-width: 55%; margin: 0.8rem 0; }
+details > summary { cursor: pointer; font-style: italic; }
+details[open] > summary { margin-bottom: 0.5rem; }
+
+/* Contents line under the title, instead of a pill navigation bar. */
+nav.contents { font-size: 1.2rem; max-width: 55%; margin: 0 0 2rem; color: var(--ink-2); }
+nav.contents a { margin-right: 1rem; white-space: nowrap; }
+
+/* Code and record dumps: monospace only for code and data. */
+pre, code { font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace; font-size: 1.0rem; }
+pre { overflow-x: auto; max-width: 55%; background: var(--tint); padding: 0.75rem 1rem; line-height: 1.45; }
+
+footer.colophon { max-width: 55%; margin: 4rem 0 3rem; padding-top: 1rem; border-top: 1px solid var(--rule); font-size: 1.1rem; color: var(--ink-2); }
+
+/* Phone: the Tufte column goes full width, sidenotes fold in as in tufte.css. */
+@media (max-width: 760px) {
+    .notice, .figure-line, .controls, details, nav.contents, pre, footer.colophon { max-width: 100%; }
+    .table-wrap, .table-wrap.wide { width: 100%; }
+    table { font-size: 1.1rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
