@@ -537,3 +537,25 @@ footer.colophon { max-width: 55%; margin: 4rem 0 3rem; padding-top: 1rem; border
     table { font-size: 1.1rem; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* Fixes from the first redesign batches (2026-11-20): every agent hit these. */
+.table-wrap.wide { width: 90%; clear: both; }
+.table-wrap.wide table { min-width: 34rem; }
+select { max-width: 100%; }
+section > div > p, section > div > ul, section > div > ol, header p { width: 55%; }
+p.subtitle { line-height: 1.25; }
+details > summary { font-size: 1.3rem; }
+footer.colophon p { font-size: inherit; width: auto; }
+table:not(:has(thead)) tbody tr:first-child td, table:not(:has(thead)) tbody tr:first-child th { border-top: 2px solid var(--rule-strong); }
+dl.kv { display: grid; grid-template-columns: max-content 1fr; gap: 0.3rem 1.25rem; max-width: 55%; font-size: 1.3rem; line-height: 1.5; }
+dl.kv dt { font-style: italic; color: var(--ink-2); }
+dl.kv dd { margin: 0; }
+td.hi, th.hi { background: var(--tint); }
+button.link { border: 0; padding: 0; background: none; text-decoration: underline; text-underline-offset: 0.15em; }
+button.link:hover { background: none; color: var(--ink); }
+.field { display: flex; flex-direction: column; gap: 0.25rem; margin: 0.75rem 0; max-width: 55%; }
+.field > label { font-style: italic; color: var(--ink-2); }
+@media (max-width: 760px) {
+  .table-wrap.wide { width: 100%; }
+  section > div > p, section > div > ul, section > div > ol, header p, dl.kv, .field { width: 100%; max-width: 100%; }
+}
