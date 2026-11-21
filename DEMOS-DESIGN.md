@@ -40,3 +40,8 @@ Eyebrows or kickers above headings. Section numbers like 01 / 02 unless the orde
 ## Verify before publishing
 
 Rendered in headless Chrome at 1280px and 375px: no console errors, no page-level sideways scroll, body text 4.5:1 or better, visible keyboard focus, every control still works, and the demo's own checks and publish gate still pass with unchanged figures.
+
+## Rebuilding
+
+Every demo with a build reads `assets/tufte/russh-tufte.css` at build time, so a change to the shared extensions changes those pages on their next rebuild. After editing `russh-extensions.css`, run `python assets/tufte/build_css.py`, then rebuild and rerun the render checks of every demo that inlines it before pushing. The pages published on 2026-11-20 were each verified against the stylesheet they were built with. Several pages carry a short page-level `<style>` that overrides shared rules; read it before changing a shared rule.
+
