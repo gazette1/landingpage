@@ -6,7 +6,7 @@ import { logVisit } from "../lib/visits/log.js";
 
 const DEMOS = [
   "back", "budget-desk", "covenant-desk", "covenant-review", "deal-intake",
-  "deploy-desk", "eligibility-desk", "feasibility-desk", "first-pass",
+  "deploy-desk", "eligibility-desk", "enablement-plan", "feasibility-desk", "first-pass",
   "intake-copilot", "leakage-desk", "lender-first-14-days", "limit-desk",
   "mandate-desk", "mortgage-fde", "outcome-desk", "payoff-desk",
   "portfolio-sentinel", "qap-engine", "rate-desk", "realization-guard",
